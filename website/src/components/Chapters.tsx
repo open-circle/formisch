@@ -88,12 +88,23 @@ export const Chapters = component$(() => {
     );
 
     // Observe every heading element
-    headings.value.forEach((heading) =>
-      observer.observe(document.getElementById(heading.id)!)
+    // Hint: There seems to be a bug in Qwik v2 that forces us to delay the observation
+    const timeout = setTimeout(
+      () =>
+        headings.value.forEach((heading) => {
+          const element = document.getElementById(heading.id);
+          if (element) {
+            observer.observe(element);
+          }
+        }),
+      250
     );
 
-    // Disconnect observer on cleanup
-    cleanup(() => observer.disconnect());
+    // Clear timeout and disconnect observer on cleanup
+    cleanup(() => {
+      clearTimeout(timeout);
+      observer.disconnect();
+    });
   });
 
   // Update indicator style when active ID changes
