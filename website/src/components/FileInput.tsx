@@ -10,6 +10,7 @@ interface FileInputProps extends FieldElementProps {
   class?: string;
   label?: string;
   accept?: string;
+  required?: boolean;
   multiple?: boolean;
   input: ReadonlySignal<File | File[] | null | undefined>;
   errors: ReadonlySignal<[string, ...string[]] | null>;

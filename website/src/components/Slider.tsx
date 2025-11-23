@@ -10,6 +10,7 @@ interface SliderProps extends FieldElementProps {
   min?: number;
   max?: number;
   step?: number;
+  required?: boolean;
   input: ReadonlySignal<string | number | undefined>;
   errors: ReadonlySignal<[string, ...string[]] | null>;
 }
