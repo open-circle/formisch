@@ -1,6 +1,7 @@
 import { $, component$, useSignal, useVisibleTask$ } from '@qwik.dev/core';
-import { Link, useLocation } from '@qwik.dev/router';
+import { useLocation } from '@qwik.dev/router';
 import clsx from 'clsx';
+import { Link } from './Link';
 
 type TabsProps = {
   items: string[];
@@ -62,7 +63,6 @@ export const Tabs = component$((props: TabsProps) => {
                     : 'hover:text-slate-900 dark:hover:text-slate-200'
                 )}
                 href={`..${href}`}
-                prefetch={false}
                 onClick$={(_, element) =>
                   element.scrollIntoView({
                     block: 'nearest',

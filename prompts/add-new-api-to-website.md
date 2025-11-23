@@ -1179,8 +1179,7 @@ contributors:
   - github-username
 ---
 
-import { Link } from '@qwik.dev/router';
-import { ApiList, Property } from '~/components';
+import { ApiList, Link, Property } from '~/components';
 import { properties } from './properties';
 
 # functionName
@@ -1515,8 +1514,7 @@ contributors:
 Always import these at the top (after front matter):
 
 ```typescript
-import { Link } from '@qwik.dev/router';
-import { ApiList, Property } from '~/components';
+import { ApiList, Link, Property } from '~/components';
 import { properties } from './properties';
 ```
 
@@ -3287,8 +3285,7 @@ Before submitting a new API route, verify:
 
 ```typescript
 // In index.mdx
-import { Link } from '@qwik.dev/router';
-import { ApiList, Property } from '~/components';
+import { ApiList, Link, Property } from '~/components';
 // In properties.ts
 import type { PropertyProps } from '~/components';
 import { properties } from './properties';

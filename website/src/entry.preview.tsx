@@ -10,8 +10,8 @@
  * - https://vitejs.dev/config/preview-options.html#preview-options
  *
  */
-import { createQwikRouter } from '@qwik.dev/router/middleware/node';
 import qwikRouterConfig from '@qwik-router-config';
+import { createQwikRouter } from '@qwik.dev/router/middleware/node';
 import render from './entry.ssr';
 
 /**

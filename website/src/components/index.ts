@@ -20,6 +20,7 @@ export * from './Header';
 export * from './IconButton';
 export * from './InputErrors';
 export * from './InputLabel';
+export * from './Link';
 export * from './MainMenuToggle';
 export * from './Navigation';
 export * from './PostCover';

@@ -1,6 +1,6 @@
 import { component$, Fragment } from '@qwik.dev/core';
-import { Link } from '@qwik.dev/router';
 import clsx from 'clsx';
+import { Link } from './Link';
 
 type DefinitionData =
   | 'string'
@@ -369,11 +369,7 @@ const Definition = component$<DefinitionProps>(({ parent, data }) => (
               ))}
             </a>
           ) : (
-            <Link
-              class="text-sky-600 dark:text-sky-400"
-              href={data.href}
-              prefetch={false}
-            >
+            <Link class="text-sky-600 dark:text-sky-400" href={data.href}>
               {data.name.split('.').map((part, index) => (
                 <Fragment key={index}>
                   {index > 0 && (

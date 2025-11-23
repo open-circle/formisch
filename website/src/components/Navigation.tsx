@@ -4,10 +4,11 @@ import {
   useSignal,
   useVisibleTask$,
 } from '@qwik.dev/core';
-import { type ContentMenu, Link, useLocation } from '@qwik.dev/router';
+import { type ContentMenu, useLocation } from '@qwik.dev/router';
 import clsx from 'clsx';
 import { useMenu } from '~/routes/plugin@menu';
 import { FrameworkPicker } from './FrameworkPicker';
+import { Link } from './Link';
 
 type NavigationProps = {
   class?: string;
@@ -138,7 +139,6 @@ const NavItem = component$<NavItemProps>(({ navElement, text, items }) => {
                     : 'hover:text-slate-800 dark:hover:text-slate-300'
                 )}
                 href={href}
-                prefetch={false}
               >
                 {text}
               </Link>

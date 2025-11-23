@@ -1,5 +1,5 @@
 import { $, component$, useOnDocument, useSignal } from '@qwik.dev/core';
-import { Form, Link, useLocation } from '@qwik.dev/router';
+import { Form, useLocation } from '@qwik.dev/router';
 import clsx from 'clsx';
 import { useFocusTrap } from '~/hooks';
 import { AngleUpIcon } from '~/icons';
@@ -12,6 +12,7 @@ import {
   useSetFramework,
 } from '~/routes/plugin@framework';
 import { useOtherMenuHrefs } from '~/routes/plugin@menu';
+import { Link } from './Link';
 
 type FrameworkPickerProps = {
   class?: string;
@@ -124,7 +125,6 @@ export const FrameworkPicker = component$<FrameworkPickerProps>((props) => {
                     key={item}
                     class="focus-ring flex items-center gap-2.5 rounded-xl px-3.5 py-2 hover:text-slate-900 dark:hover:text-slate-200"
                     href={getPathname(item)}
-                    prefetch={false}
                     onClick$={() => (isOpen.value = false)}
                   >
                     <FrameworkIcon class="mr-2.5 h-[22px]" />

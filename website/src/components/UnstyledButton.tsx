@@ -1,5 +1,5 @@
 import { component$, type QRLEventHandlerMulti, Slot } from '@qwik.dev/core';
-import { Link } from '@qwik.dev/router';
+import { Link } from './Link';
 
 export type LinkButtonProps = {
   class?: string;
@@ -41,7 +41,7 @@ export const UnstyledButton = component$((props: UnstyledButtonProps) => {
 
     // Internal link
     return (
-      <Link {...props} prefetch={false}>
+      <Link {...props}>
         <Slot />
       </Link>
     );

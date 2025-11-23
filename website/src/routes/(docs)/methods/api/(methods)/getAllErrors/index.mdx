@@ -6,8 +6,7 @@ contributors:
   - fabian-hiller
 ---
 
-import { Link } from '@qwik.dev/router';
-import { ApiList, Property } from '~/components';
+import { ApiList, Link, Property } from '~/components';
 import { properties } from './properties';
 
 # getAllErrors
@@ -34,11 +33,7 @@ The `form` parameter is the form store to retrieve errors from. The function wal
 
 ### Primitives
 
-<ApiList
-  items={[
-    { text: 'createForm', href: '/solid/api/createForm/' },
-  ]}
-/>
+<ApiList items={[{ text: 'createForm', href: '/solid/api/createForm/' }]} />
 
 ### Methods
 

@@ -6,8 +6,7 @@ contributors:
   - fabian-hiller
 ---
 
-import { Link } from '@qwik.dev/router';
-import { ApiList, Property } from '~/components';
+import { ApiList, Link, Property } from '~/components';
 import { properties } from './properties';
 
 # submit
@@ -30,11 +29,7 @@ The `form` parameter is the form store to submit. The function triggers form sub
 
 ### Primitives
 
-<ApiList
-  items={[
-    { text: 'createForm', href: '/solid/api/createForm/' },
-  ]}
-/>
+<ApiList items={[{ text: 'createForm', href: '/solid/api/createForm/' }]} />
 
 ### Methods
 
