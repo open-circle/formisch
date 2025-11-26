@@ -5,7 +5,7 @@ All notable changes to the library will be documented in this file.
 ## vX.X.X (Month DD, YYYY)
 
 - Add support for returning error messages of normal objects in `handleSubmit` method (pull request #11)
-- Fix `isDirty` in `reset` to handle `null` like `undefined` for empty string and `NaN` comparisons (issue #38)
+- Fix `isDirty` in `reset` to handle `null` like `undefined` for empty string and `NaN` comparisons (pull request #40)
 
 ## v0.4.1 (October 31, 2025)
 
