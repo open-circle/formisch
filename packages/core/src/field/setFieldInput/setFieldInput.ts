@@ -142,8 +142,8 @@ function setNestedInput(
     internalFieldStore.isDirty.value =
       startInput !== input &&
       // Hint: This check ensures that an empty string or `NaN` does not mark
-      // the field as dirty if the start input was `undefined`.
-      (startInput !== undefined || (input !== '' && !Number.isNaN(input)));
+      // the field as dirty if the start input was `undefined` or `null`.
+      (startInput != null || (input !== '' && !Number.isNaN(input)));
   }
 }
 
