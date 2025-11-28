@@ -1,11 +1,12 @@
 ---
 title: Special inputs
 description: >-
-  Learn how to use special HTML form inputs like checkboxes, select elements,
+  Learn how to use special HTML form inputs like checkboxes, radio buttons, select elements,
   and file inputs with Formisch. This guide covers both single and multiple
   value scenarios for each input type.
 contributors:
   - fabian-hiller
+  - jaydiablo
 ---
 
 import { Link } from '~/components';
@@ -43,6 +44,28 @@ However, you can also use multiple checkboxes to represent an array of strings. 
           type="checkbox"
           {value}
           checked={field.input?.includes(value)}
+        />
+        {label}
+      </label>
+    {/snippet}
+  </Field>
+{/each}
+```
+
+## Radio 
+
+A group of radio buttons, while similar to an array of checkboxes, will only allow you to select one of the options based on which button is checked.
+
+```svelte
+{#each [{ label: 'Bananas', value: 'bananas' }, { label: 'Apples', value: 'apples' }, { label: 'Grapes', value: 'grapes' }] as { label, value }}
+  <Field of={form} path={['fruits']}>
+    {#snippet children(field)}
+      <label>
+        <input
+          {...field.props}
+          type="radio"
+          {value}
+          checked={field.input === value}
         />
         {label}
       </label>

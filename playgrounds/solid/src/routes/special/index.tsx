@@ -6,6 +6,7 @@ import {
   FileInput,
   FormFooter,
   FormHeader,
+  Radio,
   Select,
   Slider,
   TextInput,
@@ -19,6 +20,7 @@ const SpecialFormSchema = v.object({
     array: v.array(v.string()),
     boolean: v.optional(v.boolean(), false),
   }),
+  radio: v.optional(v.string()),
   select: v.object({
     array: v.array(v.string()),
     string: v.optional(v.string()),
@@ -106,6 +108,35 @@ export default function SpecialPage() {
               />
             )}
           </Field>
+
+          <label class="block px-8 font-medium md:text-lg lg:mb-5 lg:px-10 lg:text-xl">
+            Radio group
+          </label>
+
+          <div class="mx-8 flex flex-wrap gap-6 rounded-2xl border-2 border-slate-200 p-6 lg:gap-10 lg:p-10 dark:border-slate-800">
+            <For
+              each={[
+                { label: 'Option 1', value: 'option_1' },
+                { label: 'Option 2', value: 'option_2' },
+                { label: 'Option 3', value: 'option_3' },
+              ]}
+            >
+              {({ label, value }) => (
+                <Field of={specialForm} path={['radio']}>
+                  {(field) => (
+                    <Radio
+                      {...field.props}
+                      class="!p-0"
+                      label={label}
+                      value={value}
+                      input={field.input === value}
+                      errors={field.errors}
+                    />
+                  )}
+                </Field>
+              )}
+            </For>
+          </div>
 
           <Field of={specialForm} path={['select', 'array']}>
             {(field) => (

@@ -9,6 +9,7 @@ export { default as FormFooter } from './FormFooter.svelte';
 export { default as FormHeader } from './FormHeader.svelte';
 export { default as InputErrors } from './InputErrors.svelte';
 export { default as InputLabel } from './InputLabel.svelte';
+export { default as Radio } from './Radio.svelte';
 export { default as Select } from './Select.svelte';
 export { default as Slider } from './Slider.svelte';
 export { default as Spinner } from './Spinner.svelte';

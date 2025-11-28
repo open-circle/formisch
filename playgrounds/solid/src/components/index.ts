@@ -9,6 +9,7 @@ export * from './FormFooter';
 export * from './FormHeader';
 export * from './InputErrors';
 export * from './InputLabel';
+export * from './Radio';
 export * from './Select';
 export * from './Slider';
 export * from './Spinner';
