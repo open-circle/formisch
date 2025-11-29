@@ -15,7 +15,7 @@
   "dependencies": {
     "@formisch/svelte": "workspace:*",
     "@formkit/auto-animate": "^0.9.0",
-    "valibot": "^1.1.0"
+    "valibot": "^1.2.0"
   },
   "devDependencies": {
     "@eslint/compat": "^1.3.2",

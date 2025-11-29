@@ -50,7 +50,7 @@
     "tsdown": "^0.16.8",
     "typescript": "~5.8.3",
     "unplugin-vue": "^7.0.0",
-    "valibot": "^1.1.0",
+    "valibot": "^1.2.0",
     "vue": "^3.5.18",
     "vue-tsc": "^3.0.4"
   },

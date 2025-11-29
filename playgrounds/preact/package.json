@@ -17,7 +17,7 @@
     "clsx": "^2.1.1",
     "preact": "^10.25.3",
     "preact-iso": "^2.9.2",
-    "valibot": "^1.1.0"
+    "valibot": "^1.2.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.9.3",

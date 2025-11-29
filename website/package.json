@@ -65,7 +65,7 @@
     "@formisch/qwik": "workspace:*",
     "clsx": "^2.1.1",
     "satori-html": "^0.3.2",
-    "valibot": "^1.1.0"
+    "valibot": "^1.2.0"
   },
   "engines": {
     "node": ">=22.0.0"

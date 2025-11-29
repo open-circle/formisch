@@ -81,7 +81,7 @@
     "tsdown": "^0.16.8",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.36.0",
-    "valibot": "^1.1.0",
+    "valibot": "^1.2.0",
     "vitest": "3.2.4",
     "vue": "^3.5.17"
   },
