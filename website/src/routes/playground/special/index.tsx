@@ -12,6 +12,7 @@ import {
   FileInput,
   FormFooter,
   FormHeader,
+  RadioGroup,
   Select,
   Slider,
   TextInput,
@@ -25,6 +26,7 @@ const SpecialFormSchema = v.object({
     array: v.array(v.string()),
     boolean: v.optional(v.boolean(), false),
   }),
+  radio: v.optional(v.string()),
   select: v.object({
     array: v.array(v.string()),
     string: v.optional(v.string()),
@@ -129,6 +131,24 @@ export default component$(() => {
               input={field.input}
               errors={field.errors}
               label="Checkbox boolean"
+            />
+          )}
+        />
+
+        <Field
+          of={specialForm}
+          path={['radio']}
+          render$={(field) => (
+            <RadioGroup
+              {...field.props}
+              label="Radio group"
+              options={[
+                { label: 'Option 1', value: 'option_1' },
+                { label: 'Option 2', value: 'option_2' },
+                { label: 'Option 3', value: 'option_3' },
+              ]}
+              input={field.input}
+              errors={field.errors}
             />
           )}
         />

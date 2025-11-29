@@ -2,6 +2,7 @@ import { component$ } from '@qwik.dev/core';
 import clsx from 'clsx';
 
 type InputLabelProps = {
+  component?: 'label' | 'legend' | 'div';
   name?: string;
   label?: string;
   required?: boolean;
@@ -12,8 +13,8 @@ type InputLabelProps = {
  * Input label for a form field.
  */
 export const InputLabel = component$(
-  ({ name, label, required, margin }: InputLabelProps) => {
-    const Element = name ? 'label' : 'div';
+  ({ component, name, label, required, margin }: InputLabelProps) => {
+    const Element = component ?? (name ? 'label' : 'div');
     return (
       <>
         {label && (
