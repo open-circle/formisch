@@ -5,6 +5,7 @@ import pluginSecurity from 'eslint-plugin-security';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
+  { ignores: ['eslint.config.js', 'tsdown.config.ts'] },
   eslint.configs.recommended,
   tseslint.configs.strict,
   tseslint.configs.stylistic,
@@ -12,7 +13,6 @@ export default tseslint.config(
   pluginSecurity.configs.recommended,
   {
     files: ['src/**/*.ts'],
-    ignores: ['eslint.config.js'],
     extends: [importPlugin.flatConfigs.recommended],
     languageOptions: {
       parserOptions: {
