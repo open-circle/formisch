@@ -1,7 +1,7 @@
 {
   "name": "@formisch/svelte",
   "description": "The modular and type-safe form library for Svelte",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",
@@ -18,11 +18,11 @@
   ],
   "type": "module",
   "main": "./dist/index.js",
-  "types": "./dist/types/index.d.ts",
+  "types": "./dist/index.d.ts",
   "svelte": "./dist/index.js",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/index.d.ts",
       "svelte": "./dist/index.js"
     }
   },

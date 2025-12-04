@@ -1,4 +1,5 @@
 import { Field, Form, useForm } from '@formisch/preact';
+import { computed } from '@preact/signals';
 import * as v from 'valibot';
 import {
   Checkbox,

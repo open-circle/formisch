@@ -110,7 +110,11 @@ function updateImportPaths(filePath) {
   );
 
   // Remove `.ts` extension from imports
-  if (filePath.endsWith('.js') || filePath.endsWith('.svelte')) {
+  if (
+    filePath.endsWith('.js') ||
+    filePath.endsWith('.svelte') ||
+    filePath.endsWith('.d.ts')
+  ) {
     newContent = newContent.replace(
       /((?:import|export) .* from ['"].*)\.ts(['"])/g,
       '$1$2'

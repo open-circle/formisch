@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.5.4 (November 29, 2025)
+
+- Fix types of build output and update package.json exports
+
 ## v0.5.3 (November 29, 2025)
 
 - Fix build output extensions to match package.json exports
