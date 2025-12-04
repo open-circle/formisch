@@ -11,7 +11,7 @@
   },
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@9.15.2",
+  "packageManager": "pnpm@10.24.0",
   "scripts": {
     "build": "pnpm run build-packages && pnpm run build-frameworks",
     "build-packages": "pnpm --filter './packages/*' build",

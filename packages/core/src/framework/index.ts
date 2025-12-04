@@ -5,7 +5,13 @@ import type { Signal } from '../types/index.ts';
 /**
  * Framework type.
  */
-export type Framework = 'preact' | 'qwik' | 'solid' | 'svelte' | 'vue';
+export type Framework =
+  | 'preact'
+  | 'qwik'
+  | 'solid'
+  | 'svelte'
+  | 'vanilla'
+  | 'vue';
 
 /**
  * The current framework being used.

@@ -42,6 +42,10 @@
       "types": "./dist/index.svelte.d.ts",
       "default": "./dist/index.svelte.js"
     },
+    "./vanilla": {
+      "types": "./dist/index.vanilla.d.ts",
+      "default": "./dist/index.vanilla.js"
+    },
     "./vue": {
       "types": "./dist/index.vue.d.ts",
       "default": "./dist/index.vue.js"

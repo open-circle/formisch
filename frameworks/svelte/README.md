@@ -2,7 +2,7 @@
 
 Formisch is a schema-based, headless form library for Svelte. It manages form state and validation. It is type-safe, fast by default and its bundle size is small due to its modular design. Try it out in our [playground](https://stackblitz.com/edit/formisch-playground-svelte)!
 
-Formisch is also available for [Preact][formisch-preact], [Qwik][formisch-qwik], [SolidJS][formisch-solid], and [Vue][formisch-vue].
+Formisch is also available for [Preact][formisch-preact], [Qwik][formisch-qwik], [React][formisch-react], [SolidJS][formisch-solid], and [Vue][formisch-vue].
 
 ## Highlights
 
@@ -77,5 +77,6 @@ This project is available free of charge and licensed under the [MIT license](ht
 
 [formisch-preact]: https://github.com/open-circle/formisch/tree/main/frameworks/preact
 [formisch-qwik]: https://github.com/open-circle/formisch/tree/main/frameworks/qwik
+[formisch-react]: https://github.com/open-circle/formisch/tree/main/frameworks/react
 [formisch-solid]: https://github.com/open-circle/formisch/tree/main/frameworks/solid
 [formisch-vue]: https://github.com/open-circle/formisch/tree/main/frameworks/vue

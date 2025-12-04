@@ -11,7 +11,7 @@ import { computed, useComputed } from '@preact/signals';
 import { useMemo } from 'preact/hooks';
 import type * as v from 'valibot';
 import type { FieldArrayStore, FormStore } from '../../types/index.ts';
-import { usePathSignal } from '../usePathSignal/usePathSignal.ts';
+import { usePathSignal } from '../usePathSignal/index.ts';
 
 /**
  * Use field array config interface.
