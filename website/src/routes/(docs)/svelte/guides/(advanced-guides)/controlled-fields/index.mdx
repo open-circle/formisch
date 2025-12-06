@@ -44,19 +44,16 @@ Since not every input into an `<input type="number" />` field is a valid number,
 
 ```svelte
 <script lang="ts">
-  type NumberInputProps = {
-    name: string;
+  import type { FieldElementProps } from '@formisch/svelte';
+
+  interface NumberInputProps extends FieldElementProps {
     type: 'number';
     label?: string;
     placeholder?: string;
     input: number | undefined;
     errors: [string, ...string[]] | null;
     required?: boolean;
-    onfocus?: (event: FocusEvent) => void;
-    oninput?: (event: InputEvent) => void;
-    onchange?: (event: Event) => void;
-    onblur?: (event: FocusEvent) => void;
-  };
+  }
 
   let {
     name,
@@ -105,19 +102,16 @@ A date or a number representing a date must be converted to a string before it c
 
 ```svelte
 <script lang="ts">
-  type DateInputProps = {
-    name: string;
+  import type { FieldElementProps } from '@formisch/svelte';
+
+  interface DateInputProps extends FieldElementProps {
     type: 'date';
     label?: string;
     placeholder?: string;
     input: Date | number | undefined;
     errors: [string, ...string[]] | null;
     required?: boolean;
-    onfocus?: (event: FocusEvent) => void;
-    oninput?: (event: InputEvent) => void;
-    onchange?: (event: Event) => void;
-    onblur?: (event: FocusEvent) => void;
-  };
+  }
 
   let {
     name,

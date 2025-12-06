@@ -34,7 +34,7 @@ export const properties: Record<string, PropertyProps> = {
     type: {
       type: 'custom',
       name: 'ValidArrayPath',
-      href: '../ValidArrayPath/',
+      href: '/core/api/ValidArrayPath/',
       generics: [
         {
           type: 'custom',
