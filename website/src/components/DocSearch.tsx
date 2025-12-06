@@ -95,8 +95,8 @@ export const DocSearch = component$<DocSearchProps>(({ open }) => {
   const modalElement = useSignal<HTMLDivElement>();
   const inputElement = useSignal<HTMLInputElement>();
 
-  // Use storage, recent, result and clicked signal
-  const storage = useStorageSignal<SearchStorage>('search-index', {});
+  // Use index, recent, result and clicked signal
+  const index = useStorageSignal<SearchStorage>('search-index', {});
   const recent = useStorageSignal<SearchItem[]>('search-recent', []);
   const result = useSignal<SearchItem[]>([]);
   const clicked = useSignal<SearchItem | null>(null);
@@ -168,7 +168,8 @@ export const DocSearch = component$<DocSearchProps>(({ open }) => {
     // If input is present, query and set search result
     if (currentInput) {
       // Get its current value
-      const storageValue = storage.value[currentInput];
+      const cacheKey = `${framework.value}: ${currentInput}`;
+      const storageValue = index.value[cacheKey];
 
       // Set result of index values is present and not expired
       if (storageValue && storageValue.expires >= Date.now()) {
@@ -244,10 +245,10 @@ export const DocSearch = component$<DocSearchProps>(({ open }) => {
               return searchItem;
             });
 
-            // Add search result to search storage
-            storage.value = {
-              ...storage.value,
-              [currentInput]: {
+            // Add search result to search index
+            index.value = {
+              ...index.value,
+              [cacheKey]: {
                 result: searchResult,
                 expires: Date.now() + 6.048e8, // 7 days
               },
