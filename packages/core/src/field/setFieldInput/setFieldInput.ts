@@ -176,12 +176,11 @@ export function setFieldInput(
         // If not at target field, mark parent input as truthy
         if (index < path.length - 1) {
           internalFieldStore.input.value = true;
-
-          // Otherwise, set nested input on target field
-        } else {
-          setNestedInput(internalFieldStore, input);
         }
       }
+
+      // Set nested input on target field
+      setNestedInput(internalFieldStore, input);
     });
   });
 }

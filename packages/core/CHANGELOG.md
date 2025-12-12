@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.4.4 (December 11, 2025)
+
+- Fix `setFieldInput` not setting input if path is empty array (issue #46)
+
 ## v0.4.3 (November 29, 2025)
 
 - Fix radio button value handling in `getElementInput` (pull request #39)
