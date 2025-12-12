@@ -2,6 +2,11 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.5.5 (December 11, 2025)
+
+- Change `@formisch/core` to v0.4.4
+- Change `@formisch/methods` to v0.5.2
+
 ## v0.5.4 (November 29, 2025)
 
 - Fix types of build output and update package.json exports

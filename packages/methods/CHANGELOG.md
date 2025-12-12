@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.5.2 (December 11, 2025)
+
+- Change `@formisch/core` to v0.4.4
+
 ## v0.5.1 (November 28, 2025)
 
 - Fix return type of `handleSubmit` method to return a function that returns a Promise (issue #41)
