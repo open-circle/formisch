@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix `initialInput` passed to `initializeFieldStore` for nullish wrapper schemas (pull request #48)
+
 ## v0.4.4 (December 11, 2025)
 
 - Fix `setFieldInput` not setting input if path is empty array (issue #46)
