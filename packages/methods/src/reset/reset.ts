@@ -3,6 +3,7 @@ import {
   batch,
   type DeepPartial,
   getFieldStore,
+  getSchemaLevelBehavior,
   INTERNAL,
   type PathValue,
   type RequiredPath,
@@ -178,12 +179,17 @@ export function reset(
 
           // If it is a value, reset value specific state
         } else {
+          const behavior = getSchemaLevelBehavior(
+            internalFormStore,
+            internalFieldStore.schema
+          );
+
           // Update is dirty to reflect changes
           // TODO: Should we add support for Dates and Files?
           const startInput = internalFieldStore.startInput.value;
           const input = internalFieldStore.input.value;
           internalFieldStore.isDirty.value =
-            startInput !== input &&
+            !behavior.equals(startInput, input) &&
             // Hint: This check ensures that an empty string or `NaN` does not mark
             // the field as dirty if the start input was `undefined` or `null`.
             (startInput != null || (input !== '' && !Number.isNaN(input)));

@@ -15,6 +15,9 @@ export interface SchemaLevelBehavior {
  * You can customize the behavior of schema-level operations such as equality checks
  * and value transformations by implementing the `schemaLevelBehavior` function.
  *
+ * - These customizations only work on fields with `kind === "value"`.
+ * - The transform is not applied when setting initial input.
+ *
  * This function receives a schema and should return an object containing partial
  * `SchemaLevelBehavior` settings (`equals` and/or `transform` functions) that will
  * be applied to all fields using that schema instance.

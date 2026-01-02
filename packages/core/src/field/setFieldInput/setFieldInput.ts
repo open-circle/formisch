@@ -1,4 +1,5 @@
 import { batch, createId, untrack } from '../../framework/index.ts';
+import { getSchemaLevelBehavior } from '../../index.ts';
 import type {
   InternalFieldStore,
   InternalFormStore,
@@ -11,10 +12,12 @@ import { initializeFieldStore } from '../initializeFieldStore/index.ts';
  * Sets the input for a nested field store and all its children, updating
  * touched and dirty states accordingly. Handles dynamic array resizing.
  *
+ * @param internalFormStore
  * @param internalFieldStore The field store to update.
  * @param input The new input value.
  */
 function setNestedInput(
+  internalFormStore: InternalFormStore,
   internalFieldStore: InternalFieldStore,
   input: unknown
 ): void {
@@ -96,6 +99,7 @@ function setNestedInput(
     ) {
       // Recursively set nested input
       setNestedInput(
+        internalFormStore,
         internalFieldStore.children[index],
         // @ts-expect-error
         arrayInput[index]
@@ -116,6 +120,7 @@ function setNestedInput(
     for (const key in internalFieldStore.children) {
       // Recursively set nested input
       setNestedInput(
+        internalFormStore,
         internalFieldStore.children[key],
         // @ts-expect-error
         input?.[key]
@@ -131,8 +136,13 @@ function setNestedInput(
 
     // Otherwise, handle value field input
   } else {
+    const behavior = getSchemaLevelBehavior(
+      internalFormStore,
+      internalFieldStore.schema
+    );
+
     // Set value input
-    internalFieldStore.input.value = input;
+    internalFieldStore.input.value = behavior.transform(input);
 
     // TODO: Should we add support for Dates and Files?
     // Get start input for comparison
@@ -140,7 +150,7 @@ function setNestedInput(
 
     // Update dirty state with special handling for empty string and NaN
     internalFieldStore.isDirty.value =
-      startInput !== input &&
+      !behavior.equals(startInput, input) &&
       // Hint: This check ensures that an empty string or `NaN` does not mark
       // the field as dirty if the start input was `undefined` or `null`.
       (startInput != null || (input !== '' && !Number.isNaN(input)));
@@ -180,7 +190,7 @@ export function setFieldInput(
       }
 
       // Set nested input on target field
-      setNestedInput(internalFieldStore, input);
+      setNestedInput(internalFormStore, internalFieldStore, input);
     });
   });
 }
