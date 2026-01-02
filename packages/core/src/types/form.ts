@@ -1,5 +1,6 @@
 import type * as v from 'valibot';
 import type { INTERNAL } from '../values.ts';
+import type { AdvancedCustomizations, SchemaLevelBehavior } from './custom.ts';
 import type { InternalObjectStore } from './field.ts';
 import type { Schema } from './schema.ts';
 import type { Signal } from './signal.ts';
@@ -36,6 +37,10 @@ export interface FormConfig<TSchema extends Schema = Schema> {
    * The revalidation mode of the form.
    */
   readonly revalidate?: Exclude<ValidationMode, 'initial'> | undefined;
+  /**
+   * Advanced customization of the form.
+   */
+  readonly custom?: Partial<AdvancedCustomizations>;
 }
 
 /**
@@ -64,7 +69,10 @@ export interface InternalFormStore<TSchema extends Schema = Schema>
    * The parse function of the form.
    */
   parse: (input: unknown) => Promise<v.SafeParseResult<TSchema>>;
-
+  /**
+   * The advanced customizations of the form. Set directly from the form config.
+   */
+  custom: Partial<AdvancedCustomizations>;
   /**
    * The submitting state of the form.
    */
