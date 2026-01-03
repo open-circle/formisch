@@ -1,5 +1,11 @@
 import type { Schema } from './schema.ts';
 
+/**
+ * Defines behavior functions for schema-level operations.
+ *
+ * - `equals`: A function to determine equality between two values. Used to set `isDirty` state.
+ * - `transform`: A function to transform input values before they are set in the form state.
+ */
 export interface SchemaLevelBehavior {
   equals: (a: unknown, b: unknown) => boolean;
   transform: (value: unknown) => unknown;
@@ -44,7 +50,14 @@ export interface SchemaLevelBehavior {
  * Note that, customizations can also be done on an specific schema instance
  * by setting {@link SchemaLevelBehavior} on the `"~formisch"` key.
  */
+
+/**
+ * Advanced configuration options for the form.
+ */
 export interface AdvancedConfig {
+  /**
+   * Customize the behavior of fields based on their schema.
+   */
   schemaLevelBehavior: (
     schema: Schema
   ) => Partial<SchemaLevelBehavior> | null | undefined;

@@ -1,1 +1,1 @@
-export * from './getSchemaLevelBehavior.ts';
+export * from './getSchemaLevelBehavior/index.ts';
