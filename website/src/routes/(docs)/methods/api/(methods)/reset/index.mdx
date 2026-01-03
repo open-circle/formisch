@@ -34,6 +34,17 @@ When called without a config or with `path` set to `undefined`, the entire form 
 
 By default, the form resets to its original initial input. However, you can pass a new `initialInput` in the config to update the form's baseline data. This is useful when remote data has changed and the form needs to reflect the updated values. Combined with `keepInput`, `keepTouched`, `keepErrors`, and `keepSubmitted`, you can update the initial state without overwriting the user's current edits.
 
+#### More context on dirty tracking
+
+Formisch distinguishes between two concepts:
+
+- **Initial input**: the baseline value used for dirty tracking (often the server state).
+- **Current input**: the value the user is currently editing (the client state).
+
+Calling `reset` updates the initial input (baseline). Depending on the `keep*` options, it can also overwrite the current input, or keep it and just recompute state like `isDirty` based on the new baseline.
+
+> If the initial input is `null` or `undefined`, Formisch does not treat an empty string or `NaN` as dirty. This helps when HTML inputs produce `''` or `NaN` for "empty" values.
+
 ## Related
 
 ### Primitives
