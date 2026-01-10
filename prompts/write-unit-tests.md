@@ -11,9 +11,8 @@ Guide for writing high-quality unit tests in `packages/core/` with proper TypeSc
 ## Core Principles
 
 1. **No type casts** — Get types right, don't use `as` assertions
-2. **Type guards over casts** — Use runtime checks that narrow types
-3. **Assertions before access** — Add `expect(...).toBe(...)` before narrowing
-4. **Real DOM elements** — Use `document.createElement()`, not mock objects
+2. **Type guards only when needed** — Use `if` blocks to narrow types only when TypeScript reports an error
+3. **Real DOM elements** — Use `document.createElement()`, not mock objects
 
 ---
 
@@ -94,6 +93,8 @@ type InternalFieldStore =
   | InternalValueStore; // has: kind: 'value', NO children property
 ```
 
+**When to use type guards:** Only use `if` blocks for type narrowing when TypeScript reports an error. If the code compiles without errors, no narrowing is needed.
+
 **❌ Bad — Type cast:**
 
 ```typescript
@@ -105,7 +106,7 @@ expect(
 ).toBe('a');
 ```
 
-**✅ Good — Type guard with assertion:**
+**✅ Good — Type guard with assertion (only when TS error occurs):**
 
 ```typescript
 const itemsStore = store.children.items;
@@ -115,7 +116,7 @@ if (itemsStore.kind === 'array') {
 }
 ```
 
-The pattern:
+The pattern (use only when TypeScript reports an error):
 
 1. **Extract to variable** — `const itemsStore = store.children.items;`
 2. **Assert the kind** — `expect(itemsStore.kind).toBe('array');` (test fails if wrong)

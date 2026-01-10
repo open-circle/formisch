@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
-import type { InternalFormStore } from '../../types/index.ts';
 import {
   arrayPath,
+  createTestStore,
   issue,
   objectPath,
   schemaIssue,
@@ -11,33 +11,11 @@ import {
 import { createFormStore } from '../createFormStore/createFormStore.ts';
 import { validateFormInput } from './validateFormInput.ts';
 
-function createMockStore<TSchema extends v.GenericSchema>(
-  schema: TSchema,
-  initialInput?: v.InferInput<TSchema>,
-  issues?: [v.BaseIssue<unknown>, ...v.BaseIssue<unknown>[]]
-): InternalFormStore {
-  const result: v.SafeParseResult<TSchema> = issues
-    ? {
-        typed: false,
-        success: false,
-        output: initialInput as v.InferOutput<TSchema>,
-        issues,
-      }
-    : {
-        typed: true,
-        success: true,
-        output: initialInput as v.InferOutput<TSchema>,
-        issues: undefined,
-      };
-  const parse = vi.fn().mockResolvedValue(result);
-  return createFormStore({ schema, initialInput }, parse);
-}
-
 describe('validateFormInput', () => {
   describe('successful validation', () => {
     test('should return success result when no issues', async () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, { name: 'John' });
+      const store = createTestStore(schema, { initialInput: { name: 'John' } });
 
       const result = await validateFormInput(store);
 
@@ -51,7 +29,9 @@ describe('validateFormInput', () => {
 
     test('should set all field errors to null on success', async () => {
       const schema = v.object({ name: v.string(), email: v.string() });
-      const store = createMockStore(schema, { name: 'John', email: 'a@b.c' });
+      const store = createTestStore(schema, {
+        initialInput: { name: 'John', email: 'a@b.c' },
+      });
 
       // Set some initial errors
       store.errors.value = ['root error'];
@@ -68,9 +48,10 @@ describe('validateFormInput', () => {
   describe('validation with errors', () => {
     test('should assign root errors for issues without path', async () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, { name: 'John' }, [
-        schemaIssue('Invalid type'),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { name: 'John' },
+        issues: [schemaIssue('Invalid type')],
+      });
 
       await validateFormInput(store);
 
@@ -79,9 +60,10 @@ describe('validateFormInput', () => {
 
     test('should assign nested errors for issues with path', async () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, { name: '' }, [
-        issue('Name is required', [objectPath('name')]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { name: '' },
+        issues: [issue('Name is required', [objectPath('name')])],
+      });
 
       await validateFormInput(store);
 
@@ -92,10 +74,13 @@ describe('validateFormInput', () => {
 
     test('should accumulate multiple errors on same field', async () => {
       const schema = v.object({ email: v.string() });
-      const store = createMockStore(schema, { email: '' }, [
-        issue('Email is required', [objectPath('email')]),
-        issue('Invalid email format', [objectPath('email')]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { email: '' },
+        issues: [
+          issue('Email is required', [objectPath('email')]),
+          issue('Invalid email format', [objectPath('email')]),
+        ],
+      });
 
       await validateFormInput(store);
 
@@ -107,9 +92,15 @@ describe('validateFormInput', () => {
 
     test('should handle nested object path', async () => {
       const schema = v.object({ user: v.object({ name: v.string() }) });
-      const store = createMockStore(schema, { user: { name: '' } }, [
-        issue('Name is required', [objectPath('user', {}), objectPath('name')]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { user: { name: '' } },
+        issues: [
+          issue('Name is required', [
+            objectPath('user', {}),
+            objectPath('name'),
+          ]),
+        ],
+      });
 
       await validateFormInput(store);
 
@@ -124,9 +115,12 @@ describe('validateFormInput', () => {
 
     test('should handle array path with index', async () => {
       const schema = v.object({ items: v.array(v.string()) });
-      const store = createMockStore(schema, { items: ['a', ''] }, [
-        issue('Item is required', [objectPath('items', []), arrayPath(1)]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { items: ['a', ''] },
+        issues: [
+          issue('Item is required', [objectPath('items', []), arrayPath(1)]),
+        ],
+      });
 
       await validateFormInput(store);
 
@@ -141,10 +135,13 @@ describe('validateFormInput', () => {
 
     test('should handle multiple root errors', async () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, { name: '' }, [
-        schemaIssue('First root error'),
-        schemaIssue('Second root error'),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { name: '' },
+        issues: [
+          schemaIssue('First root error'),
+          schemaIssue('Second root error'),
+        ],
+      });
 
       await validateFormInput(store);
 
@@ -165,9 +162,10 @@ describe('validateFormInput', () => {
         key: Symbol('test'),
         value: '',
       };
-      const store = createMockStore(schema, { name: '' }, [
-        issue('Symbol key error', [symbolPath, objectPath('name')]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { name: '' },
+        issues: [issue('Symbol key error', [symbolPath, objectPath('name')])],
+      });
 
       await validateFormInput(store);
 
@@ -185,9 +183,10 @@ describe('validateFormInput', () => {
         key: 'key',
         value: '',
       };
-      const store = createMockStore(schema, { name: '' }, [
-        issue('Map error', [mapPath]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { name: '' },
+        issues: [issue('Map error', [mapPath])],
+      });
 
       await validateFormInput(store);
 
@@ -204,9 +203,10 @@ describe('validateFormInput', () => {
         key: null,
         value: '',
       };
-      const store = createMockStore(schema, { name: '' }, [
-        issue('Set error', [setPath]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { name: '' },
+        issues: [issue('Set error', [setPath])],
+      });
 
       await validateFormInput(store);
 
@@ -223,13 +223,16 @@ describe('validateFormInput', () => {
         key: 'key',
         value: '',
       };
-      const store = createMockStore(schema, { user: { name: '' } }, [
-        issue('Mid-path error', [
-          objectPath('user', {}),
-          mapPath,
-          objectPath('name'),
-        ]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { user: { name: '' } },
+        issues: [
+          issue('Mid-path error', [
+            objectPath('user', {}),
+            mapPath,
+            objectPath('name'),
+          ]),
+        ],
+      });
 
       await validateFormInput(store);
 
@@ -243,10 +246,13 @@ describe('validateFormInput', () => {
   describe('focus behavior', () => {
     test('should focus first error field when shouldFocus is true', async () => {
       const schema = v.object({ name: v.string(), email: v.string() });
-      const store = createMockStore(schema, { name: '', email: '' }, [
-        issue('Name is required', [objectPath('name')]),
-        issue('Email is required', [objectPath('email')]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { name: '', email: '' },
+        issues: [
+          issue('Name is required', [objectPath('name')]),
+          issue('Email is required', [objectPath('email')]),
+        ],
+      });
 
       const inputElement = document.createElement('input');
       const mockFocus = vi.spyOn(inputElement, 'focus');
@@ -259,9 +265,10 @@ describe('validateFormInput', () => {
 
     test('should not focus when shouldFocus is false', async () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, { name: '' }, [
-        issue('Name is required', [objectPath('name')]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { name: '' },
+        issues: [issue('Name is required', [objectPath('name')])],
+      });
 
       const inputElement = document.createElement('input');
       const mockFocus = vi.spyOn(inputElement, 'focus');
@@ -274,9 +281,10 @@ describe('validateFormInput', () => {
 
     test('should not focus when shouldFocus is undefined', async () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, { name: '' }, [
-        issue('Name is required', [objectPath('name')]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { name: '' },
+        issues: [issue('Name is required', [objectPath('name')])],
+      });
 
       const inputElement = document.createElement('input');
       const mockFocus = vi.spyOn(inputElement, 'focus');
@@ -289,10 +297,13 @@ describe('validateFormInput', () => {
 
     test('should only focus first field with error', async () => {
       const schema = v.object({ name: v.string(), email: v.string() });
-      const store = createMockStore(schema, { name: '', email: '' }, [
-        issue('Name is required', [objectPath('name')]),
-        issue('Email is required', [objectPath('email')]),
-      ]);
+      const store = createTestStore(schema, {
+        initialInput: { name: '', email: '' },
+        issues: [
+          issue('Name is required', [objectPath('name')]),
+          issue('Email is required', [objectPath('email')]),
+        ],
+      });
 
       const nameInput = document.createElement('input');
       const emailInput = document.createElement('input');
@@ -326,7 +337,7 @@ describe('validateFormInput', () => {
 
     test('should set isValidating to false after validation', async () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, { name: 'John' });
+      const store = createTestStore(schema, { initialInput: { name: 'John' } });
 
       await validateFormInput(store);
 
@@ -335,7 +346,7 @@ describe('validateFormInput', () => {
 
     test('should increment and decrement validators counter', async () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, { name: 'John' });
+      const store = createTestStore(schema, { initialInput: { name: 'John' } });
 
       expect(store.validators).toBe(0);
       await validateFormInput(store);

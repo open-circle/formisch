@@ -1,54 +1,13 @@
 import * as v from 'valibot';
-import { describe, expect, test, vi } from 'vitest';
-import type {
-  InternalArrayStore,
-  InternalFieldStore,
-  InternalFormStore,
-  InternalObjectStore,
-} from '../../types/index.ts';
-import { createFormStore } from '../createFormStore/createFormStore.ts';
+import { describe, expect, test } from 'vitest';
+import { createTestStore } from '../../vitest/index.ts';
 import { validateIfRequired } from './validateIfRequired.ts';
-
-function isArrayStore(store: InternalFieldStore): store is InternalArrayStore {
-  return store.kind === 'array';
-}
-
-function isObjectStore(
-  store: InternalFieldStore
-): store is InternalObjectStore {
-  return store.kind === 'object';
-}
-
-function createMockStore(
-  schema: v.GenericSchema,
-  config: {
-    validate?: 'initial' | 'touch' | 'input' | 'change' | 'blur' | 'submit';
-    revalidate?: 'touch' | 'input' | 'change' | 'blur' | 'submit';
-    initialInput?: unknown;
-  } = {}
-): InternalFormStore {
-  const parse = vi.fn().mockResolvedValue({
-    typed: true,
-    success: true,
-    output: config.initialInput ?? {},
-    issues: undefined,
-  });
-  return createFormStore(
-    {
-      schema,
-      initialInput: config.initialInput,
-      validate: config.validate,
-      revalidate: config.revalidate,
-    },
-    parse
-  );
-}
 
 describe('validateIfRequired', () => {
   describe('validate = initial', () => {
     test('should use revalidate mode when validate is initial', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'initial',
         revalidate: 'input',
       });
@@ -63,7 +22,7 @@ describe('validateIfRequired', () => {
 
     test('should not validate when mode does not match revalidate', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'initial',
         revalidate: 'input',
       });
@@ -77,7 +36,7 @@ describe('validateIfRequired', () => {
   describe('validate = submit', () => {
     test('should use revalidate mode when form is submitted', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'submit',
         revalidate: 'input',
       });
@@ -92,7 +51,7 @@ describe('validateIfRequired', () => {
 
     test('should use validate mode when form is not submitted', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'submit',
         revalidate: 'input',
       });
@@ -105,7 +64,7 @@ describe('validateIfRequired', () => {
 
     test('should not validate when mode does not match and not submitted', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'submit',
         revalidate: 'input',
       });
@@ -120,7 +79,7 @@ describe('validateIfRequired', () => {
   describe('validate = input (non-submit, non-initial)', () => {
     test('should use revalidate mode when field has errors', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'input',
         revalidate: 'blur',
       });
@@ -135,7 +94,7 @@ describe('validateIfRequired', () => {
 
     test('should use validate mode when field has no errors', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'input',
         revalidate: 'blur',
       });
@@ -148,7 +107,7 @@ describe('validateIfRequired', () => {
 
     test('should not validate when mode does not match and no errors', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'input',
         revalidate: 'blur',
       });
@@ -163,7 +122,7 @@ describe('validateIfRequired', () => {
   describe('validate = blur', () => {
     test('should validate on blur when no errors', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'blur',
         revalidate: 'input',
       });
@@ -175,7 +134,7 @@ describe('validateIfRequired', () => {
 
     test('should validate on input when has errors (revalidate)', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'blur',
         revalidate: 'input',
       });
@@ -191,7 +150,7 @@ describe('validateIfRequired', () => {
   describe('validate = touch', () => {
     test('should validate on touch when no errors', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'touch',
         revalidate: 'change',
       });
@@ -203,7 +162,7 @@ describe('validateIfRequired', () => {
 
     test('should validate on change when has errors (revalidate)', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'touch',
         revalidate: 'change',
       });
@@ -219,7 +178,7 @@ describe('validateIfRequired', () => {
   describe('validate = change', () => {
     test('should validate on change when no errors', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'change',
         revalidate: 'blur',
       });
@@ -231,7 +190,7 @@ describe('validateIfRequired', () => {
 
     test('should validate on blur when has errors (revalidate)', () => {
       const schema = v.object({ name: v.string() });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'change',
         revalidate: 'blur',
       });
@@ -249,7 +208,7 @@ describe('validateIfRequired', () => {
       const schema = v.object({
         items: v.array(v.string()),
       });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'blur',
         revalidate: 'input',
         initialInput: { items: ['a', 'b'] },
@@ -257,8 +216,10 @@ describe('validateIfRequired', () => {
 
       // Set error on nested field
       const itemsStore = store.children.items;
-      if (!isArrayStore(itemsStore)) throw new Error('Expected array store');
-      itemsStore.children[0].errors.value = ['Error'];
+      expect(itemsStore.kind).toBe('array');
+      if (itemsStore.kind === 'array') {
+        itemsStore.children[0].errors.value = ['Error'];
+      }
 
       // getFieldBool should detect nested error
       validateIfRequired(store, store.children.items, 'input');
@@ -272,7 +233,7 @@ describe('validateIfRequired', () => {
           name: v.string(),
         }),
       });
-      const store = createMockStore(schema, {
+      const store = createTestStore(schema, {
         validate: 'blur',
         revalidate: 'input',
         initialInput: { user: { name: '' } },
@@ -280,8 +241,10 @@ describe('validateIfRequired', () => {
 
       // Set error on nested field
       const userStore = store.children.user;
-      if (!isObjectStore(userStore)) throw new Error('Expected object store');
-      userStore.children.name.errors.value = ['Error'];
+      expect(userStore.kind).toBe('object');
+      if (userStore.kind === 'object') {
+        userStore.children.name.errors.value = ['Error'];
+      }
 
       // getFieldBool should detect nested error
       validateIfRequired(store, store.children.user, 'input');
@@ -301,7 +264,7 @@ describe('validateIfRequired', () => {
       'validate=%s with revalidate=%s should match mode=%s',
       (validate, revalidate, mode) => {
         const schema = v.object({ name: v.string() });
-        const store = createMockStore(schema, { validate, revalidate });
+        const store = createTestStore(schema, { validate, revalidate });
 
         validateIfRequired(store, store.children.name, mode);
 
@@ -319,7 +282,7 @@ describe('validateIfRequired', () => {
       'validate=%s (no errors) should match mode=%s',
       (validate, mode) => {
         const schema = v.object({ name: v.string() });
-        const store = createMockStore(schema, {
+        const store = createTestStore(schema, {
           validate,
           revalidate: 'input',
         });
