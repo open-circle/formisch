@@ -4,9 +4,9 @@ import { describe, expect, test, vi } from 'vitest';
 import {
   arrayPath,
   createTestStore,
-  issue,
   objectPath,
   schemaIssue,
+  validationIssue,
 } from '../../vitest/index.ts';
 import { createFormStore } from '../createFormStore/createFormStore.ts';
 import { validateFormInput } from './validateFormInput.ts';
@@ -62,7 +62,7 @@ describe('validateFormInput', () => {
       const schema = v.object({ name: v.string() });
       const store = createTestStore(schema, {
         initialInput: { name: '' },
-        issues: [issue('Name is required', [objectPath('name')])],
+        issues: [validationIssue('Name is required', [objectPath('name')])],
       });
 
       await validateFormInput(store);
@@ -77,8 +77,8 @@ describe('validateFormInput', () => {
       const store = createTestStore(schema, {
         initialInput: { email: '' },
         issues: [
-          issue('Email is required', [objectPath('email')]),
-          issue('Invalid email format', [objectPath('email')]),
+          validationIssue('Email is required', [objectPath('email')]),
+          validationIssue('Invalid email format', [objectPath('email')]),
         ],
       });
 
@@ -95,7 +95,7 @@ describe('validateFormInput', () => {
       const store = createTestStore(schema, {
         initialInput: { user: { name: '' } },
         issues: [
-          issue('Name is required', [
+          validationIssue('Name is required', [
             objectPath('user', {}),
             objectPath('name'),
           ]),
@@ -118,7 +118,10 @@ describe('validateFormInput', () => {
       const store = createTestStore(schema, {
         initialInput: { items: ['a', ''] },
         issues: [
-          issue('Item is required', [objectPath('items', []), arrayPath(1)]),
+          validationIssue('Item is required', [
+            objectPath('items', []),
+            arrayPath(1),
+          ]),
         ],
       });
 
@@ -164,7 +167,9 @@ describe('validateFormInput', () => {
       };
       const store = createTestStore(schema, {
         initialInput: { name: '' },
-        issues: [issue('Symbol key error', [symbolPath, objectPath('name')])],
+        issues: [
+          validationIssue('Symbol key error', [symbolPath, objectPath('name')]),
+        ],
       });
 
       await validateFormInput(store);
@@ -185,7 +190,7 @@ describe('validateFormInput', () => {
       };
       const store = createTestStore(schema, {
         initialInput: { name: '' },
-        issues: [issue('Map error', [mapPath])],
+        issues: [validationIssue('Map error', [mapPath])],
       });
 
       await validateFormInput(store);
@@ -205,7 +210,7 @@ describe('validateFormInput', () => {
       };
       const store = createTestStore(schema, {
         initialInput: { name: '' },
-        issues: [issue('Set error', [setPath])],
+        issues: [validationIssue('Set error', [setPath])],
       });
 
       await validateFormInput(store);
@@ -226,7 +231,7 @@ describe('validateFormInput', () => {
       const store = createTestStore(schema, {
         initialInput: { user: { name: '' } },
         issues: [
-          issue('Mid-path error', [
+          validationIssue('Mid-path error', [
             objectPath('user', {}),
             mapPath,
             objectPath('name'),
@@ -249,8 +254,8 @@ describe('validateFormInput', () => {
       const store = createTestStore(schema, {
         initialInput: { name: '', email: '' },
         issues: [
-          issue('Name is required', [objectPath('name')]),
-          issue('Email is required', [objectPath('email')]),
+          validationIssue('Name is required', [objectPath('name')]),
+          validationIssue('Email is required', [objectPath('email')]),
         ],
       });
 
@@ -267,7 +272,7 @@ describe('validateFormInput', () => {
       const schema = v.object({ name: v.string() });
       const store = createTestStore(schema, {
         initialInput: { name: '' },
-        issues: [issue('Name is required', [objectPath('name')])],
+        issues: [validationIssue('Name is required', [objectPath('name')])],
       });
 
       const inputElement = document.createElement('input');
@@ -283,7 +288,7 @@ describe('validateFormInput', () => {
       const schema = v.object({ name: v.string() });
       const store = createTestStore(schema, {
         initialInput: { name: '' },
-        issues: [issue('Name is required', [objectPath('name')])],
+        issues: [validationIssue('Name is required', [objectPath('name')])],
       });
 
       const inputElement = document.createElement('input');
@@ -300,8 +305,8 @@ describe('validateFormInput', () => {
       const store = createTestStore(schema, {
         initialInput: { name: '', email: '' },
         issues: [
-          issue('Name is required', [objectPath('name')]),
-          issue('Email is required', [objectPath('email')]),
+          validationIssue('Name is required', [objectPath('name')]),
+          validationIssue('Email is required', [objectPath('email')]),
         ],
       });
 

@@ -77,16 +77,16 @@ export function arrayPath(key: number, value: unknown = ''): v.ArrayPathItem {
  *
  * @returns A base issue object.
  */
-export function issue(
+export function validationIssue(
   message: string,
   path?: [v.IssuePathItem, ...v.IssuePathItem[]]
 ): v.BaseIssue<unknown> {
   return {
     kind: 'validation',
-    type: 'custom',
+    type: 'check',
     input: '',
-    expected: 'valid',
-    received: 'invalid',
+    expected: null,
+    received: 'unknown',
     message,
     path,
   };

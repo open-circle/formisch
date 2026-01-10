@@ -10,7 +10,8 @@ export default defineConfig({
       exclude: [
         'src/types',
         'src/vitest',
-        'src/regex.ts',
+        'src/framework',
+        'src/values.ts',
         '**/index.ts',
         '**/types.ts',
         '**/*.test.ts',

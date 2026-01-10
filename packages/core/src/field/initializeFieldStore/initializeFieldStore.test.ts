@@ -143,6 +143,26 @@ describe('initializeFieldStore', () => {
     });
   });
 
+  describe('lazy schemas', () => {
+    test('should unwrap lazy schema', () => {
+      const store = createTestStore(
+        v.object({ name: v.lazy(() => v.string()) })
+      );
+      expect(store.children.name.kind).toBe('value');
+    });
+
+    test('should unwrap nested lazy schema', () => {
+      const store = createTestStore(
+        v.object({ user: v.lazy(() => v.object({ name: v.string() })) })
+      );
+      const userStore = store.children.user;
+      expect(userStore.kind).toBe('object');
+      if (userStore.kind === 'object') {
+        expect(userStore.children.name.kind).toBe('value');
+      }
+    });
+  });
+
   describe('unsupported schemas', () => {
     test('should throw for record schema', () => {
       expect(() => {
@@ -156,6 +176,34 @@ describe('initializeFieldStore', () => {
           v.object({ data: v.objectWithRest({ a: v.string() }, v.number()) })
         );
       }).toThrow('"object_with_rest" schema is not supported');
+    });
+  });
+
+  describe('reinitialization errors', () => {
+    test('should throw when reinitializing object as array', () => {
+      expect(() => {
+        createTestStore(
+          v.object({
+            field: v.union([
+              v.object({ name: v.string() }),
+              v.array(v.string()),
+            ]),
+          })
+        );
+      }).toThrow('cannot be reinitialized as "array"');
+    });
+
+    test('should throw when reinitializing array as object', () => {
+      expect(() => {
+        createTestStore(
+          v.object({
+            field: v.union([
+              v.array(v.string()),
+              v.object({ name: v.string() }),
+            ]),
+          })
+        );
+      }).toThrow('cannot be reinitialized as "object"');
     });
   });
 });
