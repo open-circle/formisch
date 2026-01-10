@@ -53,7 +53,7 @@
     "access": "public"
   },
   "scripts": {
-    "test": "vitest --typecheck",
+    "test": "vitest run",
     "coverage": "vitest run --coverage --isolate",
     "lint": "eslint \"src/**/*.ts*\" && tsc --noEmit",
     "lint.fix": "eslint \"src/**/*.ts*\" --fix",
