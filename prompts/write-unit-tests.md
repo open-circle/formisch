@@ -191,16 +191,16 @@ function arrayPath(key: number, value: unknown = ''): v.ArrayPathItem {
   return { type: 'array', origin: 'value', input: [], key, value };
 }
 
-function issue(
+function validationIssue(
   message: string,
   path?: [v.IssuePathItem, ...v.IssuePathItem[]]
 ): v.BaseIssue<unknown> {
   return {
     kind: 'validation',
-    type: 'custom',
+    type: 'check',
     input: '',
-    expected: 'valid',
-    received: 'invalid',
+    expected: null,
+    received: 'unknown',
     message,
     path,
   };
@@ -347,5 +347,5 @@ store.children.name.elements = [input];
 ### Issue Helper Pattern
 
 ```typescript
-issue('Error message', [objectPath('field'), arrayPath(0)]);
+validationIssue('Error message', [objectPath('field'), arrayPath(0)]);
 ```
