@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import * as v from 'valibot';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { createTestStore } from '../vitest/index.ts';
 import { reset } from './reset.ts';
 

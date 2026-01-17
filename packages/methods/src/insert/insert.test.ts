@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../vitest/index.ts';
+import { createTestStore, initializeChildSlot } from '../vitest/index.ts';
 import { insert } from './insert.ts';
 
 describe('insert', () => {
@@ -19,15 +19,69 @@ describe('insert', () => {
     }
   });
 
-  // TODO: Test insert at specific index once core initializes children slots
-  // Coverage note: Lines 93-97 (copyItemState loop) and 112-116 (resetItemState for existing child)
-  // are not covered because:
-  // 1. The children array is sparse - slots only exist for accessed indices
-  // 2. When inserting at index X < items.length, the loop tries to copy from children[index-1]
-  //    to children[index], but children[items.length] doesn't exist
-  // 3. The else branch (resetItemState) only runs if children[insertIndex] already exists,
-  //    which doesn't happen with the current core initialization strategy
-  // This results in 80% coverage for insert.ts - the remaining 20% requires core changes.
+  test('should insert item at specific index and shift children', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: ['a', 'b'] },
+    });
+
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+    if (itemsStore.kind === 'array') {
+      // Pre-initialize children slot at index 2 to allow copyItemState to work
+      initializeChildSlot(itemsStore, 2);
+
+      // Insert at index 0 - should shift existing children up
+      insert(store, { path: ['items'], at: 0, initialInput: 'inserted' });
+
+      expect(itemsStore.items.value).toHaveLength(3);
+      // The inserted item should be at index 0
+      expect(itemsStore.children[0].input.value).toBe('inserted');
+    }
+  });
+
+  test('should insert at middle index', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: ['a', 'b', 'c'] },
+    });
+
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+    if (itemsStore.kind === 'array') {
+      // Pre-initialize children slot at index 3 to allow copyItemState to work
+      initializeChildSlot(itemsStore, 3);
+
+      // Insert at index 1
+      insert(store, { path: ['items'], at: 1, initialInput: 'middle' });
+
+      expect(itemsStore.items.value).toHaveLength(4);
+      expect(itemsStore.children[1].input.value).toBe('middle');
+    }
+  });
+
+  test('should reset existing child when inserting at occupied index', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: ['a', 'b'] },
+    });
+
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+    if (itemsStore.kind === 'array') {
+      // Pre-initialize slot at index 2 and also at index 0 to make resetItemState branch execute
+      initializeChildSlot(itemsStore, 2);
+
+      // Store reference to original child at index 0
+      const originalChild = itemsStore.children[0];
+      originalChild.isTouched.value = true;
+      originalChild.errors.value = ['some error'];
+
+      // Insert at index 0 - should use resetItemState on the existing child
+      insert(store, { path: ['items'], at: 0, initialInput: 'reset' });
+
+      expect(itemsStore.items.value).toHaveLength(3);
+      // The child at index 0 should have been reset
+      expect(itemsStore.children[0].input.value).toBe('reset');
+    }
+  });
 
   test('should mark array as dirty after insert', () => {
     const store = createTestStore(v.object({ items: v.array(v.string()) }), {

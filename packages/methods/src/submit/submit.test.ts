@@ -9,16 +9,18 @@ describe('submit', () => {
   test('should call requestSubmit on form element', () => {
     const store = createTestStore(v.object({ name: v.string() }));
     const form = document.createElement('form');
-    const submitSpy = vi.spyOn(form, 'requestSubmit');
+    // Mock requestSubmit since jsdom doesn't implement it
+    form.requestSubmit = vi.fn();
     store[INTERNAL].element = form;
 
     submit(store);
 
-    expect(submitSpy).toHaveBeenCalledOnce();
+    expect(form.requestSubmit).toHaveBeenCalledOnce();
   });
 
   test('should not throw if form element is undefined', () => {
     const store = createTestStore(v.object({ name: v.string() }));
+    // @ts-expect-error - Testing undefined element behavior
     store[INTERNAL].element = undefined;
 
     expect(() => submit(store)).not.toThrow();
