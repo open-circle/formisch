@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 import type { Signal } from '../types/index.ts';
 
 let idCounter = 0;
@@ -61,14 +60,23 @@ export function resetIdCounter(): void {
 }
 
 /**
- * Mocks the framework module with test implementations.
+ * Framework mock implementations interface.
  */
-export function mockFramework(): void {
-  vi.mock('../framework/index.ts', () => ({
-    framework: 'vanilla',
-    createSignal,
-    batch,
-    untrack,
-    createId,
-  }));
+interface FrameworkMocks {
+  framework: 'vanilla';
+  createSignal: typeof createSignal;
+  batch: typeof batch;
+  untrack: typeof untrack;
+  createId: typeof createId;
 }
+
+/**
+ * Mock implementations for the framework module.
+ */
+export const frameworkMocks: FrameworkMocks = {
+  framework: 'vanilla',
+  createSignal: createSignal,
+  batch: batch,
+  untrack: untrack,
+  createId: createId,
+};

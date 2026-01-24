@@ -1,8 +1,12 @@
-import { beforeEach } from 'vitest';
-import { mockFramework, resetIdCounter } from './mock.ts';
+import { beforeEach, vi } from 'vitest';
 
-// Mock framework globally for all tests
-mockFramework();
+// Use vi.hoisted() to import mocks before vi.mock() runs
+const { frameworkMocks, resetIdCounter } = await vi.hoisted(
+  async () => await import('./mock.ts')
+);
+
+// Mock framework module at top level (hoisted by Vitest)
+vi.mock('../framework/index.ts', () => frameworkMocks);
 
 // Reset ID counter before each test
 beforeEach(() => {
