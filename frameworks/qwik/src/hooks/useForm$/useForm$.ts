@@ -6,8 +6,7 @@ import {
   type Schema,
   validateFormInput,
 } from '@formisch/core/qwik';
-import type {
-  QRL} from '@qwik.dev/core';
+import type { QRL } from '@qwik.dev/core';
 import {
   $,
   createComputed$,

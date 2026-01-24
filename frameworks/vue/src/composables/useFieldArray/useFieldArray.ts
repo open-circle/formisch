@@ -8,7 +8,7 @@ import {
   type ValidArrayPath,
 } from '@formisch/core/vue';
 import type * as v from 'valibot';
-import type { MaybeRefOrGetter} from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
 import { computed, toValue } from 'vue';
 import type { FieldArrayStore, FormStore } from '../../types/index.ts';
 

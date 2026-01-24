@@ -12,7 +12,7 @@ import {
   type ValidPath,
 } from '@formisch/core/vue';
 import type * as v from 'valibot';
-import type { MaybeRefOrGetter} from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
 import { computed, onUnmounted, toValue } from 'vue';
 import type { FieldStore, FormStore } from '../../types/index.ts';
 

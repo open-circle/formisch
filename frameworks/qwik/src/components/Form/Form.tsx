@@ -1,6 +1,6 @@
 import { INTERNAL, type Schema, type SubmitHandler } from '@formisch/core/qwik';
 import { handleSubmit } from '@formisch/methods/qwik';
-import type { JSXOutput, PropsOf, QRL} from '@qwik.dev/core';
+import type { JSXOutput, PropsOf, QRL } from '@qwik.dev/core';
 import { component$, Slot } from '@qwik.dev/core';
 import type { FormStore } from '../../types/index.ts';
 
