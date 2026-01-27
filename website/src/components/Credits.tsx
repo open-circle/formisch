@@ -6,10 +6,10 @@ import {
   BuilderLogo,
   DigitalOceanLogo,
   HdmLogo,
-  LambdaTestLogo,
   MotionLogo,
   PaceLogo,
   StainlessLogo,
+  TestMuAiLogo,
   VercelLogo,
 } from '~/logos';
 
@@ -66,7 +66,7 @@ export const Credits = component$(() => {
           { Logo: MotionLogo, href: 'https://www.usemotion.com/' },
           { Logo: VercelLogo, href: 'https://vercel.com' },
           { Logo: StainlessLogo, href: 'https://www.stainless.com/' },
-          { Logo: LambdaTestLogo, href: 'https://www.lambdatest.com/' },
+          { Logo: TestMuAiLogo, href: 'https://www.testmu.ai/' },
           { Logo: AlgoliaLogo, href: 'https://www.algolia.com' },
           { Logo: DigitalOceanLogo, href: 'https://www.digitalocean.com/' },
           { Logo: BuilderLogo, href: 'https://www.builder.io' },

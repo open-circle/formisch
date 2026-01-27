@@ -14,5 +14,6 @@ export * from './PaceLogo';
 export * from './SolidLogo';
 export * from './StainlessLogo';
 export * from './SvelteLogo';
+export * from './TestMuAiLogo';
 export * from './VercelLogo';
 export * from './VueLogo';
