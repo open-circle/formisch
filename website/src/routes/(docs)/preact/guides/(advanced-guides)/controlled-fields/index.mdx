@@ -141,6 +141,30 @@ export function DateInput({
 }
 ```
 
+## Custom inputs and component libraries
+
+Some component libraries don't expose the underlying native HTML element, which means you cannot spread `field.props` onto them. For these cases, use `field.onInput` to set the value programmatically.
+
+```tsx
+import { DatePicker } from 'some-component-library';
+
+<Field of={form} path={['date']}>
+  {(field) => (
+    <DatePicker
+      value={field.input.value}
+      onInput={(newDate) => field.onInput(newDate)}
+    />
+  )}
+</Field>;
+```
+
+This is useful for:
+
+- **Component libraries** that wrap native elements without exposing them
+- **Complex custom inputs** like date pickers, rich text editors, or color pickers
+
+The `field.onInput` method updates the field value and triggers validation, just like a native input would.
+
 ## Next steps
 
 Now that you understand controlled fields, you can explore more advanced topics like <Link href="/preact/guides/nested-fields/">nested fields</Link> and <Link href="/preact/guides/field-arrays/">field arrays</Link> to handle complex form structures.

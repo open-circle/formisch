@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Add `onInput` method to `FieldStore` for programmatic input value setting
+
 ## v0.5.6 (December 12, 2025)
 
 - Change `@formisch/core` to v0.4.5

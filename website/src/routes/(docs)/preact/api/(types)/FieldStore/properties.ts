@@ -141,6 +141,47 @@ export const properties: Record<string, PropertyProps> = {
           },
         },
         {
+          key: 'onInput',
+          value: {
+            type: 'function',
+            params: [
+              {
+                name: 'value',
+                type: {
+                  type: 'custom',
+                  name: 'PartialValues',
+                  href: '/core/api/PartialValues/',
+                  generics: [
+                    {
+                      type: 'custom',
+                      name: 'PathValue',
+                      href: '/core/api/PathValue/',
+                      generics: [
+                        {
+                          type: 'custom',
+                          name: 'v.InferInput',
+                          href: 'https://valibot.dev/api/InferInput/',
+                          generics: [
+                            {
+                              type: 'custom',
+                              name: 'TSchema',
+                            },
+                          ],
+                        },
+                        {
+                          type: 'custom',
+                          name: 'TFieldPath',
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+            return: 'void',
+          },
+        },
+        {
           key: 'props',
           value: {
             type: 'custom',
@@ -262,6 +303,46 @@ export const properties: Record<string, PropertyProps> = {
       type: 'custom',
       name: 'ReadonlySignal',
       generics: ['boolean'],
+    },
+  },
+  onInput: {
+    type: {
+      type: 'function',
+      params: [
+        {
+          name: 'value',
+          type: {
+            type: 'custom',
+            name: 'PartialValues',
+            href: '/core/api/PartialValues/',
+            generics: [
+              {
+                type: 'custom',
+                name: 'PathValue',
+                href: '/core/api/PathValue/',
+                generics: [
+                  {
+                    type: 'custom',
+                    name: 'v.InferInput',
+                    href: 'https://valibot.dev/api/InferInput/',
+                    generics: [
+                      {
+                        type: 'custom',
+                        name: 'TSchema',
+                      },
+                    ],
+                  },
+                  {
+                    type: 'custom',
+                    name: 'TFieldPath',
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+      return: 'void',
     },
   },
   props: {

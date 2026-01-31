@@ -78,6 +78,11 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
       get isValid() {
         return !getFieldBool(internalFieldStore, 'errors');
       },
+      onChange(value) {
+        setFieldInput(internalFormStore, config.path, value);
+        validateIfRequired(internalFormStore, internalFieldStore, 'input');
+        validateIfRequired(internalFormStore, internalFieldStore, 'change');
+      },
       props: {
         name: internalFieldStore.name,
         autoFocus: !!internalFieldStore.errors.value,
