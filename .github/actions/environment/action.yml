@@ -20,28 +20,12 @@ runs:
       shell: bash
       run: pnpm install
 
-    - name: Create /core build cache
-      id: core-build-cache
-      uses: actions/cache@v4
-      with:
-        path: ${{ github.workspace }}/packages/core/dist
-        key: core-build-cache-${{ hashFiles('packages/core/src/**/*.ts', '!packages/core/src/**/*.test.ts', '!packages/core/src/**/*.test-d.ts') }}
-
-    - name: Build core packages
-      if: steps.core-build-cache.outputs.cache-hit != 'true'
+    - name: Build core package
       shell: bash
       run: pnpm build
       working-directory: packages/core
 
-    - name: Create /methods build cache
-      id: methods-build-cache
-      uses: actions/cache@v4
-      with:
-        path: ${{ github.workspace }}/packages/methods/dist
-        key: methods-build-cache-${{ hashFiles('packages/methods/src/**/*.ts', '!packages/methods/src/**/*.test.ts') }}
-
     - name: Build methods package
-      if: steps.methods-build-cache.outputs.cache-hit != 'true'
       shell: bash
       run: pnpm build
       working-directory: packages/methods
