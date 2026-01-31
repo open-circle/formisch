@@ -28,6 +28,10 @@
       "types": "./dist/index.qwik.d.ts",
       "default": "./dist/index.qwik.js"
     },
+    "./react": {
+      "types": "./dist/index.react.d.ts",
+      "default": "./dist/index.react.js"
+    },
     "./solid": {
       "types": "./dist/index.solid.d.ts",
       "default": "./dist/index.solid.js"
@@ -35,10 +39,6 @@
     "./svelte": {
       "types": "./dist/index.svelte.d.ts",
       "default": "./dist/index.svelte.js"
-    },
-    "./vanilla": {
-      "types": "./dist/index.vanilla.d.ts",
-      "default": "./dist/index.vanilla.js"
     },
     "./vue": {
       "types": "./dist/index.vue.d.ts",
@@ -65,6 +65,7 @@
     "@formisch/core": "workspace:*",
     "@formisch/eslint-config": "workspace:*",
     "@types/node": "24.0.13",
+    "@types/react": "^19.2.5",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.31.0",
     "jsdom": "^26.1.0",
@@ -76,10 +77,14 @@
     "vitest": "3.2.4"
   },
   "peerDependencies": {
+    "react": "^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "typescript": ">=5",
     "valibot": "^1.0.0"
   },
   "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
     "typescript": {
       "optional": true
     }

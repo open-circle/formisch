@@ -4,11 +4,8 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   resolve: {
     alias: {
-      // Use the vanilla build of @formisch/core for testing
-      '@formisch/core': path.resolve(
-        __dirname,
-        '../core/dist/index.vanilla.js'
-      ),
+      // Use the react build of @formisch/core for testing
+      '@formisch/core': path.resolve(__dirname, '../core/dist/index.react.js'),
     },
   },
   test: {

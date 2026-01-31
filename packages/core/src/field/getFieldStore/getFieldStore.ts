@@ -1,4 +1,8 @@
-import type { InternalFieldStore, InternalFormStore, Path } from '../../types';
+import type {
+  InternalFieldStore,
+  InternalFormStore,
+  Path,
+} from '../../types/index.ts';
 
 /**
  * Returns the field store at the specified path by traversing the form store's

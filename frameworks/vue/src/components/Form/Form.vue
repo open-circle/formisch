@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="TSchema extends Schema = Schema">
 import { Schema, SubmitHandler } from '@formisch/core/vue';
 import { handleSubmit } from '@formisch/methods/vue';
-import { FormStore } from '../../types';
+import { FormStore } from '../../types/index.ts';
 
 /**
  * Form component props interface.

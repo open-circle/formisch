@@ -1,4 +1,4 @@
-import type { BaseFormStore, Schema } from '@formisch/core/vanilla';
+import type { BaseFormStore, Schema } from '@formisch/core/react';
 
 /**
  * Form store interface.

@@ -63,7 +63,7 @@ export function resetIdCounter(): void {
  * Framework mock implementations interface.
  */
 interface FrameworkMocks {
-  framework: 'vanilla';
+  framework: 'react';
   createSignal: typeof createSignal;
   batch: typeof batch;
   untrack: typeof untrack;
@@ -74,7 +74,7 @@ interface FrameworkMocks {
  * Mock implementations for the framework module.
  */
 export const frameworkMocks: FrameworkMocks = {
-  framework: 'vanilla',
+  framework: 'react',
   createSignal: createSignal,
   batch: batch,
   untrack: untrack,

@@ -3,10 +3,10 @@
   lang="ts"
   generic="TSchema extends Schema, TFieldArrayPath extends RequiredPath"
 >
-import { RequiredPath, Schema, ValidArrayPath } from '@formisch/core/vue';
-import * as v from 'valibot';
-import { useFieldArray } from '../../composables';
-import { FieldArrayStore, FormStore } from '../../types';
+import type { RequiredPath, Schema, ValidArrayPath } from '@formisch/core/vue';
+import type * as v from 'valibot';
+import { useFieldArray } from '../../composables/index.ts';
+import type { FieldArrayStore, FormStore } from '../../types/index.ts';
 
 /**
  * Field array component props interface.

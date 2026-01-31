@@ -10,7 +10,7 @@ import {
   setFieldInput,
   validateIfRequired,
   type ValidPath,
-} from '@formisch/core/vanilla';
+} from '@formisch/core/react';
 import { useEffect, useMemo } from 'react';
 import type * as v from 'valibot';
 import type { FieldStore, FormStore } from '../../types/index.ts';

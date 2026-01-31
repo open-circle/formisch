@@ -2,7 +2,7 @@ import {
   type RequiredPath,
   type Schema,
   type ValidPath,
-} from '@formisch/core/vanilla';
+} from '@formisch/core/react';
 import type { ReactElement } from 'react';
 import type * as v from 'valibot';
 import { useField } from '../../hooks/index.ts';

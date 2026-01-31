@@ -1,4 +1,4 @@
-import type { InternalFieldStore } from '../../types';
+import type { InternalFieldStore } from '../../types/index.ts';
 
 /**
  * Returns whether the specified boolean property is true for the field store
