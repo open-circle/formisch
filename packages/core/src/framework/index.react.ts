@@ -4,7 +4,7 @@ import type { Framework } from './index.ts';
 /**
  * The current framework being used.
  */
-export const framework: Framework = 'vanilla';
+export const framework: Framework = 'react';
 
 /**
  * Creates a unique identifier string.

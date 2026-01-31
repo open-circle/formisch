@@ -1,4 +1,4 @@
-import { type Listener, setListener } from '@formisch/core/vanilla';
+import { type Listener, setListener } from '@formisch/core/react';
 import {
   useCallback,
   useEffect,

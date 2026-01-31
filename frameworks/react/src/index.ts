@@ -10,8 +10,8 @@ export type {
   ValidArrayPath,
   ValidationMode,
   ValidPath,
-} from '@formisch/core/vanilla';
-export * from '@formisch/methods/vanilla';
+} from '@formisch/core/react';
+export * from '@formisch/methods/react';
 export * from './components/index.ts';
 export * from './hooks/index.ts';
 export * from './types/index.ts';

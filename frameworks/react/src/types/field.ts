@@ -6,7 +6,7 @@ import type {
   Schema,
   ValidArrayPath,
   ValidPath,
-} from '@formisch/core/vanilla';
+} from '@formisch/core/react';
 import type { ChangeEventHandler, FocusEventHandler } from 'react';
 import type * as v from 'valibot';
 

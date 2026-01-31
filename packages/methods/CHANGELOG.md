@@ -2,6 +2,11 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Add React-specific `handleSubmit` method using `FormEvent` type from React
+- Rename `vanilla` build target in favor of dedicated `react` target
+
 ## v0.5.2 (December 11, 2025)
 
 - Change `@formisch/core` to v0.4.4

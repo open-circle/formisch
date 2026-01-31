@@ -8,9 +8,9 @@ import type { Signal } from '../types/index.ts';
 export type Framework =
   | 'preact'
   | 'qwik'
+  | 'react'
   | 'solid'
   | 'svelte'
-  | 'vanilla'
   | 'vue';
 
 /**

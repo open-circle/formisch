@@ -2,8 +2,8 @@ import {
   INTERNAL,
   type Schema,
   type SubmitHandler,
-} from '@formisch/core/vanilla';
-import { handleSubmit } from '@formisch/methods/vanilla';
+} from '@formisch/core/react';
+import { handleSubmit } from '@formisch/methods/react';
 import type { FormHTMLAttributes, ReactElement } from 'react';
 import type { FormStore } from '../../types/index.ts';
 
@@ -48,7 +48,6 @@ export function Form({ of, onSubmit, ...other }: FormProps): ReactElement {
           of[INTERNAL].element = element;
         }
       }}
-      // @ts-ignore // TODO: Fix the type issue here
       onSubmit={handleSubmit(of, onSubmit)}
     />
   );
