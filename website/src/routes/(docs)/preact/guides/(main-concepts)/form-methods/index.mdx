@@ -36,9 +36,9 @@ To manually update form values or errors, use:
 - <Link href="/methods/api/setErrors/">`setErrors`</Link>: Manually set error
   messages for a specific field
 
-> **Tip:** When you have access to a field store (from `useField` or `Field`), you can use `field.onInput(value)` to update the value directly. This is especially useful for custom inputs or component libraries that don't expose native HTML elements.
+> When you have access to a field store (from <Link href="/preact/api/useField/">`useField`</Link> or <Link href="/preact/api/Field/">`Field`</Link>), you can use `field.onInput(value)` to update the value directly. This is especially useful for custom inputs or component libraries that don't expose native HTML elements.
 
-> If you need to update the form because the initial data has changed (e.g., remote data was refreshed), use <Link href="/methods/api/reset/">`reset`</Link> with a new `initialInput` instead of `setInput`. The `reset` method properly reinitializes the form state, while `setInput` only changes the current input values without updating the initial state.
+> If you need to update the form because the initial data has changed (e.g., remote data was refreshed), use <Link href="/methods/api/reset/">`reset`</Link> with a new `initialInput` instead of <Link href="/methods/api/setInput/">`setInput`</Link>. The <Link href="/methods/api/reset/">`reset`</Link> method properly reinitializes the form state, while <Link href="/methods/api/setInput/">`setInput`</Link> only changes the current input values without updating the initial state.
 
 ## Form control
 

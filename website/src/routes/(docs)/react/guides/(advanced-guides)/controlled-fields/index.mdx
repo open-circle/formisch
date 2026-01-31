@@ -139,7 +139,7 @@ export function DateInput({
 
 ## Custom inputs and component libraries
 
-Some component libraries (like MUI, Radix, or Headless UI) don't expose the underlying native HTML element, which means you cannot spread `field.props` onto them. For these cases, use `field.onChange` to set the value programmatically.
+Some component libraries don't expose the underlying native HTML element, which means you cannot spread `field.props` onto them. For these cases, use `field.onChange` to set the value programmatically.
 
 ```tsx
 import { DatePicker } from 'some-component-library';
@@ -156,9 +156,8 @@ import { DatePicker } from 'some-component-library';
 
 This is useful for:
 
-- **Component libraries** that wrap native elements without exposing them (MUI, Chakra UI, Radix, etc.)
+- **Component libraries** that wrap native elements without exposing them
 - **Complex custom inputs** like date pickers, rich text editors, or color pickers
-- **Third-party components** where you only have access to value/onChange props
 
 The `field.onChange` method updates the field value and triggers validation, just like a native input would.
 
