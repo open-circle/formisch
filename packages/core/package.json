@@ -1,7 +1,7 @@
 {
   "name": "@formisch/core",
   "description": "The modular and type-safe form library for any framework",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",

@@ -2,11 +2,11 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (February 05, 2026)
+## v0.9.0 (February 05, 2026)
 
-- Change `@formisch/core` to vX.X.X
-- Change `@formisch/methods` to vX.X.X
-- Change `Form` component typing to use `SubmitEventHandler`
+- Change `@formisch/core` to v0.6.0
+- Change `@formisch/methods` to v0.7.0
+- Update `Form` component submit handler types
 
 ## v0.8.0 (January 31, 2026)
 

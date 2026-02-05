@@ -2,7 +2,7 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (February 05, 2026)
+## v0.6.0 (February 05, 2026)
 
 - Split submit handler types into `SubmitHandler` (no event) and `SubmitEventHandler` (with event)
 
