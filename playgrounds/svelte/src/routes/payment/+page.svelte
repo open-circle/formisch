@@ -57,7 +57,7 @@
   <title>Payment form</title>
 </svelte:head>
 
-<Form of={paymentForm} onsubmit={(output) => console.log(output)}>
+<Form of={paymentForm} onsubmit={(output, _) => console.log(output)}>
   <div class="space-y-12 md:space-y-14 lg:space-y-16">
     <FormHeader of={paymentForm} heading="Payment form" />
     <div class="space-y-8 md:space-y-10 lg:space-y-12">

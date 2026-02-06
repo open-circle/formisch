@@ -39,7 +39,7 @@
   <title>Special form</title>
 </svelte:head>
 
-<Form of={specialForm} onsubmit={(output) => console.log(output)}>
+<Form of={specialForm} onsubmit={(output, _) => console.log(output)}>
   <div class="space-y-12 md:space-y-14 lg:space-y-16">
     <FormHeader of={specialForm} heading="Special form" />
     <div class="space-y-8 md:space-y-10 lg:space-y-12">

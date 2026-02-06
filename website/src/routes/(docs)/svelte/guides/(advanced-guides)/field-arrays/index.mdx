@@ -72,7 +72,7 @@ To dynamically generate the form fields for the todos, you use the <Link href="/
   });
 </script>
 
-<Form of={todoForm} onsubmit={(output) => console.log(output)}>
+<Form of={todoForm} onsubmit={(output, event) => console.log(output)}>
   <Field of={todoForm} path={['heading']}>
     {#snippet children(field)}
       <input {...field.props} value={field.input} type="text" />

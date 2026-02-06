@@ -61,7 +61,7 @@ export default component$(() => {
     <Form
       of={specialForm}
       class="flex flex-col gap-12 md:gap-14 lg:gap-16"
-      onSubmit$={(output) => alert(JSON.stringify(output, null, 2))}
+      onSubmit$={(output, _) => alert(JSON.stringify(output, null, 2))}
     >
       <FormHeader of={specialForm} heading="Special form" />
       <div class="flex flex-col gap-8 md:gap-10 lg:gap-12">

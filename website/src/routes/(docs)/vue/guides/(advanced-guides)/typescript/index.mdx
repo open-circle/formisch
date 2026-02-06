@@ -163,7 +163,7 @@ defineProps<FormContentProps>();
 </script>
 
 <template>
-  <Form :of="props.of" @submit="(output) => console.log(output)">
+  <Form :of="props.of" @submit="(output, event) => console.log(output)">
     <!-- Form fields -->
   </Form>
 </template>

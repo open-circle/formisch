@@ -31,7 +31,7 @@ const loginForm = useForm({ schema: LoginSchema });
 </script>
 
 <template>
-  <Form :of="loginForm" @submit="(output) => console.log(output)">
+  <Form :of="loginForm" @submit="(output, event) => console.log(output)">
     <Field :of="loginForm" :path="['email']" v-slot="field">
       <div>
         <input v-model="field.input" v-bind="field.props" type="email" />

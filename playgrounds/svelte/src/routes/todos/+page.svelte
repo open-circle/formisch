@@ -57,7 +57,7 @@
   <title>Todos form</title>
 </svelte:head>
 
-<Form of={todoForm} onsubmit={(output) => console.log(output)}>
+<Form of={todoForm} onsubmit={(output, _) => console.log(output)}>
   <div class="space-y-12 md:space-y-14 lg:space-y-16">
     <FormHeader of={todoForm} heading="Todo form" />
 

@@ -38,7 +38,7 @@ export default function LoginPage() {
   return (
     <Form
       of={loginForm}
-      onSubmit={(output) => {
+      onSubmit={(output, event) => {
         // output is fully typed based on LoginSchema
         console.log(output.email); // ✓ Type-safe
         console.log(output.username); // ✗ TypeScript error
@@ -79,7 +79,7 @@ export default function ProfilePage() {
   return (
     <Form
       of={profileForm}
-      onSubmit={(output) => {
+      onSubmit={(output, event) => {
         // output is: { age: number; birthDate: Date }
         console.log(output.age); // number
         console.log(output.birthDate); // Date
@@ -158,7 +158,7 @@ type FormContentProps = {
 
 function FormContent(props: FormContentProps) {
   return (
-    <Form of={props.of} onSubmit={(output) => console.log(output)}>
+    <Form of={props.of} onSubmit={(output, event) => console.log(output)}>
       {/* Form fields */}
     </Form>
   );
