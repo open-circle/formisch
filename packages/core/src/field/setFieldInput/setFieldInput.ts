@@ -12,7 +12,7 @@ import { initializeFieldStore } from '../initializeFieldStore/index.ts';
  * Sets the input for a nested field store and all its children, updating
  * touched and dirty states accordingly. Handles dynamic array resizing.
  *
- * @param internalFormStore
+ * @param internalFormStore The form store to update.
  * @param internalFieldStore The field store to update.
  * @param input The new input value.
  */
