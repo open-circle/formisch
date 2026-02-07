@@ -62,6 +62,7 @@ export function getSchemaLevelBehavior(
     ...defaultBehavior,
     ...((internalFormStore.advanced.schemaLevelBehavior?.(schema) ??
       {}) as SchemaLevelBehavior),
+    // @ts-expect-error
     ...((schema['~formisch']?.schemaLevelBehavior ??
       {}) as SchemaLevelBehavior),
   };

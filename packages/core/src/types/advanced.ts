@@ -30,8 +30,8 @@ export interface SchemaLevelBehavior {
  *
  * ### Example
  *
- * This is an example using valibot to set all number fields to transform string inputs
- * into actual numbers:
+ * This is an example (using valibot as the schema library) which sets all
+ * number fields to transform string inputs into actual numbers:
  * ```ts
  * createForm({
  *  // Other configuration...
@@ -61,4 +61,41 @@ export interface AdvancedConfig {
   schemaLevelBehavior: (
     schema: Schema
   ) => Partial<SchemaLevelBehavior> | null | undefined;
+}
+
+/**
+ * Type for builtin schema level behavior configurations.
+ * 
+ * Maps schema types to schema level behavior configurations.
+ * 
+ * It's designed so that you can use the builtins as a base to create your own custom behavior.
+ * 
+ * ## Example
+ * 
+ * This is a snippet from the builtin valibot behaviour.
+ *
+ * ```ts
+ * const valibotSchemaLevelBehavior = {
+ *  resolve(schema: Schema): SchemaLevelBehavior | undefined {
+ *    return this[schema.type];
+ *  },
+ *  {
+ *    types: {
+ *      number: {
+ *        transform: (value: unknown) => {
+ *          // ...
+ *        },
+ *      },
+ *      date: {
+ *        equals: (a: unknown, b: unknown) => {
+ *          // ...
+ *        },
+ *      },
+ *   }
+ * },
+ * ```
+ */
+export interface BuiltinSchemaLevelBehavior {
+  resolve(schema: Schema): Partial<SchemaLevelBehavior> | undefined
+  types: Record<string, Partial<SchemaLevelBehavior>>
 }
