@@ -1,7 +1,7 @@
 {
   "name": "@formisch/react",
   "description": "The modular and type-safe form library for React",
-  "version": "0.2.2",
+  "version": "0.4.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",
@@ -40,8 +40,8 @@
     "format.check": "prettier --check ./src"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
     "@formisch/core": "workspace:*",
+    "@formisch/eslint-config": "workspace:*",
     "@formisch/methods": "workspace:*",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
@@ -55,7 +55,6 @@
     "react-dom": "^19.2.1",
     "tsdown": "^0.16.8",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4"
   },
   "peerDependencies": {

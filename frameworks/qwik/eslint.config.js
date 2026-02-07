@@ -1,57 +1,21 @@
-import js from '@eslint/js';
+import {
+  baseConfigs,
+  createSourceConfig,
+  tseslint,
+} from '@formisch/eslint-config';
 import { qwikEslint9Plugin } from 'eslint-plugin-qwik';
-import { globalIgnores } from 'eslint/config';
 import globals from 'globals';
-import tseslint from 'typescript-eslint';
 
-const ignores = [
-  '**/*.log',
-  '**/.DS_Store',
-  '**/*.',
-  '.vscode/settings.json',
-  '**/.history',
-  '**/.yarn',
-  '**/bazel-*',
-  '**/bazel-bin',
-  '**/bazel-out',
-  '**/bazel-qwik',
-  '**/bazel-testlogs',
-  '**/dist',
-  '**/dist-dev',
-  '**/lib',
-  '**/lib-types',
-  '**/etc',
-  '**/external',
-  '**/node_modules',
-  '**/temp',
-  '**/tsc-out',
-  '**/tsdoc-metadata.json',
-  '**/target',
-  '**/output',
-  '**/rollup.config.js',
-  '**/build',
-  '**/.cache',
-  '**/.vscode',
-  '**/.rollup.cache',
-  '**/dist',
-  '**/tsconfig.tsbuildinfo',
-  '**/vite.config.ts',
-  '**/*.spec.tsx',
-  '**/*.spec.ts',
-  '**/.netlify',
-  '**/pnpm-lock.yaml',
-  '**/package-lock.json',
-  '**/yarn.lock',
-  '**/server',
-  'eslint.config.js',
-];
+const sourceConfig = createSourceConfig({
+  tsconfigRootDir: import.meta.dirname,
+});
 
 export default tseslint.config(
-  globalIgnores(ignores),
-  js.configs.recommended,
-  tseslint.configs.recommended,
+  { ignores: ['eslint.config.js', 'dist', 'server'] },
+  ...baseConfigs,
   qwikEslint9Plugin.configs.recommended,
   {
+    ...sourceConfig,
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -59,13 +23,7 @@ export default tseslint.config(
         ...globals.es2021,
         ...globals.serviceworker,
       },
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-    rules: {
-      '@typescript-eslint/ban-ts-comment': 'off',
+      parserOptions: sourceConfig.languageOptions.parserOptions,
     },
   }
 );

@@ -68,7 +68,7 @@ export default component$(() => {
     <Form
       of={nestedForm}
       class="space-y-12 md:space-y-14 lg:space-y-16"
-      onSubmit$={(output) => console.log(output)}
+      onSubmit$={(output, _) => console.log(output)}
     >
       <FormHeader of={nestedForm} heading="Nested form" />
 

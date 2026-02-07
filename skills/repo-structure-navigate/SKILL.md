@@ -1,4 +1,12 @@
-# Formisch Repository Navigation Guide
+---
+name: repo-structure-navigate
+description: Navigate the Formisch monorepo structure. Use when finding code locations, understanding architecture, locating source files, or implementing features across packages and frameworks.
+metadata:
+  author: formisch
+  version: '1.0'
+---
+
+# Repository Navigation
 
 Quick reference for understanding and navigating the Formisch repository structure.
 
@@ -23,7 +31,8 @@ formisch/
 ├── playgrounds/      # Testing environments per framework
 ├── scripts/          # Automation scripts
 ├── website/          # Documentation site
-└── prompts/          # AI agent guides
+├── skills/           # Agent skills (this folder)
+└── prompts/          # Legacy AI agent guides (deprecated)
 ```
 
 ## Core Packages
@@ -79,6 +88,31 @@ Minimal apps for testing. Use workspace dependencies (`workspace:*`). Run with `
 
 Documentation site built with Qwik. Update when APIs change.
 
+## Quick Reference
+
+### Finding Code
+
+| Looking for...                | Location                                  |
+| ----------------------------- | ----------------------------------------- |
+| Form state logic              | `/packages/core/src/form/`                |
+| Field management              | `/packages/core/src/field/`               |
+| Array utilities               | `/packages/core/src/array/`               |
+| Methods (submit, reset, etc.) | `/packages/methods/src/{method-name}/`    |
+| Framework components          | `/frameworks/{framework}/src/components/` |
+| Framework primitives          | `/frameworks/{framework}/src/primitives/` |
+| Type definitions              | `/packages/core/src/types/`               |
+| Usage examples                | `/playgrounds/{framework}/src/`           |
+| Documentation                 | `/website/src/routes/`                    |
+
+### Commands
+
+```bash
+pnpm install  # Install dependencies
+pnpm build    # Build a package
+pnpm test     # Run tests
+pnpm lint     # Lint and type check
+```
+
 ## Common Workflows
 
 ### Adding a Core Feature
@@ -122,31 +156,6 @@ Documentation site built with Qwik. Update when APIs change.
 - Tests next to implementation (`.test.ts`)
 - Use Vitest
 - Run: `pnpm test`
-
-## Quick Reference
-
-### Finding Code
-
-| Looking for...                | Location                                  |
-| ----------------------------- | ----------------------------------------- |
-| Form state logic              | `/packages/core/src/form/`                |
-| Field management              | `/packages/core/src/field/`               |
-| Array utilities               | `/packages/core/src/array/`               |
-| Methods (submit, reset, etc.) | `/packages/methods/src/{method-name}/`    |
-| Framework components          | `/frameworks/{framework}/src/components/` |
-| Framework primitives          | `/frameworks/{framework}/src/primitives/` |
-| Type definitions              | `/packages/core/src/types/`               |
-| Usage examples                | `/playgrounds/{framework}/src/`           |
-| Documentation                 | `/website/src/routes/`                    |
-
-### Commands
-
-```bash
-pnpm install  # Install dependencies
-pnpm build    # Build a package
-pnpm test     # Run tests
-pnpm lint     # Lint and type check
-```
 
 ## Architecture
 

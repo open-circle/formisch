@@ -38,6 +38,9 @@ export interface UseFieldConfig<
 /**
  * Creates a reactive field store of a specific field within a form store.
  *
+ * @param form The form store instance.
+ * @param config The field configuration.
+ *
  * @returns The field store with reactive properties and element props.
  */
 export function useField<
@@ -79,6 +82,10 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
     isValid: createComputed$(
       () => !getFieldBool(internalFieldStore.value, 'errors')
     ),
+    onInput: $((value) => {
+      setFieldInput(internalFormStore, pathSignal.value, value);
+      validateIfRequired(internalFormStore, internalFieldStore.value, 'input');
+    }),
     props: {
       get name() {
         return internalFieldStore.value.name;

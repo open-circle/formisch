@@ -1,9 +1,10 @@
 import {
   INTERNAL,
   type Schema,
+  type SubmitEventHandler,
   type SubmitHandler,
-} from '@formisch/core/vanilla';
-import { handleSubmit } from '@formisch/methods/vanilla';
+} from '@formisch/core/react';
+import { handleSubmit } from '@formisch/methods/react';
 import type { FormHTMLAttributes, ReactElement } from 'react';
 import type { FormStore } from '../../types/index.ts';
 
@@ -21,7 +22,7 @@ export type FormProps<TSchema extends Schema = Schema> = Omit<
   /**
    * The submit handler called when the form is submitted and validation succeeds.
    */
-  readonly onSubmit: SubmitHandler<TSchema>;
+  readonly onSubmit: SubmitHandler<TSchema> | SubmitEventHandler<TSchema>;
 };
 
 /**
@@ -48,7 +49,6 @@ export function Form({ of, onSubmit, ...other }: FormProps): ReactElement {
           of[INTERNAL].element = element;
         }
       }}
-      // @ts-ignore // TODO: Fix the type issue here
       onSubmit={handleSubmit(of, onSubmit)}
     />
   );

@@ -1,20 +1,26 @@
 import { includeIgnoreFile } from '@eslint/compat';
-import js from '@eslint/js';
+import {
+  baseConfigs,
+  commonRules,
+  importPlugin,
+  jsdoc,
+  tseslint,
+} from '@formisch/eslint-config';
 import svelte from 'eslint-plugin-svelte';
 import globals from 'globals';
 import { fileURLToPath } from 'node:url';
-import ts from 'typescript-eslint';
 import svelteConfig from './svelte.config.js';
 
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
-export default ts.config(
+export default tseslint.config(
   includeIgnoreFile(gitignorePath),
-  js.configs.recommended,
-  ...ts.configs.recommended,
+  { ignores: ['eslint.config.js'] },
+  ...baseConfigs,
   ...svelte.configs.recommended,
   {
-    ignores: ['eslint.config.js'],
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: { import: importPlugin, jsdoc },
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
       parserOptions: {
@@ -23,10 +29,10 @@ export default ts.config(
       },
     },
     rules: {
-      // typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
-      // see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
+      ...commonRules,
+      // Svelte-specific rules
       'no-undef': 'off',
-      '@typescript-eslint/ban-ts-comment': 'off',
+      'import/namespace': 'off',
     },
   },
   {
@@ -35,7 +41,7 @@ export default ts.config(
       parserOptions: {
         projectService: true,
         extraFileExtensions: ['.svelte'],
-        parser: ts.parser,
+        parser: tseslint.parser,
         svelteConfig,
       },
     },

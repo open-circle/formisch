@@ -77,6 +77,14 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
       isValid: computed(
         () => !getFieldBool(internalFieldStore.value, 'errors')
       ),
+      onInput(value) {
+        setFieldInput(internalFormStore, pathSignal.value, value);
+        validateIfRequired(
+          internalFormStore,
+          internalFieldStore.value,
+          'input'
+        );
+      },
       props: {
         get name() {
           return internalFieldStore.value.name;

@@ -3,6 +3,7 @@
     INTERNAL,
     type Schema,
     type SubmitHandler,
+    type SubmitEventHandler,
   } from '@formisch/core/svelte';
   import { handleSubmit } from '@formisch/methods/svelte';
   import type { FormStore } from '../../types/index.ts';
@@ -23,7 +24,7 @@
     /**
      * The submit handler called when the form is submitted and validation succeeds.
      */
-    onsubmit: SubmitHandler<TSchema>;
+    onsubmit: SubmitHandler<TSchema> | SubmitEventHandler<TSchema>;
     /**
      * The child elements to render within the form.
      */

@@ -194,7 +194,7 @@ export function initializeFieldStore(
           // Otherwise, if schema is fixed tuple, initialize children from schema
         } else {
           // Initialize child for each tuple item
-          for (let index = 0; index < schema.items; index++) {
+          for (let index = 0; index < schema.items.length; index++) {
             // Create empty child object
             // @ts-expect-error
             internalFieldStore.children[index] = {};

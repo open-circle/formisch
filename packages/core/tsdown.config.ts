@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import type { RolldownPluginOption } from 'rolldown';
 import { defineConfig, type UserConfig, type UserConfigFn } from 'tsdown';
 
-type Framework = 'preact' | 'qwik' | 'solid' | 'svelte' | 'vanilla' | 'vue';
+type Framework = 'preact' | 'qwik' | 'react' | 'solid' | 'svelte' | 'vue';
 
 /**
  * Rolldown plugin to rewrite framework-specific imports.
@@ -46,6 +46,11 @@ function rewriteFrameworkImports(framework: Framework): RolldownPluginOption {
 
     // Resolve imports of `.ts` files to framework-specific files
     async resolveId(source, importer) {
+      // Skip rewriting if importer is already a framework-specific file
+      if (importer?.endsWith(`.${framework}.ts`)) {
+        return null;
+      }
+
       // Resolve full path of imported file
       const resolved = await this.resolve(source, importer, {
         skipSelf: true,
@@ -112,9 +117,9 @@ const config: (UserConfig | UserConfigFn)[] = [
   defineFrameworkConfig(null),
   defineFrameworkConfig('preact'),
   defineFrameworkConfig('qwik'),
+  defineFrameworkConfig('react'),
   defineFrameworkConfig('solid'),
   defineFrameworkConfig('svelte'),
-  defineFrameworkConfig('vanilla'),
   defineFrameworkConfig('vue'),
 ];
 

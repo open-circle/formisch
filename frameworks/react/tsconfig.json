@@ -8,7 +8,8 @@
     "moduleResolution": "bundler",
     "noEmit": true,
     "jsx": "react-jsx",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["node"]
   },
   "include": ["src"]
 }

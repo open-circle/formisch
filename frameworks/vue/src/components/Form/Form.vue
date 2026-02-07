@@ -1,7 +1,11 @@
 <script setup lang="ts" generic="TSchema extends Schema = Schema">
-import { Schema, SubmitHandler } from '@formisch/core/vue';
+import type {
+  Schema,
+  SubmitEventHandler,
+  SubmitHandler,
+} from '@formisch/core/vue';
 import { handleSubmit } from '@formisch/methods/vue';
-import { FormStore } from '../../types';
+import type { FormStore } from '../../types/index.ts';
 
 /**
  * Form component props interface.
@@ -14,7 +18,7 @@ export interface FormProps<TSchema extends Schema = Schema> {
   /**
    * The submit handler called when the form is submitted and validation succeeds.
    */
-  onSubmit: SubmitHandler<TSchema>;
+  onSubmit: SubmitHandler<TSchema> | SubmitEventHandler<TSchema>;
 }
 
 const props = defineProps<FormProps<TSchema>>();

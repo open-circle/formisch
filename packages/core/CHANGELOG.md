@@ -2,6 +2,15 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.6.0 (February 05, 2026)
+
+- Split submit handler types into `SubmitHandler` (no event) and `SubmitEventHandler` (with event)
+
+## v0.5.0 (January 31, 2026)
+
+- Add React-specific `SubmitHandler` type using `FormEvent` type from React
+- Rename `vanilla` build target in favor of dedicated `react` target
+
 ## v0.4.5 (December 12, 2025)
 
 - Fix `initialInput` passed to `initializeFieldStore` for nullish wrapper schemas (pull request #48)

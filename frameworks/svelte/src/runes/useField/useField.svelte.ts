@@ -78,6 +78,10 @@ export function useField(
     get isValid() {
       return isValid;
     },
+    onInput(value) {
+      setFieldInput(internalFormStore, path, value);
+      validateIfRequired(internalFormStore, internalFieldStore, 'input');
+    },
     props: {
       get name() {
         return internalFieldStore.name;

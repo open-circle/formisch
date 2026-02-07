@@ -28,6 +28,9 @@ export interface UseFieldArrayConfig<
 /**
  * Creates a reactive field array store of a specific field array within a form store.
  *
+ * @param form The form store instance.
+ * @param config The field array configuration.
+ *
  * @returns The field array store with reactive properties for array management.
  */
 // @ts-expect-error

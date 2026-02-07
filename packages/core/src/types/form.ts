@@ -103,6 +103,13 @@ export interface BaseFormStore<TSchema extends Schema = Schema> {
  * Submit handler type.
  */
 export type SubmitHandler<TSchema extends Schema> = (
+  output: v.InferOutput<TSchema>
+) => MaybePromise<unknown>;
+
+/**
+ * Submit event handler type.
+ */
+export type SubmitEventHandler<TSchema extends Schema> = (
   output: v.InferOutput<TSchema>,
   event: SubmitEvent
 ) => MaybePromise<unknown>;

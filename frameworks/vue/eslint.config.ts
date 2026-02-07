@@ -1,30 +1,34 @@
+import eslint from '@eslint/js';
+import { commonRules, importPlugin, jsdoc } from '@formisch/eslint-config';
 import {
   defineConfigWithVueTs,
   vueTsConfigs,
 } from '@vue/eslint-config-typescript';
+import pluginSecurity from 'eslint-plugin-security';
 import pluginVue from 'eslint-plugin-vue';
-import { globalIgnores } from 'eslint/config';
-
-// To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
-// import { configureVueProject } from '@vue/eslint-config-typescript'
-// configureVueProject({ scriptLangs: ['ts', 'tsx'] })
-// More info at https://github.com/vuejs/eslint-config-typescript/#advanced-setup
 
 export default defineConfigWithVueTs(
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
+  { ignores: ['eslint.config.ts', 'dist', 'dist-ssr', 'coverage'] },
+  eslint.configs.recommended,
+  jsdoc.configs['flat/recommended'],
+  pluginSecurity.configs.recommended,
   pluginVue.configs['flat/essential'],
-  vueTsConfigs.recommended,
+  vueTsConfigs.strict,
+  vueTsConfigs.stylistic,
   {
     name: 'app/files-to-lint',
-    files: ['**/*.{ts,mts,tsx,vue}'],
+    files: ['src/**/*.{ts,mts,tsx,vue}'],
+    extends: [importPlugin.flatConfigs.recommended],
+    plugins: { jsdoc },
     languageOptions: {
       parserOptions: {
         tsconfigRootDir: import.meta.dirname,
       },
     },
     rules: {
+      ...commonRules,
+      // Vue-specific rules
       'vue/multi-word-component-names': 'off',
-      '@typescript-eslint/ban-ts-comment': 'off',
     },
   }
 );

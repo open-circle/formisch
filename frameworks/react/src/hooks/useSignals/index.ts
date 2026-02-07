@@ -1,1 +1,1 @@
-export * from './useSignals';
+export * from './useSignals.ts';

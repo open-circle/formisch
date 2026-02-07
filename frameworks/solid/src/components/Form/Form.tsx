@@ -1,6 +1,7 @@
 import {
   INTERNAL,
   type Schema,
+  type SubmitEventHandler,
   type SubmitHandler,
 } from '@formisch/core/solid';
 import { handleSubmit } from '@formisch/methods/solid';
@@ -25,7 +26,7 @@ export type FormProps<TSchema extends Schema = Schema> = Omit<
   /**
    * The submit handler called when the form is submitted and validation succeeds.
    */
-  readonly onSubmit: SubmitHandler<TSchema>;
+  readonly onSubmit: SubmitHandler<TSchema> | SubmitEventHandler<TSchema>;
 };
 
 /**

@@ -168,6 +168,25 @@ export function TextInput({ label, input, errors, ...props }: TextInputProps) {
 }
 ```
 
+## Using component libraries
+
+When using component libraries that don't expose their underlying native HTML elements, you cannot spread `field.props` directly. Instead, use `field.onChange` to update the value programmatically:
+
+```tsx
+import { DatePicker } from 'some-component-library';
+
+<Field of={form} path={['date']}>
+  {(field) => (
+    <DatePicker
+      value={field.input}
+      onChange={(newDate) => field.onChange(newDate)}
+    />
+  )}
+</Field>;
+```
+
+The `field.onChange` method updates the field value and triggers validation. For more details, see the <Link href="/react/guides/controlled-fields/">controlled fields</Link> guide.
+
 ## Next steps
 
 Now that you know how to create reusable input components, continue to the <Link href="/react/guides/handle-submission/">handle submission</Link> guide to learn how to process form data when the user submits the form.

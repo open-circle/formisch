@@ -3,10 +3,10 @@
   lang="ts"
   generic="TSchema extends Schema, TFieldPath extends RequiredPath"
 >
-import { RequiredPath, Schema, ValidPath } from '@formisch/core/vue';
-import * as v from 'valibot';
-import { useField } from '../../composables';
-import { FieldStore, FormStore } from '../../types';
+import type { RequiredPath, Schema, ValidPath } from '@formisch/core/vue';
+import type * as v from 'valibot';
+import { useField } from '../../composables/index.ts';
+import type { FieldStore, FormStore } from '../../types/index.ts';
 
 /**
  * Field component props interface.

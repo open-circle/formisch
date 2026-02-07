@@ -10,7 +10,7 @@ import {
   setFieldInput,
   validateIfRequired,
   type ValidPath,
-} from '@formisch/core/vanilla';
+} from '@formisch/core/react';
 import { useEffect, useMemo } from 'react';
 import type * as v from 'valibot';
 import type { FieldStore, FormStore } from '../../types/index.ts';
@@ -77,6 +77,11 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
       },
       get isValid() {
         return !getFieldBool(internalFieldStore, 'errors');
+      },
+      onChange(value) {
+        setFieldInput(internalFormStore, config.path, value);
+        validateIfRequired(internalFormStore, internalFieldStore, 'input');
+        validateIfRequired(internalFormStore, internalFieldStore, 'change');
       },
       props: {
         name: internalFieldStore.name,

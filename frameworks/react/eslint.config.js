@@ -1,31 +1,35 @@
-import js from '@eslint/js';
+import {
+  baseConfigs,
+  commonRules,
+  componentRules,
+  importConfig,
+  jsdoc,
+} from '@formisch/eslint-config';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import { defineConfig, globalIgnores } from 'eslint/config';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'eslint.config.js']),
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}'],
     extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
+      ...baseConfigs,
+      importConfig,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
+    plugins: { jsdoc },
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-      parser: undefined,
       parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
-    rules: {
-      '@typescript-eslint/ban-ts-comment': 'off',
-    },
+    rules: commonRules,
+  },
+  {
+    files: ['src/components/**/*.tsx'],
+    rules: componentRules,
   },
 ]);

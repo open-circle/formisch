@@ -24,31 +24,64 @@ export const properties: Record<string, PropertyProps> = {
   },
   handler: {
     type: {
-      type: 'custom',
-      name: 'SubmitHandler',
-      href: '/core/api/SubmitHandler/',
-      generics: [
+      type: 'union',
+      options: [
         {
           type: 'custom',
-          name: 'TSchema',
+          name: 'SubmitHandler',
+          href: '/core/api/SubmitHandler/',
+          generics: [
+            {
+              type: 'custom',
+              name: 'TSchema',
+            },
+          ],
+        },
+        {
+          type: 'custom',
+          name: 'SubmitEventHandler',
+          href: '/core/api/SubmitEventHandler/',
+          generics: [
+            {
+              type: 'custom',
+              name: 'TSchema',
+            },
+          ],
         },
       ],
     },
   },
   result: {
     type: {
-      type: 'function',
-      params: [
+      type: 'union',
+      options: [
         {
-          name: 'event',
-          type: {
+          type: 'function',
+          params: [],
+          return: {
             type: 'custom',
-            name: 'SubmitEvent',
-            href: '../SubmitEvent/',
+            name: 'Promise',
+            generics: ['void'],
+          },
+        },
+        {
+          type: 'function',
+          params: [
+            {
+              name: 'event',
+              type: {
+                type: 'custom',
+                name: 'SubmitEvent',
+              },
+            },
+          ],
+          return: {
+            type: 'custom',
+            name: 'Promise',
+            generics: ['void'],
           },
         },
       ],
-      return: 'void',
     },
   },
 };

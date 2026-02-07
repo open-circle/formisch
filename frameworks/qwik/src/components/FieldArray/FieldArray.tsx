@@ -3,7 +3,8 @@ import {
   type Schema,
   type ValidArrayPath,
 } from '@formisch/core/qwik';
-import { component$, JSXOutput, QRL } from '@qwik.dev/core';
+import type { JSXOutput, QRL } from '@qwik.dev/core';
+import { component$ } from '@qwik.dev/core';
 import type * as v from 'valibot';
 import { useFieldArray } from '../../hooks/index.ts';
 import { useResolvedQrl } from '../../hooks/useResolvedQrl/index.ts';

@@ -1,5 +1,5 @@
 import type { Path } from '@formisch/core/preact';
-import { ReadonlySignal, useSignal } from '@preact/signals';
+import { type ReadonlySignal, useSignal } from '@preact/signals';
 
 /**
  * Compares two paths for equality.

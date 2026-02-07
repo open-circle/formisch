@@ -1,7 +1,7 @@
 {
   "name": "@formisch/vue",
   "description": "The modular and type-safe form library for Vue",
-  "version": "0.6.5",
+  "version": "0.7.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",
@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@formisch/core": "workspace:*",
+    "@formisch/eslint-config": "workspace:*",
     "@formisch/methods": "workspace:*",
     "@types/node": "^24.1.0",
     "@vue/eslint-config-typescript": "^14.6.0",

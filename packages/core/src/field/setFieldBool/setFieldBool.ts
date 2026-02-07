@@ -1,5 +1,5 @@
 import { batch, untrack } from '../../framework/index.ts';
-import type { InternalFieldStore } from '../../types';
+import type { InternalFieldStore } from '../../types/index.ts';
 
 /**
  * Sets the specified boolean property for the field store and all nested

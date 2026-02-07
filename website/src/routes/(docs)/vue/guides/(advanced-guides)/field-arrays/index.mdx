@@ -73,7 +73,7 @@ const todoForm = useForm({
 </script>
 
 <template>
-  <Form :of="todoForm" @submit="(output) => console.log(output)">
+  <Form :of="todoForm" @submit="(output, event) => console.log(output)">
     <Field :of="todoForm" :path="['heading']" v-slot="field">
       <input v-bind="field.props" v-model="field.input" type="text" />
       <div v-if="field.errors">{{ field.errors[0] }}</div>

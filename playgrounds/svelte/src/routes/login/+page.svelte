@@ -25,7 +25,7 @@
   <title>Login form</title>
 </svelte:head>
 
-<Form of={loginForm} onsubmit={(output) => console.log(output)}>
+<Form of={loginForm} onsubmit={(output, _) => console.log(output)}>
   <div class="space-y-12 md:space-y-14 lg:space-y-16">
     <FormHeader of={loginForm} heading="Login form" />
     <div class="space-y-8 md:space-y-10 lg:space-y-12">

@@ -112,7 +112,8 @@ function setNestedInput(
     // Update dirty state based on input or items length change
     internalFieldStore.isDirty.value =
       internalFieldStore.startInput.value !== internalFieldStore.input.value ||
-      internalFieldStore.startItems.value.length !== items.length;
+      internalFieldStore.startItems.value.length !==
+        internalFieldStore.items.value.length;
 
     // Otherwise, if field store is object, handle object input
   } else if (internalFieldStore.kind === 'object') {

@@ -22,11 +22,4 @@ export const properties: Record<string, PropertyProps> = {
       ],
     },
   },
-  event: {
-    type: {
-      type: 'custom',
-      name: 'SubmitEvent',
-      href: '/methods/api/SubmitEvent/',
-    },
-  },
 };

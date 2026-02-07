@@ -28,7 +28,7 @@ const result = handleSubmit<TSchema>(form, handler);
 
 ### Explanation
 
-The `form` parameter is the form store to handle submission for. The `handler` parameter is the submit handler function that gets called with the validated form output if validation succeeds.
+The `form` parameter is the form store to handle submission for. The `handler` parameter can be a `SubmitHandler` (no event) or a `SubmitEventHandler` (with event) that gets called with the validated form output if validation succeeds.
 
 ## Returns
 

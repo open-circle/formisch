@@ -6,15 +6,20 @@ on:
   workflow_dispatch:
 
 jobs:
+  default_ci:
+    name: Run default CI of repository
+    uses: ./.github/workflows/ci.yml
+
   preact_npm:
     name: Publish Preact to NPM
+    needs: default_ci
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup environment
         uses: ./.github/actions/environment
       - name: Build library
@@ -29,13 +34,14 @@ jobs:
 
   qwik_npm:
     name: Publish Qwik to NPM
+    needs: default_ci
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup environment
         uses: ./.github/actions/environment
       - name: Build library
@@ -50,13 +56,14 @@ jobs:
 
   react_npm:
     name: Publish React to NPM
+    needs: default_ci
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup environment
         uses: ./.github/actions/environment
       - name: Build library
@@ -71,13 +78,14 @@ jobs:
 
   solid_npm:
     name: Publish Solid to NPM
+    needs: default_ci
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup environment
         uses: ./.github/actions/environment
       - name: Build library
@@ -92,13 +100,14 @@ jobs:
 
   svelte_npm:
     name: Publish Svelte to NPM
+    needs: default_ci
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup environment
         uses: ./.github/actions/environment
       - name: Build library
@@ -113,13 +122,14 @@ jobs:
 
   vue_npm:
     name: Publish Vue to NPM
+    needs: default_ci
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup environment
         uses: ./.github/actions/environment
       - name: Build library

@@ -76,6 +76,12 @@ export interface FieldStore<
    */
   readonly isValid: boolean;
   /**
+   * Sets the field input value programmatically.
+   */
+  readonly onInput: (
+    value: PartialValues<PathValue<v.InferInput<TSchema>, TFieldPath>>
+  ) => void;
+  /**
    * The props to spread onto the field element for integration.
    */
   readonly props: FieldElementProps;

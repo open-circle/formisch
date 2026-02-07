@@ -124,8 +124,8 @@ export const EmailInput = component$<EmailInputProps>((props) => {
 
 ### When to use which
 
-- **Use `Field` component**: When defining multiple fields in the same component. It ensures you don't accidentally access the wrong field store.
-- **Use `useField$` hook**: When creating field components for single fields. It allows you to access field state in your component logic.
+- **Use <Link href="/qwik/api/Field/">`Field`</Link> component**: When defining multiple fields in the same component. It ensures you don't accidentally access the wrong field store.
+- **Use <Link href="/qwik/api/useField/">`useField$`</Link> hook**: When creating field components for single fields. It allows you to access field state in your component logic.
 
 The <Link href="/qwik/api/Field/">`Field`</Link> component is essentially a thin wrapper around <Link href="/qwik/api/useField/">`useField$`</Link> that allows you to access the field state within JSX code.
 
@@ -139,6 +139,7 @@ The field store provides access to the following properties as signals:
 - `isTouched`: A signal indicating whether the field has been touched (access with `.value`).
 - `isDirty`: A signal indicating whether the current input differs from the initial input (access with `.value`).
 - `isValid`: A signal indicating whether the field passes all validation rules (access with `.value`).
+- `onInput`: Sets the field input value programmatically. Use this when the field cannot be connected to a native HTML element (e.g., complex custom inputs or component libraries that don't expose the underlying element).
 
 ## Next steps
 

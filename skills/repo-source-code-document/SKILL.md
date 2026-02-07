@@ -1,4 +1,12 @@
-# Formisch Source Code Documentation Guide
+---
+name: repo-source-code-document
+description: Document Formisch source code with JSDoc and inline comments. Use when writing or updating documentation comments in packages/core, packages/methods, or frameworks/* source files.
+metadata:
+  author: formisch
+  version: '1.0'
+---
+
+# Source Code Documentation
 
 A concise guide for documenting Formisch source code with JSDoc and inline comments.
 
@@ -8,8 +16,6 @@ A concise guide for documenting Formisch source code with JSDoc and inline comme
 2. **Consistency is critical** - Same APIs use identical documentation across all frameworks
 3. **User-focused** - Documentation enhances TypeScript IntelliSense
 4. **Group related code** - Comment logical blocks, not every line
-
----
 
 ## JSDoc Patterns
 
@@ -94,8 +100,6 @@ export const INTERNAL = '~internal' as const;
 
 No JSDoc and inline comments needed - keep clean.
 
----
-
 ## Inline Comments
 
 ### Style Rules
@@ -149,8 +153,6 @@ store.validate = config.validate ?? 'submit';
 store.revalidate = config.revalidate ?? 'input';
 ```
 
-Avoid over-commenting every line.
-
 ### Hints
 
 Explain WHY, not WHAT. Can use articles and periods:
@@ -173,15 +175,11 @@ In JSDoc:
 initialInput: Signal<unknown>;
 ```
 
----
-
 ## Cross-Framework Consistency
 
 **Same properties/functions across frameworks must use identical documentation text.**
 
 Check documentation in other frameworks before adding or modifying.
-
----
 
 ## What to Document
 
@@ -203,8 +201,6 @@ Check documentation in other frameworks before adding or modifying.
 - Every single line
 - Obvious operations
 - `@ts-expect-error` when context is clear
-
----
 
 ## Quick Reference
 
@@ -233,7 +229,3 @@ Check documentation in other frameworks before adding or modifying.
 // Hint: [explanation with articles and period]
 // TODO: [task]
 ```
-
----
-
-This guide ensures consistent, maintainable documentation throughout the Formisch codebase while keeping it concise and focused on what matters most.

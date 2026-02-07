@@ -39,7 +39,7 @@ const specialForm = useForm({
   <Form
     :of="specialForm"
     class="space-y-12 md:space-y-14 lg:space-y-16"
-    @submit="(output) => console.log(output)"
+    @submit="(output, _) => console.log(output)"
   >
     <FormHeader :of="specialForm" heading="Special form" />
     <div class="space-y-8 md:space-y-10 lg:space-y-12">

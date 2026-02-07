@@ -6,7 +6,7 @@ import {
   type RequiredPath,
   type Schema,
   type ValidArrayPath,
-} from '@formisch/core/vanilla';
+} from '@formisch/core/react';
 import { useMemo } from 'react';
 import type * as v from 'valibot';
 import type { FieldArrayStore, FormStore } from '../../types/index.ts';

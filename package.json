@@ -14,8 +14,14 @@
   "packageManager": "pnpm@10.24.0",
   "scripts": {
     "build": "pnpm run build-packages && pnpm run build-frameworks",
-    "build-packages": "pnpm --filter './packages/*' build",
-    "build-frameworks": "pnpm --filter './frameworks/*' build",
+    "build-packages": "pnpm --filter './packages/*' --if-present build",
+    "build-frameworks": "pnpm --filter './frameworks/*' --if-present build",
+    "lint": "pnpm run lint-packages && pnpm run lint-frameworks",
+    "lint-packages": "pnpm --filter './packages/*' --if-present lint",
+    "lint-frameworks": "pnpm --filter './frameworks/*' --if-present lint",
+    "test": "pnpm run test-packages && pnpm run test-frameworks",
+    "test-packages": "pnpm --filter './packages/*' --if-present test",
+    "test-frameworks": "pnpm --filter './frameworks/*' --if-present test",
     "check-versions": "pnpm --filter formisch-scripts check-versions",
     "create-releases": "pnpm --filter formisch-scripts create-releases"
   },

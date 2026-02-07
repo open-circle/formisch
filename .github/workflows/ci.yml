@@ -1,0 +1,269 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+jobs:
+  # packages/core
+  core_prettier:
+    name: Run Prettier in packages/core
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: packages/core
+
+  core_eslint:
+    name: Run ESLint in packages/core
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: packages/core
+
+  core_vitest:
+    name: Run Vitest in packages/core
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Vitest tests
+        run: pnpm test
+        working-directory: packages/core
+
+  # packages/methods
+  methods_prettier:
+    name: Run Prettier in packages/methods
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: packages/methods
+
+  methods_eslint:
+    name: Run ESLint in packages/methods
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: packages/methods
+
+  methods_vitest:
+    name: Run Vitest in packages/methods
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Vitest tests
+        run: pnpm test
+        working-directory: packages/methods
+
+  # frameworks/solid
+  solid_prettier:
+    name: Run Prettier in frameworks/solid
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: frameworks/solid
+
+  solid_eslint:
+    name: Run ESLint in frameworks/solid
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: frameworks/solid
+
+  # frameworks/react
+  react_prettier:
+    name: Run Prettier in frameworks/react
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: frameworks/react
+
+  react_eslint:
+    name: Run ESLint in frameworks/react
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: frameworks/react
+
+  # frameworks/preact
+  preact_prettier:
+    name: Run Prettier in frameworks/preact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: frameworks/preact
+
+  preact_eslint:
+    name: Run ESLint in frameworks/preact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: frameworks/preact
+
+  # frameworks/qwik
+  qwik_prettier:
+    name: Run Prettier in frameworks/qwik
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: frameworks/qwik
+
+  qwik_eslint:
+    name: Run ESLint in frameworks/qwik
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: frameworks/qwik
+
+  # frameworks/svelte
+  svelte_prettier:
+    name: Run Prettier in frameworks/svelte
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: frameworks/svelte
+
+  svelte_eslint:
+    name: Run ESLint in frameworks/svelte
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: frameworks/svelte
+
+  svelte_check:
+    name: Run Svelte check in frameworks/svelte
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Svelte check
+        run: pnpm check
+        working-directory: frameworks/svelte
+
+  # frameworks/vue
+  vue_prettier:
+    name: Run Prettier in frameworks/vue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: frameworks/vue
+
+  vue_eslint:
+    name: Run ESLint in frameworks/vue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: frameworks/vue
+
+  # website
+  website_prettier:
+    name: Run Prettier in website
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: website
+
+  website_eslint:
+    name: Run ESLint in website
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: website

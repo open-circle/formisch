@@ -86,6 +86,14 @@ export function useField(
     get isValid() {
       return getIsValid();
     },
+    onInput(value) {
+      setFieldInput(getInternalFormStore(), getPath(), value);
+      validateIfRequired(
+        getInternalFormStore(),
+        getInternalFieldStore(),
+        'input'
+      );
+    },
     props: {
       get name() {
         return getInternalFieldStore().name;

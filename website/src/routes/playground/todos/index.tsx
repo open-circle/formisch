@@ -87,7 +87,7 @@ export default component$(() => {
     <Form
       of={todoForm}
       class="flex flex-col gap-12 md:gap-14 lg:gap-16"
-      onSubmit$={(output) => alert(JSON.stringify(output, null, 2))}
+      onSubmit$={(output, _) => alert(JSON.stringify(output, null, 2))}
     >
       <FormHeader of={todoForm} heading="Todo form" />
 

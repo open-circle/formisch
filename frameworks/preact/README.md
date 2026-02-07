@@ -32,7 +32,7 @@ export default function LoginPage() {
   });
 
   return (
-    <Form of={loginForm} onSubmit={(output) => console.log(output)}>
+    <Form of={loginForm} onSubmit={(output, event) => console.log(output)}>
       <Field of={loginForm} path={['email']}>
         {(field) => (
           <div>

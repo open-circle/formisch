@@ -1,0 +1,37 @@
+---
+title: SubmitEventHandler
+description: Function type for handling form submission with the submit event.
+source: /packages/core/src/types/form.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# SubmitEventHandler
+
+Function type for handling form submission with the submit event. Used by the `handleSubmit` method and form components.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+
+## Parameters
+
+- `output` <Property {...properties.output} />
+- `event` <Property {...properties.event} />
+
+## Related
+
+### Methods
+
+<ApiList
+  items={[{ text: 'handleSubmit', href: '/methods/api/handleSubmit/' }]}
+/>
+
+### Types
+
+<ApiList
+  items={[{ text: 'SubmitHandler', href: '/core/api/SubmitHandler/' }]}
+/>

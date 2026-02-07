@@ -6,11 +6,11 @@ import {
   type Schema,
   validateFormInput,
 } from '@formisch/core/qwik';
+import type { QRL } from '@qwik.dev/core';
 import {
   $,
   createComputed$,
   implicit$FirstArg,
-  QRL,
   useConstant,
   useTask$,
 } from '@qwik.dev/core';
@@ -21,6 +21,8 @@ import { useResolvedQrl } from '../useResolvedQrl/useResolvedQrl.ts';
 /**
  * Creates a reactive form store from a form configuration. The form store
  * manages form state and provides reactive properties.
+ *
+ * @param configQrl The QRL containing the form configuration.
  *
  * @returns The form store with reactive properties.
  */

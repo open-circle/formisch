@@ -39,7 +39,7 @@ export default component$(() => {
   return (
     <Form
       of={loginForm}
-      onSubmit$={(output) => {
+      onSubmit$={(output, event) => {
         // output is fully typed based on LoginSchema
         console.log(output.email); // ✓ Type-safe
         console.log(output.username); // ✗ TypeScript error
@@ -81,7 +81,7 @@ export default component$(() => {
   return (
     <Form
       of={profileForm}
-      onSubmit$={(output) => {
+      onSubmit$={(output, event) => {
         // output is: { age: number; birthDate: Date }
         console.log(output.age); // number
         console.log(output.birthDate); // Date
@@ -165,7 +165,7 @@ type FormContentProps = {
 
 export const FormContent = component$<FormContentProps>((props) => {
   return (
-    <Form of={props.of} onSubmit$={(output) => console.log(output)}>
+    <Form of={props.of} onSubmit$={(output, event) => console.log(output)}>
       {/* Form fields */}
     </Form>
   );
@@ -216,4 +216,6 @@ Most types you need can be imported from `@formisch/qwik`. You can find all avai
   valid array field paths
 - <Link href="/core/api/Schema/">`Schema`</Link> - Base schema type from Valibot
 - <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link> - Type for submit
-  handler functions
+  handlers without the event
+- <Link href="/core/api/SubmitEventHandler/">`SubmitEventHandler`</Link> - Type
+  for submit handlers with the event

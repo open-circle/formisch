@@ -6,7 +6,7 @@ import type {
   Schema,
   ValidArrayPath,
   ValidPath,
-} from '@formisch/core/vanilla';
+} from '@formisch/core/react';
 import type { ChangeEventHandler, FocusEventHandler } from 'react';
 import type * as v from 'valibot';
 
@@ -71,6 +71,12 @@ export interface FieldStore<
    * Whether the field is valid according to the schema.
    */
   readonly isValid: boolean;
+  /**
+   * Sets the field input value programmatically.
+   */
+  readonly onChange: (
+    value: PartialValues<PathValue<v.InferInput<TSchema>, TFieldPath>>
+  ) => void;
   /**
    * The props to spread onto the field element for integration.
    */

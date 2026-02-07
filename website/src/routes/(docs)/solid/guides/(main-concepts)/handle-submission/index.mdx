@@ -32,20 +32,20 @@ export default function App() {
     schema: LoginSchema,
   });
 
-  const handleSubmit: SubmitHandler<typeof LoginSchema> = (values) => {
+  const submitForm: SubmitHandler<typeof LoginSchema> = (values) => {
     // Process the validated form values
     console.log(values); // { email: string, password: string }
   };
 
   return (
-    <Form of={loginForm} onSubmit={handleSubmit}>
+    <Form of={loginForm} onSubmit={submitForm}>
       {/* Form fields will go here */}
     </Form>
   );
 }
 ```
 
-The <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link> type ensures type safety for your submission handler, automatically inferring the types of validated values from your schema.
+The <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link> type ensures type safety for your submission handler, automatically inferring the types of validated values from your schema. If you need access to the submit event, use <Link href="/core/api/SubmitEventHandler/">`SubmitEventHandler`</Link> instead.
 
 ### Prevent default
 
@@ -68,7 +68,7 @@ The form store also provides other reactive properties like `isSubmitted`, `isVa
 The submit handler can be asynchronous, allowing you to perform API calls or other async operations:
 
 ```tsx
-const handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
   try {
     const response = await fetch('/api/login', {
       method: 'POST',
@@ -87,6 +87,54 @@ const handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
     console.error('Error during submission:', error);
   }
 };
+```
+
+### Trigger submission
+
+If you want to trigger submission programmatically from outside the form, you can use the <Link href="/methods/api/submit/">`submit`</Link> method. It calls `requestSubmit()` on the underlying form element:
+
+```tsx
+import { submit } from '@formisch/solid';
+
+<button type="button" onClick={() => submit(loginForm)}>
+  Submit from outside
+</button>;
+```
+
+## Submit without \<form /\>
+
+In some cases, you may not be able to wrap your fields in a `<form>` element — for example, when your form is rendered inside another form, since nesting `<form>` elements is invalid HTML. In these situations, you can use the <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method directly to submit the form programmatically without the <Link href="/solid/api/Form/">`Form`</Link> component.
+
+The returned function accepts no arguments and can be called from anywhere — for example, from a button's `onClick` handler:
+
+```tsx
+import { createForm, Field, handleSubmit } from '@formisch/solid';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function App() {
+  const loginForm = createForm({
+    schema: LoginSchema,
+  });
+
+  const submitForm = handleSubmit(loginForm, (values) => {
+    // Process the validated form values
+    console.log(values);
+  });
+
+  return (
+    <div>
+      {/* Form fields without a <Form /> wrapper */}
+      <button type="button" onClick={submitForm}>
+        Login
+      </button>
+    </div>
+  );
+}
 ```
 
 ## Next steps

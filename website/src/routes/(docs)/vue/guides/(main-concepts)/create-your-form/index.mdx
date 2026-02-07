@@ -60,7 +60,9 @@ const loginForm = useForm({
 });
 ```
 
-> If your initial data comes from a remote source and may change after form creation, use the <Link href="/methods/api/reset/">`reset`</Link> method with a new `initialInput` to update the form's baseline data.
+Formisch tracks two inputs for every field: the **initial input** (baseline for dirty tracking) and the **current input** (what the user is editing). In many apps, the initial input represents the server state while the current input represents the client state.
+
+`isDirty` becomes `true` when a field's current input differs from its initial input. Use <Link href="/methods/api/setInput/">`setInput`</Link> to update the current input (client state), and use <Link href="/methods/api/reset/">`reset`</Link> to update the initial input (baseline) when your server data changes or is refreshed.
 
 ### Multiple forms
 

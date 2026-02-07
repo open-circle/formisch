@@ -7,7 +7,7 @@ import type {
   ValidPath,
 } from '@formisch/core/vue';
 import type * as v from 'valibot';
-import { ComponentPublicInstance } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
 
 /**
  * Field element props interface.

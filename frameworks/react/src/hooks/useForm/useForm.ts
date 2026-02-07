@@ -5,7 +5,7 @@ import {
   INTERNAL,
   type Schema,
   validateFormInput,
-} from '@formisch/core/vanilla';
+} from '@formisch/core/react';
 import { useLayoutEffect, useMemo } from 'react';
 import * as v from 'valibot';
 import type { FormStore } from '../../types/index.ts';

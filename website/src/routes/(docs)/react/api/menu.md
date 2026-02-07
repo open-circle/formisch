@@ -59,7 +59,7 @@
 - [SetFieldInputConfig](/methods/api/SetFieldInputConfig/)
 - [SetFormErrorsConfig](/methods/api/SetFormErrorsConfig/)
 - [SetFormInputConfig](/methods/api/SetFormInputConfig/)
-- [SubmitEvent](/methods/api/SubmitEvent/)
+- [SubmitEventHandler](/core/api/SubmitEventHandler/)
 - [SubmitHandler](/core/api/SubmitHandler/)
 - [SwapConfig](/methods/api/SwapConfig/)
 - [UseFieldArrayConfig](/react/api/UseFieldArrayConfig/)

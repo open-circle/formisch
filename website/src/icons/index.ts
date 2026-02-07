@@ -11,6 +11,7 @@ export * from './DiscordIcon';
 export * from './GitHubIcon';
 export * from './HashtagIcon';
 export * from './LogoIcon';
+export * from './MarkdownIcon';
 export * from './MenuIcon';
 export * from './NightIcon';
 export * from './PageIcon';

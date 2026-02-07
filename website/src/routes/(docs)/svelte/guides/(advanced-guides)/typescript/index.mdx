@@ -24,7 +24,7 @@ Formisch uses Valibot's type inference to automatically derive TypeScript types 
     createForm,
     Field,
     Form,
-    type SubmitHandler,
+    type SubmitEventHandler,
   } from '@formisch/svelte';
   import * as v from 'valibot';
 
@@ -40,7 +40,10 @@ Formisch uses Valibot's type inference to automatically derive TypeScript types 
   // TypeScript knows the form structure from the schema
   // loginForm is of type FormStore<typeof LoginSchema>
 
-  const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+  const handleSubmit: SubmitEventHandler<typeof LoginSchema> = (
+    output,
+    _event
+  ) => {
     // output is fully typed based on LoginSchema
     console.log(output.email); // ✓ Type-safe
     console.log(output.username); // ✗ TypeScript error
@@ -62,7 +65,7 @@ Valibot schemas can have different input and output types when using transformat
     createForm,
     Field,
     Form,
-    type SubmitHandler,
+    type SubmitEventHandler,
   } from '@formisch/svelte';
   import * as v from 'valibot';
 
@@ -83,7 +86,10 @@ Valibot schemas can have different input and output types when using transformat
     schema: ProfileSchema,
   });
 
-  const handleSubmit: SubmitHandler<typeof ProfileSchema> = (output) => {
+  const handleSubmit: SubmitEventHandler<typeof ProfileSchema> = (
+    output,
+    _event
+  ) => {
     // output is: { age: number; birthDate: Date }
     console.log(output.age); // number
     console.log(output.birthDate); // Date
@@ -158,7 +164,11 @@ To pass your form to another component via props, you can use the <Link href="/s
 
 <!-- In another file -->
 <script lang="ts">
-  import { Form, type FormStore, type SubmitHandler } from '@formisch/svelte';
+  import {
+    Form,
+    type FormStore,
+    type SubmitEventHandler,
+  } from '@formisch/svelte';
   import * as v from 'valibot';
 
   const LoginSchema = v.object({
@@ -172,7 +182,10 @@ To pass your form to another component via props, you can use the <Link href="/s
 
   let { of } = $props<FormContentProps>();
 
-  const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => console.log(output);
+  const handleSubmit: SubmitEventHandler<typeof LoginSchema> = (
+    output,
+    _event
+  ) => console.log(output);
 </script>
 
 <Form of={of} onsubmit={handleSubmit}>
@@ -226,4 +239,6 @@ Most types you need can be imported from `@formisch/svelte`. You can find all av
   valid array field paths
 - <Link href="/core/api/Schema/">`Schema`</Link> - Base schema type from Valibot
 - <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link> - Type for submit
-  handler functions
+  handlers without the event
+- <Link href="/core/api/SubmitEventHandler/">`SubmitEventHandler`</Link> - Type
+  for submit handlers with the event

@@ -1,4 +1,4 @@
-import type { InternalFieldStore } from '../../types';
+import type { InternalFieldStore } from '../../types/index.ts';
 
 /**
  * Returns the current input of the field store. For arrays and objects,

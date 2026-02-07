@@ -6,6 +6,7 @@ export type {
   PathValue,
   RequiredPath,
   Schema,
+  SubmitEventHandler,
   SubmitHandler,
   ValidArrayPath,
   ValidationMode,

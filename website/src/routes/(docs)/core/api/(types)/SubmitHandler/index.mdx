@@ -11,7 +11,7 @@ import { properties } from './properties';
 
 # SubmitHandler
 
-Function type for handling form submission. Used by the `handleSubmit` method.
+Function type for handling form submission without the submit event. Used by the `handleSubmit` method.
 
 ## Generics
 
@@ -20,7 +20,6 @@ Function type for handling form submission. Used by the `handleSubmit` method.
 ## Parameters
 
 - `output` <Property {...properties.output} />
-- `event` <Property {...properties.event} />
 
 ## Related
 
@@ -32,4 +31,8 @@ Function type for handling form submission. Used by the `handleSubmit` method.
 
 ### Types
 
-<ApiList items={[{ text: 'SubmitEvent', href: '/methods/api/SubmitEvent/' }]} />
+<ApiList
+  items={[
+    { text: 'SubmitEventHandler', href: '/core/api/SubmitEventHandler/' },
+  ]}
+/>

@@ -58,7 +58,7 @@ export default function TodoPage() {
   });
 
   return (
-    <Form of={todoForm} onSubmit={(output) => console.log(output)}>
+    <Form of={todoForm} onSubmit={(output, event) => console.log(output)}>
       <Field of={todoForm} path={['heading']}>
         {(field) => (
           <>

@@ -2,6 +2,16 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.7.0 (February 05, 2026)
+
+- Align `handleSubmit` overloads with separate `SubmitHandler` and `SubmitEventHandler` types
+
+## v0.6.0 (January 31, 2026)
+
+- Add React-specific `handleSubmit` method using `FormEvent` type from React
+- Add React-specific `setInput` method with change event validation
+- Rename `vanilla` build target in favor of dedicated `react` target
+
 ## v0.5.2 (December 11, 2025)
 
 - Change `@formisch/core` to v0.4.4
