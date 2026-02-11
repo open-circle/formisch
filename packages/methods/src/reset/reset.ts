@@ -68,9 +68,9 @@ export interface ResetFieldConfig<
    * The new initial input to reset the field to. If provided, replaces the
    * field's initial input.
    */
-  readonly initialInput?: DeepPartial<
-    PathValue<v.InferInput<TSchema>, TFieldPath>
-  >;
+  readonly initialInput?:
+    | DeepPartial<PathValue<v.InferInput<TSchema>, TFieldPath>>
+    | undefined;
 }
 
 /**

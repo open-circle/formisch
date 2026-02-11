@@ -16,10 +16,10 @@ import { vi } from 'vitest';
  * Configuration options for creating a test store.
  */
 interface CreateTestStoreConfig<TSchema extends Schema> {
-  validate?: ValidationMode;
-  revalidate?: Exclude<ValidationMode, 'initial'>;
-  initialInput?: v.InferInput<TSchema>;
-  issues?: [v.BaseIssue<unknown>, ...v.BaseIssue<unknown>[]];
+  validate?: ValidationMode | undefined;
+  revalidate?: Exclude<ValidationMode, 'initial'> | undefined;
+  initialInput?: v.InferInput<TSchema> | undefined;
+  issues?: [v.BaseIssue<unknown>, ...v.BaseIssue<unknown>[]] | undefined;
 }
 
 /**

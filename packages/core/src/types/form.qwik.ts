@@ -41,7 +41,7 @@ export interface InternalFormStore<TSchema extends Schema = Schema>
   /**
    * The element of the form.
    */
-  element?: HTMLFormElement;
+  element?: HTMLFormElement | undefined;
 
   /**
    * The number of active validators.

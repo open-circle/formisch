@@ -1,17 +1,17 @@
 /**
  * Checks if a type is `any`.
  */
-export type IsAny<Type> = 0 extends 1 & Type ? true : false;
+export type IsAny<T> = 0 extends 1 & T ? true : false;
 
 /**
  * Checks if a type is `never`.
  */
-export type IsNever<Type> = [Type] extends [never] ? true : false;
+export type IsNever<T> = [T] extends [never] ? true : false;
 
 /**
  * Constructs a type that is maybe a promise.
  */
-export type MaybePromise<TValue> = TValue | Promise<TValue>;
+export type MaybePromise<T> = T | Promise<T>;
 
 /**
  * Makes all properties deeply optional.
@@ -19,7 +19,7 @@ export type MaybePromise<TValue> = TValue | Promise<TValue>;
 export type DeepPartial<TValue> = TValue extends
   | Record<PropertyKey, unknown>
   | readonly unknown[]
-  ? { [Key in keyof TValue]?: DeepPartial<TValue[Key]> | undefined }
+  ? { [TKey in keyof TValue]?: DeepPartial<TValue[TKey]> | undefined }
   : TValue | undefined;
 
 /**
@@ -37,12 +37,12 @@ export type PartialValues<TValue> = TValue extends readonly (infer TItem)[]
       // to fail the object and array check as a whole and skip recursion
       // entirely, leaving object members like `{ id: number }` unchanged.
       (TItem extends Record<PropertyKey, unknown> | readonly unknown[]
-        ? { [Key in keyof TItem]: PartialValues<TItem[Key]> }
+        ? { [TKey in keyof TItem]: PartialValues<TItem[TKey]> }
         : TItem)[]
     : // For tuples, recurse into each position making values optional
-      { [Key in keyof TValue]: PartialValues<TValue[Key]> }
+      { [TKey in keyof TValue]: PartialValues<TValue[TKey]> }
   : // For objects, recurse into each property making values optional
     TValue extends Record<PropertyKey, unknown>
-    ? { [Key in keyof TValue]: PartialValues<TValue[Key]> }
+    ? { [TKey in keyof TValue]: PartialValues<TValue[TKey]> }
     : // For primitives, make the value itself optional
       TValue | undefined;

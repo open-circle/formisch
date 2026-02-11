@@ -40,8 +40,10 @@ type KeyOf<TValue> =
  * properties that do not exist in all union options are not accessible
  * and result in "any" when accessed.
  */
-type MergeUnion<T> = {
-  [K in KeyOf<T>]: T extends Record<K, infer V> ? V : never;
+type MergeUnion<TValue> = {
+  [TKey in KeyOf<TValue>]: TValue extends Record<TKey, infer TItem>
+    ? TItem
+    : never;
 };
 
 /**

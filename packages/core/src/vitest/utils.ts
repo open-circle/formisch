@@ -7,10 +7,10 @@ import type { InternalFormStore, ValidationMode } from '../types/index.ts';
  * Configuration options for creating a test store.
  */
 interface CreateTestStoreConfig {
-  validate?: ValidationMode;
-  revalidate?: Exclude<ValidationMode, 'initial'>;
-  initialInput?: unknown;
-  issues?: [v.BaseIssue<unknown>, ...v.BaseIssue<unknown>[]];
+  validate?: ValidationMode | undefined;
+  revalidate?: Exclude<ValidationMode, 'initial'> | undefined;
+  initialInput?: unknown | undefined;
+  issues?: [v.BaseIssue<unknown>, ...v.BaseIssue<unknown>[]] | undefined;
 }
 
 /**
