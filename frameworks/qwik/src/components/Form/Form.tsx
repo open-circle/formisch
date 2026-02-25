@@ -23,9 +23,7 @@ export type FormProps<TSchema extends Schema = Schema> = Omit<
   /**
    * The submit handler called when the form is submitted and validation succeeds.
    */
-  readonly onSubmit$:
-    | QRL<SubmitHandler<TSchema>>
-    | QRL<SubmitEventHandler<TSchema>>;
+  readonly onSubmit$: QRL<SubmitHandler<TSchema> & SubmitEventHandler<TSchema>>;
 };
 
 /**

@@ -18,7 +18,7 @@ export interface FormProps<TSchema extends Schema = Schema> {
   /**
    * The submit handler called when the form is submitted and validation succeeds.
    */
-  onSubmit: SubmitHandler<TSchema> | SubmitEventHandler<TSchema>;
+  onSubmit: SubmitHandler<TSchema> & SubmitEventHandler<TSchema>;
 }
 
 const props = defineProps<FormProps<TSchema>>();

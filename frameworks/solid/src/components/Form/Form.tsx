@@ -26,7 +26,7 @@ export type FormProps<TSchema extends Schema = Schema> = Omit<
   /**
    * The submit handler called when the form is submitted and validation succeeds.
    */
-  readonly onSubmit: SubmitHandler<TSchema> | SubmitEventHandler<TSchema>;
+  readonly onSubmit: SubmitHandler<TSchema> & SubmitEventHandler<TSchema>;
 };
 
 /**
@@ -53,7 +53,12 @@ export function Form(props: FormProps): JSX.Element {
       ref={(element) => {
         props.of[INTERNAL].element = element;
       }}
-      onSubmit={(event) => handleSubmit(props.of, props.onSubmit)(event)}
+      onSubmit={(event) =>
+        handleSubmit(
+          props.of,
+          props.onSubmit as SubmitEventHandler<Schema>
+        )(event)
+      }
     />
   );
 }

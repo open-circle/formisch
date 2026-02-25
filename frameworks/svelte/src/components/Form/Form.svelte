@@ -24,7 +24,7 @@
     /**
      * The submit handler called when the form is submitted and validation succeeds.
      */
-    onsubmit: SubmitHandler<TSchema> | SubmitEventHandler<TSchema>;
+    onsubmit: SubmitHandler<TSchema> & SubmitEventHandler<TSchema>;
     /**
      * The child elements to render within the form.
      */
