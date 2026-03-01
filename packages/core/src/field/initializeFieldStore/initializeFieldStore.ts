@@ -117,7 +117,9 @@ export function initializeFieldStore(
         internalFieldStore,
         schemaOption,
         initialInput,
-        path
+        path,
+        // pass nullish through to option as these are just wrapper types
+        nullish
       );
     }
 
