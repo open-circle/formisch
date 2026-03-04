@@ -1,8 +1,9 @@
 <script setup lang="ts" generic="TSchema extends Schema = Schema">
-import type {
-  Schema,
-  SubmitEventHandler,
-  SubmitHandler,
+import {
+  INTERNAL,
+  type Schema,
+  type SubmitEventHandler,
+  type SubmitHandler,
 } from '@formisch/core/vue';
 import { handleSubmit } from '@formisch/methods/vue';
 import type { FormStore } from '../../types/index.ts';
@@ -23,13 +24,19 @@ export interface FormProps<TSchema extends Schema = Schema> {
 
 const props = defineProps<FormProps<TSchema>>();
 
-const handler = handleSubmit(props.of, props.onSubmit) as (
-  event: Event
-) => void;
+const handler = handleSubmit(props.of, props.onSubmit);
 </script>
 
 <template>
-  <form novalidate @submit="handler">
+  <form
+    novalidate
+    :ref="
+      (element) => {
+        of[INTERNAL].element = element as HTMLFormElement;
+      }
+    "
+    @submit="handler"
+  >
     <slot></slot>
   </form>
 </template>
