@@ -48,7 +48,7 @@ export const Form = component$(
         ref={(element) => {
           of[INTERNAL].element = element;
         }}
-        onSubmit$={handleSubmit(of, onSubmit$)}
+        onSubmit$={(event) => handleSubmit(of, onSubmit$)(event)}
       >
         <Slot />
       </form>
