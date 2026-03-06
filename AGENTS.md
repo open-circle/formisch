@@ -1,10 +1,6 @@
-# Copilot Instructions
+# AI Instructions
 
 Formisch is a schema-based, headless form library with a framework-agnostic core supporting multiple frameworks (Preact, Qwik, React, Solid, Svelte, Vue).
-
-## Planning Mode
-
-When in planning mode and something is unclear, ask questions **one at a time** (like a quiz). Wait for each answer before asking the next question. Only after all questions are answered and you have no remaining uncertainties, present the final plan.
 
 ## Monorepo Layout
 
