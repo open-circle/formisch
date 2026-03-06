@@ -6,6 +6,7 @@ import {
   type SubmitHandler,
 } from '@formisch/core/vue';
 import { handleSubmit } from '@formisch/methods/vue';
+import { computed } from 'vue';
 import type { FormStore } from '../../types/index.ts';
 
 /**
@@ -24,7 +25,7 @@ export interface FormProps<TSchema extends Schema = Schema> {
 
 const props = defineProps<FormProps<TSchema>>();
 
-const handler = handleSubmit(props.of, props.onSubmit);
+const handler = computed(() => handleSubmit(props.of, props.onSubmit));
 </script>
 
 <template>
@@ -32,7 +33,10 @@ const handler = handleSubmit(props.of, props.onSubmit);
     novalidate
     :ref="
       (element) => {
-        of[INTERNAL].element = element as HTMLFormElement;
+        if (element) {
+          // eslint-disable-next-line vue/no-mutating-props
+          of[INTERNAL].element = element as HTMLFormElement;
+        }
       }
     "
     @submit="handler"
