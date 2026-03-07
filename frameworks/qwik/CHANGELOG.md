@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.9.5 (March 06, 2026)
+
+- Change `@formisch/core` to v0.6.3
+
 ## v0.9.4 (March 05, 2026)
 
 - Fix `Form` component submit handling

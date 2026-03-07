@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.6.3 (March 06, 2026)
+
+- Fix `initializeFieldStore` for nullable and nullish `lazy`, `variant`, `union` and `intersect` schemas (pull request #68)
+
 ## v0.6.2 (February 10, 2026)
 
 - Fix `PartialValues` type for array items

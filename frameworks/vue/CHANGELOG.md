@@ -2,8 +2,9 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v0.7.3 (March 06, 2026)
 
+- Change `@formisch/core` to v0.6.3
 - Fix missing `Form` component element assignment (pull request #70)
 - Fix `Form` component submit handler updates when `of` or `onSubmit` props change (pull request #70)
 
