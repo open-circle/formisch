@@ -2,7 +2,6 @@ import {
   INTERNAL,
   type Schema,
   type SubmitEventHandler,
-  type SubmitHandler,
 } from '@formisch/core/qwik';
 import { handleSubmit } from '@formisch/methods/qwik';
 import type { JSXOutput, PropsOf, QRL } from '@qwik.dev/core';
@@ -23,9 +22,7 @@ export type FormProps<TSchema extends Schema = Schema> = Omit<
   /**
    * The submit handler called when the form is submitted and validation succeeds.
    */
-  readonly onSubmit$:
-    | QRL<SubmitHandler<TSchema>>
-    | QRL<SubmitEventHandler<TSchema>>;
+  readonly onSubmit$: QRL<SubmitEventHandler<TSchema>>;
 };
 
 /**

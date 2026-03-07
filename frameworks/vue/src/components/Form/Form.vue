@@ -3,7 +3,6 @@ import {
   INTERNAL,
   type Schema,
   type SubmitEventHandler,
-  type SubmitHandler,
 } from '@formisch/core/vue';
 import { handleSubmit } from '@formisch/methods/vue';
 import { computed } from 'vue';
@@ -20,7 +19,7 @@ export interface FormProps<TSchema extends Schema = Schema> {
   /**
    * The submit handler called when the form is submitted and validation succeeds.
    */
-  onSubmit: SubmitHandler<TSchema> | SubmitEventHandler<TSchema>;
+  onSubmit: SubmitEventHandler<TSchema>;
 }
 
 const props = defineProps<FormProps<TSchema>>();

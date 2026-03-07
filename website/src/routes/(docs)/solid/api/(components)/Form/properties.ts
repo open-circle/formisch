@@ -30,29 +30,13 @@ export const properties: Record<string, PropertyProps> = {
   },
   onSubmit: {
     type: {
-      type: 'union',
-      options: [
+      type: 'custom',
+      name: 'SubmitEventHandler',
+      href: '/core/api/SubmitEventHandler/',
+      generics: [
         {
           type: 'custom',
-          name: 'SubmitHandler',
-          href: '/core/api/SubmitHandler/',
-          generics: [
-            {
-              type: 'custom',
-              name: 'TSchema',
-            },
-          ],
-        },
-        {
-          type: 'custom',
-          name: 'SubmitEventHandler',
-          href: '/core/api/SubmitEventHandler/',
-          generics: [
-            {
-              type: 'custom',
-              name: 'TSchema',
-            },
-          ],
+          name: 'TSchema',
         },
       ],
     },

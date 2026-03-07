@@ -2,7 +2,6 @@ import {
   INTERNAL,
   type Schema,
   type SubmitEventHandler,
-  type SubmitHandler,
 } from '@formisch/core/react';
 import { handleSubmit } from '@formisch/methods/react';
 import type { FormHTMLAttributes, ReactElement } from 'react';
@@ -22,7 +21,7 @@ export type FormProps<TSchema extends Schema = Schema> = Omit<
   /**
    * The submit handler called when the form is submitted and validation succeeds.
    */
-  readonly onSubmit: SubmitHandler<TSchema> | SubmitEventHandler<TSchema>;
+  readonly onSubmit: SubmitEventHandler<TSchema>;
 };
 
 /**
