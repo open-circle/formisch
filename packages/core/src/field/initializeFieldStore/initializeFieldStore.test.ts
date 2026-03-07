@@ -187,10 +187,7 @@ describe('initializeFieldStore', () => {
       const store = createTestStore(
         v.object({
           nest: v.nullable(
-            v.union([
-              v.object({ a: v.string() }),
-              v.object({ b: v.number() }),
-            ])
+            v.union([v.object({ a: v.string() }), v.object({ b: v.number() })])
           ),
         }),
         { initialInput: { nest: null } }
