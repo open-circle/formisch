@@ -22,7 +22,6 @@ export const PostMeta = component$<PostCoverProps>(
           const authorProps =
             variant === 'post'
               ? {
-                  style: { zIndex: authors.length - index },
                   href: `https://github.com/${author}`,
                   target: '_blank',
                   rel: 'noopener noreferrer',
@@ -32,6 +31,7 @@ export const PostMeta = component$<PostCoverProps>(
             <Author
               {...authorProps}
               key={author}
+              style={{ zIndex: authors.length - index }}
               class={clsx(
                 'box-content w-6 overflow-hidden rounded-full border-[3px] border-white dark:border-gray-900',
                 variant === 'blog' && 'lg:w-7',
