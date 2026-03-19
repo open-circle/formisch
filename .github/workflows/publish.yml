@@ -26,11 +26,9 @@ jobs:
         run: pnpm build
         working-directory: frameworks/preact
       - name: Publish library
-        run: pnpm publish --provenance --access public --no-git-checks
+        run: npm publish --access public
         working-directory: frameworks/preact
         continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   qwik_npm:
     name: Publish Qwik to NPM
@@ -48,11 +46,9 @@ jobs:
         run: pnpm build
         working-directory: frameworks/qwik
       - name: Publish library
-        run: pnpm publish --provenance --access public --no-git-checks
+        run: npm publish --access public
         working-directory: frameworks/qwik
         continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   react_npm:
     name: Publish React to NPM
@@ -70,11 +66,9 @@ jobs:
         run: pnpm build
         working-directory: frameworks/react
       - name: Publish library
-        run: pnpm publish --provenance --access public --no-git-checks
+        run: npm publish --access public
         working-directory: frameworks/react
         continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   solid_npm:
     name: Publish Solid to NPM
@@ -92,11 +86,9 @@ jobs:
         run: pnpm build
         working-directory: frameworks/solid
       - name: Publish library
-        run: pnpm publish --provenance --access public --no-git-checks
+        run: npm publish --access public
         working-directory: frameworks/solid
         continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   svelte_npm:
     name: Publish Svelte to NPM
@@ -114,11 +106,9 @@ jobs:
         run: pnpm build
         working-directory: frameworks/svelte
       - name: Publish library
-        run: pnpm publish --provenance --access public --no-git-checks
+        run: npm publish --access public
         working-directory: frameworks/svelte
         continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   vue_npm:
     name: Publish Vue to NPM
@@ -136,8 +126,6 @@ jobs:
         run: pnpm build
         working-directory: frameworks/vue
       - name: Publish library
-        run: pnpm publish --provenance --access public --no-git-checks
+        run: npm publish --access public
         working-directory: frameworks/vue
         continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
