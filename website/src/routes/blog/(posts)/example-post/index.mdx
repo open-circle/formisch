@@ -258,17 +258,11 @@ The core change is that the schema becomes the starting point for everything. In
 - `watch("field")` is replaced by `getInput(form, ["field"])` when you need access outside the field component.
 - `useFieldArray` is replaced by `insert`, `remove`, `move`, `swap`, and `replace` methods on the form, used alongside the `FieldArray` component for dynamic field arrays.
 
-**What does not change:**
-
 Your input components, submit handlers, and server-side validation logic remain the same. Formisch is headless and works with your existing UI components.
-
-**How to approach migration:**
 
 Migrate one form at a time instead of rewriting everything at once. Start with the most complex form, where the limitations of RHF are most visible. This gives you a clear comparison and a reusable pattern for the rest of your codebase. Formisch and RHF can coexist in the same application without conflict.
 
-Note: You will need to add Valibot (`@valibot/valibot`) alongside `@formisch/react`. If you are currently using Zod, porting schemas to Valibot is a separate step. The concepts are similar, but the APIs differ.
-
-For most forms this is straightforward, but it should be included in your migration estimate.
+> **Note:** You will need to add Valibot (`@valibot/valibot`) alongside `@formisch/react`. If you are currently using Zod, porting schemas to Valibot is a separate step. The concepts are similar, but the APIs differ. 
 
 | | RHF | Formisch |
 |---|---|---|
@@ -281,5 +275,4 @@ For most forms this is straightforward, but it should be included in your migrat
 
 ---
 
-
-At that point, it's less about features and more about where you want the complexity to live. RHF keeps it closer to your components. TanStack Form and Formisch move more of it into the form layer. Which one makes sense depends on how much complexity your forms actually carry.
+It's less about features and more about where you want the complexity to live. RHF keeps it closer to your components. TanStack Form and Formisch move more of it into the form layer. Which one makes sense depends on how much complexity your forms actually carry.
