@@ -399,7 +399,7 @@ The core change is that the schema becomes the starting point for everything. In
 - Schema resolvers are no longer needed. The schema is passed directly to `useForm`.
 - `formState.errors.field` becomes `field.errors`.
 - `watch("field")` is replaced by [`getInput(form, { path: ["field"] })`](https://formisch.dev/methods/api/getInput/) when you need access outside the field component.
-- `useFieldArray` is replaced by Formisch's [`useFieldArray`](https://formisch.dev/react/api/useFieldArray) component used alongside `insert`, `remove`, `move`, `swap`, and `replace` methods on the form.
+- `useFieldArray` is replaced by Formisch's [`useFieldArray`](https://formisch.dev/react/api/useFieldArray) hook or [`FieldArray`](https://formisch.dev/react/api/FieldArray/) component used alongside `insert`, `remove`, `move`, `swap`, and `replace` methods on the form.
 
 Your input components, submit handlers, and server-side validation logic remain mostly the same. Formisch is headless and works with your existing UI components.
 
@@ -414,7 +414,7 @@ Migrate one form at a time instead of rewriting everything at once. Start with t
 | Schema connection | Resolver configuration | Direct schema |
 | Error access | `formState.errors.field` | `field.errors` |
 | Read value | `watch("field")` | `getInput(form, { path: ["field"] })` |
-| Dynamic arrays | `useFieldArray` | `insert`, `remove`, `move`, `swap`, `replace` + `FieldArray` or `useFieldArray`|
+| Dynamic arrays | `useFieldArray` or `FieldArray` + `insert`, `remove`, `move`, `swap`, `replace` |
 
 
 
