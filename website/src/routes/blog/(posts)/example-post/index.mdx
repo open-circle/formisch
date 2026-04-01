@@ -413,7 +413,7 @@ Migrate one form at a time instead of rewriting everything at once. Start with t
 | Field registration | `register("field")` | `<Field of={form} path={["field"]}>` |
 | Schema connection | Resolver configuration | Direct schema |
 | Error access | `formState.errors.field` | `field.errors` |
-| Read value | `watch("field")` | `getInput(form, ["field"])` |
+| Read value | `watch("field")` | `getInput(form, { path: ["field"] })` |
 | Dynamic arrays | `useFieldArray` | `insert`, `remove`, `move`, `swap`, `replace` + `FieldArray` |
 
 
