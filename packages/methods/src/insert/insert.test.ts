@@ -113,6 +113,58 @@ describe('insert', () => {
     }
   });
 
+  test('should insert object item in the middle without a preinitialized target slot', () => {
+    const store = createTestStore(
+      v.object({
+        runs: v.array(
+          v.object({
+            name: v.string(),
+            config: v.object({
+              windowSize: v.number(),
+            }),
+          })
+        ),
+      }),
+      {
+        initialInput: {
+          runs: [
+            { name: 'Run 1', config: { windowSize: 1 } },
+            { name: 'Run 2', config: { windowSize: 2 } },
+          ],
+        },
+      }
+    );
+
+    insert(store, {
+      path: ['runs'],
+      at: 1,
+      initialInput: { name: 'Run 1 Copy', config: { windowSize: 9 } },
+    });
+
+    const runsStore = store.children.runs;
+    expect(runsStore.kind).toBe('array');
+    if (runsStore.kind === 'array') {
+      expect(runsStore.items.value).toHaveLength(3);
+
+      const insertedRun = runsStore.children[1];
+      expect(insertedRun.kind).toBe('object');
+      if (insertedRun.kind === 'object') {
+        expect(insertedRun.children.name.input.value).toBe('Run 1 Copy');
+        const configStore = insertedRun.children.config;
+        expect(configStore.kind).toBe('object');
+        if (configStore.kind === 'object') {
+          expect(configStore.children.windowSize.input.value).toBe(9);
+        }
+      }
+
+      const shiftedRun = runsStore.children[2];
+      expect(shiftedRun.kind).toBe('object');
+      if (shiftedRun.kind === 'object') {
+        expect(shiftedRun.children.name.input.value).toBe('Run 2');
+      }
+    }
+  });
+
   test('should insert into empty array', () => {
     const store = createTestStore(v.object({ items: v.array(v.string()) }), {
       initialInput: { items: [] },
