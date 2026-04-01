@@ -348,24 +348,23 @@ With Formisch, rendering performance is handled automatically at the signal leve
 > With those three areas covered, here is how to make the actual call for your project.
 
 
-## Which library should you use
-
-**Should you switch from React Hook Form to TanStack Form or Formisch?**
-
-Not necessarily. If your current forms are working and you are not running into the problems described in this post, the switching cost might not be worth it and the benefit is limited.
-
-**Should new projects use React Hook Form?**
-
-For simple to moderately complex forms, RHF remains a mature, well-documented, widely understood choice. If you are not expecting significant form complexity, there is no strong reason to choose a different approach.
-
-**When does TanStack Form make more sense than React Hook Form?**
-
-When you need fine-grained control over validation timing and built-in async validation handling without building that infrastructure yourself. It also makes more sense if your team is already using TanStack Query or TanStack Router and a consistent mental model across data fetching, routing, and forms has practical value.
+## Which library should you use?
 
 **When does Formisch make more sense than TanStack Form?**
 
 When TypeScript accuracy and long-term maintainability are the primary concerns, and you want validation logic to live in one place instead of being distributed across component configuration. It also makes more sense for new projects where you are not already invested in the TanStack ecosystem.
 
+**When does TanStack Form make more sense than React Hook Form?**
+
+When you need fine-grained control over validation timing and built-in async validation handling without building that infrastructure yourself. It also makes more sense if your team is already using TanStack Query or TanStack Router and a consistent mental model across data fetching, routing, and forms has practical value.
+
+**Should new projects use React Hook Form?**
+
+For simple to moderately complex forms, RHF remains a mature, well-documented, widely understood choice. If you are not expecting significant form complexity, there is no strong reason to choose a different approach.
+
+**Should you switch from React Hook Form to TanStack Form or Formisch?**
+
+Not necessarily. If your current forms are working and you are not running into the problems described in this post, the switching cost might not be worth it and the benefit is limited.
 
 RHF is still a well-maintained library with a large community and years of production usage behind it.
 
@@ -373,23 +372,22 @@ TanStack Form and Formisch exist because the problems teams bring to form librar
 
 RHF's design decisions still make sense for simpler forms. The tradeoffs become visible as forms grow in size and complexity, especially when validation logic, cross-field dependencies, and TypeScript alignment start to accumulate.
 
-
 If your forms are mostly static, your team already uses RHF, and you are not experiencing TypeScript or validation issues, stay with RHF. The switching cost is unlikely to justify itself.
 
 If you are starting a new project in TypeScript and expect forms to grow in complexity, Formisch is worth evaluating. The schema-first approach reduces the number of moving pieces you have to keep aligned over time.
 
 If you are already using the TanStack ecosystem and want better validation control than RHF without changing mental models too drastically, TanStack Form is the natural fit.
 
-If your current RHF setup is already showing signs of strain such as type drift, validation logic spread across components, or performance issues in large field arrays, then evaluating Formisch or TanStack Form becomes more relevant.
+If your current RHF setup is already showing signs of strain such as type drift, validation logic spread across components, or performance issues in large field arrays, then evaluating Formisch or TanStack Form becomes more 
+relevant.
 
-Formisch makes the most sense for new projects. Migrating an existing RHF codebase to Formisch is not trivial. The mental model is different enough that this is a rewrite of your form layer, not a drop-in replacement. That is not a reason to avoid it, but it is a reason to be clear about the cost before committing to it.
+Formisch makes the most sense for new projects. Migrating an existing RHF codebase to Formisch is not trivial. The mental model is different enough that this is a rewrite of your form layer, not a drop-in replacement. That is not a reason to avoid it, but it is a reason to be clear about the cost nefore committing to it.
 
-| | Best for | Main consideration |
-|---|---|---|
-| **RHF** | Simple to moderately complex forms | No switching cost if already in use |
-| **TanStack Form** | Complex forms, TanStack ecosystem | More explicit configuration |
-| **Formisch** | New projects, TypeScript-heavy codebases | Valibot only. Migration requires a rewrite |
-
+|               | Best for                                  | Main consideration                         |
+|---------------|-------------------------------------------|--------------------------------------------|
+| Formisch      | New projects, TypeScript-heavy codebases  | Valibot only. Migration requires a rewrite |
+| TanStack Form | Complex forms, TanStack ecosystem         | More explicit configuration                |
+| RHF           | Simple to moderately complex forms        | No switching cost if already in use        |
 
 ## Migrating from React Hook Form to Formisch
 
