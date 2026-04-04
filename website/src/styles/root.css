@@ -180,7 +180,7 @@
     @apply rounded-lg bg-slate-100 px-2 py-1 text-slate-700 dark:bg-gray-800 dark:text-slate-300;
   }
   .mdx p > code {
-    @apply whitespace-nowrap;
+    @apply wrap-anywhere whitespace-normal;
   }
 
   /* Horizontal spacing */
