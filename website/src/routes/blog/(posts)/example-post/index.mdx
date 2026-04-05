@@ -105,7 +105,7 @@ Note that the form's shape is anchored to whatever you provide as defaults. For 
 
 This also applies to fields that need to accept more than one type. An input that should hold either a string or a number cannot express that through a default value alone. HTML inputs always return strings, so the default will always appear as a string to the form. Handling this requires manual type casting in the `onChange` handler and a union schema to validate the full range of accepted types. The form does not infer the union from the default value.
 
-If you use a validation schema alongside your default values, which most teams do, those two things still have no enforced connection. A field added to one but not the other will not be caught. The same silent failure that applies to RHF applies here, just between fewer moving parts.
+If you use a validation schema alongside your default values, which most teams do, those two things still have no enforced connection at the Typescript level. A field added to one but not the other will not be caught. The same silent failure that applies to RHF applies here, just between fewer moving parts.
 
 In summary, type maintenance in TanStack Form comes down to keeping your `defaultValues` accurate, and the form derives everything else from there.
 
