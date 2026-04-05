@@ -27,8 +27,8 @@ If you're evaluating React form libraries or deciding between TanStack Form and 
 - **Formisch types come directly from the schema.** The Valibot schema is both the runtime validator and the TypeScript type source.
 - **RHF validation is field-centric.** Each field owns its rules. Validation timing is a single form-wide setting. Async loading state is managed in your component.
 - **TanStack Form validation is per-validator.** Each validator specifies its own trigger and manages its own async state. All of this is explicitly configured.
-- **Formisch validation rules lives entirely in the schema.** Rules are defined in one place without field-level validators or resolver setup.
-- **RHF stores values in RHF's internal object, updating the DOM directly**. Components that need to react to value changes subscribe through watch, which triggers re-renders.
+- **Formisch validation rules live entirely in the schema.** Rules are defined in one place without field-level validators or resolver setup.
+- **RHF stores values in RHF's internal object, updating the DOM directly**.  Components that need to react to value changes subscribe through `watch` or `useWatch`, with different re-render implications for each. 
 - **TanStack Form and Formisch both scope re-renders automatically.** Both only update what actually changed. Formisch uses signals, which carry slightly less overhead.
 
 > Starting with TypeScript inference gives the clearest picture of how each library is architecturally different, because it affects everything downstream.
@@ -304,7 +304,7 @@ This is what makes RHF fast. It is a deliberate architectural choice.
 The tradeoff appears when React needs to know about a field's value. Conditional rendering, UI updates as you type, and cross-field rules all require React to be aware of the current value. The two mechanisms for this are `watch`, which triggers re-renders at the root of the form, and `useWatch`, which isolates re-renders at the component level. Using `watch` broadly is the common pattern and the source of most performance complaints. `useWatch` is the 
 more focused approach but requires deliberate structure to use effectively. 
 
-In small forms this is not a problem. In larger forms with many watched fields, the re-render problem returns, but now in a more selective way.
+In small forms this is not a problem. In larger forms with many watched fields, the re-render problem returns, but scoped to the components subscribed to those fields. 
 
 [`useFieldArray`](https://react-hook-form.com/docs/usefieldarray) makes this more visible. When you append, remove, or reorder rows, RHF updates its internal array state. Any component subscribed to `formState` at a higher level will re-render as a result.
 
