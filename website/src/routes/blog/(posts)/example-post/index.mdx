@@ -39,7 +39,7 @@ All three libraries support TypeScript. The more relevant question is where the 
 
 **React Hook Form**
 
-[RHF asks you to declare the form's shape as a TypeScript type and pass it in as a generic](https://react-hook-form.com/docs/useform): `useForm<MyFormValues>()`. That generic is a TypeScript-only construct. It exists purely at compile time and is completely absent at runtime.
+[RHF asks you to declare the form's shape as a TypeScript type and pass it in as a generic](https://react-hook-form.com/ts): `useForm<MyFormValues>()`. That generic is a TypeScript-only construct. It exists purely at compile time and is completely absent at runtime.
 
 The validation schema you configure through a resolver (whether that's Zod, Valibot, Yup, or anything else) is a separate runtime object with no connection to each other. TypeScript has no enforced connection between the type you passed to `useForm` and the schema you passed to the resolver. You can have a type with ten fields and a schema that only validates seven of them, and TypeScript will not flag it. Keeping them aligned is entirely your responsibility, and there is no mechanism to enforce that they stay that way.
 
@@ -220,7 +220,7 @@ TanStack Form gives you fine-grained control over validation timing and async be
 
 **Formisch**
 
-Formisch centralizes everything in the Valibot schema. The component registers a field name and everything else comes from the schema, without field-level validators, form-level validator configuration, or resolver setup.
+Formisch centralizes everything in the Valibot schema. The component registers a field name and everything else comes from the schema, without field-level validators, or resolver setup.
 
 ```ts
 import { useForm } from '@formisch/react';
@@ -237,7 +237,7 @@ const form = useForm({ schema });
 
 Validation runs when a field is blurred or the form is submitted by default, rather than on individual field events like `onChange`. The `<Form>` component intercepts the submit event, runs the schema against all current values, and blocks submission if anything fails. After that first submission attempt, you can configure `revalidate: 'input'` on `useForm` to re-run validation as the user types, giving users silent-until-submit behaviour on first interaction, then live feedback as they correct mistakes. For most forms, this covers the range of timing behaviour users expect.
 
-Async validation follows the same pattern. A username availability check, for example, requires calling your server. In TanStack Form, that async logic lives on the field itself. In Formisch, it lives in the schema using `pipeAsync` and `checkAsync`.  The field component is unchanged and just reads `field.errors`. Rather than wiring up a per-field async validator with its own trigger and loading state, you configure the async rule once in the schema and, the form exposes 
+Async validation follows the same pattern. A username availability check, for example, requires calling your server. In TanStack Form, that async logic lives on the field itself. In Formisch, it lives in the schema using `pipeAsync` and `checkAsync`.  The field component is unchanged and just reads `field.errors`. Rather than wiring up a per-field async validator with its own trigger and loading state, you configure the async rule once in the schema. The form exposes 
 `isValidating` on the form store if you need to show a global loading indicator. 
 
 ```ts
