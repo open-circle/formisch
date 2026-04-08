@@ -22,17 +22,18 @@ import { useResolvedQrl } from '../useResolvedQrl/useResolvedQrl.ts';
  * Creates a reactive form store from a form configuration. The form store
  * manages form state and provides reactive properties.
  *
- * @param configQrl The QRL containing the form configuration.
+ * @param configQrl The QRL containing a function that returns the form configuration.
  *
  * @returns The form store with reactive properties.
  */
 export function useFormQrl<TSchema extends Schema>(
-  configQrl: QRL<FormConfig<TSchema>>
+  configQrl: QRL<() => FormConfig<TSchema>>
 ): FormStore<TSchema>;
 
 // @__NO_SIDE_EFFECTS__
-export function useFormQrl(configQrl: QRL<FormConfig>): FormStore {
-  const config = useResolvedQrl(configQrl);
+export function useFormQrl(configQrl: QRL<() => FormConfig>): FormStore {
+  const configFn = useResolvedQrl(configQrl);
+  const config = configFn();
 
   const form = useConstant(() => {
     const internalFormStore = createFormStore(
@@ -41,7 +42,7 @@ export function useFormQrl(configQrl: QRL<FormConfig>): FormStore {
         schema: JSON.parse(JSON.stringify(config.schema)),
       },
       $(async (input: unknown) =>
-        v.safeParseAsync((await configQrl.resolve()).schema, input)
+        v.safeParseAsync((await configQrl.resolve())().schema, input)
       )
     );
     return {
@@ -76,6 +77,9 @@ export function useFormQrl(configQrl: QRL<FormConfig>): FormStore {
  * Creates a reactive form store from a form configuration. The form store
  * manages form state and provides reactive properties.
  *
+ * @param configFn A function that returns the form configuration.
+ *
  * @returns The form store with reactive properties.
  */
 export const useForm$ = implicit$FirstArg(useFormQrl);
+
