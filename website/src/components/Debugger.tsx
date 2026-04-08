@@ -43,6 +43,8 @@ export const Debugger = component$((props: DebuggerProps) => {
       return `${import.meta.env.PUBLIC_STACKBLITZ_SVELTE_URL}?file=src/routes/${path}/+page.svelte`;
     } else if (framework.value === 'qwik') {
       return `${import.meta.env.PUBLIC_STACKBLITZ_QWIK_URL}?file=src/routes/${path}/index.tsx`;
+    } else if (framework.value === 'react') {
+      return `${import.meta.env.PUBLIC_STACKBLITZ_REACT_URL}?file=src/routes/${path}/index.tsx`;
     } else if (framework.value === 'solid') {
       return `${import.meta.env.PUBLIC_STACKBLITZ_SOLID_URL}?file=src/routes/${path}/index.tsx`;
     } else {
