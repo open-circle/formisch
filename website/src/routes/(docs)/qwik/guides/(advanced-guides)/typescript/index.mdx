@@ -29,9 +29,9 @@ const LoginSchema = v.object({
 });
 
 export default component$(() => {
-  const loginForm = useForm$({
+  const loginForm = useForm$(() => ({
     schema: LoginSchema,
-  });
+  }));
 
   // TypeScript knows the form structure from the schema
   // loginForm is of type FormStore<typeof LoginSchema>
@@ -74,9 +74,9 @@ const ProfileSchema = v.object({
 });
 
 export default component$(() => {
-  const profileForm = useForm$({
+  const profileForm = useForm$(() => ({
     schema: ProfileSchema,
-  });
+  }));
 
   return (
     <Form
@@ -126,7 +126,7 @@ const UserSchema = v.object({
   }),
 });
 
-const userForm = useForm$({ schema: UserSchema });
+const userForm = useForm$(() => ({ schema: UserSchema }));
 
 // ✓ Valid paths - TypeScript provides autocompletion
 <Field of={userForm} path={['profile', 'name', 'first']} render$={(field) => ...} />
@@ -152,9 +152,9 @@ const LoginSchema = v.object({
 });
 
 export default component$(() => {
-  const loginForm = useForm$({
+  const loginForm = useForm$(() => ({
     schema: LoginSchema,
-  });
+  }));
 
   return <FormContent of={loginForm} />;
 });

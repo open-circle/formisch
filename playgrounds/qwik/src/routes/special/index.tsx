@@ -32,9 +32,9 @@ const SpecialFormSchema = v.object({
 });
 
 export default component$(() => {
-  const specialForm = useForm$({
+  const specialForm = useForm$(() => ({
     schema: SpecialFormSchema,
-  });
+  }));
 
   return (
     <Form

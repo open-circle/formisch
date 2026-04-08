@@ -48,9 +48,9 @@ export const head: DocumentHead = {
 };
 
 export default component$(() => {
-  const specialForm = useForm$({
+  const specialForm = useForm$(() => ({
     schema: SpecialFormSchema,
-  });
+  }));
 
   const formContext = useContext(FormStoreContext);
   useTask$(() => {

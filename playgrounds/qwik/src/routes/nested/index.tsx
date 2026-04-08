@@ -25,7 +25,7 @@ const NestedFormSchema = v.object({
 });
 
 export default component$(() => {
-  const nestedForm = useForm$({
+  const nestedForm = useForm$(() => ({
     schema: NestedFormSchema,
     initialInput: {
       items: [
@@ -39,7 +39,7 @@ export default component$(() => {
         },
       ],
     },
-  });
+  }));
 
   const allListElements = useSignal<HTMLDivElement[]>([]);
   const newListElements = useSignal<HTMLDivElement[] | null>(null);

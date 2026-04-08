@@ -28,9 +28,9 @@ const LoginSchema = v.object({
 });
 
 export default component$(() => {
-  const loginForm = useForm$({
+  const loginForm = useForm$(() => ({
     schema: LoginSchema,
-  });
+  }));
 
   const submitForm = $<SubmitHandler<typeof LoginSchema>>((values) => {
     // Process the validated form values
@@ -118,9 +118,9 @@ const LoginSchema = v.object({
 });
 
 export default component$(() => {
-  const loginForm = useForm$({
+  const loginForm = useForm$(() => ({
     schema: LoginSchema,
-  });
+  }));
 
   const submitForm = $(
     handleSubmit(loginForm, (values) => {
