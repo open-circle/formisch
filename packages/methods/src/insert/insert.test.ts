@@ -27,19 +27,16 @@ describe('insert', () => {
     const itemsStore = store.children.items;
     expect(itemsStore.kind).toBe('array');
     if (itemsStore.kind === 'array') {
-      // Pre-initialize children slot at index 2 to allow copyItemState to work
-      initializeChildSlot(itemsStore, 2);
-
-      // Insert at index 0 - should shift existing children up
       insert(store, { path: ['items'], at: 0, initialInput: 'inserted' });
 
       expect(itemsStore.items.value).toHaveLength(3);
-      // The inserted item should be at index 0
       expect(itemsStore.children[0].input.value).toBe('inserted');
+      expect(itemsStore.children[1].input.value).toBe('a');
+      expect(itemsStore.children[2].input.value).toBe('b');
     }
   });
 
-  test('should insert at middle index', () => {
+  test('should insert at middle index without a preinitialized target slot', () => {
     const store = createTestStore(v.object({ items: v.array(v.string()) }), {
       initialInput: { items: ['a', 'b', 'c'] },
     });
@@ -47,14 +44,13 @@ describe('insert', () => {
     const itemsStore = store.children.items;
     expect(itemsStore.kind).toBe('array');
     if (itemsStore.kind === 'array') {
-      // Pre-initialize children slot at index 3 to allow copyItemState to work
-      initializeChildSlot(itemsStore, 3);
-
-      // Insert at index 1
       insert(store, { path: ['items'], at: 1, initialInput: 'middle' });
 
       expect(itemsStore.items.value).toHaveLength(4);
+      expect(itemsStore.children[0].input.value).toBe('a');
       expect(itemsStore.children[1].input.value).toBe('middle');
+      expect(itemsStore.children[2].input.value).toBe('b');
+      expect(itemsStore.children[3].input.value).toBe('c');
     }
   });
 
