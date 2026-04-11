@@ -27,19 +27,16 @@ describe('insert', () => {
     const itemsStore = store.children.items;
     expect(itemsStore.kind).toBe('array');
     if (itemsStore.kind === 'array') {
-      // Pre-initialize children slot at index 2 to allow copyItemState to work
-      initializeChildSlot(itemsStore, 2);
-
-      // Insert at index 0 - should shift existing children up
       insert(store, { path: ['items'], at: 0, initialInput: 'inserted' });
 
       expect(itemsStore.items.value).toHaveLength(3);
-      // The inserted item should be at index 0
       expect(itemsStore.children[0].input.value).toBe('inserted');
+      expect(itemsStore.children[1].input.value).toBe('a');
+      expect(itemsStore.children[2].input.value).toBe('b');
     }
   });
 
-  test('should insert at middle index', () => {
+  test('should insert at middle index without a preinitialized target slot', () => {
     const store = createTestStore(v.object({ items: v.array(v.string()) }), {
       initialInput: { items: ['a', 'b', 'c'] },
     });
@@ -47,14 +44,13 @@ describe('insert', () => {
     const itemsStore = store.children.items;
     expect(itemsStore.kind).toBe('array');
     if (itemsStore.kind === 'array') {
-      // Pre-initialize children slot at index 3 to allow copyItemState to work
-      initializeChildSlot(itemsStore, 3);
-
-      // Insert at index 1
       insert(store, { path: ['items'], at: 1, initialInput: 'middle' });
 
       expect(itemsStore.items.value).toHaveLength(4);
+      expect(itemsStore.children[0].input.value).toBe('a');
       expect(itemsStore.children[1].input.value).toBe('middle');
+      expect(itemsStore.children[2].input.value).toBe('b');
+      expect(itemsStore.children[3].input.value).toBe('c');
     }
   });
 
@@ -109,6 +105,58 @@ describe('insert', () => {
       expect(secondUser.kind).toBe('object');
       if (secondUser.kind === 'object') {
         expect(secondUser.children.name.input.value).toBe('Jane');
+      }
+    }
+  });
+
+  test('should insert object item in the middle without a preinitialized target slot', () => {
+    const store = createTestStore(
+      v.object({
+        runs: v.array(
+          v.object({
+            name: v.string(),
+            config: v.object({
+              windowSize: v.number(),
+            }),
+          })
+        ),
+      }),
+      {
+        initialInput: {
+          runs: [
+            { name: 'Run 1', config: { windowSize: 1 } },
+            { name: 'Run 2', config: { windowSize: 2 } },
+          ],
+        },
+      }
+    );
+
+    insert(store, {
+      path: ['runs'],
+      at: 1,
+      initialInput: { name: 'Run 1 Copy', config: { windowSize: 9 } },
+    });
+
+    const runsStore = store.children.runs;
+    expect(runsStore.kind).toBe('array');
+    if (runsStore.kind === 'array') {
+      expect(runsStore.items.value).toHaveLength(3);
+
+      const insertedRun = runsStore.children[1];
+      expect(insertedRun.kind).toBe('object');
+      if (insertedRun.kind === 'object') {
+        expect(insertedRun.children.name.input.value).toBe('Run 1 Copy');
+        const configStore = insertedRun.children.config;
+        expect(configStore.kind).toBe('object');
+        if (configStore.kind === 'object') {
+          expect(configStore.children.windowSize.input.value).toBe(9);
+        }
+      }
+
+      const shiftedRun = runsStore.children[2];
+      expect(shiftedRun.kind).toBe('object');
+      if (shiftedRun.kind === 'object') {
+        expect(shiftedRun.children.name.input.value).toBe('Run 2');
       }
     }
   });

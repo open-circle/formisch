@@ -90,6 +90,19 @@ export function insert<
 
       // Move all child stores after the insertion point one index up
       for (let index = items.length; index > insertIndex; index--) {
+        if (!internalArrayStore.children[index]) {
+          const path = JSON.parse(internalArrayStore.name) as PathKey[];
+          // @ts-expect-error
+          internalArrayStore.children[index] = {};
+          path.push(index);
+          initializeFieldStore(
+            internalArrayStore.children[index],
+            // @ts-expect-error
+            internalArrayStore.schema.item,
+            undefined,
+            path
+          );
+        }
         copyItemState(
           internalArrayStore.children[index - 1],
           internalArrayStore.children[index]
