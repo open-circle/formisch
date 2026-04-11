@@ -82,4 +82,3 @@ export function useFormQrl(configQrl: QRL<() => FormConfig>): FormStore {
  * @returns The form store with reactive properties.
  */
 export const useForm$ = implicit$FirstArg(useFormQrl);
-

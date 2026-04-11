@@ -9,17 +9,21 @@ export const properties: Record<string, PropertyProps> = {
       href: '/core/api/Schema/',
     },
   },
-  config: {
+  configFn: {
     type: {
-      type: 'custom',
-      name: 'FormConfig',
-      href: '../FormConfig/',
-      generics: [
-        {
-          type: 'custom',
-          name: 'TSchema',
-        },
-      ],
+      type: 'function',
+      params: [],
+      return: {
+        type: 'custom',
+        name: 'FormConfig',
+        href: '../FormConfig/',
+        generics: [
+          {
+            type: 'custom',
+            name: 'TSchema',
+          },
+        ],
+      },
     },
   },
   FormStore: {
