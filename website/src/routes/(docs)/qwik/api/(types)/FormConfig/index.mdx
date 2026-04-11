@@ -11,7 +11,7 @@ import { properties } from './properties';
 
 # FormConfig
 
-Form config interface that defines the configuration options for creating a form store with <Link href="../useForm$/">`useForm$`</Link>.
+Form config interface that defines the configuration options returned from the configuration function passed to <Link href="../useForm$/">`useForm$`</Link>.
 
 ## Generics
 
@@ -27,4 +27,4 @@ Form config interface that defines the configuration options for creating a form
 
 ### Explanation
 
-The `FormConfig` object is passed to <Link href="../useForm$/">`useForm$`</Link> with a required `schema` property and optional properties for `initialInput`, `validate`, and `revalidate` to control form behavior and validation timing.
+The `FormConfig` object is returned from the configuration function passed to <Link href="../useForm$/">`useForm$`</Link>. It has a required `schema` property and optional properties for `initialInput`, `validate`, and `revalidate` to control form behavior and validation timing.

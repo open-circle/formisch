@@ -63,13 +63,13 @@ export const head: DocumentHead = {
 };
 
 export default component$(() => {
-  const todoForm = useForm$({
+  const todoForm = useForm$(() => ({
     schema: TodoFormSchema,
     initialInput: {
       heading: '',
       todos: [{ label: '', deadline: '' }],
     },
-  });
+  }));
 
   const formContext = useContext(FormStoreContext);
   useTask$(() => {

@@ -43,7 +43,7 @@ export const head: DocumentHead = {
 };
 
 export default component$(() => {
-  const nestedForm = useForm$({
+  const nestedForm = useForm$(() => ({
     schema: NestedFormSchema,
     initialInput: {
       items: [
@@ -57,7 +57,7 @@ export default component$(() => {
         },
       ],
     },
-  });
+  }));
 
   const formContext = useContext(FormStoreContext);
   useTask$(() => {

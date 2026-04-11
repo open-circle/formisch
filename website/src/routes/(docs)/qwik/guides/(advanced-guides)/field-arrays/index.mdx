@@ -49,13 +49,13 @@ import { Field, FieldArray, Form, useForm$ } from '@formisch/qwik';
 import { component$ } from '@qwik.dev/core';
 
 export default component$(() => {
-  const todoForm = useForm$({
+  const todoForm = useForm$(() => ({
     schema: TodoFormSchema,
     initialInput: {
       heading: '',
       todos: [{ label: '', deadline: '' }],
     },
-  });
+  }));
 
   return (
     <Form of={todoForm} onSubmit$={(output, event) => console.log(output)}>
