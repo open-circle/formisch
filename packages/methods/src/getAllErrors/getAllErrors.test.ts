@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../vitest/index.ts';
+import { createTestStore, initializeChildSlot } from '../vitest/index.ts';
 import { getAllErrors } from './getAllErrors.ts';
 
 describe('getAllErrors', () => {
@@ -60,6 +60,28 @@ describe('getAllErrors', () => {
     const result = getAllErrors(store);
 
     expect(result).toEqual(['Too short', 'Invalid format']);
+  });
+
+  test('should return errors from dynamically added array items', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: ['a'] },
+    });
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+
+    if (itemsStore.kind === 'array') {
+      // Set error on initial item
+      itemsStore.children[0].errors.value = ['Item 0 error'];
+
+      // Simulate dynamically adding a new item (as insert() would do)
+      initializeChildSlot(itemsStore, 1);
+      itemsStore.items.value = [...itemsStore.items.value, 'new-id'];
+      itemsStore.children[1].errors.value = ['Item 1 error'];
+    }
+
+    const result = getAllErrors(store);
+
+    expect(result).toEqual(['Item 0 error', 'Item 1 error']);
   });
 
   test('should combine errors from multiple fields', () => {
