@@ -20,7 +20,7 @@ export const FormError = component$(
 
     // Freeze response while element collapses to prevent UI from jumping
     useTask$(({ track, cleanup }) => {
-      const nextFormError = track(form.errors);
+      const nextFormError = track(() => form.errors.value);
       if (isBrowser && !nextFormError) {
         const timeout = setTimeout(
           () => (frozenFormError.value = nextFormError),
