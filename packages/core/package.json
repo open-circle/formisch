@@ -70,7 +70,7 @@
   "devDependencies": {
     "@formisch/eslint-config": "workspace:*",
     "@preact/signals": "^2.2.1",
-    "@qwik.dev/core": "2.0.0-beta.5",
+    "@qwik.dev/core": "https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@8541",
     "@types/node": "24.0.13",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.31.0",
