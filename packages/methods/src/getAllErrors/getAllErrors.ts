@@ -15,6 +15,11 @@ export function getAllErrors(
 ): [string, ...string[]] | null {
   let allErrors: [string, ...string[]] | null = null;
   walkFieldStore(form[INTERNAL], (internalFieldStore) => {
+    // Subscribe to items so reactive computations re-run when array items
+    // are added or removed (walkFieldStore reads items via untrack internally)
+    if (internalFieldStore.kind === 'array') {
+      internalFieldStore.items.value;
+    }
     const errors = internalFieldStore.errors.value;
     if (errors) {
       if (allErrors) {

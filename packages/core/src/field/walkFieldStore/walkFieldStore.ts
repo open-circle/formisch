@@ -1,3 +1,4 @@
+import { untrack } from '../../framework/index.ts';
 import type { InternalFieldStore } from '../../types/index.ts';
 
 /**
@@ -19,7 +20,7 @@ export function walkFieldStore(
     // Walk each array item
     for (
       let index = 0;
-      index < internalFieldStore.items.value.length;
+      index < untrack(() => internalFieldStore.items.value).length;
       index++
     ) {
       // Recursively walk child
