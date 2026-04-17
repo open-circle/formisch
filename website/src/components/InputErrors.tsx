@@ -21,7 +21,7 @@ export const InputErrors = component$(({ name, errors }: InputErrorProps) => {
 
   // Freeze error while element collapses to prevent UI from jumping
   useTask$(({ track, cleanup }) => {
-    const nextErrors = track(errors);
+    const nextErrors = track(() => errors.value);
     if (isBrowser && !nextErrors) {
       const timeout = setTimeout(() => (frozenError.value = null), 200);
       cleanup(() => clearTimeout(timeout));
