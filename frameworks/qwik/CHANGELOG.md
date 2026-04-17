@@ -2,6 +2,12 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix QRL implementation of `useForm$` hook
+
+> This is a breaking change and requires updating every `useForm$` hook from `useForm$({ /* config */ })` to `useForm$(() => ({ /* config */ }))`.
+
 ## v0.9.6 (March 19, 2026)
 
 - Fix `Form` component submit handler type inference

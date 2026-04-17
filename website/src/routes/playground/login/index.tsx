@@ -29,9 +29,9 @@ export const head: DocumentHead = {
 };
 
 export default component$(() => {
-  const loginForm = useForm$({
+  const loginForm = useForm$(() => ({
     schema: LoginSchema,
-  });
+  }));
 
   const formContext = useContext(FormStoreContext);
   useTask$(() => {

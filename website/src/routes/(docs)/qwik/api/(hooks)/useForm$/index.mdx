@@ -14,7 +14,7 @@ import { properties } from './properties';
 Creates a reactive form store from a form configuration. The form store manages form state and provides reactive properties.
 
 ```ts
-const form = useForm$<TSchema>(config);
+const form = useForm$<TSchema>(configFn);
 ```
 
 ## Generics
@@ -23,11 +23,11 @@ const form = useForm$<TSchema>(config);
 
 ## Parameters
 
-- `config` <Property {...properties.config} />
+- `configFn` <Property {...properties.configFn} />
 
 ### Explanation
 
-`useForm$` creates a reactive form store that manages form state using the provided Valibot schema. Validation runs when a field is blurred or the form is submitted by default, but this can be customized with the `validate` and `revalidate` options.
+`useForm$` creates a reactive form store that manages form state using the provided Valibot schema. The `configFn` callback must return a <Link href="../FormConfig/">`FormConfig`</Link> object. Validation runs when a field is blurred or the form is submitted by default, but this can be customized with the `validate` and `revalidate` options.
 
 ## Returns
 

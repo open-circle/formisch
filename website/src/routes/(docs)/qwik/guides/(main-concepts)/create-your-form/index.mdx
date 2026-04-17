@@ -29,9 +29,9 @@ const LoginSchema = v.object({
 });
 
 export default component$(() => {
-  const loginForm = useForm$({
+  const loginForm = useForm$(() => ({
     schema: LoginSchema,
-  });
+  }));
 
   return <Form of={loginForm}>{/* Form fields will go here */}</Form>;
 });
@@ -47,14 +47,14 @@ The <Link href="/qwik/api/useForm$/">`useForm$`</Link> hook accepts a configurat
 - `revalidate`: When revalidation occurs after initial validation (optional, defaults to `'input'`)
 
 ```tsx
-const loginForm = useForm$({
+const loginForm = useForm$(() => ({
   schema: LoginSchema,
   initialInput: {
     email: 'user@example.com',
   },
   validate: 'initial',
   revalidate: 'input',
-});
+}));
 ```
 
 Formisch tracks two inputs for every field: the **initial input** (baseline for dirty tracking) and the **current input** (what the user is editing). In many apps, the initial input represents the server state while the current input represents the client state.
@@ -82,8 +82,8 @@ const RegisterSchema = v.object({
 });
 
 export default component$(() => {
-  const loginForm = useForm$({ schema: LoginSchema });
-  const registerForm = useForm$({ schema: RegisterSchema });
+  const loginForm = useForm$(() => ({ schema: LoginSchema }));
+  const registerForm = useForm$(() => ({ schema: RegisterSchema }));
 
   return (
     <>

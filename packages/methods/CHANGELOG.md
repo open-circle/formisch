@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix `insert` method to initialize missing target child slots when shifting array items (pull request #76)
+
 ## v0.7.0 (February 05, 2026)
 
 - Align `handleSubmit` overloads with separate `SubmitHandler` and `SubmitEventHandler` types

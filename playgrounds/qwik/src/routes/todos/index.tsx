@@ -46,13 +46,13 @@ const TodoFormSchema = v.object({
 });
 
 export default component$(() => {
-  const todoForm = useForm$({
+  const todoForm = useForm$(() => ({
     schema: TodoFormSchema,
     initialInput: {
       heading: '',
       todos: [{ label: '', deadline: '' }],
     },
-  });
+  }));
 
   const listElement = useSignal<HTMLDivElement>();
 

@@ -59,9 +59,9 @@ export const head: DocumentHead = {
 };
 
 export default component$(() => {
-  const paymentForm = useForm$({
+  const paymentForm = useForm$(() => ({
     schema: PaymentFormSchema,
-  });
+  }));
 
   const formContext = useContext(FormStoreContext);
   useTask$(() => {

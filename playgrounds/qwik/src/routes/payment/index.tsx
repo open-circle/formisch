@@ -48,9 +48,9 @@ const PaymentFormSchema = v.intersect([
 ]);
 
 export default component$(() => {
-  const paymentForm = useForm$({
+  const paymentForm = useForm$(() => ({
     schema: PaymentFormSchema,
-  });
+  }));
 
   const type = useComputed$(() => getInput(paymentForm, { path: ['type'] }));
 
