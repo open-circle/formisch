@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.7.5 (April 16, 2026)
+
+- Change `@formisch/methods` to v0.7.1
+
 ## v0.7.4 (March 19, 2026)
 
 - Fix `Form` component submit handler type inference

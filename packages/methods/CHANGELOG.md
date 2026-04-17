@@ -2,7 +2,7 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v0.7.1 (April 16, 2026)
 
 - Fix `insert` method to initialize missing target child slots when shifting array items (pull request #76)
 - Fix `getAllErrors` to be reactive when items are dynamically added to a `FieldArray`

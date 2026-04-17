@@ -2,9 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v0.10.0 (April 16, 2026)
 
-- Fix QRL implementation of `useForm$` hook
+- Change `@formisch/methods` to v0.7.1
+- Change QRL implementation of `useForm$` hook
 
 > This is a breaking change and requires updating every `useForm$` hook from `useForm$({ /* config */ })` to `useForm$(() => ({ /* config */ }))`.
 
