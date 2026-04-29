@@ -12,7 +12,6 @@ import {
 } from '../components';
 
 const schema = v.object({
-  number: v.optional(v.string()),
   range: v.optional(v.string(), '50'),
   checkbox_list: v.array(v.string()),
   checkbox_item: v.optional(v.boolean(), false),
@@ -41,7 +40,7 @@ export default function Page() {
       <FormHeader of={form} heading="Special form" />
       <div className="space-y-8 md:space-y-10 lg:space-y-12">
         {/* Number */}
-        <Field of={form} path={['number']}>
+        <Field of={form} path={['range']}>
           {(field) => (
             <TextInput
               {...field.props}
@@ -54,16 +53,13 @@ export default function Page() {
         </Field>
 
         {/* Range */}
-        <small className="block px-8 font-medium md:text-lg lg:mb-5 lg:px-10 lg:text-xl">
-          Range value: {rangeValue}
-        </small>
         <Field of={form} path={['range']}>
           {(field) => (
             <Slider
               {...field.props}
               input={field.input}
               errors={field.errors}
-              label="Range"
+              label={`Range: ${rangeValue}`}
             />
           )}
         </Field>
