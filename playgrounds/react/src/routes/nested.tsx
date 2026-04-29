@@ -11,12 +11,7 @@ import {
 } from '@formisch/react';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import * as v from 'valibot';
-import {
-  ColorButton,
-  FormFooter,
-  FormHeader,
-  TextInput,
-} from '../../components';
+import { ColorButton, FormFooter, FormHeader, TextInput } from '../components';
 
 const NestedFormSchema = v.object({
   items: v.array(

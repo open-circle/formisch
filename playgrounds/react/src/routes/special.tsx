@@ -9,7 +9,7 @@ import {
   Select,
   Slider,
   TextInput,
-} from '../../components';
+} from '../components';
 
 const SpecialFormSchema = v.object({
   number: v.optional(v.string()),

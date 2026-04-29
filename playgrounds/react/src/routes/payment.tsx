@@ -1,6 +1,6 @@
 import { Field, Form, getInput, useForm } from '@formisch/react';
 import * as v from 'valibot';
-import { FormFooter, FormHeader, Select, TextInput } from '../../components';
+import { FormFooter, FormHeader, Select, TextInput } from '../components';
 
 // Helpers
 const expirationRegex: RegExp = /^(?:0[1-9]|1[0-2])\/(?:2[5-9]|3[0-9])$/;

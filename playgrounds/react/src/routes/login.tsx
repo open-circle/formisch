@@ -1,6 +1,6 @@
 import { Field, Form, useForm } from '@formisch/react';
 import * as v from 'valibot';
-import { FormFooter, FormHeader, TextInput } from '../../components';
+import { FormFooter, FormHeader, TextInput } from '../components';
 
 const LoginSchema = v.object({
   email: v.pipe(

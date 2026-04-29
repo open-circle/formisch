@@ -18,7 +18,7 @@ import {
   InputErrors,
   InputLabel,
   TextInput,
-} from '../../components';
+} from '../components';
 
 const TodoFormSchema = v.object({
   heading: v.pipe(
