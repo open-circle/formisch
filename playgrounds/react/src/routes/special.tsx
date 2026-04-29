@@ -14,19 +14,13 @@ import {
 const schema = v.object({
   number: v.optional(v.string()),
   range: v.optional(v.string(), '50'),
-  checkbox: v.object({
-    array: v.array(v.string()),
-    boolean: v.optional(v.boolean(), false),
-  }),
+  checkbox_list: v.array(v.string()),
+  checkbox_item: v.optional(v.boolean(), false),
   radio: v.optional(v.string()),
-  select: v.object({
-    array: v.array(v.string()),
-    string: v.optional(v.string()),
-  }),
-  file: v.object({
-    list: v.array(v.file()),
-    item: v.optional(v.file()),
-  }),
+  select_list: v.array(v.string()),
+  select_item: v.optional(v.string()),
+  file_list: v.array(v.file()),
+  file_item: v.optional(v.file()),
 });
 
 export default function Page() {
@@ -73,7 +67,7 @@ export default function Page() {
             { label: 'Option 2', value: 'option_2' },
             { label: 'Option 3', value: 'option_3' },
           ].map(({ label, value }) => (
-            <Field of={form} path={['checkbox', 'array']} key={value}>
+            <Field of={form} path={['checkbox_list']} key={value}>
               {(field) => (
                 <Checkbox
                   {...field.props}
@@ -88,7 +82,7 @@ export default function Page() {
           ))}
         </div>
 
-        <Field of={form} path={['checkbox', 'boolean']}>
+        <Field of={form} path={['checkbox_item']}>
           {(field) => (
             <Checkbox
               {...field.props}
@@ -115,7 +109,7 @@ export default function Page() {
           )}
         </Field>
 
-        <Field of={form} path={['select', 'array']}>
+        <Field of={form} path={['select_list']}>
           {(field) => (
             <Select
               {...field.props}
@@ -132,7 +126,7 @@ export default function Page() {
           )}
         </Field>
 
-        <Field of={form} path={['select', 'string']}>
+        <Field of={form} path={['select_item']}>
           {(field) => (
             <Select
               {...field.props}
@@ -148,7 +142,7 @@ export default function Page() {
           )}
         </Field>
 
-        <Field of={form} path={['file', 'list']}>
+        <Field of={form} path={['file_list']}>
           {(field) => (
             <FileInput
               {...field.props}
@@ -160,7 +154,7 @@ export default function Page() {
           )}
         </Field>
 
-        <Field of={form} path={['file', 'item']}>
+        <Field of={form} path={['file_item']}>
           {(field) => (
             <FileInput
               {...field.props}
