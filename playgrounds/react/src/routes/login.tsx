@@ -2,7 +2,7 @@ import { Field, Form, useForm } from '@formisch/react';
 import * as v from 'valibot';
 import { FormFooter, FormHeader, TextInput } from '../components';
 
-const LoginSchema = v.object({
+const schema = v.object({
   email: v.pipe(
     v.string('Please enter your email.'),
     v.nonEmpty('Please enter your email.'),
@@ -16,17 +16,17 @@ const LoginSchema = v.object({
 });
 
 export default function LoginPage() {
-  const loginForm = useForm({ schema: LoginSchema });
+  const form = useForm({ schema: schema });
 
   return (
     <Form
-      of={loginForm}
+      of={form}
       className="space-y-12 md:space-y-14 lg:space-y-16"
       onSubmit={(output) => console.log(output)}
     >
-      <FormHeader of={loginForm} heading="Login form" />
+      <FormHeader of={form} heading="Login form" />
       <div className="space-y-8 md:space-y-10 lg:space-y-12">
-        <Field of={loginForm} path={['email']}>
+        <Field of={form} path={['email']}>
           {(field) => (
             <TextInput
               {...field.props}
@@ -39,7 +39,7 @@ export default function LoginPage() {
             />
           )}
         </Field>
-        <Field of={loginForm} path={['password']}>
+        <Field of={form} path={['password']}>
           {(field) => (
             <TextInput
               {...field.props}
@@ -53,7 +53,7 @@ export default function LoginPage() {
           )}
         </Field>
       </div>
-      <FormFooter of={loginForm} />
+      <FormFooter of={form} />
     </Form>
   );
 }

@@ -13,7 +13,7 @@ import { useAutoAnimate } from '@formkit/auto-animate/react';
 import * as v from 'valibot';
 import { ColorButton, FormFooter, FormHeader, TextInput } from '../components';
 
-const NestedFormSchema = v.object({
+const schema = v.object({
   items: v.array(
     v.object({
       label: v.optional(v.string()),
@@ -22,34 +22,33 @@ const NestedFormSchema = v.object({
   ),
 });
 
-export default function NestedPage() {
-  const nestedForm = useForm({
-    schema: NestedFormSchema,
-    initialInput: {
-      items: [
-        {
-          label: 'Item 1',
-          options: ['Option 1', 'Option 2'],
-        },
-        {
-          label: 'Item 2',
-          options: ['Option 1', 'Option 2'],
-        },
-      ],
+const initialInput = {
+  items: [
+    {
+      label: 'Item 1',
+      options: ['Option 1', 'Option 2'],
     },
-  });
+    {
+      label: 'Item 2',
+      options: ['Option 1', 'Option 2'],
+    },
+  ],
+};
+
+export default function NestedPage() {
+  const form = useForm({ schema: schema, initialInput: initialInput });
 
   const [itemsListElement] = useAutoAnimate();
 
   return (
     <Form
-      of={nestedForm}
+      of={form}
       className="space-y-12 md:space-y-14 lg:space-y-16"
       onSubmit={(output) => console.log(output)}
     >
-      <FormHeader of={nestedForm} heading="Nested form" />
+      <FormHeader of={form} heading="Nested form" />
 
-      <FieldArray of={nestedForm} path={['items']}>
+      <FieldArray of={form} path={['items']}>
         {(fieldArray) => (
           <div className="space-y-7 px-8 lg:px-10">
             <div ref={itemsListElement} className="space-y-5">
@@ -59,7 +58,7 @@ export default function NestedPage() {
                   className="flex-1 space-y-5 rounded-2xl border-2 border-slate-200 bg-slate-100/25 py-6 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/10 dark:hover:border-slate-700"
                 >
                   <div className="flex space-x-5 px-6">
-                    <Field of={nestedForm} path={['items', itemIndex, 'label']}>
+                    <Field of={form} path={['items', itemIndex, 'label']}>
                       {(field) => (
                         <TextInput
                           {...field.props}
@@ -77,7 +76,7 @@ export default function NestedPage() {
                       label="Delete"
                       width="auto"
                       onClick={() =>
-                        remove(nestedForm, { path: ['items'], at: itemIndex })
+                        remove(form, { path: ['items'], at: itemIndex })
                       }
                     />
                   </div>
@@ -87,10 +86,7 @@ export default function NestedPage() {
                     role="separator"
                   />
 
-                  <FieldArray
-                    of={nestedForm}
-                    path={['items', itemIndex, 'options']}
-                  >
+                  <FieldArray of={form} path={['items', itemIndex, 'options']}>
                     {(fieldArray) => {
                       // eslint-disable-next-line react-hooks/rules-of-hooks
                       const [optionsListElement] = useAutoAnimate();
@@ -102,7 +98,7 @@ export default function NestedPage() {
                           {fieldArray.items.map((item, optionIndex) => (
                             <div key={item} className="flex space-x-5">
                               <Field
-                                of={nestedForm}
+                                of={form}
                                 path={[
                                   'items',
                                   itemIndex,
@@ -127,7 +123,7 @@ export default function NestedPage() {
                                 label="Delete"
                                 width="auto"
                                 onClick={() =>
-                                  remove(nestedForm, {
+                                  remove(form, {
                                     path: ['items', itemIndex, 'options'],
                                     at: optionIndex,
                                   })
@@ -141,7 +137,7 @@ export default function NestedPage() {
                               color="green"
                               label="Add option"
                               onClick={() =>
-                                insert(nestedForm, {
+                                insert(form, {
                                   path: ['items', itemIndex, 'options'],
                                   initialInput: '',
                                 })
@@ -151,7 +147,7 @@ export default function NestedPage() {
                               color="yellow"
                               label="Move first to end"
                               onClick={() =>
-                                move(nestedForm, {
+                                move(form, {
                                   path: ['items', itemIndex, 'options'],
                                   from: 0,
                                   to: fieldArray.items.length - 1,
@@ -162,7 +158,7 @@ export default function NestedPage() {
                               color="purple"
                               label="Swap first two"
                               onClick={() =>
-                                swap(nestedForm, {
+                                swap(form, {
                                   path: ['items', itemIndex, 'options'],
                                   at: 0,
                                   and: 1,
@@ -183,7 +179,7 @@ export default function NestedPage() {
                 color="green"
                 label="Add item"
                 onClick={() =>
-                  insert(nestedForm, {
+                  insert(form, {
                     path: ['items'],
                     initialInput: { label: '', options: [''] },
                   })
@@ -193,7 +189,7 @@ export default function NestedPage() {
                 color="yellow"
                 label="Move first to end"
                 onClick={() =>
-                  move(nestedForm, {
+                  move(form, {
                     path: ['items'],
                     from: 0,
                     to: fieldArray.items.length - 1,
@@ -203,15 +199,13 @@ export default function NestedPage() {
               <ColorButton
                 color="purple"
                 label="Swap first two"
-                onClick={() =>
-                  swap(nestedForm, { path: ['items'], at: 0, and: 1 })
-                }
+                onClick={() => swap(form, { path: ['items'], at: 0, and: 1 })}
               />
               <ColorButton
                 color="blue"
                 label="Replace first"
                 onClick={() =>
-                  replace(nestedForm, {
+                  replace(form, {
                     path: ['items'],
                     at: 0,
                     initialInput: {
@@ -226,7 +220,7 @@ export default function NestedPage() {
         )}
       </FieldArray>
 
-      <FormFooter of={nestedForm} />
+      <FormFooter of={form} />
     </Form>
   );
 }

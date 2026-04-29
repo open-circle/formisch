@@ -20,7 +20,7 @@ import {
   TextInput,
 } from '../components';
 
-const TodoFormSchema = v.object({
+const schema = v.object({
   heading: v.pipe(
     v.string('Please enter a heading.'),
     v.nonEmpty('Please enter a heading.')
@@ -43,27 +43,26 @@ const TodoFormSchema = v.object({
   ),
 });
 
+const initialInput = {
+  heading: '',
+  todos: [{ label: '', deadline: '' }],
+};
+
 export default function Page() {
-  const todoForm = useForm({
-    schema: TodoFormSchema,
-    initialInput: {
-      heading: '',
-      todos: [{ label: '', deadline: '' }],
-    },
-  });
+  const form = useForm({ schema: schema, initialInput: initialInput });
 
   const [listElement] = useAutoAnimate();
 
   return (
     <Form
-      of={todoForm}
+      of={form}
       className="space-y-12 md:space-y-14 lg:space-y-16"
       onSubmit={(output) => console.log(output)}
     >
-      <FormHeader of={todoForm} heading="Todo form" />
+      <FormHeader of={form} heading="Todo form" />
 
       <div className="space-y-8 md:space-y-10 lg:space-y-12">
-        <Field of={todoForm} path={['heading']}>
+        <Field of={form} path={['heading']}>
           {(field) => (
             <TextInput
               {...field.props}
@@ -77,7 +76,7 @@ export default function Page() {
           )}
         </Field>
 
-        <FieldArray of={todoForm} path={['todos']}>
+        <FieldArray of={form} path={['todos']}>
           {(fieldArray) => (
             <div className="space-y-5 px-8 lg:px-10">
               <InputLabel label="Todos" margin="none" required />
@@ -89,7 +88,7 @@ export default function Page() {
                       key={item}
                       className="flex flex-wrap gap-5 rounded-2xl border-2 border-slate-200 bg-slate-100/25 p-5 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/10 dark:hover:border-slate-700"
                     >
-                      <Field of={todoForm} path={['todos', index, 'label']}>
+                      <Field of={form} path={['todos', index, 'label']}>
                         {(field) => (
                           <TextInput
                             {...field.props}
@@ -103,7 +102,7 @@ export default function Page() {
                         )}
                       </Field>
 
-                      <Field of={todoForm} path={['todos', index, 'deadline']}>
+                      <Field of={form} path={['todos', index, 'deadline']}>
                         {(field) => (
                           <TextInput
                             {...field.props}
@@ -121,7 +120,7 @@ export default function Page() {
                         label="Delete"
                         width="auto"
                         onClick={() =>
-                          remove(todoForm, { path: ['todos'], at: index })
+                          remove(form, { path: ['todos'], at: index })
                         }
                       />
                     </div>
@@ -135,7 +134,7 @@ export default function Page() {
                   color="green"
                   label="Add new"
                   onClick={() =>
-                    insert(todoForm, {
+                    insert(form, {
                       path: ['todos'],
                       initialInput: { label: '', deadline: '' },
                     })
@@ -145,7 +144,7 @@ export default function Page() {
                   color="yellow"
                   label="Move first to end"
                   onClick={() =>
-                    move(todoForm, {
+                    move(form, {
                       path: ['todos'],
                       from: 0,
                       to: fieldArray.items.length - 1,
@@ -155,15 +154,13 @@ export default function Page() {
                 <ColorButton
                   color="purple"
                   label="Swap first two"
-                  onClick={() =>
-                    swap(todoForm, { path: ['todos'], at: 0, and: 1 })
-                  }
+                  onClick={() => swap(form, { path: ['todos'], at: 0, and: 1 })}
                 />
                 <ColorButton
                   color="blue"
                   label="Replace first"
                   onClick={() =>
-                    replace(todoForm, {
+                    replace(form, {
                       path: ['todos'],
                       at: 0,
                       initialInput: {
@@ -179,7 +176,7 @@ export default function Page() {
         </FieldArray>
       </div>
 
-      <FormFooter of={todoForm} />
+      <FormFooter of={form} />
     </Form>
   );
 }

@@ -11,7 +11,7 @@ import {
   TextInput,
 } from '../components';
 
-const SpecialFormSchema = v.object({
+const schema = v.object({
   number: v.optional(v.string()),
   range: v.optional(v.string(), '50'),
   checkbox: v.object({
@@ -30,19 +30,17 @@ const SpecialFormSchema = v.object({
 });
 
 export default function Page() {
-  const specialForm = useForm({
-    schema: SpecialFormSchema,
-  });
+  const form = useForm({ schema: schema });
 
   return (
     <Form
-      of={specialForm}
+      of={form}
       className="space-y-12 md:space-y-14 lg:space-y-16"
       onSubmit={(output) => console.log(output)}
     >
-      <FormHeader of={specialForm} heading="Special form" />
+      <FormHeader of={form} heading="Special form" />
       <div className="space-y-8 md:space-y-10 lg:space-y-12">
-        <Field of={specialForm} path={['number']}>
+        <Field of={form} path={['number']}>
           {(field) => (
             <TextInput
               {...field.props}
@@ -54,7 +52,7 @@ export default function Page() {
           )}
         </Field>
 
-        <Field of={specialForm} path={['range']}>
+        <Field of={form} path={['range']}>
           {(field) => (
             <Slider
               {...field.props}
@@ -75,7 +73,7 @@ export default function Page() {
             { label: 'Option 2', value: 'option_2' },
             { label: 'Option 3', value: 'option_3' },
           ].map(({ label, value }) => (
-            <Field of={specialForm} path={['checkbox', 'array']} key={value}>
+            <Field of={form} path={['checkbox', 'array']} key={value}>
               {(field) => (
                 <Checkbox
                   {...field.props}
@@ -90,7 +88,7 @@ export default function Page() {
           ))}
         </div>
 
-        <Field of={specialForm} path={['checkbox', 'boolean']}>
+        <Field of={form} path={['checkbox', 'boolean']}>
           {(field) => (
             <Checkbox
               {...field.props}
@@ -101,7 +99,7 @@ export default function Page() {
           )}
         </Field>
 
-        <Field of={specialForm} path={['radio']}>
+        <Field of={form} path={['radio']}>
           {(field) => (
             <RadioGroup
               {...field.props}
@@ -117,7 +115,7 @@ export default function Page() {
           )}
         </Field>
 
-        <Field of={specialForm} path={['select', 'array']}>
+        <Field of={form} path={['select', 'array']}>
           {(field) => (
             <Select
               {...field.props}
@@ -134,7 +132,7 @@ export default function Page() {
           )}
         </Field>
 
-        <Field of={specialForm} path={['select', 'string']}>
+        <Field of={form} path={['select', 'string']}>
           {(field) => (
             <Select
               {...field.props}
@@ -150,7 +148,7 @@ export default function Page() {
           )}
         </Field>
 
-        <Field of={specialForm} path={['file', 'list']}>
+        <Field of={form} path={['file', 'list']}>
           {(field) => (
             <FileInput
               {...field.props}
@@ -162,7 +160,7 @@ export default function Page() {
           )}
         </Field>
 
-        <Field of={specialForm} path={['file', 'item']}>
+        <Field of={form} path={['file', 'item']}>
           {(field) => (
             <FileInput
               {...field.props}
@@ -173,7 +171,7 @@ export default function Page() {
           )}
         </Field>
       </div>
-      <FormFooter of={specialForm} />
+      <FormFooter of={form} />
     </Form>
   );
 }
