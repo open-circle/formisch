@@ -2,52 +2,52 @@ import { Field, Form, getInput, useForm } from '@formisch/react';
 import * as v from 'valibot';
 import { FormFooter, FormHeader, Select, TextInput } from '../../components';
 
+// Helpers
+const expirationRegex: RegExp = /^(?:0[1-9]|1[0-2])\/(?:2[5-9]|3[0-9])$/;
+
+// Fields
+const name_on_card = v.pipe(
+  v.string('Please enter your name.'),
+  v.nonEmpty('Please enter your name.')
+);
+const number = v.pipe(
+  v.string('Please enter your card number.'),
+  v.nonEmpty('Please enter your card number.'),
+  v.creditCard('The card number is badly formatted.')
+);
+const expiration = v.pipe(
+  v.string('Please enter the expiration date.'),
+  v.nonEmpty('Please enter the expiration date.'),
+  v.regex(expirationRegex, 'The expiration date is badly formatted.')
+);
+const email = v.pipe(
+  v.string('Please enter your PayPal email.'),
+  v.nonEmpty('Please enter your PayPal email.'),
+  v.email('The email address is badly formatted.')
+);
+
+// Variants
+const credit_card = v.object({
+  payment_type: v.literal('credit_card'),
+  credit_card: v.object({ number, expiration }),
+});
+const paypal = v.object({
+  payment_type: v.literal('paypal'),
+  paypal: v.object({ email }),
+});
+
 const PaymentFormSchema = v.intersect([
-  v.object({
-    owner: v.pipe(
-      v.string('Please enter your name.'),
-      v.nonEmpty('Please enter your name.')
-    ),
-  }),
+  v.object({ name_on_card }),
   v.variant(
-    'type',
-    [
-      v.object({
-        type: v.literal('card'),
-        card: v.object({
-          number: v.pipe(
-            v.string('Please enter your card number.'),
-            v.nonEmpty('Please enter your card number.'),
-            v.creditCard('The card number is badly formatted.')
-          ),
-          expiration: v.pipe(
-            v.string('Please enter the expiration date.'),
-            v.nonEmpty('Please enter the expiration date.'),
-            v.regex(
-              /^(?:0[1-9]|1[0-2])\/(?:2[5-9]|3[0-9])$/,
-              'The expiration date is badly formatted.'
-            )
-          ),
-        }),
-      }),
-      v.object({
-        type: v.literal('paypal'),
-        paypal: v.object({
-          email: v.pipe(
-            v.string('Please enter your PayPal email.'),
-            v.nonEmpty('Please enter your PayPal email.'),
-            v.email('The email address is badly formatted.')
-          ),
-        }),
-      }),
-    ],
+    'payment_type',
+    [credit_card, paypal],
     'Please select the payment type.'
   ),
 ]);
 
 export default function PaymentPage() {
   const paymentForm = useForm({ schema: PaymentFormSchema });
-  const type = getInput(paymentForm, { path: ['type'] });
+  const type = getInput(paymentForm, { path: ['payment_type'] });
 
   return (
     <Form
@@ -57,7 +57,7 @@ export default function PaymentPage() {
     >
       <FormHeader of={paymentForm} heading="Payment form" />
       <div className="space-y-8 md:space-y-10 lg:space-y-12">
-        <Field of={paymentForm} path={['owner']}>
+        <Field of={paymentForm} path={['name_on_card']}>
           {(field) => (
             <TextInput
               {...field.props}
@@ -70,13 +70,13 @@ export default function PaymentPage() {
             />
           )}
         </Field>
-        <Field of={paymentForm} path={['type']}>
+        <Field of={paymentForm} path={['payment_type']}>
           {(field) => (
             <Select
               {...field.props}
               input={field.input}
               options={[
-                { label: 'Card', value: 'card' },
+                { label: 'Card', value: 'credit_card' },
                 { label: 'PayPal', value: 'paypal' },
               ]}
               errors={field.errors}
@@ -86,9 +86,9 @@ export default function PaymentPage() {
             />
           )}
         </Field>
-        {type === 'card' && (
+        {type === 'credit_card' && (
           <>
-            <Field of={paymentForm} path={['card', 'number']}>
+            <Field of={paymentForm} path={['credit_card', 'number']}>
               {(field) => (
                 <TextInput
                   {...field.props}
@@ -101,7 +101,7 @@ export default function PaymentPage() {
                 />
               )}
             </Field>
-            <Field of={paymentForm} path={['card', 'expiration']}>
+            <Field of={paymentForm} path={['credit_card', 'expiration']}>
               {(field) => (
                 <TextInput
                   {...field.props}
