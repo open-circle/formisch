@@ -29,15 +29,19 @@ const email = v.pipe(
 // Variants
 const credit_card = v.object({
   payment_type: v.literal('credit_card'),
-  credit_card: v.object({ number, expiration }),
+  number,
+  expiration,
 });
 const paypal = v.object({
   payment_type: v.literal('paypal'),
-  paypal: v.object({ email }),
+  email,
 });
 
-const PaymentFormSchema = v.intersect([
+const schema = v.intersect([
+  // static fields
   v.object({ name_on_card }),
+
+  // dynamic fields
   v.variant(
     'payment_type',
     [credit_card, paypal],
@@ -46,18 +50,22 @@ const PaymentFormSchema = v.intersect([
 ]);
 
 export default function PaymentPage() {
-  const paymentForm = useForm({ schema: PaymentFormSchema });
-  const type = getInput(paymentForm, { path: ['payment_type'] });
+  const form = useForm({ schema: schema });
+  const paymentType = getInput(form, { path: ['payment_type'] });
+  const paymentOptions = [
+    { label: 'Card', value: 'credit_card' },
+    { label: 'PayPal', value: 'paypal' },
+  ];
 
   return (
     <Form
-      of={paymentForm}
+      of={form}
       className="space-y-12 md:space-y-14 lg:space-y-16"
       onSubmit={(output) => console.log(output)}
     >
-      <FormHeader of={paymentForm} heading="Payment form" />
+      <FormHeader of={form} heading="Payment form" />
       <div className="space-y-8 md:space-y-10 lg:space-y-12">
-        <Field of={paymentForm} path={['name_on_card']}>
+        <Field of={form} path={['name_on_card']}>
           {(field) => (
             <TextInput
               {...field.props}
@@ -70,15 +78,12 @@ export default function PaymentPage() {
             />
           )}
         </Field>
-        <Field of={paymentForm} path={['payment_type']}>
+        <Field of={form} path={['payment_type']}>
           {(field) => (
             <Select
               {...field.props}
               input={field.input}
-              options={[
-                { label: 'Card', value: 'credit_card' },
-                { label: 'PayPal', value: 'paypal' },
-              ]}
+              options={paymentOptions}
               errors={field.errors}
               label="Type"
               placeholder="Card or PayPal?"
@@ -86,9 +91,9 @@ export default function PaymentPage() {
             />
           )}
         </Field>
-        {type === 'credit_card' && (
+        {paymentType === 'credit_card' && (
           <>
-            <Field of={paymentForm} path={['credit_card', 'number']}>
+            <Field of={form} path={['number']}>
               {(field) => (
                 <TextInput
                   {...field.props}
@@ -101,7 +106,7 @@ export default function PaymentPage() {
                 />
               )}
             </Field>
-            <Field of={paymentForm} path={['credit_card', 'expiration']}>
+            <Field of={form} path={['expiration']}>
               {(field) => (
                 <TextInput
                   {...field.props}
@@ -116,8 +121,8 @@ export default function PaymentPage() {
             </Field>
           </>
         )}
-        {type === 'paypal' && (
-          <Field of={paymentForm} path={['paypal', 'email']}>
+        {paymentType === 'paypal' && (
+          <Field of={form} path={['email']}>
             {(field) => (
               <TextInput
                 {...field.props}
@@ -132,7 +137,7 @@ export default function PaymentPage() {
           </Field>
         )}
       </div>
-      <FormFooter of={paymentForm} />
+      <FormFooter of={form} />
     </Form>
   );
 }
