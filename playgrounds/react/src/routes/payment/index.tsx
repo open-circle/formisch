@@ -13,7 +13,7 @@ const name_on_card = v.pipe(
 const number = v.pipe(
   v.string('Please enter your card number.'),
   v.nonEmpty('Please enter your card number.'),
-  v.creditCard('The card number is badly formatted.')
+  v.minLength(8, 'The card number must be 8 digits.')
 );
 const expiration = v.pipe(
   v.string('Please enter the expiration date.'),
