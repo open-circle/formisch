@@ -16,9 +16,7 @@ const LoginSchema = v.object({
 });
 
 export default function LoginPage() {
-  const loginForm = useForm({
-    schema: LoginSchema,
-  });
+  const loginForm = useForm({ schema: LoginSchema });
 
   return (
     <Form
