@@ -10,7 +10,7 @@ const name_on_card = v.pipe(
   v.string('Please enter your name.'),
   v.nonEmpty('Please enter your name.')
 );
-const number = v.pipe(
+const credit_card_number = v.pipe(
   v.string('Please enter your card number.'),
   v.nonEmpty('Please enter your card number.'),
   v.minLength(8, 'The card number must be 8 digits.')
@@ -29,7 +29,7 @@ const email = v.pipe(
 // Variants
 const credit_card = v.object({
   payment_type: v.literal('credit_card'),
-  number,
+  credit_card_number,
   expiration,
 });
 const paypal = v.object({
@@ -93,7 +93,7 @@ export default function PaymentPage() {
         </Field>
         {paymentType === 'credit_card' && (
           <>
-            <Field of={form} path={['number']}>
+            <Field of={form} path={['credit_card_number']}>
               {(field) => (
                 <TextInput
                   {...field.props}
