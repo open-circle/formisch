@@ -53,10 +53,6 @@ const schema = v.intersect([
 export default function Payment() {
   const form = useForm({ schema: schema });
   const paymentType = getInput(form, { path: ['payment_type'] });
-  const paymentOptions = [
-    { label: 'Card', value: 'credit_card' },
-    { label: 'PayPal', value: 'paypal' },
-  ];
 
   return (
     <Form
@@ -84,7 +80,10 @@ export default function Payment() {
             <Select
               {...field.props}
               input={field.input}
-              options={paymentOptions}
+              options={[
+                { label: 'Card', value: 'credit_card' },
+                { label: 'PayPal', value: 'paypal' },
+              ]}
               errors={field.errors}
               label="Type"
               placeholder="Card or PayPal?"

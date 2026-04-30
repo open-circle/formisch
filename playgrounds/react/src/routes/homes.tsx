@@ -1,20 +1,32 @@
-import { Field, Form, useForm } from '@formisch/react';
+import { Field, Form, getInput, useForm } from '@formisch/react';
 import * as v from 'valibot';
 import { FormFooter, FormHeader, RadioGroup, TextInput } from '../components';
 
 // Fields
-const size = v.string('Specify how big is the property in square meters');
-const rooms = v.string('Specify how many rooms the property has.');
-const operating_costs = v.optional(v.string('How much it cost to operate?'));
-const monthly_fee = v.optional(v.string('How much it cost to operate?'));
+const size = v.pipe(
+  v.string('Specify how big is the property in square meters.'),
+  v.nonEmpty('Specify how big is the property in square meters.')
+);
+const rooms = v.pipe(
+  v.string('Specify how many rooms the property has.'),
+  v.nonEmpty('Specify how many rooms the property has.')
+);
+const operating_costs = v.pipe(
+  v.string('Specify the operating costs'),
+  v.nonEmpty('Specify how many rooms the property has.')
+);
+const monthly_fee = v.pipe(
+  v.string('Specify the monthly fee'),
+  v.nonEmpty('Specify how many rooms the property has.')
+);
 
 // Variants
-const has_tenant_ownership_yes = v.object({
-  tenant_ownership: v.literal('yes'),
+const has_tenant_agreement = v.object({
+  tenant_ownership: v.literal('agreement'),
   operating_costs,
 });
-const has_tenant_ownership_no = v.object({
-  tenant_ownership: v.literal('no'),
+const has_tenant_ownership = v.object({
+  tenant_ownership: v.literal('ownership'),
   monthly_fee,
 });
 
@@ -26,17 +38,14 @@ const schema = v.intersect([
   // dynamic fields
   v.variant(
     'tenant_ownership',
-    [has_tenant_ownership_yes, has_tenant_ownership_no],
+    [has_tenant_agreement, has_tenant_ownership],
     'Specify the type ownership.'
   ),
 ]);
 
 export default function Homes() {
   const form = useForm({ schema: schema });
-  const options = [
-    { label: 'Self owned', value: 'yes' },
-    { label: 'Rented', value: 'no' },
-  ];
+  const tenantOwnershipType = getInput(form, { path: ['tenant_ownership'] });
 
   return (
     <Form
@@ -51,8 +60,11 @@ export default function Homes() {
           {(field) => (
             <RadioGroup
               {...field.props}
-              label="Tennant ownership"
-              options={options}
+              label="What type of lease does the townhouse have?"
+              options={[
+                { label: 'Tenancy agreement', value: 'agreement' },
+                { label: 'Ownership', value: 'ownership' },
+              ]}
               input={field.input}
               errors={field.errors}
             />
@@ -83,29 +95,33 @@ export default function Homes() {
           )}
         </Field>
 
-        <Field of={form} path={['operating_costs']}>
-          {(field) => (
-            <TextInput
-              {...field.props}
-              input={field.input}
-              errors={field.errors}
-              type="number"
-              label="Operating cost"
-            />
-          )}
-        </Field>
+        {tenantOwnershipType === 'agreement' && (
+          <Field of={form} path={['monthly_fee']}>
+            {(field) => (
+              <TextInput
+                {...field.props}
+                input={field.input}
+                errors={field.errors}
+                type="number"
+                label="Monthly fee"
+              />
+            )}
+          </Field>
+        )}
 
-        <Field of={form} path={['monthly_fee']}>
-          {(field) => (
-            <TextInput
-              {...field.props}
-              input={field.input}
-              errors={field.errors}
-              type="number"
-              label="Monthly fee"
-            />
-          )}
-        </Field>
+        {tenantOwnershipType === 'ownership' && (
+          <Field of={form} path={['operating_costs']}>
+            {(field) => (
+              <TextInput
+                {...field.props}
+                input={field.input}
+                errors={field.errors}
+                type="number"
+                label="Operating cost"
+              />
+            )}
+          </Field>
+        )}
       </section>
 
       <FormFooter of={form} />
