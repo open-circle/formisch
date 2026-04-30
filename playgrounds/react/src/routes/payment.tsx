@@ -37,6 +37,7 @@ const paypal = v.object({
   email,
 });
 
+// Schema
 const schema = v.intersect([
   // static fields
   v.object({ name_on_card }),

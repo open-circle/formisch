@@ -2,20 +2,40 @@ import { Field, Form, useForm } from '@formisch/react';
 import * as v from 'valibot';
 import { FormFooter, FormHeader, RadioGroup, TextInput } from '../components';
 
-const schema = v.object({
-  tenant_ownership: v.string(),
-  size: v.string(),
-  rooms: v.string(),
-  operating_costs: v.optional(v.string()),
-  monthly_fee: v.optional(v.string()),
+// Fields
+const size = v.string('Specify how big is the property in square meters');
+const rooms = v.string('Specify how many rooms the property has.');
+const operating_costs = v.optional(v.string('How much it cost to operate?'));
+const monthly_fee = v.optional(v.string('How much it cost to operate?'));
+
+// Variants
+const has_tenant_ownership_yes = v.object({
+  tenant_ownership: v.literal('yes'),
+  operating_costs,
 });
+const has_tenant_ownership_no = v.object({
+  tenant_ownership: v.literal('no'),
+  monthly_fee,
+});
+
+// Schema
+const schema = v.intersect([
+  // static fields
+  v.object({ size, rooms }),
+
+  // dynamic fields
+  v.variant(
+    'tenant_ownership',
+    [has_tenant_ownership_yes, has_tenant_ownership_no],
+    'Specify the type ownership.'
+  ),
+]);
 
 export default function Homes() {
   const form = useForm({ schema: schema });
   const options = [
-    { label: '⛵️ Boat', value: 'boat' },
-    { label: '🚗 Car', value: 'car' },
-    { label: '✈️ Plane', value: 'plane' },
+    { label: 'Self owned', value: 'yes' },
+    { label: 'Rented', value: 'no' },
   ];
 
   return (
