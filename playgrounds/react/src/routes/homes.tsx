@@ -4,8 +4,8 @@ import { FormFooter, FormHeader, RadioGroup, TextInput } from '../components';
 
 // Fields
 const size = v.pipe(
-  v.string('Specify how big is the property in square meters.'),
-  v.nonEmpty('Specify how big is the property in square meters.')
+  v.string('Specify how big the property is in square meters.'),
+  v.nonEmpty('Specify how big the property is in square meters.')
 );
 const rooms = v.pipe(
   v.string('Specify how many rooms the property has.'),
@@ -13,39 +13,58 @@ const rooms = v.pipe(
 );
 const operating_costs = v.pipe(
   v.string('Specify the operating costs'),
-  v.nonEmpty('Specify how many rooms the property has.')
+  v.nonEmpty('Specify the operating costs.')
 );
 const monthly_fee = v.pipe(
   v.string('Specify the monthly fee'),
-  v.nonEmpty('Specify how many rooms the property has.')
+  v.nonEmpty('Specify the monthly fee.')
 );
 
-// Variants
+// Variants (tenancy only)
 const agreement = v.object({
   tenancy_type: v.literal('agreement'),
-  operating_costs,
+  monthly_fee,
 });
 const ownership = v.object({
   tenancy_type: v.literal('ownership'),
-  monthly_fee,
+  operating_costs,
 });
 
-// Schema
-const schema = v.intersect([
-  // static fields
-  v.object({ size, rooms }),
+function getSchema(property: 'home' | 'apartment' | 'tenancy') {
+  const staticFields = { size, rooms };
 
-  // dynamic fields
-  v.variant(
-    'tenancy_type',
-    [agreement, ownership],
-    'Specify the type ownership.'
-  ),
-]);
+  if (property === 'home') {
+    return v.object({ ...staticFields, operating_costs });
+  }
 
-export default function Homes() {
-  const form = useForm({ schema: schema });
-  const tenancyType = getInput(form, { path: ['tenancy_type'] });
+  if (property === 'apartment') {
+    return v.object({ ...staticFields, monthly_fee });
+  }
+
+  return v.intersect([
+    v.object(staticFields),
+    v.variant(
+      'tenancy_type',
+      [agreement, ownership],
+      'Specify the type of lease.'
+    ),
+  ]);
+}
+
+interface Props {
+  property: 'home' | 'apartment' | 'tenancy';
+}
+
+export default function Homes({ property }: Props) {
+  const form = useForm({ schema: getSchema(property) });
+
+  // Properties
+  const isTenancy = property === 'tenancy';
+  const tenancyType = isTenancy
+    ? getInput(form, { path: ['tenancy_type'] })
+    : undefined;
+  const hasMonthlyFee = property === 'apartment' || tenancyType === 'agreement';
+  const hasOperatingCost = property === 'home' || tenancyType === 'ownership';
 
   return (
     <Form
@@ -53,24 +72,10 @@ export default function Homes() {
       className="space-y-12 md:space-y-14 lg:space-y-16"
       onSubmit={(output) => console.log(output)}
     >
-      <FormHeader of={form} heading="Home property types form" />
+      <FormHeader of={form} heading={`Property details (${property})`} />
 
       <section className="space-y-8 md:space-y-10 lg:space-y-12">
-        <Field of={form} path={['tenancy_type']}>
-          {(field) => (
-            <RadioGroup
-              {...field.props}
-              label="What type of lease does the townhouse have?"
-              options={[
-                { label: 'Tenancy agreement', value: 'agreement' },
-                { label: 'Ownership', value: 'ownership' },
-              ]}
-              input={field.input}
-              errors={field.errors}
-            />
-          )}
-        </Field>
-
+        {/* Static Fields (Always visible) */}
         <Field of={form} path={['size']}>
           {(field) => (
             <TextInput
@@ -95,7 +100,24 @@ export default function Homes() {
           )}
         </Field>
 
-        {tenancyType === 'agreement' && (
+        {isTenancy && (
+          <Field of={form} path={['tenancy_type']}>
+            {(field) => (
+              <RadioGroup
+                {...field.props}
+                label="What type of lease does the townhouse have?"
+                options={[
+                  { label: 'Tenancy agreement', value: 'agreement' },
+                  { label: 'Ownership', value: 'ownership' },
+                ]}
+                input={field.input}
+                errors={field.errors}
+              />
+            )}
+          </Field>
+        )}
+
+        {hasMonthlyFee && (
           <Field of={form} path={['monthly_fee']}>
             {(field) => (
               <TextInput
@@ -109,7 +131,7 @@ export default function Homes() {
           </Field>
         )}
 
-        {tenancyType === 'ownership' && (
+        {hasOperatingCost && (
           <Field of={form} path={['operating_costs']}>
             {(field) => (
               <TextInput

@@ -27,7 +27,7 @@ export function App() {
           <Route path="/todos" element={<Todos />} />
           <Route path="/special" element={<Special />} />
           <Route path="/nested" element={<Nested />} />
-          <Route path="/homes" element={<Homes />} />
+          <Route path="/homes" element={<Homes property="home" />} />
         </Routes>
       </main>
     </BrowserRouter>
