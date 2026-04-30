@@ -20,24 +20,22 @@ import {
   TextInput,
 } from '../components';
 
+const label = v.pipe(
+  v.string('Please enter a label.'),
+  v.nonEmpty('Please enter a label.')
+);
+const deadline = v.pipe(
+  v.string('Please enter a deadline.'),
+  v.nonEmpty('Please enter a deadline.')
+);
+
 const schema = v.object({
   heading: v.pipe(
     v.string('Please enter a heading.'),
     v.nonEmpty('Please enter a heading.')
   ),
   todos: v.pipe(
-    v.array(
-      v.object({
-        label: v.pipe(
-          v.string('Please enter a label.'),
-          v.nonEmpty('Please enter a label.')
-        ),
-        deadline: v.pipe(
-          v.string('Please enter a deadline.'),
-          v.nonEmpty('Please enter a deadline.')
-        ),
-      })
-    ),
+    v.array(v.object({ label, deadline })),
     v.nonEmpty('Please add at least one todo.'),
     v.maxLength(4, 'You can only add up to 4 todos.')
   ),
