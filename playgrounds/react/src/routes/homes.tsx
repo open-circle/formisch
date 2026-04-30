@@ -21,12 +21,12 @@ const monthly_fee = v.pipe(
 );
 
 // Variants
-const has_tenant_agreement = v.object({
-  tenant_ownership: v.literal('agreement'),
+const agreement = v.object({
+  tenancy_type: v.literal('agreement'),
   operating_costs,
 });
-const has_tenant_ownership = v.object({
-  tenant_ownership: v.literal('ownership'),
+const ownership = v.object({
+  tenancy_type: v.literal('ownership'),
   monthly_fee,
 });
 
@@ -37,15 +37,15 @@ const schema = v.intersect([
 
   // dynamic fields
   v.variant(
-    'tenant_ownership',
-    [has_tenant_agreement, has_tenant_ownership],
+    'tenancy_type',
+    [agreement, ownership],
     'Specify the type ownership.'
   ),
 ]);
 
 export default function Homes() {
   const form = useForm({ schema: schema });
-  const tenantOwnershipType = getInput(form, { path: ['tenant_ownership'] });
+  const tenancyType = getInput(form, { path: ['tenancy_type'] });
 
   return (
     <Form
@@ -56,7 +56,7 @@ export default function Homes() {
       <FormHeader of={form} heading="Home property types form" />
 
       <section className="space-y-8 md:space-y-10 lg:space-y-12">
-        <Field of={form} path={['tenant_ownership']}>
+        <Field of={form} path={['tenancy_type']}>
           {(field) => (
             <RadioGroup
               {...field.props}
@@ -95,7 +95,7 @@ export default function Homes() {
           )}
         </Field>
 
-        {tenantOwnershipType === 'agreement' && (
+        {tenancyType === 'agreement' && (
           <Field of={form} path={['monthly_fee']}>
             {(field) => (
               <TextInput
@@ -109,7 +109,7 @@ export default function Homes() {
           </Field>
         )}
 
-        {tenantOwnershipType === 'ownership' && (
+        {tenancyType === 'ownership' && (
           <Field of={form} path={['operating_costs']}>
             {(field) => (
               <TextInput
