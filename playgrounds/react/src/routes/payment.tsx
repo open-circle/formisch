@@ -49,7 +49,7 @@ const schema = v.intersect([
   ),
 ]);
 
-export default function PaymentPage() {
+export default function Payment() {
   const form = useForm({ schema: schema });
   const paymentType = getInput(form, { path: ['payment_type'] });
   const paymentOptions = [

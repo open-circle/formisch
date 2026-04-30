@@ -22,7 +22,7 @@ const schema = v.object({
   file_item: v.optional(v.file()),
 });
 
-export default function Page() {
+export default function Special() {
   const form = useForm({ schema: schema });
   const rangeValue = getInput(form, { path: ['range'] });
   const options = [

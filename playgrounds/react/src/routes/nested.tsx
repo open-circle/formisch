@@ -35,7 +35,7 @@ const initialInput = {
   ],
 };
 
-export default function NestedPage() {
+export default function Nested() {
   const form = useForm({ schema: schema, initialInput: initialInput });
 
   const [itemsListElement] = useAutoAnimate();

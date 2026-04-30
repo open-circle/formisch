@@ -46,7 +46,7 @@ const initialInput = {
   todos: [{ label: '', deadline: '' }],
 };
 
-export default function Page() {
+export default function Todos() {
   const form = useForm({ schema: schema, initialInput: initialInput });
 
   const [listElement] = useAutoAnimate();
