@@ -29,6 +29,27 @@ export function createId(): string {
 }
 
 /**
+ * Listener tuple.
+ *
+ * The first element is the execute function, which notifies the listener
+ * about updates.
+ *
+ * The second element is the subscription set, which keeps track
+ * of where the listener is subscribed and is used to clean up subscriptions if
+ * they are no longer needed.
+ */
+export type Listener = [() => void, Set<Set<Listener>>];
+
+/**
+ * Sets the current listener being tracked.
+ *
+ * @param newListener The new listener to set.
+ */
+export function setListener(newListener: Listener | undefined): void {
+  throw new Error('No framework selected');
+}
+
+/**
  * Creates a reactive signal without an initial value.
  *
  * @returns The created signal.
