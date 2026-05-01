@@ -1,0 +1,52 @@
+---
+title: useFormData
+description: Creates a reactive store of the entire form input values.
+source: /frameworks/svelte/src/runes/useFormData/useFormData.svelte.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# useFormData
+
+Creates a reactive store of the entire form input values. The `current` property updates on every change, so it can be used for live previews, debug panels, or conditional rendering based on multiple fields.
+
+```ts
+const formData = useFormData<TSchema>(form);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+
+### Explanation
+
+With `useFormData` you get a reactive store whose `current` property holds the entire form's current input as a schema-shaped object. Rendering `{JSON.stringify(formData.current, null, 2)}` in a `<pre>` gives a live preview that updates on every keystroke.
+
+## Returns
+
+- `formData` <Property {...properties.formData} />
+
+## Related
+
+The following APIs can be combined with `useFormData`.
+
+### Runes
+
+<ApiList
+  items={[
+    { text: 'createForm', href: '../createForm/' },
+    { text: 'useField', href: '../useField/' },
+    { text: 'useFieldArray', href: '../useFieldArray/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList items={[{ text: 'getInput', href: '/methods/api/getInput/' }]} />

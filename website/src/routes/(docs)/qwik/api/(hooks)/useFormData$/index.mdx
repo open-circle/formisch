@@ -1,0 +1,52 @@
+---
+title: useFormData$
+description: Creates a reactive signal of the entire form input values.
+source: /frameworks/qwik/src/hooks/useFormData$/useFormData$.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# useFormData$
+
+Creates a reactive signal of the entire form input values. The signal updates on every change, so it can be used for live previews, debug panels, or conditional rendering based on multiple fields.
+
+```ts
+const formData = useFormData$<TSchema>(form);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+
+### Explanation
+
+With `useFormData$` you get a readonly signal that holds the entire form's current input as a schema-shaped object. Read `formData.value` to access the latest value. Rendering `{JSON.stringify(formData.value, null, 2)}` in a `<pre>` gives a live preview that updates on every keystroke.
+
+## Returns
+
+- `formData` <Property {...properties.formData} />
+
+## Related
+
+The following APIs can be combined with `useFormData$`.
+
+### Hooks
+
+<ApiList
+  items={[
+    { text: 'useForm$', href: '../useForm$/' },
+    { text: 'useField', href: '../useField/' },
+    { text: 'useFieldArray', href: '../useFieldArray/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList items={[{ text: 'getInput', href: '/methods/api/getInput/' }]} />

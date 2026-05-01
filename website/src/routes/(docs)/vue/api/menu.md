@@ -5,6 +5,7 @@
 - [useForm](/vue/api/useForm/)
 - [useField](/vue/api/useField/)
 - [useFieldArray](/vue/api/useFieldArray/)
+- [useFormData](/vue/api/useFormData/)
 
 ## Components
 

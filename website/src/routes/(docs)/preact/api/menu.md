@@ -5,6 +5,7 @@
 - [useForm](/preact/api/useForm/)
 - [useField](/preact/api/useField/)
 - [useFieldArray](/preact/api/useFieldArray/)
+- [useFormData](/preact/api/useFormData/)
 
 ## Components
 
