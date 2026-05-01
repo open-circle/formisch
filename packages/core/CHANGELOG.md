@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.6.4 (May 01, 2026)
+
+- Fix missing `setListener` export in React core build by adding `Listener` type and `setListener` stub to the framework-agnostic `framework/index.ts`
+
 ## v0.6.3 (March 06, 2026)
 
 - Fix `initializeFieldStore` for nullable and nullish `lazy`, `variant`, `union` and `intersect` schemas (pull request #68)

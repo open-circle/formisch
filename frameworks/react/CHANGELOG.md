@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.4.6 (May 01, 2026)
+
+- Change `@formisch/core` to v0.6.4 (fixes broken React framework build caused by missing `setListener` export)
+
 ## v0.4.5 (April 16, 2026)
 
 - Change `@formisch/methods` to v0.7.1
