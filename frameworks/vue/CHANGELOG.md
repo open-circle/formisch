@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.8.0 (April 22, 2026)
+
+- Add `useFormData` composable for reactive full-form input extraction
+
 ## v0.7.5 (April 16, 2026)
 
 - Change `@formisch/methods` to v0.7.1
