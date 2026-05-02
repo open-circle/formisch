@@ -14,11 +14,11 @@ import { disableTransitions } from './utils';
 export function App() {
   useEventListener('resize', disableTransitions);
 
+  const links = ['Login', 'Payment', 'Todos', 'Special', 'Nested', 'Homes'];
+
   return (
     <BrowserRouter>
-      <Tabs
-        items={['Login', 'Payment', 'Todos', 'Special', 'Nested', 'Homes']}
-      />
+      <Tabs items={links} />
       <main>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
