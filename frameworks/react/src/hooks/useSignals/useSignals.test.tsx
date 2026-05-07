@@ -1,121 +1,189 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { type ReactElement, useEffect, useState } from 'react';
+import { batch, createSignal } from '@formisch/core/react';
+import { act, render, screen } from '@testing-library/react';
+import { type ReactElement, StrictMode, useState } from 'react';
 import { describe, expect, test } from 'vitest';
 import { useSignals } from './useSignals.ts';
 
 describe('useSignals', () => {
-  describe('basic functionality', () => {
-    function TestComponent(): ReactElement {
-      useSignals();
-      const [count, setCount] = useState(0);
+  describe('signal subscription', () => {
+    test('should re-render the component when a tracked signal changes', () => {
+      const signal = createSignal(0);
 
-      return (
-        <div>
-          <span data-testid="count">{count}</span>
-          <button onClick={() => setCount((c) => c + 1)}>Increment</button>
-        </div>
-      );
-    }
+      function TrackedComponent(): ReactElement {
+        useSignals();
+        return <span data-testid="value">{signal.value}</span>;
+      }
 
-    test('should render without errors', () => {
-      render(<TestComponent />);
-      expect(screen.getByTestId('count')).toHaveTextContent('0');
+      render(<TrackedComponent />);
+      expect(screen.getByTestId('value')).toHaveTextContent('0');
+
+      act(() => {
+        signal.value = 5;
+      });
+
+      expect(screen.getByTestId('value')).toHaveTextContent('5');
     });
 
-    test('should allow re-renders', async () => {
-      render(<TestComponent />);
-      const button = screen.getByText('Increment');
+    test('should not re-render the component for signals that were not read', () => {
+      const tracked = createSignal('a');
+      const untracked = createSignal('x');
+      let renderCount = 0;
 
-      button.click();
+      function PartialTrackComponent(): ReactElement {
+        useSignals();
+        renderCount++;
+        return <span data-testid="value">{tracked.value}</span>;
+      }
 
-      await waitFor(() => {
-        expect(screen.getByTestId('count')).toHaveTextContent('1');
+      render(<PartialTrackComponent />);
+      const initialRenderCount = renderCount;
+
+      act(() => {
+        untracked.value = 'y';
       });
+
+      expect(renderCount).toBe(initialRenderCount);
+    });
+
+    test('should re-render once per batched signal update cycle', () => {
+      const signalA = createSignal(0);
+      const signalB = createSignal(0);
+      let renderCount = 0;
+
+      function BatchedComponent(): ReactElement {
+        useSignals();
+        renderCount++;
+        return <span data-testid="sum">{signalA.value + signalB.value}</span>;
+      }
+
+      render(<BatchedComponent />);
+      const initialRenderCount = renderCount;
+
+      act(() => {
+        batch(() => {
+          signalA.value = 1;
+          signalB.value = 2;
+        });
+      });
+
+      expect(screen.getByTestId('sum')).toHaveTextContent('3');
+      // Both signals share a single subscriber, so a single notification fires
+      expect(renderCount - initialRenderCount).toBe(1);
     });
   });
 
   describe('cleanup', () => {
-    function MountUnmountComponent({
-      onMount,
-      onUnmount,
-    }: {
-      onMount: () => void;
-      onUnmount: () => void;
-    }): ReactElement {
-      useSignals();
+    test('should not re-render after unmount when a tracked signal changes', async () => {
+      const signal = createSignal('initial');
+      let renderCount = 0;
 
-      useEffect(() => {
-        onMount();
-        return () => {
-          onUnmount();
-        };
-      }, [onMount, onUnmount]);
+      function TrackedComponent(): ReactElement {
+        useSignals();
+        renderCount++;
+        return <span data-testid="value">{signal.value}</span>;
+      }
 
-      return <div data-testid="mounted">Mounted</div>;
-    }
-
-    test('should cleanup on unmount', async () => {
-      let mounted = false;
-      let unmounted = false;
-
-      const { unmount } = render(
-        <MountUnmountComponent
-          onMount={() => {
-            mounted = true;
-          }}
-          onUnmount={() => {
-            unmounted = true;
-          }}
-        />
-      );
-
-      expect(mounted).toBe(true);
-      expect(unmounted).toBe(false);
+      const { unmount } = render(<TrackedComponent />);
+      const renderCountBeforeUnmount = renderCount;
 
       unmount();
 
-      // Give time for the timeout-based cleanup
-      await waitFor(() => {
-        expect(unmounted).toBe(true);
+      // Wait a tick for the timeout-based cleanup to flush
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
       });
+
+      signal.value = 'after-unmount';
+
+      expect(renderCount).toBe(renderCountBeforeUnmount);
+    });
+
+    test('should keep subscriptions alive across StrictMode effect re-runs', () => {
+      const signal = createSignal(0);
+
+      function TrackedComponent(): ReactElement {
+        useSignals();
+        return <span data-testid="value">{signal.value}</span>;
+      }
+
+      // StrictMode mounts → unmounts → re-mounts the component in dev mode,
+      // which schedules and then cancels the cleanup timeout. The signal
+      // subscription must survive that cycle.
+      render(
+        <StrictMode>
+          <TrackedComponent />
+        </StrictMode>
+      );
+
+      act(() => {
+        signal.value = 7;
+      });
+
+      expect(screen.getByTestId('value')).toHaveTextContent('7');
     });
   });
 
   describe('multiple components', () => {
-    function Counter({ id }: { id: string }): ReactElement {
-      useSignals();
-      const [count, setCount] = useState(0);
+    test('should only re-render components that read the changed signal', () => {
+      const signalA = createSignal(0);
+      const signalB = createSignal(0);
+      let renderCountA = 0;
+      let renderCountB = 0;
 
-      return (
-        <div>
-          <span data-testid={`count-${id}`}>{count}</span>
-          <button
-            data-testid={`button-${id}`}
-            onClick={() => setCount((c) => c + 1)}
-          >
-            Increment {id}
-          </button>
-        </div>
-      );
-    }
+      function CounterA(): ReactElement {
+        useSignals();
+        renderCountA++;
+        return <span data-testid="a">{signalA.value}</span>;
+      }
 
-    test('should work with multiple components', async () => {
+      function CounterB(): ReactElement {
+        useSignals();
+        renderCountB++;
+        return <span data-testid="b">{signalB.value}</span>;
+      }
+
       render(
-        <div>
-          <Counter id="a" />
-          <Counter id="b" />
-        </div>
+        <>
+          <CounterA />
+          <CounterB />
+        </>
       );
 
-      expect(screen.getByTestId('count-a')).toHaveTextContent('0');
-      expect(screen.getByTestId('count-b')).toHaveTextContent('0');
+      const initialA = renderCountA;
+      const initialB = renderCountB;
 
-      screen.getByTestId('button-a').click();
-
-      await waitFor(() => {
-        expect(screen.getByTestId('count-a')).toHaveTextContent('1');
-        expect(screen.getByTestId('count-b')).toHaveTextContent('0');
+      act(() => {
+        signalA.value = 1;
       });
+
+      expect(screen.getByTestId('a')).toHaveTextContent('1');
+      expect(screen.getByTestId('b')).toHaveTextContent('0');
+      expect(renderCountA - initialA).toBe(1);
+      expect(renderCountB).toBe(initialB);
+    });
+  });
+
+  describe('coexistence with React state', () => {
+    test('should not interfere with regular useState updates', () => {
+      function StateComponent(): ReactElement {
+        useSignals();
+        const [count, setCount] = useState(0);
+        return (
+          <div>
+            <span data-testid="count">{count}</span>
+            <button onClick={() => setCount((c) => c + 1)}>Increment</button>
+          </div>
+        );
+      }
+
+      render(<StateComponent />);
+      expect(screen.getByTestId('count')).toHaveTextContent('0');
+
+      act(() => {
+        screen.getByText('Increment').click();
+      });
+
+      expect(screen.getByTestId('count')).toHaveTextContent('1');
     });
   });
 });

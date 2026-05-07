@@ -10,7 +10,7 @@ describe('Form', () => {
     function TestForm(): ReactElement {
       const form = useForm({ schema: v.object({ name: v.string() }) });
       return (
-        <Form of={form} onSubmit={() => {}}>
+        <Form of={form} onSubmit={vi.fn()}>
           <input name="name" aria-label="Name" />
           <button type="submit">Submit</button>
         </Form>
@@ -43,7 +43,7 @@ describe('Form', () => {
         return (
           <Form
             of={form}
-            onSubmit={() => {}}
+            onSubmit={vi.fn()}
             className="test-class"
             id="test-form"
             aria-label="Test Form"
@@ -136,6 +136,7 @@ describe('Form', () => {
 
         return (
           <Form of={form} onSubmit={handleSubmit} aria-label="Validation Form">
+            <span data-testid="valid">{String(form.isValid)}</span>
             <button type="submit">Submit</button>
           </Form>
         );
@@ -146,10 +147,12 @@ describe('Form', () => {
       const form = screen.getByRole('form', { name: 'Validation Form' });
       fireEvent.submit(form);
 
-      // Use waitFor to ensure validation has completed
+      // Wait for validation to complete by observing the form becoming invalid
       await waitFor(() => {
-        expect(handleSubmit).not.toHaveBeenCalled();
+        expect(screen.getByTestId('valid')).toHaveTextContent('false');
       });
+
+      expect(handleSubmit).not.toHaveBeenCalled();
     });
 
     test('should call onSubmit with valid output', async () => {

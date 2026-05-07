@@ -1,4 +1,5 @@
 import {
+  act,
   fireEvent,
   render,
   renderHook,
@@ -7,7 +8,8 @@ import {
 } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import * as v from 'valibot';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
+import { Form } from '../../components/Form/index.ts';
 import { useForm } from '../useForm/index.ts';
 import { useField } from './useField.ts';
 
@@ -132,6 +134,34 @@ describe('useField', () => {
       expect(typeof result.current.props.onFocus).toBe('function');
       expect(typeof result.current.props.onChange).toBe('function');
       expect(typeof result.current.props.onBlur).toBe('function');
+    });
+  });
+
+  describe('imperative onChange', () => {
+    test('should update field input and trigger validation', async () => {
+      const schema = v.object({
+        email: v.pipe(v.string(), v.email('Invalid email')),
+      });
+
+      const { result } = renderHook(() => {
+        const form = useForm({
+          schema,
+          validate: 'input',
+          initialInput: { email: '' },
+        });
+        return useField(form, { path: ['email'] });
+      });
+
+      act(() => {
+        result.current.onChange('not-an-email');
+      });
+
+      expect(result.current.input).toBe('not-an-email');
+
+      await waitFor(() => {
+        expect(result.current.errors).not.toBe(null);
+        expect(result.current.isValid).toBe(false);
+      });
     });
   });
 
@@ -260,24 +290,59 @@ describe('useField', () => {
   });
 
   describe('element registration', () => {
-    function TestInputComponent(): ReactElement {
-      const form = useForm({
-        schema: v.object({ name: v.string() }),
-      });
-      const field = useField(form, { path: ['name'] });
+    test('should focus the registered element when validation fails on submit', async () => {
+      function FocusOnErrorForm(): ReactElement {
+        const form = useForm({
+          schema: v.object({
+            email: v.pipe(v.string(), v.nonEmpty('Email is required')),
+          }),
+          initialInput: { email: '' },
+        });
+        const field = useField(form, { path: ['email'] });
 
-      return <input data-testid="field-input" {...field.props} />;
-    }
+        return (
+          <Form of={form} onSubmit={vi.fn()} aria-label="Focus Form">
+            <input
+              data-testid="field-input"
+              {...field.props}
+              value={field.input ?? ''}
+            />
+            <button type="submit">Submit</button>
+          </Form>
+        );
+      }
 
-    test('should register element via ref callback', () => {
-      const { unmount } = render(<TestInputComponent />);
+      render(<FocusOnErrorForm />);
 
-      // Element should be registered after render
       const input = screen.getByTestId('field-input');
-      expect(input).toBeInTheDocument();
+      const formEl = screen.getByRole('form', { name: 'Focus Form' });
 
-      // Cleanup on unmount
-      unmount();
+      expect(document.activeElement).not.toBe(input);
+
+      fireEvent.submit(formEl);
+
+      // The first registered element receives focus when validation fails
+      await waitFor(() => {
+        expect(document.activeElement).toBe(input);
+      });
+    });
+
+    test('should remove disconnected elements on unmount', () => {
+      function TestInputComponent(): ReactElement {
+        const form = useForm({
+          schema: v.object({ name: v.string() }),
+        });
+        const field = useField(form, { path: ['name'] });
+
+        return <input data-testid="field-input" {...field.props} />;
+      }
+
+      const { unmount } = render(<TestInputComponent />);
+      expect(screen.getByTestId('field-input')).toBeInTheDocument();
+
+      // Cleanup runs without errors and removes disconnected elements
+      expect(() => unmount()).not.toThrow();
+      expect(screen.queryByTestId('field-input')).toBeNull();
     });
   });
 });

@@ -149,8 +149,7 @@ describe('useFieldArray', () => {
       rerender();
       const secondStore = result.current;
 
-      // Path should be the same reference
-      expect(firstStore.path).toEqual(secondStore.path);
+      expect(firstStore).toBe(secondStore);
     });
   });
 
