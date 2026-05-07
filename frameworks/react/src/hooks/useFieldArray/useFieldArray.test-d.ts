@@ -34,7 +34,7 @@ describe('useFieldArray types', () => {
     const form = useForm({ schema });
     const fieldArray = useFieldArray(form, { path: ['items'] });
 
-    expectTypeOf(fieldArray.items).toEqualTypeOf<readonly string[]>();
+    expectTypeOf(fieldArray.items).toEqualTypeOf<string[]>();
     expectTypeOf(fieldArray.errors).toEqualTypeOf<
       [string, ...string[]] | null
     >();
@@ -55,6 +55,6 @@ describe('useFieldArray types', () => {
     const form = useForm({ schema });
     const fieldArray = useFieldArray(form, { path: ['users'] });
 
-    expectTypeOf(fieldArray.items).toEqualTypeOf<readonly string[]>();
+    expectTypeOf(fieldArray.items).toEqualTypeOf<string[]>();
   });
 });

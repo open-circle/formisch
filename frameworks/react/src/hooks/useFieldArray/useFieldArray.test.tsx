@@ -1,4 +1,4 @@
-import { insert, remove, swap } from '@formisch/methods/vanilla';
+import { insert, remove, swap } from '@formisch/methods/react';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
@@ -215,7 +215,7 @@ describe('useFieldArray', () => {
         return { form, fieldArray };
       });
 
-      const keysBefore = result.current.fieldArray.items.map((item) => item.id);
+      const keysBefore = [...result.current.fieldArray.items];
 
       act(() => {
         swap(result.current.form, {
@@ -225,7 +225,7 @@ describe('useFieldArray', () => {
         });
       });
 
-      const keysAfter = result.current.fieldArray.items.map((item) => item.id);
+      const keysAfter = [...result.current.fieldArray.items];
 
       // Keys should be swapped, not regenerated
       expect(keysAfter[0]).toBe(keysBefore[2]);

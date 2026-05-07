@@ -1,4 +1,4 @@
-import { insert, remove } from '@formisch/methods/vanilla';
+import { insert, remove } from '@formisch/methods/react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import * as v from 'valibot';
