@@ -1,5 +1,5 @@
 import { batch, createSignal } from '@formisch/core/react';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { type ReactElement, StrictMode, useState } from 'react';
 import { describe, expect, test } from 'vitest';
 import { useSignals } from './useSignals.ts';
@@ -88,7 +88,7 @@ describe('useSignals', () => {
 
       unmount();
 
-      // Wait a tick for the timeout-based cleanup to flush
+      // Flush the 0ms cleanup timeout scheduled in useSignals.ts
       await act(async () => {
         await new Promise((resolve) => setTimeout(resolve, 0));
       });
@@ -180,7 +180,7 @@ describe('useSignals', () => {
       expect(screen.getByTestId('count')).toHaveTextContent('0');
 
       act(() => {
-        screen.getByText('Increment').click();
+        fireEvent.click(screen.getByText('Increment'));
       });
 
       expect(screen.getByTestId('count')).toHaveTextContent('1');
