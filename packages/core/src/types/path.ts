@@ -100,12 +100,12 @@ export type PathValue<TValue, TPath extends Path> = TPath extends readonly [
 type IsOrHasArray<TValue> =
   IsAny<TValue> extends true
     ? false
-    : TValue extends readonly unknown[]
+    : true extends (TValue extends readonly unknown[] ? true : false)
       ? true
-      : TValue extends Record<string, unknown>
+      : [TValue] extends [Record<string, unknown>]
         ? true extends {
-            [TKey in keyof TValue]: IsOrHasArray<TValue[TKey]>;
-          }[keyof TValue]
+            [TKey in KeyOf<TValue>]: IsOrHasArray<MergeUnion<TValue>[TKey]>;
+          }[KeyOf<TValue>]
           ? true
           : false
         : false;
@@ -130,12 +130,12 @@ type KeyOfArrayPath<TValue> =
           }[number]
       : TValue extends Record<string, unknown>
         ? {
-            [TKey in keyof TValue]: IsOrHasArray<
-              NonNullable<TValue[TKey]>
+            [TKey in KeyOf<TValue>]: IsOrHasArray<
+              NonNullable<MergeUnion<TValue>[TKey]>
             > extends true
               ? TKey
               : never;
-          }[keyof TValue] &
+          }[KeyOf<TValue>] &
             PathKey
         : never;
 
