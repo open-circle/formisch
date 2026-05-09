@@ -5,6 +5,7 @@
 - [createForm](/svelte/api/createForm/)
 - [useField](/svelte/api/useField/)
 - [useFieldArray](/svelte/api/useFieldArray/)
+- [useFormData](/svelte/api/useFormData/)
 
 ## Components
 
@@ -39,6 +40,7 @@
 - [FieldStore](/svelte/api/FieldStore/)
 - [FocusFieldConfig](/methods/api/FocusFieldConfig/)
 - [FormConfig](/svelte/api/FormConfig/)
+- [FormDataStore](/svelte/api/FormDataStore/)
 - [FormStore](/svelte/api/FormStore/)
 - [GetFieldErrorsConfig](/methods/api/GetFieldErrorsConfig/)
 - [GetFieldInputConfig](/methods/api/GetFieldInputConfig/)

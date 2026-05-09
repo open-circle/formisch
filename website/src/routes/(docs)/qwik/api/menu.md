@@ -5,6 +5,7 @@
 - [useForm$](/qwik/api/useForm$/)
 - [useField](/qwik/api/useField/)
 - [useFieldArray](/qwik/api/useFieldArray/)
+- [useFormData$](/qwik/api/useFormData$/)
 
 ## Components
 

@@ -1,0 +1,23 @@
+---
+title: FormDataStore
+description: Reactive store interface exposing the entire form input values.
+source: /frameworks/svelte/src/runes/useFormData/useFormData.svelte.ts
+contributors:
+  - fabian-hiller
+---
+
+import { Property } from '~/components';
+import { properties } from './properties';
+
+# FormDataStore
+
+Reactive store interface exposing the entire form's current input values.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+
+## Definition
+
+- `FormDataStore`
+  - `current` <Property {...properties.current} />

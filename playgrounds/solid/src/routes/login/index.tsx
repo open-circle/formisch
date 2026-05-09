@@ -1,4 +1,4 @@
-import { createForm, Field, Form } from '@formisch/solid';
+import { createForm, Field, Form, useFormData } from '@formisch/solid';
 import * as v from 'valibot';
 import { FormFooter, FormHeader, TextInput, Title } from '~/components';
 
@@ -59,6 +59,18 @@ export default function LoginPage() {
         </div>
         <FormFooter of={loginForm} />
       </Form>
+      <FormDataPreview form={loginForm} />
     </>
+  );
+}
+
+function FormDataPreview(props: {
+  form: ReturnType<typeof createForm<typeof LoginSchema>>;
+}) {
+  const formData = useFormData(() => props.form);
+  return (
+    <pre class="overflow-auto bg-slate-100 p-4 text-xs dark:bg-slate-800">
+      <code>{JSON.stringify(formData(), null, 2)}</code>
+    </pre>
   );
 }

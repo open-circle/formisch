@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.10.0 (April 22, 2026)
+
+- Add `useFormData` hook for reactive full-form input extraction
+
 ## v0.9.5 (April 16, 2026)
 
 - Change `@formisch/methods` to v0.7.1

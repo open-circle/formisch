@@ -1,4 +1,4 @@
-import { Field, Form, useForm } from '@formisch/react';
+import { Field, Form, useForm, useFormData } from '@formisch/react';
 import * as v from 'valibot';
 import { FormFooter, FormHeader, TextInput } from '../../components';
 
@@ -21,41 +21,57 @@ export default function LoginPage() {
   });
 
   return (
-    <Form
-      of={loginForm}
-      className="space-y-12 md:space-y-14 lg:space-y-16"
-      onSubmit={(output) => console.log(output)}
-    >
-      <FormHeader of={loginForm} heading="Login form" />
-      <div className="space-y-8 md:space-y-10 lg:space-y-12">
-        <Field of={loginForm} path={['email']}>
-          {(field) => (
-            <TextInput
-              {...field.props}
-              input={field.input}
-              errors={field.errors}
-              type="email"
-              label="Email"
-              placeholder="example@email.com"
-              required
-            />
-          )}
-        </Field>
-        <Field of={loginForm} path={['password']}>
-          {(field) => (
-            <TextInput
-              {...field.props}
-              input={field.input}
-              errors={field.errors}
-              type="password"
-              label="Password"
-              placeholder="********"
-              required
-            />
-          )}
-        </Field>
-      </div>
-      <FormFooter of={loginForm} />
-    </Form>
+    <>
+      <Form
+        of={loginForm}
+        className="space-y-12 md:space-y-14 lg:space-y-16"
+        onSubmit={(output) => console.log(output)}
+      >
+        <FormHeader of={loginForm} heading="Login form" />
+        <div className="space-y-8 md:space-y-10 lg:space-y-12">
+          <Field of={loginForm} path={['email']}>
+            {(field) => (
+              <TextInput
+                {...field.props}
+                input={field.input}
+                errors={field.errors}
+                type="email"
+                label="Email"
+                placeholder="example@email.com"
+                required
+              />
+            )}
+          </Field>
+          <Field of={loginForm} path={['password']}>
+            {(field) => (
+              <TextInput
+                {...field.props}
+                input={field.input}
+                errors={field.errors}
+                type="password"
+                label="Password"
+                placeholder="********"
+                required
+              />
+            )}
+          </Field>
+        </div>
+        <FormFooter of={loginForm} />
+      </Form>
+      <FormDataPreview form={loginForm} />
+    </>
+  );
+}
+
+function FormDataPreview({
+  form,
+}: {
+  form: ReturnType<typeof useForm<typeof LoginSchema>>;
+}) {
+  const formData = useFormData(form);
+  return (
+    <pre className="overflow-auto bg-slate-100 p-4 text-xs dark:bg-slate-800">
+      <code>{JSON.stringify(formData, null, 2)}</code>
+    </pre>
   );
 }

@@ -5,6 +5,7 @@
 - [createForm](/solid/api/createForm/)
 - [useField](/solid/api/useField/)
 - [useFieldArray](/solid/api/useFieldArray/)
+- [useFormData](/solid/api/useFormData/)
 
 ## Components
 
