@@ -106,6 +106,18 @@ jobs:
         run: pnpm lint
         working-directory: frameworks/solid
 
+  solid_vitest:
+    name: Run Vitest in frameworks/solid
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Vitest tests
+        run: pnpm test
+        working-directory: frameworks/solid
+
   # frameworks/react
   react_prettier:
     name: Run Prettier in frameworks/react
@@ -166,6 +178,18 @@ jobs:
         uses: ./.github/actions/environment
       - name: ESLint check
         run: pnpm lint
+        working-directory: frameworks/preact
+
+  preact_vitest:
+    name: Run Vitest in frameworks/preact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Vitest tests
+        run: pnpm test
         working-directory: frameworks/preact
 
   # frameworks/qwik
@@ -230,6 +254,18 @@ jobs:
         run: pnpm check
         working-directory: frameworks/svelte
 
+  svelte_vitest:
+    name: Run Vitest in frameworks/svelte
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Vitest tests
+        run: pnpm test
+        working-directory: frameworks/svelte
+
   # frameworks/vue
   vue_prettier:
     name: Run Prettier in frameworks/vue
@@ -253,6 +289,18 @@ jobs:
         uses: ./.github/actions/environment
       - name: ESLint check
         run: pnpm lint
+        working-directory: frameworks/vue
+
+  vue_vitest:
+    name: Run Vitest in frameworks/vue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Vitest tests
+        run: pnpm test
         working-directory: frameworks/vue
 
   # website
