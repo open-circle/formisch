@@ -1,6 +1,6 @@
 {
   "name": "formisch",
-  "description": "The modular and type-safe form library for any framework",
+  "description": "The lightweight, schema-first, and fully type-safe form library for React, Solid, Vue, Svelte and more",
   "version": "0.0.0",
   "license": "MIT",
   "author": "Fabian Hiller",

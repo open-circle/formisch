@@ -119,7 +119,7 @@ function extractFilePathsOfMenu(
 
 // Create llms.txt intro text
 const introText =
-  '# Formisch\n\nThe modular and type-safe form library for any framework.\n';
+  '# Formisch\n\nThe lightweight, schema-first, and fully type-safe form library for React, Solid, Vue, Svelte and more.\n';
 
 // Define output directories for shared content
 const publicCoreDir = path.join('public', 'core', 'api');

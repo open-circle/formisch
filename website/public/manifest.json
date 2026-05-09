@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
   "name": "Formisch",
   "short_name": "Formisch",
-  "description": "The modular and type-safe form library for any framework",
+  "description": "The lightweight, schema-first, and fully type-safe form library for React, Solid, Vue, Svelte and more",
   "theme_color": "#111827",
   "background_color": "#111827",
   "display": "standalone",

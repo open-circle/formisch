@@ -1,6 +1,6 @@
 {
   "name": "@formisch/qwik",
-  "description": "The modular and type-safe form library for Qwik",
+  "description": "The lightweight, schema-first, and fully type-safe form library for Qwik",
   "version": "0.10.0",
   "license": "MIT",
   "author": "Fabian Hiller",
