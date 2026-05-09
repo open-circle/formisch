@@ -4,53 +4,50 @@ import type { FieldStore } from '../../types/index.ts';
 import { useForm } from '../useForm/index.ts';
 import { useField } from './useField.ts';
 
-describe('useField types', () => {
-  test('should infer field type from path', () => {
-    const schema = v.object({
-      name: v.string(),
-      age: v.number(),
-    });
-    const form = useForm({ schema });
-    const field = useField(form, { path: ['name'] });
-
-    expectTypeOf(field).toMatchTypeOf<FieldStore<typeof schema, ['name']>>();
-    expectTypeOf(field.input).toEqualTypeOf<string | undefined>();
-  });
-
-  test('should infer nested field type', () => {
-    const schema = v.object({
-      user: v.object({
-        email: v.string(),
-      }),
-    });
-    const form = useForm({ schema });
-    const field = useField(form, { path: ['user', 'email'] });
-
-    expectTypeOf(field.input).toEqualTypeOf<string | undefined>();
-  });
-
-  test('should have correct property types', () => {
+describe('useField', () => {
+  test('should return a FieldStore typed against the form schema and path', () => {
     const schema = v.object({ name: v.string() });
     const form = useForm({ schema });
     const field = useField(form, { path: ['name'] });
 
-    expectTypeOf(field.path).toEqualTypeOf<['name']>();
-    expectTypeOf(field.errors).toEqualTypeOf<[string, ...string[]] | null>();
-    expectTypeOf(field.isTouched).toBeBoolean();
-    expectTypeOf(field.isDirty).toBeBoolean();
-    expectTypeOf(field.isValid).toBeBoolean();
+    expectTypeOf(field).toEqualTypeOf<FieldStore<typeof schema, ['name']>>();
   });
 
-  test('should have correct props types', () => {
+  test('should narrow input type for primitive leaves', () => {
+    const schema = v.object({ name: v.string(), age: v.number() });
+    const form = useForm({ schema });
+
+    expectTypeOf(useField(form, { path: ['name'] }).input).toEqualTypeOf<
+      string | undefined
+    >();
+    expectTypeOf(useField(form, { path: ['age'] }).input).toEqualTypeOf<
+      number | undefined
+    >();
+  });
+
+  test('should narrow input type through nested object and array index paths', () => {
+    const schema = v.object({
+      user: v.object({ email: v.string() }),
+      tags: v.array(v.string()),
+    });
+    const form = useForm({ schema });
+
+    expectTypeOf(
+      useField(form, { path: ['user', 'email'] }).input
+    ).toEqualTypeOf<string | undefined>();
+    expectTypeOf(useField(form, { path: ['tags', 0] }).input).toEqualTypeOf<
+      string | undefined
+    >();
+  });
+
+  test('should reject invalid paths', () => {
     const schema = v.object({ name: v.string() });
     const form = useForm({ schema });
-    const field = useField(form, { path: ['name'] });
 
-    expectTypeOf(field.props.name).toBeString();
-    expectTypeOf(field.props.autoFocus).toBeBoolean();
-    expectTypeOf(field.props.ref).toBeFunction();
-    expectTypeOf(field.props.onFocus).toBeFunction();
-    expectTypeOf(field.props.onChange).toBeFunction();
-    expectTypeOf(field.props.onBlur).toBeFunction();
+    // @ts-expect-error nonexistent field
+    useField(form, { path: ['nonexistent'] });
+
+    // @ts-expect-error path through a string leaf
+    useField(form, { path: ['name', 'nested'] });
   });
 });

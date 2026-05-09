@@ -4,24 +4,38 @@ import type { FieldArrayStore } from '../../types/index.ts';
 import { useForm } from '../useForm/index.ts';
 import { useFieldArray } from './useFieldArray.ts';
 
-describe('useFieldArray types', () => {
-  test('should infer array type from path', () => {
-    const schema = v.object({
-      tags: v.array(v.string()),
-    });
+describe('useFieldArray', () => {
+  test('should return a FieldArrayStore typed against the form schema and path', () => {
+    const schema = v.object({ tags: v.array(v.string()) });
     const form = useForm({ schema });
     const fieldArray = useFieldArray(form, { path: ['tags'] });
 
-    expectTypeOf(fieldArray).toMatchTypeOf<
+    expectTypeOf(fieldArray).toEqualTypeOf<
       FieldArrayStore<typeof schema, ['tags']>
     >();
   });
 
-  test('should infer nested array type', () => {
-    const schema = v.object({
-      user: v.object({
-        hobbies: v.array(v.string()),
+  test('should always type items as string[] regardless of element type', () => {
+    const stringForm = useForm({
+      schema: v.object({ tags: v.array(v.string()) }),
+    });
+    const objectForm = useForm({
+      schema: v.object({
+        users: v.array(v.object({ name: v.string(), age: v.number() })),
       }),
+    });
+
+    expectTypeOf(
+      useFieldArray(stringForm, { path: ['tags'] }).items
+    ).toEqualTypeOf<string[]>();
+    expectTypeOf(
+      useFieldArray(objectForm, { path: ['users'] }).items
+    ).toEqualTypeOf<string[]>();
+  });
+
+  test('should narrow path through nested array paths', () => {
+    const schema = v.object({
+      user: v.object({ hobbies: v.array(v.string()) }),
     });
     const form = useForm({ schema });
     const fieldArray = useFieldArray(form, { path: ['user', 'hobbies'] });
@@ -29,32 +43,17 @@ describe('useFieldArray types', () => {
     expectTypeOf(fieldArray.path).toEqualTypeOf<['user', 'hobbies']>();
   });
 
-  test('should have correct property types', () => {
-    const schema = v.object({ items: v.array(v.string()) });
-    const form = useForm({ schema });
-    const fieldArray = useFieldArray(form, { path: ['items'] });
-
-    expectTypeOf(fieldArray.items).toEqualTypeOf<string[]>();
-    expectTypeOf(fieldArray.errors).toEqualTypeOf<
-      [string, ...string[]] | null
-    >();
-    expectTypeOf(fieldArray.isTouched).toBeBoolean();
-    expectTypeOf(fieldArray.isDirty).toBeBoolean();
-    expectTypeOf(fieldArray.isValid).toBeBoolean();
-  });
-
-  test('should work with array of objects', () => {
+  test('should reject non-array and invalid paths', () => {
     const schema = v.object({
-      users: v.array(
-        v.object({
-          name: v.string(),
-          age: v.number(),
-        })
-      ),
+      name: v.string(),
+      tags: v.array(v.string()),
     });
     const form = useForm({ schema });
-    const fieldArray = useFieldArray(form, { path: ['users'] });
 
-    expectTypeOf(fieldArray.items).toEqualTypeOf<string[]>();
+    // @ts-expect-error name is a string field, not an array
+    useFieldArray(form, { path: ['name'] });
+
+    // @ts-expect-error nonexistent field
+    useFieldArray(form, { path: ['nonexistent'] });
   });
 });

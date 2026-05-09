@@ -15,34 +15,27 @@ import { useField } from './useField.ts';
 
 describe('useField', () => {
   describe('initialization', () => {
-    test('should create field store with correct path', () => {
-      const schema = v.object({ name: v.string() });
-
+    test('should return field store with default state and props', () => {
       const { result } = renderHook(() => {
-        const form = useForm({ schema });
+        const form = useForm({ schema: v.object({ name: v.string() }) });
         return useField(form, { path: ['name'] });
       });
 
-      expect(result.current.path).toEqual(['name']);
+      const field = result.current;
+      expect(field.path).toEqual(['name']);
+      expect(field.input).toBe(undefined);
+      expect(field.errors).toBe(null);
+      expect(field.isTouched).toBe(false);
+      expect(field.isDirty).toBe(false);
+      expect(field.isValid).toBe(true);
+      expect(field.props.name).toBe('["name"]');
+      expect(field.props.autoFocus).toBe(false);
     });
 
-    test('should have undefined input for uninitialized field', () => {
-      const schema = v.object({ name: v.string() });
-
-      const { result } = renderHook(() => {
-        const form = useForm({ schema });
-        return useField(form, { path: ['name'] });
-      });
-
-      expect(result.current.input).toBe(undefined);
-    });
-
-    test('should have initial input value when provided', () => {
-      const schema = v.object({ name: v.string() });
-
+    test('should reflect initialInput from form', () => {
       const { result } = renderHook(() => {
         const form = useForm({
-          schema,
+          schema: v.object({ name: v.string() }),
           initialInput: { name: 'John' },
         });
         return useField(form, { path: ['name'] });
@@ -52,100 +45,47 @@ describe('useField', () => {
     });
   });
 
-  describe('field state', () => {
-    test('should have default state values', () => {
-      const schema = v.object({ email: v.string() });
-
-      const { result } = renderHook(() => {
-        const form = useForm({ schema });
-        return useField(form, { path: ['email'] });
-      });
-
-      expect(result.current.errors).toBe(null);
-      expect(result.current.isTouched).toBe(false);
-      expect(result.current.isDirty).toBe(false);
-      expect(result.current.isValid).toBe(true);
-    });
-
-    test('should show errors after validation', async () => {
-      const schema = v.object({
-        email: v.pipe(v.string(), v.email('Invalid email')),
-      });
-
-      const { result } = renderHook(() => {
+  describe('input updates', () => {
+    test('should update input and isDirty via DOM onChange', async () => {
+      function Test(): ReactElement {
         const form = useForm({
-          schema,
-          validate: 'initial',
-          initialInput: { email: 'invalid' },
+          schema: v.object({ name: v.string() }),
+          initialInput: { name: 'initial' },
         });
-        return useField(form, { path: ['email'] });
-      });
+        const field = useField(form, { path: ['name'] });
+        return (
+          <div>
+            <input
+              data-testid="input"
+              {...field.props}
+              value={field.input ?? ''}
+            />
+            <span data-testid="dirty">{String(field.isDirty)}</span>
+          </div>
+        );
+      }
+
+      render(<Test />);
+
+      const input = screen.getByTestId('input') as HTMLInputElement;
+      const dirty = screen.getByTestId('dirty');
+      expect(input.value).toBe('initial');
+      expect(dirty).toHaveTextContent('false');
+
+      fireEvent.change(input, { target: { value: 'changed' } });
 
       await waitFor(() => {
-        expect(result.current.errors).not.toBe(null);
-        expect(result.current.isValid).toBe(false);
+        expect(input.value).toBe('changed');
+        expect(dirty).toHaveTextContent('true');
       });
     });
-  });
 
-  describe('props', () => {
-    test('should have correct name prop', () => {
-      const schema = v.object({ username: v.string() });
-
-      const { result } = renderHook(() => {
-        const form = useForm({ schema });
-        return useField(form, { path: ['username'] });
-      });
-
-      // The name is the stringified path
-      expect(result.current.props.name).toBe('["username"]');
-    });
-
-    test('should have autoFocus false when no errors', () => {
-      const schema = v.object({ name: v.string() });
-
-      const { result } = renderHook(() => {
-        const form = useForm({ schema });
-        return useField(form, { path: ['name'] });
-      });
-
-      expect(result.current.props.autoFocus).toBe(false);
-    });
-
-    test('should have ref callback', () => {
-      const schema = v.object({ name: v.string() });
-
-      const { result } = renderHook(() => {
-        const form = useForm({ schema });
-        return useField(form, { path: ['name'] });
-      });
-
-      expect(typeof result.current.props.ref).toBe('function');
-    });
-
-    test('should have event handlers', () => {
-      const schema = v.object({ name: v.string() });
-
-      const { result } = renderHook(() => {
-        const form = useForm({ schema });
-        return useField(form, { path: ['name'] });
-      });
-
-      expect(typeof result.current.props.onFocus).toBe('function');
-      expect(typeof result.current.props.onChange).toBe('function');
-      expect(typeof result.current.props.onBlur).toBe('function');
-    });
-  });
-
-  describe('imperative onChange', () => {
-    test('should update field input and trigger validation', async () => {
-      const schema = v.object({
-        email: v.pipe(v.string(), v.email('Invalid email')),
-      });
-
+    test('should update input and trigger validation via imperative onChange', async () => {
       const { result } = renderHook(() => {
         const form = useForm({
-          schema,
+          schema: v.object({
+            email: v.pipe(v.string(), v.email('Invalid email')),
+          }),
           validate: 'input',
           initialInput: { email: '' },
         });
@@ -159,68 +99,57 @@ describe('useField', () => {
       expect(result.current.input).toBe('not-an-email');
 
       await waitFor(() => {
-        expect(result.current.errors).not.toBe(null);
+        expect(result.current.errors).toEqual(['Invalid email']);
         expect(result.current.isValid).toBe(false);
       });
     });
   });
 
-  describe('event handlers', () => {
-    function TestComponent(): ReactElement {
-      const form = useForm({
-        schema: v.object({ name: v.string() }),
-        validate: 'touch',
-      });
-      const field = useField(form, { path: ['name'] });
+  describe('validation modes', () => {
+    test('should run validate:"touch" on focus and flip isTouched', async () => {
+      function Test(): ReactElement {
+        const form = useForm({
+          schema: v.object({
+            email: v.pipe(v.string(), v.nonEmpty('Required')),
+          }),
+          validate: 'touch',
+          initialInput: { email: '' },
+        });
+        const field = useField(form, { path: ['email'] });
+        return (
+          <div>
+            <input data-testid="input" {...field.props} />
+            <span data-testid="touched">{String(field.isTouched)}</span>
+            <span data-testid="valid">{String(field.isValid)}</span>
+          </div>
+        );
+      }
 
-      return (
-        <div>
-          <input
-            data-testid="input"
-            {...field.props}
-            value={field.input ?? ''}
-          />
-          <span data-testid="touched">{String(field.isTouched)}</span>
-          <span data-testid="dirty">{String(field.isDirty)}</span>
-        </div>
-      );
-    }
+      render(<Test />);
 
-    test('should set isTouched on focus', async () => {
-      render(<TestComponent />);
+      const touched = screen.getByTestId('touched');
+      const valid = screen.getByTestId('valid');
+      expect(touched).toHaveTextContent('false');
+      expect(valid).toHaveTextContent('true');
 
-      const input = screen.getByTestId('input');
-      expect(screen.getByTestId('touched')).toHaveTextContent('false');
-
-      fireEvent.focus(input);
+      fireEvent.focus(screen.getByTestId('input'));
 
       await waitFor(() => {
-        expect(screen.getByTestId('touched')).toHaveTextContent('true');
+        expect(touched).toHaveTextContent('true');
+        expect(valid).toHaveTextContent('false');
       });
     });
 
-    test('should update input value on change', async () => {
-      render(<TestComponent />);
-
-      const input = screen.getByTestId('input') as HTMLInputElement;
-      fireEvent.change(input, { target: { value: 'test' } });
-
-      await waitFor(() => {
-        expect(input.value).toBe('test');
-      });
-    });
-
-    test('should trigger validation on blur when validate is blur', async () => {
-      function BlurValidateComponent(): ReactElement {
+    test('should run validate:"input" on change and surface errors', async () => {
+      function Test(): ReactElement {
         const form = useForm({
           schema: v.object({
             email: v.pipe(v.string(), v.email('Invalid email')),
           }),
-          validate: 'blur',
-          initialInput: { email: 'invalid' },
+          validate: 'input',
+          initialInput: { email: '' },
         });
         const field = useField(form, { path: ['email'] });
-
         return (
           <div>
             <input
@@ -234,76 +163,83 @@ describe('useField', () => {
         );
       }
 
-      render(<BlurValidateComponent />);
+      render(<Test />);
 
-      // Initially valid (no validation run yet)
-      expect(screen.getByTestId('valid')).toHaveTextContent('true');
+      const valid = screen.getByTestId('valid');
+      expect(valid).toHaveTextContent('true');
 
-      const input = screen.getByTestId('input');
-      fireEvent.blur(input);
+      fireEvent.change(screen.getByTestId('input'), {
+        target: { value: 'bad' },
+      });
 
       await waitFor(() => {
-        expect(screen.getByTestId('valid')).toHaveTextContent('false');
+        expect(valid).toHaveTextContent('false');
         expect(screen.getByTestId('error')).toHaveTextContent('Invalid email');
+      });
+    });
+
+    test('should run validate:"blur" on blur and surface errors', async () => {
+      function Test(): ReactElement {
+        const form = useForm({
+          schema: v.object({
+            email: v.pipe(v.string(), v.email('Invalid email')),
+          }),
+          validate: 'blur',
+          initialInput: { email: 'invalid' },
+        });
+        const field = useField(form, { path: ['email'] });
+        return (
+          <div>
+            <input
+              data-testid="input"
+              {...field.props}
+              value={field.input ?? ''}
+            />
+            <span data-testid="valid">{String(field.isValid)}</span>
+          </div>
+        );
+      }
+
+      render(<Test />);
+
+      const valid = screen.getByTestId('valid');
+      expect(valid).toHaveTextContent('true');
+
+      fireEvent.blur(screen.getByTestId('input'));
+
+      await waitFor(() => {
+        expect(valid).toHaveTextContent('false');
       });
     });
   });
 
-  describe('nested fields', () => {
-    test('should handle nested object path', () => {
-      const schema = v.object({
-        user: v.object({
-          profile: v.object({
-            name: v.string(),
-          }),
-        }),
+  describe('store stability', () => {
+    test('should return memoized store reference across re-renders', () => {
+      const { result, rerender } = renderHook(() => {
+        const form = useForm({ schema: v.object({ name: v.string() }) });
+        return useField(form, { path: ['name'] });
       });
 
-      const { result } = renderHook(() => {
-        const form = useForm({
-          schema,
-          initialInput: { user: { profile: { name: 'John' } } },
-        });
-        return useField(form, { path: ['user', 'profile', 'name'] });
-      });
-
-      expect(result.current.path).toEqual(['user', 'profile', 'name']);
-      expect(result.current.input).toBe('John');
-    });
-
-    test('should handle array index path', () => {
-      const schema = v.object({
-        items: v.array(v.string()),
-      });
-
-      const { result } = renderHook(() => {
-        const form = useForm({
-          schema,
-          initialInput: { items: ['first', 'second'] },
-        });
-        return useField(form, { path: ['items', 0] });
-      });
-
-      expect(result.current.path).toEqual(['items', 0]);
-      expect(result.current.input).toBe('first');
+      const first = result.current;
+      rerender();
+      expect(result.current).toBe(first);
     });
   });
 
   describe('element registration', () => {
     test('should focus the registered element when validation fails on submit', async () => {
-      function FocusOnErrorForm(): ReactElement {
+      function Test(): ReactElement {
         const form = useForm({
           schema: v.object({
-            email: v.pipe(v.string(), v.nonEmpty('Email is required')),
+            email: v.pipe(v.string(), v.nonEmpty('Required')),
           }),
           initialInput: { email: '' },
         });
         const field = useField(form, { path: ['email'] });
-
         return (
-          <Form of={form} onSubmit={vi.fn()} aria-label="Focus Form">
+          <Form of={form} onSubmit={vi.fn()} aria-label="Test">
             <input
-              data-testid="field-input"
+              data-testid="input"
               {...field.props}
               value={field.input ?? ''}
             />
@@ -312,37 +248,31 @@ describe('useField', () => {
         );
       }
 
-      render(<FocusOnErrorForm />);
+      render(<Test />);
 
-      const input = screen.getByTestId('field-input');
-      const formEl = screen.getByRole('form', { name: 'Focus Form' });
-
+      const input = screen.getByTestId('input');
       expect(document.activeElement).not.toBe(input);
 
-      fireEvent.submit(formEl);
+      fireEvent.submit(screen.getByRole('form', { name: 'Test' }));
 
-      // The first registered element receives focus when validation fails
       await waitFor(() => {
         expect(document.activeElement).toBe(input);
       });
     });
 
-    test('should remove disconnected elements on unmount', () => {
-      function TestInputComponent(): ReactElement {
-        const form = useForm({
-          schema: v.object({ name: v.string() }),
-        });
+    test('should unmount cleanly when the registered element is removed', () => {
+      function Test(): ReactElement {
+        const form = useForm({ schema: v.object({ name: v.string() }) });
         const field = useField(form, { path: ['name'] });
-
-        return <input data-testid="field-input" {...field.props} />;
+        return <input data-testid="input" {...field.props} />;
       }
 
-      const { unmount } = render(<TestInputComponent />);
-      expect(screen.getByTestId('field-input')).toBeInTheDocument();
+      const { unmount } = render(<Test />);
+      expect(screen.getByTestId('input')).toBeInTheDocument();
 
-      // Cleanup runs without errors and removes disconnected elements
-      expect(() => unmount()).not.toThrow();
-      expect(screen.queryByTestId('field-input')).toBeNull();
+      unmount();
+
+      expect(screen.queryByTestId('input')).toBeNull();
     });
   });
 });

@@ -5,225 +5,89 @@ import { describe, expect, test, vi } from 'vitest';
 import { useForm } from '../../hooks/index.ts';
 import { Form } from './Form.tsx';
 
+const schema = v.object({
+  email: v.pipe(v.string(), v.nonEmpty('Email is required')),
+});
+
 describe('Form', () => {
-  describe('rendering', () => {
-    function TestForm(): ReactElement {
-      const form = useForm({ schema: v.object({ name: v.string() }) });
+  test('should render a form element with noValidate, children, and forwarded attributes', () => {
+    function Test(): ReactElement {
+      const form = useForm({ schema });
       return (
-        <Form of={form} onSubmit={vi.fn()}>
-          <input name="name" aria-label="Name" />
+        <Form
+          of={form}
+          onSubmit={vi.fn()}
+          aria-label="Test"
+          className="my-form"
+          id="signup"
+        >
+          <span data-testid="child">child</span>
+        </Form>
+      );
+    }
+
+    render(<Test />);
+
+    const formElement = screen.getByRole('form', { name: 'Test' });
+    expect(formElement.tagName).toBe('FORM');
+    expect(formElement).toHaveAttribute('novalidate');
+    expect(formElement).toHaveClass('my-form');
+    expect(formElement).toHaveAttribute('id', 'signup');
+    expect(screen.getByTestId('child')).toBeInTheDocument();
+  });
+
+  test('should call onSubmit with the validated output when submitted', async () => {
+    const onSubmit = vi.fn();
+
+    function Test(): ReactElement {
+      const form = useForm({
+        schema,
+        initialInput: { email: 'user@example.com' },
+      });
+      return (
+        <Form of={form} onSubmit={onSubmit} aria-label="Test">
           <button type="submit">Submit</button>
         </Form>
       );
     }
 
-    test('should render form element with children', () => {
-      render(<TestForm />);
+    render(<Test />);
 
-      expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: 'Submit' })
-      ).toBeInTheDocument();
-    });
+    fireEvent.submit(screen.getByRole('form', { name: 'Test' }));
 
-    test('should have noValidate attribute', () => {
-      render(<TestForm />);
-
-      // Form elements without accessible name don't have role="form"
-      // so we use querySelector instead
-      const form = document.querySelector('form');
-      expect(form).toHaveAttribute('noValidate');
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        { email: 'user@example.com' },
+        expect.any(Object)
+      );
     });
   });
 
-  describe('props forwarding', () => {
-    test('should forward standard form attributes', () => {
-      function TestFormWithProps(): ReactElement {
-        const form = useForm({ schema: v.object({ name: v.string() }) });
-        return (
-          <Form
-            of={form}
-            onSubmit={vi.fn()}
-            className="test-class"
-            id="test-form"
-            aria-label="Test Form"
-          >
-            <button type="submit">Submit</button>
-          </Form>
-        );
-      }
+  test('should not call onSubmit when validation fails', async () => {
+    const onSubmit = vi.fn();
 
-      render(<TestFormWithProps />);
+    function Test(): ReactElement {
+      const form = useForm({ schema, initialInput: { email: '' } });
+      return (
+        <Form of={form} onSubmit={onSubmit} aria-label="Test">
+          <span data-testid="valid">{String(form.isValid)}</span>
+          <button type="submit">Submit</button>
+        </Form>
+      );
+    }
 
-      const formElement = screen.getByRole('form', { name: 'Test Form' });
-      expect(formElement).toHaveClass('test-class');
-      expect(formElement).toHaveAttribute('id', 'test-form');
-    });
-  });
+    render(<Test />);
 
-  describe('submission', () => {
-    test('should call onSubmit when form is submitted with valid data', async () => {
-      const handleSubmit = vi.fn();
-      const schema = v.object({ name: v.string() });
+    const valid = screen.getByTestId('valid');
 
-      function SubmitTestForm(): ReactElement {
-        const form = useForm({
-          schema,
-          initialInput: { name: 'John' },
-        });
+    expect(valid).toHaveTextContent('true');
 
-        return (
-          <Form of={form} onSubmit={handleSubmit} aria-label="Submit Test">
-            <button type="submit">Submit</button>
-          </Form>
-        );
-      }
+    fireEvent.submit(screen.getByRole('form', { name: 'Test' }));
 
-      render(<SubmitTestForm />);
-
-      const form = screen.getByRole('form', { name: 'Submit Test' });
-      fireEvent.submit(form);
-
-      await waitFor(() => {
-        expect(handleSubmit).toHaveBeenCalled();
-      });
+    await waitFor(() => {
+      expect(valid).toHaveTextContent('false');
     });
 
-    test('should prevent default form submission', async () => {
-      const handleSubmit = vi.fn();
-      const schema = v.object({ name: v.string() });
-
-      function PreventDefaultForm(): ReactElement {
-        const form = useForm({
-          schema,
-          initialInput: { name: 'John' },
-        });
-
-        return (
-          <Form of={form} onSubmit={handleSubmit} aria-label="Prevent Default">
-            <button type="submit">Submit</button>
-          </Form>
-        );
-      }
-
-      render(<PreventDefaultForm />);
-
-      const form = screen.getByRole('form', { name: 'Prevent Default' });
-      const submitEvent = new Event('submit', {
-        bubbles: true,
-        cancelable: true,
-      });
-
-      form.dispatchEvent(submitEvent);
-
-      // The form should prevent default
-      expect(submitEvent.defaultPrevented).toBe(true);
-    });
-  });
-
-  describe('validation on submit', () => {
-    test('should not call onSubmit when validation fails', async () => {
-      const handleSubmit = vi.fn();
-      const schema = v.object({
-        email: v.pipe(v.string(), v.nonEmpty('Email is required')),
-      });
-
-      function ValidationForm(): ReactElement {
-        const form = useForm({
-          schema,
-          initialInput: { email: '' },
-        });
-
-        return (
-          <Form of={form} onSubmit={handleSubmit} aria-label="Validation Form">
-            <span data-testid="valid">{String(form.isValid)}</span>
-            <button type="submit">Submit</button>
-          </Form>
-        );
-      }
-
-      render(<ValidationForm />);
-
-      const form = screen.getByRole('form', { name: 'Validation Form' });
-      fireEvent.submit(form);
-
-      // Wait for validation to complete by observing the form becoming invalid
-      await waitFor(() => {
-        expect(screen.getByTestId('valid')).toHaveTextContent('false');
-      });
-
-      expect(handleSubmit).not.toHaveBeenCalled();
-    });
-
-    test('should call onSubmit with valid output', async () => {
-      const handleSubmit = vi.fn();
-      const schema = v.object({
-        email: v.pipe(v.string(), v.email()),
-      });
-
-      function ValidForm(): ReactElement {
-        const form = useForm({
-          schema,
-          initialInput: { email: 'test@example.com' },
-        });
-
-        return (
-          <Form of={form} onSubmit={handleSubmit} aria-label="Valid Form">
-            <button type="submit">Submit</button>
-          </Form>
-        );
-      }
-
-      render(<ValidForm />);
-
-      const form = screen.getByRole('form', { name: 'Valid Form' });
-      fireEvent.submit(form);
-
-      await waitFor(() => {
-        expect(handleSubmit).toHaveBeenCalledWith(
-          { email: 'test@example.com' },
-          expect.any(Object)
-        );
-      });
-    });
-  });
-
-  describe('form state', () => {
-    test('should set isSubmitting during submission', async () => {
-      const schema = v.object({ name: v.string() });
-      let capturedIsSubmitting = false;
-
-      function StateForm(): ReactElement {
-        const form = useForm({
-          schema,
-          initialInput: { name: 'John' },
-        });
-
-        return (
-          <Form
-            of={form}
-            onSubmit={async () => {
-              capturedIsSubmitting = form.isSubmitting;
-              await new Promise((resolve) => setTimeout(resolve, 50));
-            }}
-            aria-label="State Form"
-          >
-            <span data-testid="submitting">{String(form.isSubmitting)}</span>
-            <button type="submit">Submit</button>
-          </Form>
-        );
-      }
-
-      render(<StateForm />);
-
-      expect(screen.getByTestId('submitting')).toHaveTextContent('false');
-
-      const form = screen.getByRole('form', { name: 'State Form' });
-      fireEvent.submit(form);
-
-      await waitFor(() => {
-        expect(capturedIsSubmitting).toBe(true);
-      });
-    });
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });

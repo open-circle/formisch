@@ -3,43 +3,21 @@ import { describe, expectTypeOf, test } from 'vitest';
 import type { FormStore } from '../../types/index.ts';
 import { useForm } from './useForm.ts';
 
-describe('useForm types', () => {
-  test('should infer schema type from config', () => {
+describe('useForm', () => {
+  test('should return a FormStore typed against the schema', () => {
     const schema = v.object({ name: v.string() });
     const form = useForm({ schema });
 
-    expectTypeOf(form).toMatchTypeOf<FormStore<typeof schema>>();
+    expectTypeOf(form).toEqualTypeOf<FormStore<typeof schema>>();
   });
 
-  test('should have correct property types', () => {
-    const schema = v.object({ name: v.string() });
-    const form = useForm({ schema });
+  test('should accept full, partial, and reject mistyped initialInput', () => {
+    const schema = v.object({ name: v.string(), age: v.number() });
 
-    expectTypeOf(form.isSubmitting).toBeBoolean();
-    expectTypeOf(form.isSubmitted).toBeBoolean();
-    expectTypeOf(form.isValidating).toBeBoolean();
-    expectTypeOf(form.isTouched).toBeBoolean();
-    expectTypeOf(form.isDirty).toBeBoolean();
-    expectTypeOf(form.isValid).toBeBoolean();
-    expectTypeOf(form.errors).toEqualTypeOf<[string, ...string[]] | null>();
-  });
+    useForm({ schema, initialInput: { name: 'John', age: 30 } });
+    useForm({ schema, initialInput: { name: 'John' } });
 
-  test('should type check initial input', () => {
-    const schema = v.object({
-      name: v.string(),
-      age: v.number(),
-    });
-
-    // This should compile
-    useForm({
-      schema,
-      initialInput: { name: 'John', age: 30 },
-    });
-
-    // Partial input should also be allowed
-    useForm({
-      schema,
-      initialInput: { name: 'John' },
-    });
+    // @ts-expect-error wrong leaf type
+    useForm({ schema, initialInput: { name: 123 } });
   });
 });
