@@ -3,8 +3,8 @@ import { flushSync, tick } from 'svelte';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
 import FieldHost from '../../vitest/FieldHost.svelte';
-import UnmountHost from '../../vitest/UnmountHost.svelte';
 import { renderHook } from '../../vitest/renderHook.ts';
+import UnmountHost from '../../vitest/UnmountHost.svelte';
 import { createForm } from '../createForm/createForm.svelte.ts';
 import { useField } from './useField.svelte.ts';
 

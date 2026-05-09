@@ -1,29 +1,24 @@
-<script
-  lang="ts"
-  generics="TSchema extends Schema, TFieldPath extends RequiredPath"
->
-  import type {
-    FormConfig,
-    RequiredPath,
-    Schema,
-    ValidPath,
-  } from '@formisch/core/svelte';
-  import type * as v from 'valibot';
+<script lang="ts">
+  import type { FormConfig, RequiredPath, Schema } from '@formisch/core/svelte';
   import { createForm } from '../runes/createForm/createForm.svelte.ts';
   import { useField } from '../runes/useField/useField.svelte.ts';
+
+  // Test fixture: generic parameters are deliberately untyped because Svelte
+  // component generics don't survive @testing-library/svelte's `render()`
+  // signature. We accept a permissive `RequiredPath` and cast internally.
 
   let {
     config,
     path,
   }: {
-    config: FormConfig<TSchema>;
-    path: ValidPath<v.InferInput<TSchema>, TFieldPath>;
+    config: FormConfig<Schema>;
+    path: RequiredPath;
   } = $props();
 
   const form = createForm(config);
   const field = useField(
     () => form,
-    () => ({ path })
+    () => ({ path: path as never })
   );
 </script>
 

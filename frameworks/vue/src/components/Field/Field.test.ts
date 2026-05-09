@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import * as v from 'valibot';
-import { defineComponent, h } from 'vue';
 import { describe, expect, test, vi } from 'vitest';
+import { defineComponent, h } from 'vue';
 import { useForm } from '../../composables/index.ts';
 import type { FieldStore } from '../../types/index.ts';
 import Field from './Field.vue';

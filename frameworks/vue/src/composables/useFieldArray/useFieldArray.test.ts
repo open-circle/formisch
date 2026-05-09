@@ -1,8 +1,8 @@
 import { insert, swap } from '@formisch/methods/vue';
 import { mount } from '@vue/test-utils';
 import * as v from 'valibot';
-import { defineComponent, h } from 'vue';
 import { describe, expect, test, vi } from 'vitest';
+import { defineComponent, h } from 'vue';
 import { renderHook } from '../../vitest/renderHook.ts';
 import { useForm } from '../useForm/index.ts';
 import { useFieldArray } from './useFieldArray.ts';

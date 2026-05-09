@@ -1,34 +1,29 @@
-<script
-  lang="ts"
-  generics="TSchema extends Schema, TFieldArrayPath extends RequiredPath"
->
-  import type {
-    FormConfig,
-    RequiredPath,
-    Schema,
-    ValidArrayPath,
-  } from '@formisch/core/svelte';
+<script lang="ts">
+  import type { FormConfig, RequiredPath, Schema } from '@formisch/core/svelte';
   import { insert } from '@formisch/methods/svelte';
-  import type * as v from 'valibot';
   import { createForm } from '../runes/createForm/createForm.svelte.ts';
   import { useFieldArray } from '../runes/useFieldArray/useFieldArray.svelte.ts';
+
+  // Test fixture: generic parameters are deliberately untyped because Svelte
+  // component generics don't survive @testing-library/svelte's `render()`
+  // signature. We accept a permissive `RequiredPath` and cast internally.
 
   let {
     config,
     path,
   }: {
-    config: FormConfig<TSchema>;
-    path: ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>;
+    config: FormConfig<Schema>;
+    path: RequiredPath;
   } = $props();
 
   const form = createForm(config);
   const fieldArray = useFieldArray(
     () => form,
-    () => ({ path })
+    () => ({ path: path as never })
   );
 
   function add() {
-    insert(form, { path, initialInput: 'c' });
+    insert(form, { path: path as never, initialInput: 'c' as never });
   }
 </script>
 

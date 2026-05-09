@@ -1,8 +1,5 @@
 <script lang="ts" generics="TSchema extends Schema">
-  import type {
-    Schema,
-    SubmitEventHandler,
-  } from '@formisch/core/svelte';
+  import type { Schema, SubmitEventHandler } from '@formisch/core/svelte';
   import * as v from 'valibot';
   import { createForm } from '../../runes/createForm/createForm.svelte.ts';
   import { Form } from './index.ts';
@@ -19,12 +16,6 @@
   const form = createForm({ schema });
 </script>
 
-<Form
-  of={form}
-  {onsubmit}
-  aria-label="Test"
-  class="my-form"
-  id="signup"
->
+<Form of={form} {onsubmit} aria-label="Test" class="my-form" id="signup">
   <span data-testid="child">child</span>
 </Form>

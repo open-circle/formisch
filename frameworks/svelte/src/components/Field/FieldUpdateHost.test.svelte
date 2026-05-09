@@ -9,11 +9,7 @@
 
 <Field of={form} path={['name']}>
   {#snippet children(field)}
-    <input
-      data-testid="input"
-      {...field.props}
-      value={field.input ?? ''}
-    />
+    <input data-testid="input" {...field.props} value={field.input ?? ''} />
     <span data-testid="dirty">{String(field.isDirty)}</span>
   {/snippet}
 </Field>

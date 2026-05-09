@@ -1,7 +1,7 @@
 import { validate } from '@formisch/methods/svelte';
-import { flushSync, tick } from 'svelte';
+import { flushSync } from 'svelte';
 import * as v from 'valibot';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { renderHook } from '../../vitest/renderHook.ts';
 import { createForm } from './createForm.svelte.ts';
 
@@ -35,11 +35,9 @@ describe('createForm', () => {
         })
       );
 
-      // onMount fires after mount; allow microtasks to flush.
-      await tick();
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      flushSync();
-      expect(result.current.isValid).toBe(false);
+      await vi.waitFor(() => {
+        expect(result.current.isValid).toBe(false);
+      });
     });
 
     test('should not run validation on mount otherwise', () => {

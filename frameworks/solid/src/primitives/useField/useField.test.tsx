@@ -155,9 +155,7 @@ describe('useField', () => {
               value={field.input ?? ''}
             />
             <span data-testid="valid">{String(field.isValid)}</span>
-            {field.errors && (
-              <span data-testid="error">{field.errors[0]}</span>
-            )}
+            {field.errors && <span data-testid="error">{field.errors[0]}</span>}
           </div>
         );
       }

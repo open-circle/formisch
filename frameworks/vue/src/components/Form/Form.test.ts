@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import * as v from 'valibot';
-import { defineComponent, h } from 'vue';
 import { describe, expect, test, vi } from 'vitest';
+import { defineComponent, h } from 'vue';
 import { useForm } from '../../composables/index.ts';
 import Form from './Form.vue';
 
@@ -25,8 +25,7 @@ describe('Form', () => {
               id: 'signup',
             },
             {
-              default: () =>
-                h('span', { 'data-testid': 'child' }, 'child'),
+              default: () => h('span', { 'data-testid': 'child' }, 'child'),
             }
           );
       },

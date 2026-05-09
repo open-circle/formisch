@@ -14,11 +14,14 @@ export function renderHook<T>(hook: () => T): {
   unmount: () => void;
 } {
   const result = { current: undefined as unknown as T };
+  // Svelte's render() does not propagate the Hook component's generic, so the
+  // onResult callback is typed against `unknown` here; the cast is safe
+  // because both sides are owned by this helper.
   const view = render(Hook, {
     props: {
-      run: hook,
-      onResult: (value: T) => {
-        result.current = value;
+      run: hook as () => unknown,
+      onResult: (value: unknown) => {
+        result.current = value as T;
       },
     },
   });

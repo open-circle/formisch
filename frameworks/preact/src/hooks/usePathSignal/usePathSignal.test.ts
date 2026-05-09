@@ -10,10 +10,9 @@ describe('usePathSignal', () => {
   });
 
   test('should keep the same signal reference when re-rendered with an equal path', () => {
-    const { result, rerender } = renderHook(
-      ({ path }) => usePathSignal(path),
-      { initialProps: { path: ['items', 0] as ['items', 0] } }
-    );
+    const { result, rerender } = renderHook(({ path }) => usePathSignal(path), {
+      initialProps: { path: ['items', 0] as ['items', 0] },
+    });
 
     const first = result.current;
     rerender({ path: ['items', 0] as ['items', 0] });
@@ -22,10 +21,9 @@ describe('usePathSignal', () => {
   });
 
   test('should update the signal value when re-rendered with a different path', () => {
-    const { result, rerender } = renderHook(
-      ({ path }) => usePathSignal(path),
-      { initialProps: { path: ['a'] as ['a' | 'b'] } }
-    );
+    const { result, rerender } = renderHook(({ path }) => usePathSignal(path), {
+      initialProps: { path: ['a'] as ['a' | 'b'] },
+    });
 
     const first = result.current;
     expect(first.value).toEqual(['a']);
@@ -36,10 +34,9 @@ describe('usePathSignal', () => {
   });
 
   test('should update the signal value when re-rendered with a different-length path', () => {
-    const { result, rerender } = renderHook(
-      ({ path }) => usePathSignal(path),
-      { initialProps: { path: ['a'] as ['a'] | ['a', 'b'] } }
-    );
+    const { result, rerender } = renderHook(({ path }) => usePathSignal(path), {
+      initialProps: { path: ['a'] as ['a'] | ['a', 'b'] },
+    });
 
     expect(result.current.value).toEqual(['a']);
 

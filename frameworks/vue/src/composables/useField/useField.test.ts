@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import * as v from 'valibot';
-import { defineComponent, h } from 'vue';
 import { describe, expect, test, vi } from 'vitest';
+import { defineComponent, h } from 'vue';
 import Form from '../../components/Form/Form.vue';
 import { renderHook } from '../../vitest/renderHook.ts';
 import { useForm } from '../useForm/index.ts';
@@ -113,11 +113,7 @@ describe('useField', () => {
           return () =>
             h('div', [
               h('input', { 'data-testid': 'input', ...field.props }),
-              h(
-                'span',
-                { 'data-testid': 'touched' },
-                String(field.isTouched)
-              ),
+              h('span', { 'data-testid': 'touched' }, String(field.isTouched)),
               h('span', { 'data-testid': 'valid' }, String(field.isValid)),
             ]);
         },
@@ -247,7 +243,6 @@ describe('useField', () => {
       await vi.waitFor(() => {
         expect(document.activeElement).toBe(input.element);
       });
-      wrapper.unmount();
     });
 
     test('should unmount cleanly when the registered element is removed', () => {
@@ -255,8 +250,7 @@ describe('useField', () => {
         setup() {
           const form = useForm({ schema: v.object({ name: v.string() }) });
           const field = useField(form, { path: ['name'] });
-          return () =>
-            h('input', { 'data-testid': 'input', ...field.props });
+          return () => h('input', { 'data-testid': 'input', ...field.props });
         },
       });
 

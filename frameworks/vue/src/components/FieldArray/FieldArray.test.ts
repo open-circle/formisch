@@ -1,8 +1,8 @@
 import { insert } from '@formisch/methods/vue';
 import { mount } from '@vue/test-utils';
 import * as v from 'valibot';
-import { defineComponent, h } from 'vue';
 import { describe, expect, test, vi } from 'vitest';
+import { defineComponent, h } from 'vue';
 import { useForm } from '../../composables/index.ts';
 import type { FieldArrayStore } from '../../types/index.ts';
 import FieldArray from './FieldArray.vue';
@@ -31,22 +31,16 @@ describe('FieldArray', () => {
   });
 
   test('should invoke default slot with the field array store', () => {
-    const slotFn = vi.fn(
-      (field: FieldArrayStore<Schema, ['items']>) => {
-        void field;
-        return h('span');
-      }
-    );
+    const slotFn = vi.fn((field: FieldArrayStore<Schema, ['items']>) => {
+      void field;
+      return h('span');
+    });
 
     const Test = defineComponent({
       setup() {
         const form = useForm({ schema, initialInput: { items: ['a', 'b'] } });
         return () =>
-          h(
-            FieldArray,
-            { of: form, path: ['items'] },
-            { default: slotFn }
-          );
+          h(FieldArray, { of: form, path: ['items'] }, { default: slotFn });
       },
     });
 
