@@ -1,20 +1,22 @@
 ---
-name: repo-source-code-test
-description: Write unit tests for Formisch packages/core with proper TypeScript types. Use when creating new tests, fixing type errors in tests, or adding test coverage for core functions.
+name: repo-source-code-test-packages
+description: Write unit tests for Formisch packages (packages/core and packages/methods) with proper TypeScript types. Use when creating new tests, fixing type errors in tests, or adding test coverage for core/methods functions.
 metadata:
   author: formisch
-  version: '1.0'
+  version: '2.0'
 ---
 
 # Writing Unit Tests
 
-Guide for writing high-quality unit tests in `packages/core/` with proper TypeScript types.
+Guide for writing high-quality unit tests in `packages/core/` and `packages/methods/` with proper TypeScript types. Both packages share the same conventions: `createTestStore` helper, `objectPath` / `arrayPath` / `validationIssue` helpers, and the type-guard pattern for narrowing union store types.
+
+For tests in `frameworks/<framework>/` (hooks, composables, runes, components), use the **`repo-source-code-test-frameworks`** skill instead — those have framework-specific concerns (DOM testing, signal/rune reactivity, snippets/slots, cross-framework consistency) that are out of scope here.
 
 ## When to Use This Guide
 
-- Creating new unit tests for core functions
-- Fixing type errors in existing tests
-- Adding test coverage for new features
+- Creating new unit tests for functions in `packages/core/src/` or `packages/methods/src/`
+- Fixing type errors in existing tests in those packages
+- Adding test coverage for new core or method features
 
 ## Core Principles
 
@@ -26,7 +28,7 @@ Guide for writing high-quality unit tests in `packages/core/` with proper TypeSc
 
 ### File Location
 
-Tests live next to their implementation:
+Tests live next to their implementation in either package:
 
 ```
 packages/core/src/
@@ -38,6 +40,14 @@ packages/core/src/
 │   └── getFieldInput/
 │       ├── getFieldInput.ts
 │       └── getFieldInput.test.ts
+
+packages/methods/src/
+├── insert/
+│   ├── insert.ts
+│   └── insert.test.ts
+├── validate/
+│   ├── validate.ts
+│   └── validate.test.ts
 ```
 
 ### Basic Template
@@ -273,18 +283,20 @@ test('focus test', () => {});
 
 ## Running Tests
 
+Replace `<pkg>` with `core` or `methods`:
+
 ```bash
 # Run all tests
-pnpm -C packages/core test
+pnpm -C packages/<pkg> test
 
 # Run tests in watch mode
-pnpm -C packages/core test --watch
+pnpm -C packages/<pkg> test --watch
 
 # Run specific test file
-pnpm -C packages/core test validateFormInput
+pnpm -C packages/<pkg> test validateFormInput
 
 # Run with coverage
-pnpm -C packages/core test --coverage
+pnpm -C packages/<pkg> test --coverage
 ```
 
 ## Checklist

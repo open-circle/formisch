@@ -1,8 +1,8 @@
-import solid from 'vite-plugin-solid';
+import vue from 'unplugin-vue/vite';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  plugins: [solid()],
+  plugins: [vue()],
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/vitest/setup.ts'],
@@ -11,10 +11,9 @@ export default defineConfig({
       exclude: [
         'src/types',
         'src/vitest',
+        'src/shims-vue.d.ts',
         '**/index.ts',
-        '**/index.tsx',
         '**/*.test.ts',
-        '**/*.test.tsx',
         '**/*.test-d.ts',
       ],
     },
