@@ -131,6 +131,18 @@ jobs:
         run: pnpm lint
         working-directory: frameworks/react
 
+  react_vitest:
+    name: Run Vitest in frameworks/react
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Vitest tests
+        run: pnpm test
+        working-directory: frameworks/react
+
   # frameworks/preact
   preact_prettier:
     name: Run Prettier in frameworks/preact
