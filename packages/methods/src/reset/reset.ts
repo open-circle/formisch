@@ -113,7 +113,7 @@ export function reset(
         : internalFormStore;
 
       // If initial input is provided, set it
-      if (config && Object.hasOwn(config, 'initialInput')) {
+      if (config && 'initialInput' in config) {
         setInitialFieldInput(internalFieldStore, config.initialInput);
       }
 
