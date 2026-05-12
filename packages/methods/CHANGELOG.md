@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix `reset` method to apply falsy and explicit `undefined` values when resetting the initial input of a specific field (issue #78)
+
 ## v0.7.1 (April 16, 2026)
 
 - Fix `insert` method to initialize missing target child slots when shifting array items (pull request #76)

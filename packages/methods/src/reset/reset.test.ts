@@ -229,6 +229,75 @@ describe('reset', () => {
       expect(store.children.name.input.value).toBe('Bob');
       expect(store.children.name.initialInput.value).toBe('Bob');
     });
+
+    test('should reset field to empty string initial input', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'John' },
+      });
+
+      reset(store, { path: ['name'], initialInput: '' });
+
+      expect(store.children.name.input.value).toBe('');
+      expect(store.children.name.initialInput.value).toBe('');
+    });
+
+    test('should reset field to zero initial input', () => {
+      const store = createTestStore(v.object({ count: v.number() }), {
+        initialInput: { count: 42 },
+      });
+
+      reset(store, { path: ['count'], initialInput: 0 });
+
+      expect(store.children.count.input.value).toBe(0);
+      expect(store.children.count.initialInput.value).toBe(0);
+    });
+
+    test('should reset field to false initial input', () => {
+      const store = createTestStore(v.object({ flag: v.boolean() }), {
+        initialInput: { flag: true },
+      });
+
+      reset(store, { path: ['flag'], initialInput: false });
+
+      expect(store.children.flag.input.value).toBe(false);
+      expect(store.children.flag.initialInput.value).toBe(false);
+    });
+
+    test('should reset field to null initial input', () => {
+      const store = createTestStore(
+        v.object({ name: v.nullable(v.string()) }),
+        { initialInput: { name: 'John' } }
+      );
+
+      reset(store, { path: ['name'], initialInput: null });
+
+      expect(store.children.name.input.value).toBeNull();
+      expect(store.children.name.initialInput.value).toBeNull();
+    });
+
+    test('should reset field to undefined when initialInput is explicitly undefined', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'John' },
+      });
+      store.children.name.input.value = 'Jane';
+
+      reset(store, { path: ['name'], initialInput: undefined });
+
+      expect(store.children.name.input.value).toBeUndefined();
+      expect(store.children.name.initialInput.value).toBeUndefined();
+    });
+
+    test('should keep existing initial input when initialInput key is omitted', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'John' },
+      });
+      store.children.name.input.value = 'Jane';
+
+      reset(store, { path: ['name'] });
+
+      expect(store.children.name.input.value).toBe('John');
+      expect(store.children.name.initialInput.value).toBe('John');
+    });
   });
 
   describe('file input reset', () => {
