@@ -14,20 +14,49 @@ export type IsNever<T> = [T] extends [never] ? true : false;
 export type MaybePromise<T> = T | Promise<T>;
 
 /**
+ * Keys of `TValue` that are marked optional (`?`).
+ */
+type OptionalKeys<TValue> = {
+  [TKey in keyof TValue]-?: {} extends Pick<TValue, TKey> ? TKey : never;
+}[keyof TValue];
+
+/**
+ * Prettifies a type for better readability.
+ *
+ * Hint: This type has no effect and is only used so that TypeScript displays
+ * the final type in the preview instead of the utility types used.
+ */
+type Prettify<TObject> = { [TKey in keyof TObject]: TObject[TKey] } & {};
+
+/**
  * Removes the optional `?` modifier while keeping `| undefined` in the value
  * type for previously optional properties.
  *
- * Hint: The built-in `Required<T>` strips `| undefined` from optional
- * properties when `exactOptionalPropertyTypes` is disabled. This helper
- * preserves nullability across both compiler settings, so downstream types
- * such as `PathValue` do not lose the ability to read or write `undefined`
- * on previously optional fields (issue #15).
+ * Hint: The built-in `Required<T>` and the `-?` modifier strip `| undefined`
+ * from optional properties when `exactOptionalPropertyTypes` is disabled,
+ * regardless of whether the `| undefined` was implicit or explicitly written
+ * in the value. To stay mode-independent, this type splits the input into
+ * required and optional keys, recombining via intersection: required keys are
+ * picked unchanged, optional keys are funnelled through `Required<Pick<...>>`
+ * (which removes the `?` modifier and any undefined the modifier added) and
+ * then re-OR'd with `undefined`. Both halves are constructed with
+ * homomorphic mapped types so `readonly` modifiers are preserved. The outer
+ * conditional short-circuits for types without optional keys (including
+ * arrays and primitives) so that the original type is returned unchanged —
+ * otherwise `Pick<string[], keyof string[]>` would collapse the array into
+ * a plain object.
  */
-export type ExactRequired<TValue> = {
-  [TKey in keyof TValue]-?: {} extends Pick<TValue, TKey>
-    ? TValue[TKey] | undefined
-    : TValue[TKey];
-};
+export type ExactRequired<TValue> = TValue extends readonly unknown[]
+  ? TValue
+  : OptionalKeys<TValue> extends never
+    ? TValue
+    : Prettify<
+        Pick<TValue, Exclude<keyof TValue, OptionalKeys<TValue>>> & {
+          [TKey in keyof Required<Pick<TValue, OptionalKeys<TValue>>>]:
+            | Required<Pick<TValue, OptionalKeys<TValue>>>[TKey]
+            | undefined;
+        }
+      >;
 
 /**
  * Makes all properties deeply optional.

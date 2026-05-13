@@ -152,4 +152,17 @@ describe('ExactRequired', () => {
   test('should produce an empty object for an empty object', () => {
     expectTypeOf<ExactRequired<{}>>().toEqualTypeOf<{}>();
   });
+
+  test('should pass arrays through unchanged', () => {
+    expectTypeOf<ExactRequired<string[]>>().toEqualTypeOf<string[]>();
+    expectTypeOf<ExactRequired<{ id: number }[]>>().toEqualTypeOf<
+      { id: number }[]
+    >();
+  });
+
+  test('should pass tuples through unchanged', () => {
+    expectTypeOf<ExactRequired<[number, string]>>().toEqualTypeOf<
+      [number, string]
+    >();
+  });
 });
