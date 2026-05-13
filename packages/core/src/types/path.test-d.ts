@@ -184,6 +184,15 @@ describe('ValidArrayPath', () => {
       >
     >().toEqualTypeOf<['data', 'values']>();
   });
+
+  test('should accept array items whose item type is a union of an object and a primitive', () => {
+    expectTypeOf<
+      ValidArrayPath<
+        { rows: ({ tags: string[] } | string)[] },
+        ['rows', number, 'tags']
+      >
+    >().toEqualTypeOf<['rows', number, 'tags']>();
+  });
 });
 
 describe('PathValue', () => {
