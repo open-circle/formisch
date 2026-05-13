@@ -3,9 +3,9 @@ import type { PathValue, ValidArrayPath, ValidPath } from './path.ts';
 
 describe('ValidPath', () => {
   test('should accept a valid path on a simple object', () => {
-    expectTypeOf<
-      ValidPath<{ name: string }, ['name']>
-    >().toEqualTypeOf<['name']>();
+    expectTypeOf<ValidPath<{ name: string }, ['name']>>().toEqualTypeOf<
+      ['name']
+    >();
   });
 
   test('should accept a nested path', () => {
@@ -50,9 +50,9 @@ describe('ValidPath', () => {
 
 describe('ValidArrayPath', () => {
   test('should accept a simple array path', () => {
-    expectTypeOf<
-      ValidArrayPath<{ tags: string[] }, ['tags']>
-    >().toEqualTypeOf<['tags']>();
+    expectTypeOf<ValidArrayPath<{ tags: string[] }, ['tags']>>().toEqualTypeOf<
+      ['tags']
+    >();
   });
 
   test('should accept a nested array path', () => {
@@ -78,9 +78,7 @@ describe('ValidArrayPath', () => {
 
   test('should accept array fields contributed by different union variants', () => {
     interface Schema {
-      data:
-        | { type: 'A'; items: string[] }
-        | { type: 'B'; values: number[] };
+      data: { type: 'A'; items: string[] } | { type: 'B'; values: number[] };
     }
     expectTypeOf<ValidArrayPath<Schema, ['data', 'items']>>().toEqualTypeOf<
       ['data', 'items']
@@ -119,9 +117,9 @@ describe('ValidArrayPath', () => {
   });
 
   test('should accept an optional array field', () => {
-    expectTypeOf<
-      ValidArrayPath<{ tags?: string[] }, ['tags']>
-    >().toEqualTypeOf<['tags']>();
+    expectTypeOf<ValidArrayPath<{ tags?: string[] }, ['tags']>>().toEqualTypeOf<
+      ['tags']
+    >();
   });
 
   test('should accept a nullable array field', () => {
@@ -141,16 +139,16 @@ describe('ValidArrayPath', () => {
 
   test('should accept an optional array field on array items', () => {
     expectTypeOf<
-      ValidArrayPath<{ items: { tags?: string[] }[] }, ['items', number, 'tags']>
+      ValidArrayPath<
+        { items: { tags?: string[] }[] },
+        ['items', number, 'tags']
+      >
     >().toEqualTypeOf<['items', number, 'tags']>();
   });
 
   test('should accept a leaf array reached through multiple optional intermediates', () => {
     expectTypeOf<
-      ValidArrayPath<
-        { a?: { b?: { tags: string[] } } },
-        ['a', 'b', 'tags']
-      >
+      ValidArrayPath<{ a?: { b?: { tags: string[] } } }, ['a', 'b', 'tags']>
     >().toEqualTypeOf<['a', 'b', 'tags']>();
   });
 });
@@ -196,9 +194,9 @@ describe('PathValue', () => {
   });
 
   test('should preserve nullability at the leaf', () => {
-    expectTypeOf<
-      PathValue<{ name: string | null }, ['name']>
-    >().toEqualTypeOf<string | null>();
+    expectTypeOf<PathValue<{ name: string | null }, ['name']>>().toEqualTypeOf<
+      string | null
+    >();
   });
 
   test('should return unknown for an invalid path', () => {

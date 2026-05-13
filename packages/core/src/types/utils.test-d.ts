@@ -55,9 +55,7 @@ describe('PartialValues', () => {
   });
 
   test('should recurse into nested objects without making intermediates optional', () => {
-    expectTypeOf<
-      PartialValues<{ user: { name: string } }>
-    >().toEqualTypeOf<{
+    expectTypeOf<PartialValues<{ user: { name: string } }>>().toEqualTypeOf<{
       user: { name: string | undefined };
     }>();
   });
