@@ -1,4 +1,4 @@
-import type { IsAny, IsNever } from './utils.ts';
+import type { IsAny, IsNever, ExactRequired } from './utils.ts';
 
 /**
  * Path key type.
@@ -89,8 +89,8 @@ export type PathValue<TValue, TPath extends Path> = TPath extends readonly [
   infer TKey,
   ...infer TRest extends Path,
 ]
-  ? TKey extends KeyOf<Required<TValue>>
-    ? PathValue<MergeUnion<Required<TValue>>[TKey], TRest>
+  ? TKey extends KeyOf<ExactRequired<TValue>>
+    ? PathValue<MergeUnion<ExactRequired<TValue>>[TKey], TRest>
     : unknown
   : TValue;
 
@@ -105,7 +105,7 @@ type IsOrHasArray<TValue> =
       : [TValue] extends [Record<string, unknown>]
         ? true extends {
             [TKey in KeyOf<Required<TValue>>]: IsOrHasArray<
-              MergeUnion<Required<TValue>>[TKey]
+              NonNullable<MergeUnion<Required<TValue>>[TKey]>
             >;
           }[KeyOf<Required<TValue>>]
           ? true

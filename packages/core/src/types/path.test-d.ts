@@ -151,6 +151,24 @@ describe('ValidArrayPath', () => {
       ValidArrayPath<{ a?: { b?: { tags: string[] } } }, ['a', 'b', 'tags']>
     >().toEqualTypeOf<['a', 'b', 'tags']>();
   });
+
+  test('should accept a leaf array under an optional object with explicit `| undefined` (v.optional case)', () => {
+    expectTypeOf<
+      ValidArrayPath<
+        { items: { group?: { tags: string[] } | undefined }[] },
+        ['items', number, 'group', 'tags']
+      >
+    >().toEqualTypeOf<['items', number, 'group', 'tags']>();
+  });
+
+  test('should accept a leaf array under a field whose value is explicitly `T | undefined`', () => {
+    expectTypeOf<
+      ValidArrayPath<
+        { group: { tags: string[] } | undefined },
+        ['group', 'tags']
+      >
+    >().toEqualTypeOf<['group', 'tags']>();
+  });
 });
 
 describe('PathValue', () => {
@@ -203,5 +221,17 @@ describe('PathValue', () => {
     expectTypeOf<
       PathValue<{ name: string }, ['wrong']>
     >().toEqualTypeOf<unknown>();
+  });
+
+  test('should add `| undefined` when navigating to an optional field (issue #15)', () => {
+    expectTypeOf<
+      PathValue<{ group?: { name: string } }, ['group']>
+    >().toEqualTypeOf<{ name: string } | undefined>();
+  });
+
+  test('should preserve `| undefined` for nullish leaf values (issue #15, v.nullish case)', () => {
+    expectTypeOf<
+      PathValue<{ group?: { name: string } | null | undefined }, ['group']>
+    >().toEqualTypeOf<{ name: string } | null | undefined>();
   });
 });

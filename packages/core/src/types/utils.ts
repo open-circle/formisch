@@ -14,6 +14,22 @@ export type IsNever<T> = [T] extends [never] ? true : false;
 export type MaybePromise<T> = T | Promise<T>;
 
 /**
+ * Removes the optional `?` modifier while keeping `| undefined` in the value
+ * type for previously optional properties.
+ *
+ * Hint: The built-in `Required<T>` strips `| undefined` from optional
+ * properties when `exactOptionalPropertyTypes` is disabled. This helper
+ * preserves nullability across both compiler settings, so downstream types
+ * such as `PathValue` do not lose the ability to read or write `undefined`
+ * on previously optional fields (issue #15).
+ */
+export type ExactRequired<TValue> = {
+  [TKey in keyof TValue]-?: {} extends Pick<TValue, TKey>
+    ? TValue[TKey] | undefined
+    : TValue[TKey];
+};
+
+/**
  * Makes all properties deeply optional.
  */
 export type DeepPartial<TValue> = TValue extends

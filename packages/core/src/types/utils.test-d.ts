@@ -1,5 +1,9 @@
 import { describe, expectTypeOf, test } from 'vitest';
-import type { DeepPartial, PartialValues } from './utils.ts';
+import type {
+  DeepPartial,
+  PartialValues,
+  ExactRequired,
+} from './utils.ts';
 
 describe('DeepPartial', () => {
   test('should make primitives optional', () => {
@@ -96,5 +100,60 @@ describe('PartialValues', () => {
     expectTypeOf<PartialValues<{ name: string | null }>>().toEqualTypeOf<{
       name: string | null | undefined;
     }>();
+  });
+});
+
+describe('ExactRequired', () => {
+  test('should strip the optional marker and add `| undefined` to the value', () => {
+    expectTypeOf<ExactRequired<{ a?: string }>>().toEqualTypeOf<{
+      a: string | undefined;
+    }>();
+  });
+
+  test('should preserve required properties unchanged', () => {
+    expectTypeOf<ExactRequired<{ a: string }>>().toEqualTypeOf<{
+      a: string;
+    }>();
+  });
+
+  test('should preserve `| undefined` already present in optional values', () => {
+    expectTypeOf<
+      ExactRequired<{ a?: string | undefined }>
+    >().toEqualTypeOf<{ a: string | undefined }>();
+  });
+
+  test('should preserve `| null` without adding undefined to required nullable values', () => {
+    expectTypeOf<ExactRequired<{ a: string | null }>>().toEqualTypeOf<{
+      a: string | null;
+    }>();
+  });
+
+  test('should preserve nullish values on optional properties (v.nullish case)', () => {
+    expectTypeOf<
+      ExactRequired<{ a?: string | null | undefined }>
+    >().toEqualTypeOf<{ a: string | null | undefined }>();
+  });
+
+  test('should treat mixed required and optional keys correctly', () => {
+    expectTypeOf<
+      ExactRequired<{ a?: string; b: number; c?: boolean | null }>
+    >().toEqualTypeOf<{
+      a: string | undefined;
+      b: number;
+      c: boolean | null | undefined;
+    }>();
+  });
+
+  test('should preserve the `readonly` modifier', () => {
+    expectTypeOf<
+      ExactRequired<{ readonly a?: string; readonly b: number }>
+    >().toEqualTypeOf<{
+      readonly a: string | undefined;
+      readonly b: number;
+    }>();
+  });
+
+  test('should produce an empty object for an empty object', () => {
+    expectTypeOf<ExactRequired<{}>>().toEqualTypeOf<{}>();
   });
 });
