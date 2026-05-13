@@ -1,9 +1,5 @@
 import { describe, expectTypeOf, test } from 'vitest';
-import type {
-  DeepPartial,
-  PartialValues,
-  ExactRequired,
-} from './utils.ts';
+import type { DeepPartial, ExactRequired, PartialValues } from './utils.ts';
 
 describe('DeepPartial', () => {
   test('should make primitives optional', () => {
@@ -117,9 +113,9 @@ describe('ExactRequired', () => {
   });
 
   test('should preserve `| undefined` already present in optional values', () => {
-    expectTypeOf<
-      ExactRequired<{ a?: string | undefined }>
-    >().toEqualTypeOf<{ a: string | undefined }>();
+    expectTypeOf<ExactRequired<{ a?: string | undefined }>>().toEqualTypeOf<{
+      a: string | undefined;
+    }>();
   });
 
   test('should preserve `| null` without adding undefined to required nullable values', () => {

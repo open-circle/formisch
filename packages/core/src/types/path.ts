@@ -1,4 +1,4 @@
-import type { IsAny, IsNever, ExactRequired } from './utils.ts';
+import type { ExactRequired, IsAny, IsNever } from './utils.ts';
 
 /**
  * Path key type.
@@ -95,19 +95,39 @@ export type PathValue<TValue, TPath extends Path> = TPath extends readonly [
   : TValue;
 
 /**
- * Checks if a value is an array or contains one.
+ * Checks whether a value is an array or contains one anywhere in its shape.
+ *
+ * Hint: Distributes the predicate over union members
+ * (`TValue extends unknown ? ...`) so that variants, optional wrappers, and
+ * unions mixed with primitives are all handled uniformly. The outer
+ * `true extends ...` collapses the resulting `true | false` back to a
+ * definite `true`/`false`, which downstream types like `KeyOfArrayPath` rely
+ * on when checking `extends true`.
  */
-type IsOrHasArray<TValue> =
+type IsOrHasArray<TValue> = true extends (
+  TValue extends unknown ? IsOrHasArrayInner<TValue> : never
+)
+  ? true
+  : false;
+
+/**
+ * Per-member step of `IsOrHasArray`. Assumes `TValue` is a single
+ * (non-union) type; distribution over unions is handled by the public
+ * wrapper.
+ *
+ * Hint: Recursion routes back through `IsOrHasArray` (not this helper) so
+ * unions produced by indexed access — e.g. `T | undefined` from optional
+ * properties — are redistributed at every level.
+ */
+type IsOrHasArrayInner<TValue> =
   IsAny<TValue> extends true
     ? false
-    : true extends (TValue extends readonly unknown[] ? true : false)
+    : TValue extends readonly unknown[]
       ? true
-      : [TValue] extends [Record<string, unknown>]
+      : TValue extends Record<string, unknown>
         ? true extends {
-            [TKey in KeyOf<Required<TValue>>]: IsOrHasArray<
-              NonNullable<MergeUnion<Required<TValue>>[TKey]>
-            >;
-          }[KeyOf<Required<TValue>>]
+            [TKey in keyof TValue]: IsOrHasArray<TValue[TKey]>;
+          }[keyof TValue]
           ? true
           : false
         : false;

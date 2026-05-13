@@ -5,7 +5,7 @@ All notable changes to the library will be documented in this file.
 ## vX.X.X (Month DD, YYYY)
 
 - Fix `initializeFieldStore` to throw an error when `variant` or `union` branches initialize the same key with incompatible store kinds (pull request #94)
-- Fix `ValidArrayPath` type to accept array fields present only in some `variant` options and reachable through optional intermediates (pull request #89)
+- Fix `ValidArrayPath` type to accept array fields reachable through unions (`variant` options, optional/nullish intermediates, and unions that include primitives) (pull request #89)
 - Fix `PathValue` type to preserve `| undefined` when navigating to optional or nullish fields, so input types of methods like `setInput` are no longer narrowed away from `T | null | undefined` (issue #15, pull request #89)
 - Add `ExactRequired` utility type that removes the optional `?` modifier while keeping `| undefined` in the value, independent of `exactOptionalPropertyTypes` (issue #15)
 

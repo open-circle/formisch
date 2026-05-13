@@ -169,6 +169,21 @@ describe('ValidArrayPath', () => {
       >
     >().toEqualTypeOf<['group', 'tags']>();
   });
+
+  test('should accept a leaf array when the union also contains a primitive', () => {
+    expectTypeOf<
+      ValidArrayPath<{ data: { items: string[] } | string }, ['data', 'items']>
+    >().toEqualTypeOf<['data', 'items']>();
+  });
+
+  test('should accept a leaf array when the union also contains a number', () => {
+    expectTypeOf<
+      ValidArrayPath<
+        { data: { values: number[] } | number },
+        ['data', 'values']
+      >
+    >().toEqualTypeOf<['data', 'values']>();
+  });
 });
 
 describe('PathValue', () => {
