@@ -56,4 +56,19 @@ describe('useFieldArray', () => {
     // @ts-expect-error nonexistent field
     useFieldArray(form, { path: ['nonexistent'] });
   });
+
+  test('should accept an array field present in only some variant options', () => {
+    const schema = v.object({
+      data: v.variant('type', [
+        v.object({ type: v.literal('a'), items: v.array(v.string()) }),
+        v.object({ type: v.literal('b'), name: v.string() }),
+      ]),
+    });
+    const form = createForm({ schema });
+    const fieldArray = useFieldArray(form, { path: ['data', 'items'] });
+
+    expectTypeOf(fieldArray).toEqualTypeOf<
+      FieldArrayStore<typeof schema, ['data', 'items']>
+    >();
+  });
 });

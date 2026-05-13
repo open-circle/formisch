@@ -104,8 +104,10 @@ type IsOrHasArray<TValue> =
       ? true
       : [TValue] extends [Record<string, unknown>]
         ? true extends {
-            [TKey in KeyOf<TValue>]: IsOrHasArray<MergeUnion<TValue>[TKey]>;
-          }[KeyOf<TValue>]
+            [TKey in KeyOf<Required<TValue>>]: IsOrHasArray<
+              MergeUnion<Required<TValue>>[TKey]
+            >;
+          }[KeyOf<Required<TValue>>]
           ? true
           : false
         : false;

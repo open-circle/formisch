@@ -5,6 +5,7 @@ All notable changes to the library will be documented in this file.
 ## vX.X.X (Month DD, YYYY)
 
 - Fix `initializeFieldStore` to throw an error when `variant` or `union` branches initialize the same key with incompatible store kinds (pull request #94)
+- Fix `ValidArrayPath` type to accept array fields present only in some `variant` options and reachable through optional intermediates (pull request #89)
 
 ## v0.6.3 (March 06, 2026)
 
