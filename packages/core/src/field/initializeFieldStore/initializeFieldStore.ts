@@ -255,9 +255,9 @@ export function initializeFieldStore(
 
         // Initialize child for each object entry
         for (const key in schema.entries) {
-          // Create empty child object
+          // Create empty child object if not exists
           // @ts-expect-error
-          internalFieldStore.children[key] = {};
+          internalFieldStore.children[key] ??= {};
 
           // Add current key to path
           path.push(key);
@@ -285,6 +285,13 @@ export function initializeFieldStore(
 
       // Otherwise, initialize as value field (leaf node)
     } else {
+      // If already initialized as different kind, throw error
+      if (internalFieldStore.kind && internalFieldStore.kind !== 'value') {
+        throw new Error(
+          `Store initialized as "${internalFieldStore.kind}" cannot be reinitialized as "value"`
+        );
+      }
+
       // Set kind to value
       internalFieldStore.kind = 'value';
 

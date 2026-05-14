@@ -380,5 +380,73 @@ describe('initializeFieldStore', () => {
         );
       }).toThrow('cannot be reinitialized as "object"');
     });
+
+    test('should throw when variant branches have same key as value and array', () => {
+      expect(() => {
+        createTestStore(
+          v.object({
+            a: v.variant('type', [
+              v.object({ type: v.literal('string'), value: v.string() }),
+              v.object({ type: v.literal('array'), value: v.array(v.string()) }),
+            ]),
+          }),
+          { initialInput: { a: { type: 'string', value: '' } } }
+        );
+      }).toThrow('cannot be reinitialized as "array"');
+    });
+
+    test('should throw when variant branches have same key as array and value', () => {
+      expect(() => {
+        createTestStore(
+          v.object({
+            a: v.variant('type', [
+              v.object({ type: v.literal('array'), value: v.array(v.string()) }),
+              v.object({ type: v.literal('string'), value: v.string() }),
+            ]),
+          }),
+          { initialInput: { a: { type: 'array', value: [] } } }
+        );
+      }).toThrow('cannot be reinitialized as "value"');
+    });
+
+    test('should throw when variant branches have same key as value and object', () => {
+      expect(() => {
+        createTestStore(
+          v.object({
+            a: v.variant('type', [
+              v.object({
+                type: v.literal('string'),
+                value: v.string(),
+              }),
+              v.object({
+                type: v.literal('nested'),
+                value: v.object({ x: v.number() }),
+              }),
+            ]),
+          }),
+          { initialInput: { a: { type: 'string', value: '' } } }
+        );
+      }).toThrow('cannot be reinitialized as "object"');
+    });
+
+    test('should throw when variant branches have same key as object and value', () => {
+      expect(() => {
+        createTestStore(
+          v.object({
+            a: v.variant('type', [
+              v.object({
+                type: v.literal('nested'),
+                value: v.object({ x: v.number() }),
+              }),
+              v.object({
+                type: v.literal('string'),
+                value: v.string(),
+              }),
+            ]),
+          }),
+          { initialInput: { a: { type: 'nested', value: { x: 1 } } } }
+        );
+      }).toThrow('cannot be reinitialized as "value"');
+    });
   });
 });
