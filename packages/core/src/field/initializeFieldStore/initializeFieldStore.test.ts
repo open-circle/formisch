@@ -387,7 +387,10 @@ describe('initializeFieldStore', () => {
           v.object({
             a: v.variant('type', [
               v.object({ type: v.literal('string'), value: v.string() }),
-              v.object({ type: v.literal('array'), value: v.array(v.string()) }),
+              v.object({
+                type: v.literal('array'),
+                value: v.array(v.string()),
+              }),
             ]),
           }),
           { initialInput: { a: { type: 'string', value: '' } } }
@@ -400,7 +403,10 @@ describe('initializeFieldStore', () => {
         createTestStore(
           v.object({
             a: v.variant('type', [
-              v.object({ type: v.literal('array'), value: v.array(v.string()) }),
+              v.object({
+                type: v.literal('array'),
+                value: v.array(v.string()),
+              }),
               v.object({ type: v.literal('string'), value: v.string() }),
             ]),
           }),

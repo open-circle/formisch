@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix `initializeFieldStore` to throw an error when `variant` or `union` branches initialize the same key with incompatible store kinds (pull request #94)
+
 ## v0.6.3 (March 06, 2026)
 
 - Fix `initializeFieldStore` for nullable and nullish `lazy`, `variant`, `union` and `intersect` schemas (pull request #68)
