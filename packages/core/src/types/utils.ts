@@ -41,22 +41,23 @@ type Prettify<TObject> = { [TKey in keyof TObject]: TObject[TKey] } & {};
  * (which removes the `?` modifier and any undefined the modifier added) and
  * then re-OR'd with `undefined`. Both halves are constructed with
  * homomorphic mapped types so `readonly` modifiers are preserved. The outer
- * conditional short-circuits for types without optional keys (including
- * arrays and primitives) so that the original type is returned unchanged —
- * otherwise `Pick<string[], keyof string[]>` would collapse the array into
- * a plain object.
+ * conditional short-circuits for arrays and non-object types so that the
+ * original type is returned unchanged — otherwise `Pick<string[],
+ * keyof string[]>` would collapse the array into a plain object.
  */
 export type ExactRequired<TValue> = TValue extends readonly unknown[]
   ? TValue
-  : OptionalKeys<TValue> extends never
-    ? TValue
-    : Prettify<
-        Pick<TValue, Exclude<keyof TValue, OptionalKeys<TValue>>> & {
-          [TKey in keyof Required<Pick<TValue, OptionalKeys<TValue>>>]:
-            | Required<Pick<TValue, OptionalKeys<TValue>>>[TKey]
-            | undefined;
-        }
-      >;
+  : TValue extends object
+    ? OptionalKeys<TValue> extends never
+      ? TValue
+      : Prettify<
+          Pick<TValue, Exclude<keyof TValue, OptionalKeys<TValue>>> & {
+            [TKey in keyof Required<Pick<TValue, OptionalKeys<TValue>>>]:
+              | Required<Pick<TValue, OptionalKeys<TValue>>>[TKey]
+              | undefined;
+          }
+        >
+    : TValue;
 
 /**
  * Makes all properties deeply optional.

@@ -100,6 +100,14 @@ describe('PartialValues', () => {
 });
 
 describe('ExactRequired', () => {
+  test('should pass primitive and nullish types through unchanged', () => {
+    expectTypeOf<ExactRequired<string>>().toEqualTypeOf<string>();
+    expectTypeOf<ExactRequired<number>>().toEqualTypeOf<number>();
+    expectTypeOf<ExactRequired<boolean>>().toEqualTypeOf<boolean>();
+    expectTypeOf<ExactRequired<null>>().toEqualTypeOf<null>();
+    expectTypeOf<ExactRequired<undefined>>().toEqualTypeOf<undefined>();
+  });
+
   test('should strip the optional marker and add `| undefined` to the value', () => {
     expectTypeOf<ExactRequired<{ a?: string }>>().toEqualTypeOf<{
       a: string | undefined;
@@ -151,6 +159,23 @@ describe('ExactRequired', () => {
 
   test('should produce an empty object for an empty object', () => {
     expectTypeOf<ExactRequired<{}>>().toEqualTypeOf<{}>();
+  });
+
+  test('should distribute over unions', () => {
+    expectTypeOf<
+      ExactRequired<
+        { type: 'a'; value?: string } | { type: 'b'; count?: number }
+      >
+    >().toEqualTypeOf<
+      | { type: 'a'; value: string | undefined }
+      | { type: 'b'; count: number | undefined }
+    >();
+  });
+
+  test('should pass primitive members of unions through unchanged', () => {
+    expectTypeOf<ExactRequired<string | { a?: number }>>().toEqualTypeOf<
+      string | { a: number | undefined }
+    >();
   });
 
   test('should pass arrays through unchanged', () => {
