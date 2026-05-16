@@ -29,21 +29,33 @@ type OptionalKeys<TValue> = {
 type Prettify<TObject> = { [TKey in keyof TObject]: TObject[TKey] } & {};
 
 /**
- * Removes the optional `?` modifier while keeping `| undefined` in the value
- * type for previously optional properties.
+ * Detects whether the consuming project is compiled with
+ * `exactOptionalPropertyTypes: false`. Under loose mode the built-in
+ * `Required<T>` strips `| undefined` from optional properties, so
+ * `Required<{ k?: undefined }>['k']` collapses to `never` — under strict
+ * mode the same expression yields `undefined`.
+ */
+type IsLooseMode = Required<{ k?: undefined }>['k'] extends never
+  ? true
+  : false;
+
+/**
+ * Removes the optional `?` modifier from properties while preserving the
+ * value type — including any `| undefined` the schema author wrote
+ * explicitly.
  *
- * Hint: The built-in `Required<T>` and the `-?` modifier strip `| undefined`
- * from optional properties when `exactOptionalPropertyTypes` is disabled,
- * regardless of whether the `| undefined` was implicit or explicitly written
- * in the value. To stay mode-independent, this type splits the input into
- * required and optional keys, recombining via intersection: required keys are
- * picked unchanged, optional keys are funnelled through `Required<Pick<...>>`
- * (which removes the `?` modifier and any undefined the modifier added) and
- * then re-OR'd with `undefined`. Both halves are constructed with
- * homomorphic mapped types so `readonly` modifiers are preserved. The outer
- * conditional short-circuits for arrays and non-object types so that the
- * original type is returned unchanged — otherwise `Pick<string[],
- * keyof string[]>` would collapse the array into a plain object.
+ * Hint: Strict and loose `exactOptionalPropertyTypes` modes treat optional
+ * properties differently. Under strict mode, `Required<Pick<T, K>>[K]`
+ * already returns the precise value (with or without `| undefined`
+ * depending on what the schema author wrote), so we leave it alone — which
+ * lets `v.exactOptional(...)` keep its "must be `T`, never `undefined`"
+ * meaning and `v.optional(...)` keep its "may be `undefined`" meaning.
+ * Under loose mode the distinction is erased by the compiler before we see
+ * it, so we default to adding `| undefined` — this matches how the
+ * consumer's TypeScript already treats optional access in loose mode, and
+ * it preserves `| undefined` for `v.nullish`/`v.optional` (issue #15). The
+ * outer conditionals short-circuit arrays and non-object types so
+ * primitives and arrays pass through unchanged.
  */
 export type ExactRequired<TValue> = TValue extends readonly unknown[]
   ? TValue
@@ -54,7 +66,7 @@ export type ExactRequired<TValue> = TValue extends readonly unknown[]
           Pick<TValue, Exclude<keyof TValue, OptionalKeys<TValue>>> & {
             [TKey in keyof Required<Pick<TValue, OptionalKeys<TValue>>>]:
               | Required<Pick<TValue, OptionalKeys<TValue>>>[TKey]
-              | undefined;
+              | (IsLooseMode extends true ? undefined : never);
           }
         >
     : TValue;

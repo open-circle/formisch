@@ -108,9 +108,9 @@ describe('ExactRequired', () => {
     expectTypeOf<ExactRequired<undefined>>().toEqualTypeOf<undefined>();
   });
 
-  test('should strip the optional marker and add `| undefined` to the value', () => {
+  test('should strip the optional marker while preserving the exact value (v.exactOptional case, strict mode)', () => {
     expectTypeOf<ExactRequired<{ a?: string }>>().toEqualTypeOf<{
-      a: string | undefined;
+      a: string;
     }>();
   });
 
@@ -120,7 +120,7 @@ describe('ExactRequired', () => {
     }>();
   });
 
-  test('should preserve `| undefined` already present in optional values', () => {
+  test('should preserve `| undefined` written explicitly on optional values (v.optional case)', () => {
     expectTypeOf<ExactRequired<{ a?: string | undefined }>>().toEqualTypeOf<{
       a: string | undefined;
     }>();
@@ -132,7 +132,7 @@ describe('ExactRequired', () => {
     }>();
   });
 
-  test('should preserve nullish values on optional properties (v.nullish case)', () => {
+  test('should preserve explicit nullish values on optional properties (v.nullish case)', () => {
     expectTypeOf<
       ExactRequired<{ a?: string | null | undefined }>
     >().toEqualTypeOf<{ a: string | null | undefined }>();
@@ -140,9 +140,13 @@ describe('ExactRequired', () => {
 
   test('should treat mixed required and optional keys correctly', () => {
     expectTypeOf<
-      ExactRequired<{ a?: string; b: number; c?: boolean | null }>
+      ExactRequired<{
+        a?: string;
+        b: number;
+        c?: boolean | null | undefined;
+      }>
     >().toEqualTypeOf<{
-      a: string | undefined;
+      a: string;
       b: number;
       c: boolean | null | undefined;
     }>();
@@ -152,7 +156,7 @@ describe('ExactRequired', () => {
     expectTypeOf<
       ExactRequired<{ readonly a?: string; readonly b: number }>
     >().toEqualTypeOf<{
-      readonly a: string | undefined;
+      readonly a: string;
       readonly b: number;
     }>();
   });
@@ -161,21 +165,21 @@ describe('ExactRequired', () => {
     expectTypeOf<ExactRequired<{}>>().toEqualTypeOf<{}>();
   });
 
-  test('should distribute over unions', () => {
+  test('should distribute over unions and preserve each member precisely', () => {
     expectTypeOf<
       ExactRequired<
-        { type: 'a'; value?: string } | { type: 'b'; count?: number }
+        | { type: 'a'; value?: string }
+        | { type: 'b'; count?: number | undefined }
       >
     >().toEqualTypeOf<
-      | { type: 'a'; value: string | undefined }
-      | { type: 'b'; count: number | undefined }
+      { type: 'a'; value: string } | { type: 'b'; count: number | undefined }
     >();
   });
 
   test('should pass primitive members of unions through unchanged', () => {
-    expectTypeOf<ExactRequired<string | { a?: number }>>().toEqualTypeOf<
-      string | { a: number | undefined }
-    >();
+    expectTypeOf<
+      ExactRequired<string | { a?: number | undefined }>
+    >().toEqualTypeOf<string | { a: number | undefined }>();
   });
 
   test('should pass arrays through unchanged', () => {

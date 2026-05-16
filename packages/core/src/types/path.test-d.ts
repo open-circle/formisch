@@ -247,9 +247,9 @@ describe('PathValue', () => {
     >().toEqualTypeOf<unknown>();
   });
 
-  test('should add `| undefined` when navigating to an optional field (issue #15)', () => {
+  test('should preserve `| undefined` when navigating to an optional field with explicit undefined (issue #15, v.optional case)', () => {
     expectTypeOf<
-      PathValue<{ group?: { name: string } }, ['group']>
+      PathValue<{ group?: { name: string } | undefined }, ['group']>
     >().toEqualTypeOf<{ name: string } | undefined>();
   });
 
@@ -257,5 +257,11 @@ describe('PathValue', () => {
     expectTypeOf<
       PathValue<{ group?: { name: string } | null | undefined }, ['group']>
     >().toEqualTypeOf<{ name: string } | null | undefined>();
+  });
+
+  test('should produce the exact value at an optional field without adding undefined (v.exactOptional case)', () => {
+    expectTypeOf<
+      PathValue<{ group?: { name: string } }, ['group']>
+    >().toEqualTypeOf<{ name: string }>();
   });
 });
