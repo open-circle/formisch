@@ -1,11 +1,107 @@
 import { describe, expectTypeOf, test } from 'vitest';
 import type {
+  ExactKeysOf,
   ExactKeysOfArrayPath,
   PathValue,
+  PropertiesOf,
   PropertiesOfArrayPath,
   ValidArrayPath,
   ValidPath,
 } from './path.ts';
+
+describe('ExactKeysOf', () => {
+  test('should return the keys of a plain object', () => {
+    expectTypeOf<ExactKeysOf<{ a: number; b: string }>>().toEqualTypeOf<
+      'a' | 'b'
+    >();
+  });
+
+  test('should return the literal indices of a tuple', () => {
+    expectTypeOf<ExactKeysOf<[number, string, boolean]>>().toEqualTypeOf<
+      0 | 1 | 2
+    >();
+  });
+
+  test('should return `number` for a dynamic array', () => {
+    expectTypeOf<ExactKeysOf<string[]>>().toEqualTypeOf<number>();
+    expectTypeOf<ExactKeysOf<readonly string[]>>().toEqualTypeOf<number>();
+  });
+
+  test('should return the union of keys across object union members', () => {
+    expectTypeOf<ExactKeysOf<{ a: number } | { b: string }>>().toEqualTypeOf<
+      'a' | 'b'
+    >();
+  });
+
+  test('should return the union of keys across object and tuple union members', () => {
+    expectTypeOf<ExactKeysOf<{ a: string } | [string]>>().toEqualTypeOf<
+      'a' | 0
+    >();
+  });
+
+  test('should return `never` for primitives', () => {
+    expectTypeOf<ExactKeysOf<string>>().toEqualTypeOf<never>();
+    expectTypeOf<ExactKeysOf<number>>().toEqualTypeOf<never>();
+    expectTypeOf<ExactKeysOf<boolean>>().toEqualTypeOf<never>();
+    expectTypeOf<ExactKeysOf<null>>().toEqualTypeOf<never>();
+    expectTypeOf<ExactKeysOf<undefined>>().toEqualTypeOf<never>();
+  });
+
+  test('should return `never` for `any`, `unknown`, and `never`', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectTypeOf<ExactKeysOf<any>>().toEqualTypeOf<never>();
+    expectTypeOf<ExactKeysOf<unknown>>().toEqualTypeOf<never>();
+    expectTypeOf<ExactKeysOf<never>>().toEqualTypeOf<never>();
+  });
+});
+
+describe('PropertiesOf', () => {
+  test('should return the same shape for a plain object', () => {
+    expectTypeOf<PropertiesOf<{ a: number; b: string }>>().toEqualTypeOf<{
+      a: number;
+      b: string;
+    }>();
+  });
+
+  test('should produce an indexed object for tuples', () => {
+    expectTypeOf<PropertiesOf<[number, string]>>().toEqualTypeOf<{
+      0: number;
+      1: string;
+    }>();
+  });
+
+  test('should produce an index signature for dynamic arrays', () => {
+    expectTypeOf<PropertiesOf<string[]>>().toEqualTypeOf<
+      Record<number, string>
+    >();
+  });
+
+  test('should merge keys across object union members', () => {
+    expectTypeOf<PropertiesOf<{ a: number } | { b: string }>>().toEqualTypeOf<{
+      a: number;
+      b: string;
+    }>();
+  });
+
+  test('should union value types for keys shared across union members', () => {
+    expectTypeOf<
+      PropertiesOf<{ a: number; b: string } | { a: boolean; c: Date }>
+    >().toEqualTypeOf<{
+      a: number | boolean;
+      b: string;
+      c: Date;
+    }>();
+  });
+
+  test('should produce `{}` for primitives and non-indexable types', () => {
+    expectTypeOf<PropertiesOf<string>>().toEqualTypeOf<{}>();
+    expectTypeOf<PropertiesOf<number>>().toEqualTypeOf<{}>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectTypeOf<PropertiesOf<any>>().toEqualTypeOf<{}>();
+    expectTypeOf<PropertiesOf<unknown>>().toEqualTypeOf<{}>();
+    expectTypeOf<PropertiesOf<never>>().toEqualTypeOf<{}>();
+  });
+});
 
 describe('ValidPath', () => {
   test('should accept a valid path on a simple object', () => {
