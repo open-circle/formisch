@@ -1,4 +1,10 @@
-import type { ExactRequired, IsAny, IsNever } from './utils.ts';
+import type {
+  ExactKeysOf,
+  ExactRequired,
+  IsAny,
+  IsNever,
+  PropertiesOf,
+} from './utils.ts';
 
 /**
  * Path key type.
@@ -14,39 +20,6 @@ export type Path = readonly PathKey[];
  * Required path type.
  */
 export type RequiredPath = readonly [PathKey, ...Path];
-
-/**
- * Extracts the exact keys of a tuple, array or object.
- */
-type ExactKeysOf<TValue> =
-  IsAny<TValue> extends true
-    ? never
-    : TValue extends readonly unknown[]
-      ? number extends TValue['length']
-        ? number
-        : {
-            [TKey in keyof TValue]: TKey extends `${infer TIndex extends number}`
-              ? TIndex
-              : never;
-          }[number]
-      : TValue extends Record<string, unknown>
-        ? keyof TValue
-        : never;
-
-/**
- * Returns the flat object of all indexable properties of `TValue`. For object
- * unions, properties from every member are merged so that any single property
- * is accessible. For primitives and non-indexable types, the result is `{}`.
- *
- * Hint: This is necessary to make properties accessible across union members.
- * By default, properties that do not exist in all union options are not
- * accessible and result in "any" when accessed.
- */
-type PropertiesOf<TValue> = {
-  [TKey in ExactKeysOf<TValue>]: TValue extends Record<TKey, infer TItem>
-    ? TItem
-    : never;
-};
 
 /**
  * Lazily evaluates only the first valid path segment based on the given value.
@@ -165,7 +138,8 @@ type LazyArrayPath<
       : readonly [...TValidPath, ExactKeysOfArrayPath<TValue>]
     : // If first key of path to check is valid, continue with next key
       TPathToCheck extends readonly [
-          infer TFirstKey extends ExactKeysOfArrayPath<TValue> & PathKey,
+          infer TFirstKey extends ExactKeysOfArrayPath<TValue> &
+            ExactKeysOf<TValue>,
           ...infer TPathRest extends Path,
         ]
       ? LazyArrayPath<

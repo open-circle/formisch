@@ -14,6 +14,43 @@ export type IsNever<T> = [T] extends [never] ? true : false;
 export type MaybePromise<T> = T | Promise<T>;
 
 /**
+ * Extracts the index-style keys of a tuple, array or object. Tuples return
+ * their literal numeric indices, dynamic arrays return `number`, objects
+ * return their `string | number` keys (symbols excluded), and any other
+ * input returns `never`.
+ */
+export type ExactKeysOf<TValue> =
+  IsAny<TValue> extends true
+    ? never
+    : TValue extends readonly unknown[]
+      ? number extends TValue['length']
+        ? number
+        : {
+            [TKey in keyof TValue]: TKey extends `${infer TIndex extends number}`
+              ? TIndex
+              : never;
+          }[number]
+      : TValue extends Record<string, unknown>
+        ? keyof TValue & (string | number)
+        : never;
+
+/**
+ * Returns the flat object of all indexable properties of `TValue`. For object
+ * unions, properties from every member are merged so that any single property
+ * is accessible. For primitives and other non-indexable types, the result is
+ * `{}`.
+ *
+ * Hint: This is necessary to make properties accessible across union members.
+ * By default, properties that do not exist in all union options are not
+ * accessible and result in "any" when accessed.
+ */
+export type PropertiesOf<TValue> = {
+  [TKey in ExactKeysOf<TValue>]: TValue extends Record<TKey, infer TItem>
+    ? TItem
+    : never;
+};
+
+/**
  * Keys of `TValue` that are marked optional (`?`).
  */
 type OptionalKeys<TValue> = {
