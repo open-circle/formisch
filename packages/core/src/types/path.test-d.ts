@@ -1,5 +1,11 @@
 import { describe, expectTypeOf, test } from 'vitest';
-import type { PathValue, ValidArrayPath, ValidPath } from './path.ts';
+import type {
+  ExactKeysOfArrayPath,
+  PathValue,
+  PropertiesOfArrayPath,
+  ValidArrayPath,
+  ValidPath,
+} from './path.ts';
 
 describe('ValidPath', () => {
   test('should accept a valid path on a simple object', () => {
@@ -45,6 +51,194 @@ describe('ValidPath', () => {
     expectTypeOf<
       ValidPath<{ user: { name: string } }, ['wrong']>
     >().toEqualTypeOf<readonly ['user']>();
+  });
+});
+
+describe('PathValue', () => {
+  test('should extract the value type at a simple path', () => {
+    expectTypeOf<
+      PathValue<{ name: string }, ['name']>
+    >().toEqualTypeOf<string>();
+  });
+
+  test('should extract the value type through a union', () => {
+    expectTypeOf<
+      PathValue<
+        { data: { type: 'a'; name: string } | { type: 'b'; name: number } },
+        ['data', 'name']
+      >
+    >().toEqualTypeOf<string | number>();
+  });
+
+  test('should extract an array element type', () => {
+    expectTypeOf<
+      PathValue<{ items: { id: number }[] }, ['items', 0, 'id']>
+    >().toEqualTypeOf<number>();
+  });
+
+  test('should extract a whole array when path stops at the array field', () => {
+    expectTypeOf<
+      PathValue<{ items: { id: number }[] }, ['items']>
+    >().toEqualTypeOf<{ id: number }[]>();
+  });
+
+  test('should extract a tuple element by index', () => {
+    expectTypeOf<
+      PathValue<{ coords: [number, string] }, ['coords', 1]>
+    >().toEqualTypeOf<string>();
+  });
+
+  test('should strip optionality from intermediate fields', () => {
+    expectTypeOf<
+      PathValue<{ profile?: { name: string } }, ['profile', 'name']>
+    >().toEqualTypeOf<string>();
+  });
+
+  test('should preserve nullability at the leaf', () => {
+    expectTypeOf<PathValue<{ name: string | null }, ['name']>>().toEqualTypeOf<
+      string | null
+    >();
+  });
+
+  test('should return unknown for an invalid path', () => {
+    expectTypeOf<
+      PathValue<{ name: string }, ['wrong']>
+    >().toEqualTypeOf<unknown>();
+  });
+
+  test('should preserve `| undefined` when navigating to an optional field with explicit undefined (issue #15, v.optional case)', () => {
+    expectTypeOf<
+      PathValue<{ group?: { name: string } | undefined }, ['group']>
+    >().toEqualTypeOf<{ name: string } | undefined>();
+  });
+
+  test('should preserve `| undefined` for nullish leaf values (issue #15, v.nullish case)', () => {
+    expectTypeOf<
+      PathValue<{ group?: { name: string } | null | undefined }, ['group']>
+    >().toEqualTypeOf<{ name: string } | null | undefined>();
+  });
+
+  test('should produce the exact value at an optional field without adding undefined (v.exactOptional case)', () => {
+    expectTypeOf<
+      PathValue<{ group?: { name: string } }, ['group']>
+    >().toEqualTypeOf<{ name: string }>();
+  });
+});
+
+describe('ExactKeysOfArrayPath', () => {
+  test('should return only the keys whose values are arrays', () => {
+    expectTypeOf<
+      ExactKeysOfArrayPath<{ a: string[]; b: number }>
+    >().toEqualTypeOf<'a'>();
+  });
+
+  test('should return every array-leading key when multiple are present', () => {
+    expectTypeOf<
+      ExactKeysOfArrayPath<{ a: string[]; b: number[]; c: string }>
+    >().toEqualTypeOf<'a' | 'b'>();
+  });
+
+  test('should return keys whose values contain a nested array', () => {
+    expectTypeOf<
+      ExactKeysOfArrayPath<{ a: { b: string[] }; c: number }>
+    >().toEqualTypeOf<'a'>();
+  });
+
+  test('should return the literal tuple index of array-leading positions', () => {
+    expectTypeOf<
+      ExactKeysOfArrayPath<[string[], number, boolean[]]>
+    >().toEqualTypeOf<0 | 2>();
+  });
+
+  test('should return `number` for a dynamic array whose elements contain arrays', () => {
+    expectTypeOf<
+      ExactKeysOfArrayPath<{ items: string[] }[]>
+    >().toEqualTypeOf<number>();
+  });
+
+  test('should return `never` for a dynamic array whose elements have no arrays', () => {
+    expectTypeOf<
+      ExactKeysOfArrayPath<{ name: string }[]>
+    >().toEqualTypeOf<never>();
+  });
+
+  test('should merge array-leading keys across object union members', () => {
+    expectTypeOf<
+      ExactKeysOfArrayPath<{ a: string[] } | { b: number[] }>
+    >().toEqualTypeOf<'a' | 'b'>();
+  });
+
+  test('should accept array fields present in only one union variant', () => {
+    expectTypeOf<
+      ExactKeysOfArrayPath<{ a: string[]; t: 'x' } | { name: string; t: 'y' }>
+    >().toEqualTypeOf<'a'>();
+  });
+
+  test('should return `never` for objects without array-leading keys', () => {
+    expectTypeOf<
+      ExactKeysOfArrayPath<{ a: string; b: number }>
+    >().toEqualTypeOf<never>();
+  });
+
+  test('should return `never` for primitives, `any`, `never`, and `unknown`', () => {
+    expectTypeOf<ExactKeysOfArrayPath<string>>().toEqualTypeOf<never>();
+    expectTypeOf<ExactKeysOfArrayPath<number>>().toEqualTypeOf<never>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectTypeOf<ExactKeysOfArrayPath<any>>().toEqualTypeOf<never>();
+    expectTypeOf<ExactKeysOfArrayPath<never>>().toEqualTypeOf<never>();
+    expectTypeOf<ExactKeysOfArrayPath<unknown>>().toEqualTypeOf<never>();
+  });
+});
+
+describe('PropertiesOfArrayPath', () => {
+  test('should return only the array-leading properties of an object', () => {
+    expectTypeOf<
+      PropertiesOfArrayPath<{ a: string[]; b: number }>
+    >().toEqualTypeOf<{ a: string[] }>();
+  });
+
+  test('should return multiple array-leading properties', () => {
+    expectTypeOf<
+      PropertiesOfArrayPath<{ a: string[]; b: number[]; c: string }>
+    >().toEqualTypeOf<{ a: string[]; b: number[] }>();
+  });
+
+  test('should return properties whose values contain nested arrays', () => {
+    expectTypeOf<
+      PropertiesOfArrayPath<{ a: { b: string[] }; c: number }>
+    >().toEqualTypeOf<{ a: { b: string[] } }>();
+  });
+
+  test('should return array-leading tuple positions', () => {
+    expectTypeOf<
+      PropertiesOfArrayPath<[string[], number, boolean[]]>
+    >().toEqualTypeOf<{ 0: string[]; 2: boolean[] }>();
+  });
+
+  test('should merge array-leading properties across object union members', () => {
+    expectTypeOf<
+      PropertiesOfArrayPath<{ a: string[] } | { b: number[] }>
+    >().toEqualTypeOf<{ a: string[]; b: number[] }>();
+  });
+
+  test('should union value types for array-leading keys shared across union members', () => {
+    expectTypeOf<
+      PropertiesOfArrayPath<{ a: string[] } | { a: number[] }>
+    >().toEqualTypeOf<{ a: string[] | number[] }>();
+  });
+
+  test('should produce `{}` for objects without array-leading keys', () => {
+    expectTypeOf<
+      PropertiesOfArrayPath<{ a: string; b: number }>
+    >().toEqualTypeOf<{}>();
+  });
+
+  test('should produce `{}` for primitives and non-indexable types', () => {
+    expectTypeOf<PropertiesOfArrayPath<string>>().toEqualTypeOf<{}>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectTypeOf<PropertiesOfArrayPath<any>>().toEqualTypeOf<{}>();
+    expectTypeOf<PropertiesOfArrayPath<never>>().toEqualTypeOf<{}>();
+    expectTypeOf<PropertiesOfArrayPath<unknown>>().toEqualTypeOf<{}>();
   });
 });
 
@@ -192,76 +386,5 @@ describe('ValidArrayPath', () => {
         ['rows', number, 'tags']
       >
     >().toEqualTypeOf<['rows', number, 'tags']>();
-  });
-});
-
-describe('PathValue', () => {
-  test('should extract the value type at a simple path', () => {
-    expectTypeOf<
-      PathValue<{ name: string }, ['name']>
-    >().toEqualTypeOf<string>();
-  });
-
-  test('should extract the value type through a union', () => {
-    expectTypeOf<
-      PathValue<
-        { data: { type: 'a'; name: string } | { type: 'b'; name: number } },
-        ['data', 'name']
-      >
-    >().toEqualTypeOf<string | number>();
-  });
-
-  test('should extract an array element type', () => {
-    expectTypeOf<
-      PathValue<{ items: { id: number }[] }, ['items', 0, 'id']>
-    >().toEqualTypeOf<number>();
-  });
-
-  test('should extract a whole array when path stops at the array field', () => {
-    expectTypeOf<
-      PathValue<{ items: { id: number }[] }, ['items']>
-    >().toEqualTypeOf<{ id: number }[]>();
-  });
-
-  test('should extract a tuple element by index', () => {
-    expectTypeOf<
-      PathValue<{ coords: [number, string] }, ['coords', 1]>
-    >().toEqualTypeOf<string>();
-  });
-
-  test('should strip optionality from intermediate fields', () => {
-    expectTypeOf<
-      PathValue<{ profile?: { name: string } }, ['profile', 'name']>
-    >().toEqualTypeOf<string>();
-  });
-
-  test('should preserve nullability at the leaf', () => {
-    expectTypeOf<PathValue<{ name: string | null }, ['name']>>().toEqualTypeOf<
-      string | null
-    >();
-  });
-
-  test('should return unknown for an invalid path', () => {
-    expectTypeOf<
-      PathValue<{ name: string }, ['wrong']>
-    >().toEqualTypeOf<unknown>();
-  });
-
-  test('should preserve `| undefined` when navigating to an optional field with explicit undefined (issue #15, v.optional case)', () => {
-    expectTypeOf<
-      PathValue<{ group?: { name: string } | undefined }, ['group']>
-    >().toEqualTypeOf<{ name: string } | undefined>();
-  });
-
-  test('should preserve `| undefined` for nullish leaf values (issue #15, v.nullish case)', () => {
-    expectTypeOf<
-      PathValue<{ group?: { name: string } | null | undefined }, ['group']>
-    >().toEqualTypeOf<{ name: string } | null | undefined>();
-  });
-
-  test('should produce the exact value at an optional field without adding undefined (v.exactOptional case)', () => {
-    expectTypeOf<
-      PathValue<{ group?: { name: string } }, ['group']>
-    >().toEqualTypeOf<{ name: string }>();
   });
 });

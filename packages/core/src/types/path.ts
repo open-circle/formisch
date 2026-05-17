@@ -98,7 +98,7 @@ type IsOrHasArray<TValue> = true extends (
 /**
  * Extracts the exact keys of a tuple, array or object that contain arrays.
  */
-type ExactKeysOfArrayPath<TValue> =
+export type ExactKeysOfArrayPath<TValue> =
   IsAny<TValue> extends true
     ? never
     : TValue extends readonly (infer TItem)[]
@@ -124,6 +124,21 @@ type ExactKeysOfArrayPath<TValue> =
         : never;
 
 /**
+ * Returns the flat object of indexable properties of `TValue` whose values
+ * are or contain arrays. Mirrors `PropertiesOf` but keyed by
+ * `ExactKeysOfArrayPath` so the lookup is provably valid for array-path
+ * navigation in `LazyArrayPath`.
+ */
+export type PropertiesOfArrayPath<TValue> = {
+  [TKey in ExactKeysOfArrayPath<TValue>]: TValue extends Record<
+    TKey,
+    infer TItem
+  >
+    ? TItem
+    : never;
+};
+
+/**
  * Lazily evaluates only the first valid array path segment based on the given value.
  */
 type LazyArrayPath<
@@ -138,12 +153,11 @@ type LazyArrayPath<
       : readonly [...TValidPath, ExactKeysOfArrayPath<TValue>]
     : // If first key of path to check is valid, continue with next key
       TPathToCheck extends readonly [
-          infer TFirstKey extends ExactKeysOfArrayPath<TValue> &
-            ExactKeysOf<TValue>,
+          infer TFirstKey extends ExactKeysOfArrayPath<TValue> & PathKey,
           ...infer TPathRest extends Path,
         ]
       ? LazyArrayPath<
-          Required<PropertiesOf<TValue>[TFirstKey]>,
+          Required<PropertiesOfArrayPath<TValue>[TFirstKey]>,
           TPathRest,
           readonly [...TValidPath, TFirstKey]
         >
