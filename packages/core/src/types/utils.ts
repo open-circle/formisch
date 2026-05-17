@@ -14,10 +14,9 @@ export type IsNever<T> = [T] extends [never] ? true : false;
 export type MaybePromise<T> = T | Promise<T>;
 
 /**
- * Extracts the index-style keys of a tuple, array or object. Tuples return
- * their literal numeric indices, dynamic arrays return `number`, objects
- * return their `string | number` keys (symbols excluded), and any other
- * input returns `never`.
+ * Extracts the exact keys of a tuple, array or object. Tuples return their
+ * literal numeric indices, dynamic arrays return `number`, objects return
+ * their `keyof` keys, and any other input returns `never`.
  */
 export type ExactKeysOf<TValue> =
   IsAny<TValue> extends true
@@ -30,8 +29,8 @@ export type ExactKeysOf<TValue> =
               ? TIndex
               : never;
           }[number]
-      : TValue extends Record<string, unknown>
-        ? keyof TValue & (string | number)
+      : TValue extends Record<PropertyKey, unknown>
+        ? keyof TValue
         : never;
 
 /**
@@ -91,31 +90,35 @@ type EnsureKeyOrder<TValue> = { [TKey in keyof TValue]?: unknown };
  * narrow input typings for `v.optional`/`v.nullish` schemas (issue #15).
  */
 export type ExactRequired<TValue> =
-  TValue extends Record<PropertyKey, unknown>
-    ? // If `exactOptionalPropertyTypes` is `true`, the built-in
-      // `Required<TValue>` already preserves the exact value of optional
-      // properties, so we can delegate directly to it.
-      IsExactOptionalProps extends true
-      ? Required<TValue>
-      : // If `exactOptionalPropertyTypes` is `false`, we check if the object
-        // has any optional keys. If not, we can return the type as-is without
-        // the overhead of the split-and-recombine.
-        OptionalKeys<TValue> extends never
-        ? TValue
-        : // Otherwise, we split the object into required and optional keys, apply
-          // `Required<T>` to the optional keys to remove the `?` modifier, and
-          // re-add `| undefined` to preserve the loose optional semantics. The
-          // `EnsureKeyOrder` helper at the beginning ensures that the resulting
-          // properties are ordered in the same way as the input type.
-          Prettify<
-            EnsureKeyOrder<TValue> &
-              Pick<TValue, Exclude<keyof TValue, OptionalKeys<TValue>>> & {
-                [TKey in keyof Required<Pick<TValue, OptionalKeys<TValue>>>]:
-                  | Required<Pick<TValue, OptionalKeys<TValue>>>[TKey]
-                  | undefined;
-              }
-          >
-    : TValue;
+  // Guard arrays/tuples first — they satisfy the object check below but
+  // would be wrongly transformed by the loose-mode branch otherwise.
+  TValue extends readonly unknown[]
+    ? TValue
+    : TValue extends Record<PropertyKey, unknown>
+      ? // If `exactOptionalPropertyTypes` is `true`, the built-in
+        // `Required<TValue>` already preserves the exact value of optional
+        // properties, so we can delegate directly to it.
+        IsExactOptionalProps extends true
+        ? Required<TValue>
+        : // If `exactOptionalPropertyTypes` is `false`, we check if the object
+          // has any optional keys. If not, we can return the type as-is without
+          // the overhead of the split-and-recombine.
+          OptionalKeys<TValue> extends never
+          ? TValue
+          : // Otherwise, we split the object into required and optional keys, apply
+            // `Required<T>` to the optional keys to remove the `?` modifier, and
+            // re-add `| undefined` to preserve the loose optional semantics. The
+            // `EnsureKeyOrder` helper at the beginning ensures that the resulting
+            // properties are ordered in the same way as the input type.
+            Prettify<
+              EnsureKeyOrder<TValue> &
+                Pick<TValue, Exclude<keyof TValue, OptionalKeys<TValue>>> & {
+                  [TKey in keyof Required<Pick<TValue, OptionalKeys<TValue>>>]:
+                    | Required<Pick<TValue, OptionalKeys<TValue>>>[TKey]
+                    | undefined;
+                }
+            >
+      : TValue;
 
 /**
  * Makes all properties deeply optional.
