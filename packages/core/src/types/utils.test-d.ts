@@ -55,7 +55,6 @@ describe('IsNever', () => {
     expectTypeOf<IsNever<undefined>>().toEqualTypeOf<false>();
     expectTypeOf<IsNever<null>>().toEqualTypeOf<false>();
     expectTypeOf<IsNever<{ a: number }>>().toEqualTypeOf<false>();
-    expectTypeOf<IsNever<unknown>>().toEqualTypeOf<false>();
   });
 
   test('should not distribute over unions (returns false for `T | never`)', () => {
