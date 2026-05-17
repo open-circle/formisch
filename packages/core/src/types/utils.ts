@@ -29,46 +29,55 @@ type OptionalKeys<TValue> = {
 type Prettify<TObject> = { [TKey in keyof TObject]: TObject[TKey] } & {};
 
 /**
- * Detects whether the consuming project is compiled with
- * `exactOptionalPropertyTypes: false`. Under loose mode the built-in
- * `Required<T>` strips `| undefined` from optional properties, so
- * `Required<{ k?: undefined }>['k']` collapses to `never` — under strict
- * mode the same expression yields `undefined`.
+ * Detects whether the consuming project is configured with
+ * `exactOptionalPropertyTypes: true`.
+ *
+ * Hint: If `false` the built-in `Required<T>` strips `| undefined` from
+ * optional properties, so `Required<{ key?: undefined }>['key']` collapses
+ * to `never` — under strict mode the same expression yields `undefined`.
  */
-type IsLooseMode = Required<{ k?: undefined }>['k'] extends never
-  ? true
-  : false;
+type IsExactOptionalProps = Required<{ key?: undefined }>['key'] extends never
+  ? false
+  : true;
 
 /**
- * Removes the optional `?` modifier from properties while preserving the
- * value type — including any `| undefined` the schema author wrote
- * explicitly.
- *
- * Hint: Strict and loose `exactOptionalPropertyTypes` modes treat optional
- * properties differently. Under strict mode, `Required<Pick<T, K>>[K]`
- * already returns the precise value (with or without `| undefined`
- * depending on what the schema author wrote), so we leave it alone — which
- * lets `v.exactOptional(...)` keep its "must be `T`, never `undefined`"
- * meaning and `v.optional(...)` keep its "may be `undefined`" meaning.
- * Under loose mode the distinction is erased by the compiler before we see
- * it, so we default to adding `| undefined` — this matches how the
- * consumer's TypeScript already treats optional access in loose mode, and
- * it preserves `| undefined` for `v.nullish`/`v.optional` (issue #15). The
- * outer conditionals short-circuit arrays and non-object types so
- * primitives and arrays pass through unchanged.
+ * Helper type used in the beginning of an intersection to ensure that the
+ * properties of the resulting type are ordered in the same way as the input
+ * type. This is purely cosmetic and has no effect on the resulting type.
  */
-export type ExactRequired<TValue> = TValue extends readonly unknown[]
-  ? TValue
-  : TValue extends object
-    ? OptionalKeys<TValue> extends never
-      ? TValue
-      : Prettify<
-          Pick<TValue, Exclude<keyof TValue, OptionalKeys<TValue>>> & {
-            [TKey in keyof Required<Pick<TValue, OptionalKeys<TValue>>>]:
-              | Required<Pick<TValue, OptionalKeys<TValue>>>[TKey]
-              | (IsLooseMode extends true ? undefined : never);
-          }
-        >
+type EnsureKeyOrder<TValue> = { [TKey in keyof TValue]?: unknown };
+
+/**
+ * Like the built-in `Required<T>`, but keeps `| undefined` in the value
+ * type for optional properties even when `exactOptionalPropertyTypes` is
+ * `false` — `Required<T>` strips it in that mode, which would otherwise
+ * narrow input typings for `v.optional`/`v.nullish` schemas (issue #15).
+ */
+export type ExactRequired<TValue> =
+  TValue extends Record<PropertyKey, unknown>
+    ? // If `exactOptionalPropertyTypes` is `true`, the built-in
+      // `Required<TValue>` already preserves the exact value of optional
+      // properties, so we can delegate directly to it.
+      IsExactOptionalProps extends true
+      ? Required<TValue>
+      : // If `exactOptionalPropertyTypes` is `false`, we check if the object
+        // has any optional keys. If not, we can return the type as-is without
+        // the overhead of the split-and-recombine.
+        OptionalKeys<TValue> extends never
+        ? TValue
+        : // Otherwise, we split the object into required and optional keys, apply
+          // `Required<T>` to the optional keys to remove the `?` modifier, and
+          // re-add `| undefined` to preserve the loose optional semantics. The
+          // `EnsureKeyOrder` helper at the beginning ensures that the resulting
+          // properties are ordered in the same way as the input type.
+          Prettify<
+            EnsureKeyOrder<TValue> &
+              Pick<TValue, Exclude<keyof TValue, OptionalKeys<TValue>>> & {
+                [TKey in keyof Required<Pick<TValue, OptionalKeys<TValue>>>]:
+                  | Required<Pick<TValue, OptionalKeys<TValue>>>[TKey]
+                  | undefined;
+              }
+          >
     : TValue;
 
 /**
