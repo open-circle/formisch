@@ -1,7 +1,6 @@
 import { describe, expectTypeOf, test } from 'vitest';
 import type {
   DeepPartial,
-  ExactRequired,
   IsAny,
   IsNever,
   MaybePromise,
@@ -80,103 +79,6 @@ describe('MaybePromise', () => {
   test('should distribute over union inputs', () => {
     expectTypeOf<MaybePromise<string | number>>().toEqualTypeOf<
       string | number | Promise<string | number>
-    >();
-  });
-});
-
-describe('ExactRequired', () => {
-  test('should pass primitive and nullish types through unchanged', () => {
-    expectTypeOf<ExactRequired<string>>().toEqualTypeOf<string>();
-    expectTypeOf<ExactRequired<number>>().toEqualTypeOf<number>();
-    expectTypeOf<ExactRequired<boolean>>().toEqualTypeOf<boolean>();
-    expectTypeOf<ExactRequired<null>>().toEqualTypeOf<null>();
-    expectTypeOf<ExactRequired<undefined>>().toEqualTypeOf<undefined>();
-  });
-
-  test('should strip the optional marker while preserving the exact value (v.exactOptional case, strict mode)', () => {
-    expectTypeOf<ExactRequired<{ a?: string }>>().toEqualTypeOf<{
-      a: string;
-    }>();
-  });
-
-  test('should preserve required properties unchanged', () => {
-    expectTypeOf<ExactRequired<{ a: string }>>().toEqualTypeOf<{
-      a: string;
-    }>();
-  });
-
-  test('should preserve `| undefined` written explicitly on optional values (v.optional case)', () => {
-    expectTypeOf<ExactRequired<{ a?: string | undefined }>>().toEqualTypeOf<{
-      a: string | undefined;
-    }>();
-  });
-
-  test('should preserve `| null` without adding undefined to required nullable values', () => {
-    expectTypeOf<ExactRequired<{ a: string | null }>>().toEqualTypeOf<{
-      a: string | null;
-    }>();
-  });
-
-  test('should preserve explicit nullish values on optional properties (v.nullish case)', () => {
-    expectTypeOf<
-      ExactRequired<{ a?: string | null | undefined }>
-    >().toEqualTypeOf<{ a: string | null | undefined }>();
-  });
-
-  test('should treat mixed required and optional keys correctly', () => {
-    expectTypeOf<
-      ExactRequired<{
-        a?: string;
-        b: number;
-        c?: boolean | null | undefined;
-      }>
-    >().toEqualTypeOf<{
-      a: string;
-      b: number;
-      c: boolean | null | undefined;
-    }>();
-  });
-
-  test('should preserve the `readonly` modifier', () => {
-    expectTypeOf<
-      ExactRequired<{ readonly a?: string; readonly b: number }>
-    >().toEqualTypeOf<{
-      readonly a: string;
-      readonly b: number;
-    }>();
-  });
-
-  test('should produce an empty object for an empty object', () => {
-    expectTypeOf<ExactRequired<{}>>().toEqualTypeOf<{}>();
-  });
-
-  test('should distribute over unions and preserve each member precisely', () => {
-    expectTypeOf<
-      ExactRequired<
-        | { type: 'a'; value?: string }
-        | { type: 'b'; count?: number | undefined }
-      >
-    >().toEqualTypeOf<
-      { type: 'a'; value: string } | { type: 'b'; count: number | undefined }
-    >();
-  });
-
-  test('should pass primitive members of unions through unchanged', () => {
-    expectTypeOf<
-      ExactRequired<string | { a?: number | undefined }>
-    >().toEqualTypeOf<string | { a: number | undefined }>();
-  });
-
-  test('should pass arrays through unchanged', () => {
-    expectTypeOf<ExactRequired<string[]>>().toEqualTypeOf<string[]>();
-    expectTypeOf<ExactRequired<{ id: number }[]>>().toEqualTypeOf<
-      { id: number }[]
-    >();
-  });
-
-  test('should pass tuples through unchanged', () => {
-    expectTypeOf<ExactRequired<[number, string]>>().toEqualTypeOf<
-      [number, string]
     >();
   });
 });

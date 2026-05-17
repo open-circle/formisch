@@ -1,4 +1,4 @@
-import type { ExactRequired, IsAny, IsNever } from './utils.ts';
+import type { IsAny, IsNever } from './utils.ts';
 
 /**
  * Path key type.
@@ -86,6 +86,45 @@ export type ValidPath<TValue, TPath extends RequiredPath> =
   TPath extends LazyPath<Required<TValue>, TPath>
     ? TPath
     : LazyPath<Required<TValue>, TPath>;
+
+/**
+ * Detects whether the consuming project is configured with
+ * `exactOptionalPropertyTypes: true`.
+ *
+ * Hint: If `false` the built-in `Required<T>` strips `| undefined` from
+ * optional properties, so `Required<{ key?: undefined }>['key']` collapses
+ * to `never` — under strict mode the same expression yields `undefined`.
+ */
+type IsExactOptionalProps = Required<{ key?: undefined }>['key'] extends never
+  ? false
+  : true;
+
+/**
+ * Like the built-in `Required<T>`, but preserves `| undefined` in two
+ * places where `Required<T>` strips it:
+ *
+ * 1. Optional property values under `exactOptionalPropertyTypes: false`
+ *    — without this, input typings for `v.optional`/`v.nullish` schemas
+ *    narrow incorrectly (issue #15).
+ * 2. Array/tuple element types — e.g. `(string | undefined)[]` stays
+ *    `(string | undefined)[]` instead of becoming `string[]`. Arrays
+ *    fall through unchanged because they only have a numeric index
+ *    signature and don't structurally extend `Record<PropertyKey,
+ *    unknown>` (which requires string keys).
+ */
+export type ExactRequired<TValue> =
+  TValue extends Record<PropertyKey, unknown>
+    ? IsExactOptionalProps extends true
+      ? // Under `exactOptionalPropertyTypes: true`, `Required<T>` already
+        // preserves the exact value of optional properties — delegate to it
+        // so `v.exactOptional` keeps "must be `T`, never `undefined`".
+        Required<TValue>
+      : // Under loose mode, `Required<T>` strips `| undefined`. Re-derive
+        // it via indexed access: `TValue[TKey]` on an optional key gives
+        // `T | undefined` regardless of mode. Iterating `keyof Required<T>`
+        // remains homomorphic over `TValue`, so `readonly` is preserved.
+        { [TKey in keyof Required<TValue>]: TValue[TKey] }
+    : TValue;
 
 /**
  * Extracts the value type at the given path.
