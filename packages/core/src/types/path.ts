@@ -18,7 +18,7 @@ export type RequiredPath = readonly [PathKey, ...Path];
 /**
  * Extracts the exact keys of a tuple, array or object.
  */
-type KeyOf<TValue> =
+type ExactKeysOf<TValue> =
   IsAny<TValue> extends true
     ? never
     : TValue extends readonly unknown[]
@@ -30,18 +30,20 @@ type KeyOf<TValue> =
               : never;
           }[number]
       : TValue extends Record<string, unknown>
-        ? keyof TValue & PathKey
+        ? keyof TValue
         : never;
 
 /**
- * Merges array and object unions into a single object.
+ * Returns the flat object of all indexable properties of `TValue`. For object
+ * unions, properties from every member are merged so that any single property
+ * is accessible. For primitives and non-indexable types, the result is `{}`.
  *
- * Hint: This is necessary to make any property accessible. By default,
- * properties that do not exist in all union options are not accessible
- * and result in "any" when accessed.
+ * Hint: This is necessary to make properties accessible across union members.
+ * By default, properties that do not exist in all union options are not
+ * accessible and result in "any" when accessed.
  */
-type MergeUnion<TValue> = {
-  [TKey in KeyOf<TValue>]: TValue extends Record<TKey, infer TItem>
+type PropertiesOf<TValue> = {
+  [TKey in ExactKeysOf<TValue>]: TValue extends Record<TKey, infer TItem>
     ? TItem
     : never;
 };
@@ -59,17 +61,17 @@ type LazyPath<
     ? TValidPath
     : // If first key of path to check is valid, continue with next key
       TPathToCheck extends readonly [
-          infer TFirstKey extends KeyOf<TValue>,
+          infer TFirstKey extends ExactKeysOf<TValue> & PathKey,
           ...infer TPathRest extends Path,
         ]
       ? LazyPath<
-          Required<MergeUnion<TValue>[TFirstKey]>,
+          Required<PropertiesOf<TValue>[TFirstKey]>,
           TPathRest,
           readonly [...TValidPath, TFirstKey]
         >
       : // If current value has valid keys, return them
-        IsNever<KeyOf<TValue>> extends false
-        ? readonly [...TValidPath, KeyOf<TValue>]
+        IsNever<ExactKeysOf<TValue>> extends false
+        ? readonly [...TValidPath, ExactKeysOf<TValue>]
         : // Otherwise, return only last valid path
           TValidPath;
 
@@ -89,53 +91,41 @@ export type PathValue<TValue, TPath extends Path> = TPath extends readonly [
   infer TKey,
   ...infer TRest extends Path,
 ]
-  ? TKey extends KeyOf<ExactRequired<TValue>>
-    ? PathValue<MergeUnion<ExactRequired<TValue>>[TKey], TRest>
+  ? TKey extends ExactKeysOf<ExactRequired<TValue>>
+    ? PathValue<PropertiesOf<ExactRequired<TValue>>[TKey], TRest>
     : unknown
   : TValue;
 
 /**
  * Checks whether a value is an array or contains one anywhere in its shape.
  *
- * Hint: Distributes the predicate over union members
- * (`TValue extends unknown ? ...`) so that variants, optional wrappers, and
- * unions mixed with primitives are all handled uniformly. The outer
- * `true extends ...` collapses the resulting `true | false` back to a
- * definite `true`/`false`, which downstream types like `KeyOfArrayPath` rely
- * on when checking `extends true`.
+ * Hint: The inner conditionals (`TValue extends readonly unknown[]` and
+ * `TValue extends Record<string, unknown>`) distribute over union members,
+ * so the inner expression returns the union of each member's result (e.g.
+ * `true | false` when some members contain arrays and others don't).
+ * Downstream code uses `IsOrHasArray<T> extends true`, but
+ * `boolean extends true` is `false` — so we collapse the result via
+ * `true extends ...`, which is `true` whenever at least one union member
+ * contributed `true`.
  */
 type IsOrHasArray<TValue> = true extends (
-  TValue extends unknown ? IsOrHasArrayInner<TValue> : never
-)
-  ? true
-  : false;
-
-/**
- * Per-member step of `IsOrHasArray`. Assumes `TValue` is a single
- * (non-union) type; distribution over unions is handled by the public
- * wrapper.
- *
- * Hint: Recursion routes back through `IsOrHasArray` (not this helper) so
- * unions produced by indexed access — e.g. `T | undefined` from optional
- * properties — are redistributed at every level.
- */
-type IsOrHasArrayInner<TValue> =
   IsAny<TValue> extends true
     ? false
     : TValue extends readonly unknown[]
       ? true
       : TValue extends Record<string, unknown>
-        ? true extends {
+        ? {
             [TKey in keyof TValue]: IsOrHasArray<TValue[TKey]>;
           }[keyof TValue]
-          ? true
-          : false
-        : false;
+        : false
+)
+  ? true
+  : false;
 
 /**
  * Extracts the exact keys of a tuple, array or object that contain arrays.
  */
-type KeyOfArrayPath<TValue> =
+type ExactKeysOfArrayPath<TValue> =
   IsAny<TValue> extends true
     ? never
     : TValue extends readonly (infer TItem)[]
@@ -152,13 +142,12 @@ type KeyOfArrayPath<TValue> =
           }[number]
       : TValue extends Record<string, unknown>
         ? {
-            [TKey in KeyOf<TValue>]: IsOrHasArray<
-              NonNullable<MergeUnion<TValue>[TKey]>
+            [TKey in keyof TValue]: IsOrHasArray<
+              NonNullable<TValue[TKey]>
             > extends true
               ? TKey
               : never;
-          }[KeyOf<TValue>] &
-            PathKey
+          }[keyof TValue]
         : never;
 
 /**
@@ -173,20 +162,20 @@ type LazyArrayPath<
   TPathToCheck extends readonly []
     ? TValue extends readonly unknown[]
       ? TValidPath
-      : readonly [...TValidPath, KeyOfArrayPath<TValue>]
+      : readonly [...TValidPath, ExactKeysOfArrayPath<TValue>]
     : // If first key of path to check is valid, continue with next key
       TPathToCheck extends readonly [
-          infer TFirstKey extends KeyOfArrayPath<TValue>,
+          infer TFirstKey extends ExactKeysOfArrayPath<TValue> & PathKey,
           ...infer TPathRest extends Path,
         ]
       ? LazyArrayPath<
-          Required<MergeUnion<TValue>[TFirstKey]>,
+          Required<PropertiesOf<TValue>[TFirstKey]>,
           TPathRest,
           readonly [...TValidPath, TFirstKey]
         >
       : // If current value has valid array keys, return them
-        IsNever<KeyOfArrayPath<TValue>> extends false
-        ? readonly [...TValidPath, KeyOfArrayPath<TValue>]
+        IsNever<ExactKeysOfArrayPath<TValue>> extends false
+        ? readonly [...TValidPath, ExactKeysOfArrayPath<TValue>]
         : // Otherwise, no valid array keys exist
           never;
 
