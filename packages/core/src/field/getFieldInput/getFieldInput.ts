@@ -1,16 +1,31 @@
 import type { InternalFieldStore } from '../../types/index.ts';
 
 /**
+ * Options for retrieving field input.
+ */
+export interface GetFieldInputOptions {
+  /**
+   * Whether to include only fields whose `isDirty` flag is set. Clean children
+   * are skipped during the recursive walk.
+   */
+  readonly dirtyOnly?: boolean;
+}
+
+/**
  * Returns the current input of the field store. For arrays and objects,
  * recursively collects input from all children. Returns `null` or `undefined`
  * for nullish array/object inputs, or the primitive value for value fields.
  *
  * @param internalFieldStore The field store to get input from.
+ * @param config Options to filter the collected input (e.g. `dirtyOnly`).
  *
  * @returns The field input.
  */
 // @__NO_SIDE_EFFECTS__
-export function getFieldInput(internalFieldStore: InternalFieldStore): unknown {
+export function getFieldInput(
+  internalFieldStore: InternalFieldStore,
+  config?: GetFieldInputOptions
+): unknown {
   // If field store is array, collect input from children
   if (internalFieldStore.kind === 'array') {
     // If array input is not nullish, build array from children
@@ -24,7 +39,10 @@ export function getFieldInput(internalFieldStore: InternalFieldStore): unknown {
         index < internalFieldStore.items.value.length;
         index++
       ) {
-        value[index] = getFieldInput(internalFieldStore.children[index]);
+        const child = internalFieldStore.children[index];
+        if (!config?.dirtyOnly || child.isDirty.value) {
+          value[index] = getFieldInput(child, config);
+        }
       }
       return value;
     }
@@ -42,7 +60,10 @@ export function getFieldInput(internalFieldStore: InternalFieldStore): unknown {
 
       // Collect input from each object property
       for (const key in internalFieldStore.children) {
-        value[key] = getFieldInput(internalFieldStore.children[key]);
+        const child = internalFieldStore.children[key];
+        if (!config?.dirtyOnly || child.isDirty.value) {
+          value[key] = getFieldInput(child, config);
+        }
       }
       return value;
     }

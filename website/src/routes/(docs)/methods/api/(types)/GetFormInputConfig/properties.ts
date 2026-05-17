@@ -5,4 +5,11 @@ export const properties: Record<string, PropertyProps> = {
     type: 'undefined',
     default: 'undefined',
   },
+  dirtyOnly: {
+    type: 'boolean',
+    default: {
+      type: 'boolean',
+      value: false,
+    },
+  },
 };

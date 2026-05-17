@@ -41,4 +41,11 @@ export const properties: Record<string, PropertyProps> = {
       ],
     },
   },
+  dirtyOnly: {
+    type: 'boolean',
+    default: {
+      type: 'boolean',
+      value: false,
+    },
+  },
 };

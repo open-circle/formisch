@@ -19,6 +19,11 @@ export interface GetFormInputConfig {
    * The path to a field. Leave undefined to get the entire form input.
    */
   readonly path?: undefined;
+  /**
+   * Whether to include only fields whose `isDirty` flag is set. Useful for
+   * submitting only the values that changed since the start input.
+   */
+  readonly dirtyOnly?: boolean;
 }
 
 /**
@@ -32,6 +37,11 @@ export interface GetFieldInputConfig<
    * The path to the field to retrieve input from.
    */
   readonly path: ValidPath<v.InferInput<TSchema>, TFieldPath>;
+  /**
+   * Whether to include only fields whose `isDirty` flag is set. Useful for
+   * submitting only the values that changed since the start input.
+   */
+  readonly dirtyOnly?: boolean;
 }
 
 /**
@@ -75,6 +85,7 @@ export function getInput(
   config?: GetFormInputConfig | GetFieldInputConfig<Schema, RequiredPath>
 ): unknown {
   return getFieldInput(
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL]
+    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
+    config?.dirtyOnly ? { dirtyOnly: true } : undefined
   );
 }

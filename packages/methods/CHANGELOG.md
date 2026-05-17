@@ -4,6 +4,7 @@ All notable changes to the library will be documented in this file.
 
 ## vX.X.X (Month DD, YYYY)
 
+- Add `dirtyOnly` option to `getInput` to retrieve only fields whose `isDirty` flag is set (issue #21)
 - Fix `reset` method to apply falsy and explicit `undefined` values when resetting the initial input of a specific field (issue #78)
 
 ## v0.7.1 (April 16, 2026)
