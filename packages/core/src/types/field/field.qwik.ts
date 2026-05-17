@@ -1,7 +1,7 @@
 import type { NoSerialize } from '@qwik.dev/core';
+import type { Schema } from '../schema/index.ts';
+import type { Signal } from '../signal/index.ts';
 import type { FieldElement } from './field.ts';
-import type { Schema } from './schema.ts';
-import type { Signal } from './signal.ts';
 
 /**
  * Internal base store interface.

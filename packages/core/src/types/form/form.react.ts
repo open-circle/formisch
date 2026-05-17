@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react';
 import type * as v from 'valibot';
-import type { Schema } from './schema.ts';
-import type { MaybePromise } from './utils.ts';
+import type { Schema } from '../schema/index.ts';
+import type { MaybePromise } from '../utils/index.ts';
 
 // Re-export all other types from the base form module
 export type {

@@ -1,5 +1,5 @@
-import type { Schema } from './schema.ts';
-import type { Signal } from './signal.ts';
+import type { Schema } from '../schema/index.ts';
+import type { Signal } from '../signal/index.ts';
 
 /**
  * Field element type.

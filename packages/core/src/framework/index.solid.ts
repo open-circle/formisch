@@ -1,5 +1,5 @@
 import { createSignal as signal } from 'solid-js';
-import type { Signal } from '../types/signal.ts';
+import type { Signal } from '../types/signal/index.ts';
 import type { Framework } from './index.ts';
 
 export { createUniqueId as createId, untrack, batch } from 'solid-js';

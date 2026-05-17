@@ -1,4 +1,4 @@
-import type { IsAny, IsNever } from './utils.ts';
+import type { IsAny, IsNever } from '../utils/index.ts';
 
 /**
  * Path key type.

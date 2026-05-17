@@ -1,20 +1,15 @@
+import type { QRL } from '@qwik.dev/core';
 import type * as v from 'valibot';
-import type { INTERNAL } from '../values.ts';
-import type { InternalObjectStore } from './field.ts';
-import type { Schema } from './schema.ts';
-import type { Signal } from './signal.ts';
-import type { DeepPartial, MaybePromise } from './utils.ts';
-
-/**
- * Validation mode type.
- */
-export type ValidationMode =
-  | 'initial'
-  | 'touch'
-  | 'input'
-  | 'change'
-  | 'blur'
-  | 'submit';
+import type { INTERNAL } from '../../values.ts';
+import type { InternalObjectStore } from '../field/field.qwik.ts';
+import type {
+  SubmitEventHandler,
+  SubmitHandler,
+  ValidationMode,
+} from './form.ts';
+import type { Schema } from '../schema/index.ts';
+import type { Signal } from '../signal/index.ts';
+import type { DeepPartial } from '../utils/index.ts';
 
 /**
  * Form config interface.
@@ -63,7 +58,7 @@ export interface InternalFormStore<TSchema extends Schema = Schema>
   /**
    * The parse function of the form.
    */
-  parse: (input: unknown) => Promise<v.SafeParseResult<TSchema>>;
+  parse: QRL<(input: unknown) => Promise<v.SafeParseResult<TSchema>>>;
 
   /**
    * The submitting state of the form.
@@ -91,17 +86,4 @@ export interface BaseFormStore<TSchema extends Schema = Schema> {
   readonly [INTERNAL]: InternalFormStore<TSchema>;
 }
 
-/**
- * Submit handler type.
- */
-export type SubmitHandler<TSchema extends Schema> = (
-  output: v.InferOutput<TSchema>
-) => MaybePromise<unknown>;
-
-/**
- * Submit event handler type.
- */
-export type SubmitEventHandler<TSchema extends Schema> = (
-  output: v.InferOutput<TSchema>,
-  event: SubmitEvent
-) => MaybePromise<unknown>;
+export type { ValidationMode, SubmitHandler, SubmitEventHandler };

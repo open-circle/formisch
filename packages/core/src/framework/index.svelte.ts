@@ -1,4 +1,4 @@
-import type { Signal } from '../types/signal.ts';
+import type { Signal } from '../types/signal/index.ts';
 import type { Framework } from './index.ts';
 
 export { untrack } from 'svelte';
