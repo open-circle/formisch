@@ -2,14 +2,14 @@ import type { QRL } from '@qwik.dev/core';
 import type * as v from 'valibot';
 import type { INTERNAL } from '../../values.ts';
 import type { InternalObjectStore } from '../field/field.qwik.ts';
+import type { Schema } from '../schema/index.ts';
+import type { Signal } from '../signal/index.ts';
+import type { DeepPartial } from '../utils/index.ts';
 import type {
   SubmitEventHandler,
   SubmitHandler,
   ValidationMode,
 } from './form.ts';
-import type { Schema } from '../schema/index.ts';
-import type { Signal } from '../signal/index.ts';
-import type { DeepPartial } from '../utils/index.ts';
 
 /**
  * Form config interface.
