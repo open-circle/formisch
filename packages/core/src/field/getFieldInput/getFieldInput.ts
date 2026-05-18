@@ -1,12 +1,14 @@
 import type { InternalFieldStore } from '../../types/index.ts';
+import { getFieldBool } from '../getFieldBool/getFieldBool.ts';
 
 /**
  * Options for retrieving field input.
  */
 export interface GetFieldInputOptions {
   /**
-   * Whether to include only fields whose `isDirty` flag is set. Clean children
-   * are skipped during the recursive walk.
+   * When true, fields whose subtree contains no dirty descendant return
+   * `undefined`. Object iterations omit clean keys; arrays are treated as
+   * atomic and are returned in full whenever any descendant is dirty.
    */
   readonly dirtyOnly?: boolean;
 }
@@ -26,6 +28,17 @@ export function getFieldInput(
   internalFieldStore: InternalFieldStore,
   config?: GetFieldInputOptions
 ): unknown {
+  // When `dirtyOnly`, bail with `undefined` for any subtree that contains
+  // no dirty descendant. This applies uniformly to values, arrays and
+  // objects. Inside arrays we still populate every item (atomic semantic)
+  // so undefined slots never appear in the output.
+  if (
+    config?.dirtyOnly &&
+    !getFieldBool(internalFieldStore, 'isDirty')
+  ) {
+    return undefined;
+  }
+
   // If field store is array, collect input from children
   if (internalFieldStore.kind === 'array') {
     // If array input is not nullish, build array from children
@@ -33,16 +46,15 @@ export function getFieldInput(
       // Create output array
       const value = [];
 
-      // Collect input from each array item
+      // Collect input from each array item. Once we enter an array, every
+      // item is fully populated regardless of dirty state — arrays are
+      // atomic in `dirtyOnly` mode.
       for (
         let index = 0;
         index < internalFieldStore.items.value.length;
         index++
       ) {
-        const child = internalFieldStore.children[index];
-        if (!config?.dirtyOnly || child.isDirty.value) {
-          value[index] = getFieldInput(child, config);
-        }
+        value[index] = getFieldInput(internalFieldStore.children[index]);
       }
       return value;
     }
@@ -61,7 +73,7 @@ export function getFieldInput(
       // Collect input from each object property
       for (const key in internalFieldStore.children) {
         const child = internalFieldStore.children[key];
-        if (!config?.dirtyOnly || child.isDirty.value) {
+        if (!config?.dirtyOnly || getFieldBool(child, 'isDirty')) {
           value[key] = getFieldInput(child, config);
         }
       }

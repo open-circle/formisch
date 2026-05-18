@@ -30,7 +30,7 @@ const input = getInput<TSchema, TFieldPath>(form, config);
 
 ### Explanation
 
-The `form` parameter is the form store to retrieve input from. The optional `config` parameter specifies which field to get input from - if omitted, returns input from the entire form. Set `dirtyOnly` to `true` to include only fields whose `isDirty` flag is `true`, which is useful for submitting only the values that changed since the start input.
+The `form` parameter is the form store to retrieve input from. The optional `config` parameter specifies which field to get input from - if omitted, returns input from the entire form. Set `dirtyOnly` to `true` to include only fields whose subtree contains a dirty descendant — object keys with no dirty descendant are omitted, while arrays are returned in full whenever any item is dirty. This is useful for submitting only the values that changed since the start input.
 
 ## Returns
 

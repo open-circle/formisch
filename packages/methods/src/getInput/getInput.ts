@@ -20,8 +20,10 @@ export interface GetFormInputConfig {
    */
   readonly path?: undefined;
   /**
-   * Whether to include only fields whose `isDirty` flag is set. Useful for
-   * submitting only the values that changed since the start input.
+   * Whether to include only fields whose subtree contains a dirty descendant.
+   * Object keys with no dirty descendant are omitted; arrays are returned in
+   * full whenever any descendant is dirty. Useful for submitting only the
+   * values that changed since the start input.
    */
   readonly dirtyOnly?: boolean;
 }
@@ -38,8 +40,10 @@ export interface GetFieldInputConfig<
    */
   readonly path: ValidPath<v.InferInput<TSchema>, TFieldPath>;
   /**
-   * Whether to include only fields whose `isDirty` flag is set. Useful for
-   * submitting only the values that changed since the start input.
+   * Whether to include only fields whose subtree contains a dirty descendant.
+   * Object keys with no dirty descendant are omitted; arrays are returned in
+   * full whenever any descendant is dirty. Useful for submitting only the
+   * values that changed since the start input.
    */
   readonly dirtyOnly?: boolean;
 }

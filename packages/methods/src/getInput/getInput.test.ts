@@ -1,4 +1,3 @@
-import type { InternalArrayStore } from '@formisch/core';
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
 import { createTestStore } from '../vitest/index.ts';
@@ -79,43 +78,42 @@ describe('getInput', () => {
   });
 
   describe('with dirtyOnly', () => {
-    test('should return empty object for a clean form', () => {
+    test('should return undefined for a clean form', () => {
       const store = createTestStore(
         v.object({ name: v.string(), age: v.number() }),
         { initialInput: { name: 'John', age: 25 } }
       );
 
-      expect(getInput(store, { dirtyOnly: true })).toStrictEqual({});
+      expect(getInput(store, { dirtyOnly: true })).toBeUndefined();
     });
 
     test('should return only the dirty key from a flat object', () => {
       const store = createTestStore(
         v.object({ name: v.string(), email: v.string() }),
-        { initialInput: { name: 'John', email: 'a@x.com' } }
+        { initialInput: { name: 'John', email: 'a@example.com' } }
       );
-      store.children.email.input.value = 'b@x.com';
+      store.children.email.input.value = 'b@example.com';
       store.children.email.isDirty.value = true;
 
       expect(getInput(store, { dirtyOnly: true })).toStrictEqual({
-        email: 'b@x.com',
+        email: 'b@example.com',
       });
     });
 
-    test('should return only dirty indices when array items are dirty', () => {
+    test('should return the full current array when any item is dirty', () => {
       const store = createTestStore(v.object({ items: v.array(v.string()) }), {
         initialInput: { items: ['a', 'b', 'c'] },
       });
-      const itemsArray = store.children.items as InternalArrayStore;
-      itemsArray.children[1].input.value = 'B';
-      itemsArray.children[1].isDirty.value = true;
-      itemsArray.isDirty.value = true;
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+      if (itemsStore.kind === 'array') {
+        itemsStore.children[1].input.value = 'B';
+        itemsStore.children[1].isDirty.value = true;
+      }
 
-      const result = getInput(store, { dirtyOnly: true }) as {
-        items: (string | undefined)[];
-      };
-      expect(result.items[1]).toBe('B');
-      expect(result.items[0]).toBeUndefined();
-      expect(result.items[2]).toBeUndefined();
+      expect(getInput(store, { dirtyOnly: true })).toStrictEqual({
+        items: ['a', 'B', 'c'],
+      });
     });
 
     test('should scope dirty filter to the given path', () => {
@@ -123,16 +121,94 @@ describe('getInput', () => {
         v.object({
           user: v.object({ email: v.string(), name: v.string() }),
         }),
-        { initialInput: { user: { email: 'a@x.com', name: 'John' } } }
+        { initialInput: { user: { email: 'a@example.com', name: 'John' } } }
       );
-      const user = store.children.user;
-      if (user.kind !== 'object') throw new Error('expected object');
-      user.children.email.input.value = 'b@x.com';
-      user.children.email.isDirty.value = true;
+      const userStore = store.children.user;
+      expect(userStore.kind).toBe('object');
+      if (userStore.kind === 'object') {
+        userStore.children.email.input.value = 'b@example.com';
+        userStore.children.email.isDirty.value = true;
+      }
 
       expect(
         getInput(store, { path: ['user'], dirtyOnly: true })
-      ).toStrictEqual({ email: 'b@x.com' });
+      ).toStrictEqual({ email: 'b@example.com' });
+    });
+
+    test('should return undefined for an object path with a fully clean subtree', () => {
+      const store = createTestStore(
+        v.object({
+          user: v.object({ email: v.string(), name: v.string() }),
+        }),
+        { initialInput: { user: { email: 'a@example.com', name: 'John' } } }
+      );
+
+      expect(
+        getInput(store, { path: ['user'], dirtyOnly: true })
+      ).toBeUndefined();
+    });
+
+    test('should return the dirty value for a value path that is dirty', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'John' },
+      });
+      store.children.name.input.value = 'Jane';
+      store.children.name.isDirty.value = true;
+
+      expect(getInput(store, { path: ['name'], dirtyOnly: true })).toBe('Jane');
+    });
+
+    test('should return undefined for a value path that is clean', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'John' },
+      });
+
+      expect(
+        getInput(store, { path: ['name'], dirtyOnly: true })
+      ).toBeUndefined();
+    });
+
+    test('should return undefined for an array path that is fully clean', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b', 'c'] },
+      });
+
+      expect(
+        getInput(store, { path: ['items'], dirtyOnly: true })
+      ).toBeUndefined();
+    });
+
+    test('should preserve clean fields of array items when an item is dirty', () => {
+      const store = createTestStore(
+        v.object({
+          users: v.array(v.object({ name: v.string(), age: v.number() })),
+        }),
+        {
+          initialInput: {
+            users: [
+              { name: 'John', age: 25 },
+              { name: 'Jane', age: 30 },
+            ],
+          },
+        }
+      );
+      const usersStore = store.children.users;
+      expect(usersStore.kind).toBe('array');
+      if (usersStore.kind === 'array') {
+        const user0 = usersStore.children[0];
+        expect(user0.kind).toBe('object');
+        if (user0.kind === 'object') {
+          user0.children.name.input.value = 'Johnny';
+          user0.children.name.isDirty.value = true;
+        }
+      }
+
+      expect(getInput(store, { dirtyOnly: true })).toStrictEqual({
+        users: [
+          { name: 'Johnny', age: 25 },
+          { name: 'Jane', age: 30 },
+        ],
+      });
     });
   });
 });
