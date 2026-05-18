@@ -27,7 +27,7 @@ A field is dirty when its current input differs from its start input. The form s
 Returns the dirty subtree of the form's input. Use it when you want to ship the values the user typed — typically for a PATCH endpoint that accepts the same shape as your form input.
 
 ```ts
-import { getDirtyInput, useForm, type SubmitHandler } from '@formisch/vue';
+import { getDirtyInput, type SubmitHandler, useForm } from '@formisch/vue';
 import * as v from 'valibot';
 
 const UserSchema = v.object({

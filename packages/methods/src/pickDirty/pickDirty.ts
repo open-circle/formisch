@@ -65,11 +65,7 @@ function pickFromField(
   // If field store is object, recurse only into dirty branches when the
   // value is a non-array object. Skip when shapes diverge.
   if (internalFieldStore.kind === 'object') {
-    if (
-      value === null ||
-      typeof value !== 'object' ||
-      Array.isArray(value)
-    ) {
+    if (value === null || typeof value !== 'object' || Array.isArray(value)) {
       return SKIP;
     }
     const result: Record<string, unknown> = {};

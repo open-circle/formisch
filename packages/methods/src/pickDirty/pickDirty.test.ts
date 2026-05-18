@@ -78,10 +78,9 @@ describe('pickDirty', () => {
   });
 
   test('should include a dirty leaf whose value is undefined', () => {
-    const store = createTestStore(
-      v.object({ name: v.optional(v.string()) }),
-      { initialInput: { name: 'John' } }
-    );
+    const store = createTestStore(v.object({ name: v.optional(v.string()) }), {
+      initialInput: { name: 'John' },
+    });
     store.children.name.input.value = undefined;
     store.children.name.isDirty.value = true;
 
