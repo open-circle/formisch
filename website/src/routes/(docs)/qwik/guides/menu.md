@@ -20,6 +20,7 @@
 - [Special inputs](/qwik/guides/special-inputs/)
 - [Controlled fields](/qwik/guides/controlled-fields/)
 - [Nested fields](/qwik/guides/nested-fields/)
+- [Dirty fields](/qwik/guides/dirty-fields/)
 - [Field arrays](/qwik/guides/field-arrays/)
 - [TypeScript](/qwik/guides/typescript/)
 - [Architecture](/qwik/guides/architecture/)

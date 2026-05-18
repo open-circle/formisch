@@ -1,0 +1,52 @@
+---
+title: getDirtyInput
+description: Retrieves only the dirty input values of a specific field or the entire form.
+source: /packages/methods/src/getDirtyInput/getDirtyInput.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Property } from '~/components';
+import { properties } from './properties';
+
+# getDirtyInput
+
+Retrieves only the dirty input values of a specific field or the entire form. Object keys whose subtree contains no dirty descendant are omitted; arrays are treated as atomic and returned in full whenever any descendant is dirty. Returns `undefined` if no field in the inspected subtree is dirty.
+
+```ts
+const input = getDirtyInput<TSchema>(form);
+const input = getDirtyInput<TSchema, TFieldPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+The `form` parameter is the form store to retrieve dirty input from. The optional `config` parameter scopes the result to a specific field path - if omitted, returns dirty input from the entire form. The returned value is a partial of the inspected input shape containing only the fields whose `isDirty` flag is set, which is useful for submitting only the values that changed since the start input. Arrays are treated as atomic — when any descendant of an array is dirty, the full current array is returned.
+
+Internally, the function walks the form's field tree and asks `getFieldBool` whether each branch contains a dirty descendant. Because that check is itself recursive, the cost is effectively linear in field count for typical balanced forms (shallow and wide) and degrades toward `O(N²)` for deeply nested trees. Call this method from submit or blur handlers rather than from tight reactive loops on large forms.
+
+## Returns
+
+- `result` <Property {...properties.result} />
+
+## Related
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'getDirtyPaths', href: '../getDirtyPaths/' },
+    { text: 'getInput', href: '../getInput/' },
+    { text: 'pickDirty', href: '../pickDirty/' },
+    { text: 'reset', href: '../reset/' },
+  ]}
+/>

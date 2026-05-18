@@ -1,0 +1,51 @@
+---
+title: getDirtyPaths
+description: Returns the paths of dirty fields in a form.
+source: /packages/methods/src/getDirtyPaths/getDirtyPaths.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Property } from '~/components';
+import { properties } from './properties';
+
+# getDirtyPaths
+
+Returns a list of paths to dirty fields in the form. Object branches are recursed into; arrays are treated as atomic — when any descendant of an array is dirty, only the array's own path is returned.
+
+```ts
+const paths = getDirtyPaths<TSchema>(form);
+const paths = getDirtyPaths<TSchema, TFieldPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+The `form` parameter is the form store to inspect. The optional `config` parameter scopes the search to a single subtree via its `path` property. Object branches are recursed into and clean keys are omitted; arrays are atomic, so when any descendant of an array is dirty, the result includes the array's own path rather than the paths of its individual items. Returns an empty array if the inspected subtree contains no dirty fields. When the inspected target is itself a dirty array or value (for example a form whose root schema is `v.array(...)`), the result contains its path — which is the empty array for the form root and so cannot be passed back into another path-scoped method without a length check.
+
+Internally, the function walks the form's field tree and asks `getFieldBool` whether each branch contains a dirty descendant. Because that check is itself recursive, the cost is effectively linear in field count for typical balanced forms (shallow and wide) and degrades toward `O(N²)` for deeply nested trees. Call this method from submit or blur handlers rather than from tight reactive loops on large forms.
+
+## Returns
+
+- `result` <Property {...properties.result} />
+
+## Related
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'getDirtyInput', href: '../getDirtyInput/' },
+    { text: 'getInput', href: '../getInput/' },
+    { text: 'pickDirty', href: '../pickDirty/' },
+  ]}
+/>

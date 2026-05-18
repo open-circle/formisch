@@ -1,0 +1,25 @@
+---
+title: GetFormDirtyPathsConfig
+description: Configuration interface for inspecting form-level dirty paths.
+source: /packages/methods/src/getDirtyPaths/getDirtyPaths.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Property } from '~/components';
+import { properties } from './properties';
+
+# GetFormDirtyPathsConfig
+
+Configuration interface for inspecting form-level dirty paths. Used by the `getDirtyPaths` method when no specific field path is provided.
+
+## Definition
+
+- `GetFormDirtyPathsConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'getDirtyPaths', href: '../getDirtyPaths/' }]} />

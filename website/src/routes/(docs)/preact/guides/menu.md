@@ -20,6 +20,7 @@
 - [Special inputs](/preact/guides/special-inputs/)
 - [Controlled fields](/preact/guides/controlled-fields/)
 - [Nested fields](/preact/guides/nested-fields/)
+- [Dirty fields](/preact/guides/dirty-fields/)
 - [Field arrays](/preact/guides/field-arrays/)
 - [TypeScript](/preact/guides/typescript/)
 - [Architecture](/preact/guides/architecture/)

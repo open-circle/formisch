@@ -1,3 +1,4 @@
+export * from './getDirtyFieldInput/index.ts';
 export * from './getElementInput/index.ts';
 export * from './getFieldBool/index.ts';
 export * from './getFieldInput/index.ts';
