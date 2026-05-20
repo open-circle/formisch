@@ -4,6 +4,7 @@
 
 - [Introduction](/svelte/guides/introduction/)
 - [Installation](/svelte/guides/installation/)
+- [Comparison](/svelte/guides/comparison/)
 - [LLMs.txt](/svelte/guides/llms-txt/)
 
 ## Main concepts

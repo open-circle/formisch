@@ -1,0 +1,47 @@
+---
+title: Comparison
+description: >-
+  A concise comparison of Formisch with Superforms and TanStack Form for
+  Svelte across TypeScript inference, validation, and reactivity, with a
+  short decision guide.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Comparison
+
+Formisch is one of several form libraries available for Svelte. The two most common alternatives are [Superforms](https://superforms.rocks) and [TanStack Form](https://tanstack.com/form/latest). This page is meant as a quick reference for picking the right tool.
+
+## At a glance
+
+|                        | **Formisch**                            | Superforms                           | TanStack Form                           |
+| ---------------------- | --------------------------------------- | ------------------------------------ | --------------------------------------- |
+| Type source            | Inferred from schema                    | Inferred from schema                 | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                       | Defined in schema                    | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`     | Configurable per form / event        | Per-validator trigger                   |
+| Async validation       | Built-in via schema                     | Built-in (client + server)           | Built-in `isValidating`                 |
+| Reactivity scope       | Fine-grained per rune                   | Per Svelte store / rune              | Per subscription                        |
+| Schema libraries       | Valibot                                 | Zod, Valibot, Yup, ArkType, …        | Standard Schema                         |
+| Server integration     | Client-only (SvelteKit support planned) | First-class (SvelteKit form actions) | Client-only                             |
+| Bundle size (min+gzip) | From ~2.5 kB                            | ~20 kB                               | ~15 kB                                  |
+| Framework support      | React, Preact, Solid, Svelte, Vue, Qwik | Svelte / SvelteKit                   | React, Vue, Solid, Svelte, Lit, Angular |
+
+The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and reactivity.
+
+## Which library should you use?
+
+**Superforms** is the strongest choice when forms are tightly coupled to SvelteKit's server form actions. It supports unified client and server validation, progressive enhancement, and a wide range of schema libraries through Standard Schema. If SvelteKit is doing the heavy lifting on the server, Superforms fits naturally.
+
+**TanStack Form** is a good fit when you need fine-grained control over validation timing and built-in async validation handling without building that infrastructure yourself. It is also the natural choice if your team is already invested in the TanStack ecosystem and values a consistent mental model across data fetching, routing, and forms.
+
+**Formisch** makes the most sense for new projects in TypeScript-heavy codebases, especially when you expect forms to grow in complexity. The schema-first design means there is a single source of truth for types, runtime validation, and form structure, so there is less to keep aligned over time. Reactivity is fine-grained through Svelte 5 runes. The main considerations are that Formisch currently supports only [Valibot](https://valibot.dev) as the schema library, and is presently a client-side form layer — dedicated SvelteKit integration is planned for one of the next releases.
+
+## Migrating from Superforms
+
+Migrating from Superforms to Formisch is not a drop-in replacement. Superforms is built around SvelteKit's server form actions, while Formisch is a pure client-side form layer. Migration typically means moving validation and submission out of `+page.server.ts` actions into client-side handlers, or wiring server validation separately. The two libraries can coexist in the same application, so you can migrate one form at a time.
+
+## Next steps
+
+If you have decided that Formisch is a good fit, install it via the <Link href="/svelte/guides/installation/">installation</Link> guide and start building by <Link href="/svelte/guides/define-your-form/">defining your form</Link>.
