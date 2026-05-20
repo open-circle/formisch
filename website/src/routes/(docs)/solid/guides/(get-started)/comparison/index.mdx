@@ -1,0 +1,46 @@
+---
+title: Comparison
+description: >-
+  A concise comparison of Formisch with Felte and TanStack Form for SolidJS
+  across TypeScript inference, validation, and reactivity, with a short
+  decision guide.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Comparison
+
+Formisch is one of several form libraries available for SolidJS. The two most common alternatives are [Felte](https://felte.dev) and [TanStack Form](https://tanstack.com/form/latest). This page is meant as a quick reference for picking the right tool.
+
+## At a glance
+
+|                        | **Formisch**                            | Felte                                | TanStack Form                           |
+| ---------------------- | --------------------------------------- | ------------------------------------ | --------------------------------------- |
+| Type source            | Inferred from schema                    | Inferred from validator or declared  | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                       | Validator package or `validate` fn   | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`     | Per validator, debouncable           | Per-validator trigger                   |
+| Async validation       | Built-in via schema                     | Built-in                             | Built-in `isValidating`                 |
+| Reactivity scope       | Fine-grained per signal                 | Per Solid store subscription         | Per subscription                        |
+| Schema libraries       | Valibot                                 | Zod, Yup, Valibot, Vest, Superstruct | Standard Schema                         |
+| Bundle size (min+gzip) | From ~2.5 kB                            | ~8 kB                                | ~15 kB                                  |
+| Framework support      | React, Preact, Solid, Svelte, Vue, Qwik | React, Preact, Solid, Svelte         | React, Vue, Solid, Svelte, Lit, Angular |
+
+The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and reactivity.
+
+## Which library should you use?
+
+**Felte** is a small, focused form library with a directive-based API (`use:form`). It supports a wide range of schema validators through separate adapter packages and is a good fit when you want a minimal library that stays close to plain Solid stores.
+
+**TanStack Form** is a good fit when you need fine-grained control over validation timing and built-in async validation handling without building that infrastructure yourself. It is also the natural choice if your team is already invested in the TanStack ecosystem and values a consistent mental model across data fetching, routing, and forms.
+
+**Formisch** makes the most sense for new projects in TypeScript-heavy codebases, especially when you expect forms to grow in complexity. The schema-first design means there is a single source of truth for types, runtime validation, and form structure, so there is less to keep aligned over time. The main consideration is that Formisch currently supports only [Valibot](https://valibot.dev) as the schema library.
+
+## Migrating from Felte
+
+Migrating from Felte to Formisch is not a drop-in replacement. The mental model is different: instead of attaching form behavior to an element through a directive, you start from a Valibot schema and build your fields around it. Formisch and Felte can coexist in the same application, so you can migrate one form at a time and use the most complex form first as a reference point.
+
+## Next steps
+
+If you have decided that Formisch is a good fit, install it via the <Link href="/solid/guides/installation/">installation</Link> guide and start building by <Link href="/solid/guides/define-your-form/">defining your form</Link>.
