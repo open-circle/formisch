@@ -4,6 +4,7 @@
 
 - [Introduction](/vue/guides/introduction/)
 - [Installation](/vue/guides/installation/)
+- [Comparison](/vue/guides/comparison/)
 - [LLMs.txt](/vue/guides/llms-txt/)
 
 ## Main concepts

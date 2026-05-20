@@ -1,0 +1,49 @@
+---
+title: Comparison
+description: >-
+  A concise comparison of Formisch with VeeValidate, FormKit, and TanStack
+  Form for Vue across TypeScript inference, validation, and reactivity, with
+  a short decision guide.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Comparison
+
+Formisch is one of several form libraries available for Vue. The three most common alternatives are [VeeValidate](https://vee-validate.logaretm.com), [FormKit](https://formkit.com), and [TanStack Form](https://tanstack.com/form/latest). This page is meant as a quick reference for picking the right tool.
+
+## At a glance
+
+|                        | **Formisch**                            | VeeValidate                   | FormKit                               | TanStack Form                           |
+| ---------------------- | --------------------------------------- | ----------------------------- | ------------------------------------- | --------------------------------------- |
+| Type source            | Inferred from schema                    | Inferred from schema          | Declared manually                     | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                       | Validator rules or schema     | Per-input prop or form schema         | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`     | Per field, configurable       | Per input (`validation-visibility`)   | Per-validator trigger                   |
+| Async validation       | Built-in via schema                     | Built-in                      | Built-in                              | Built-in `isValidating`                 |
+| Reactivity scope       | Per Vue ref subscription                | Per Vue ref subscription      | Per Vue ref subscription              | Per TanStack Store subscription         |
+| Schema libraries       | Valibot                                 | Zod, Yup, Valibot, ArkType, … | Built-in rules; schemas via plugins   | Standard Schema                         |
+| UI approach            | Headless                                | Headless                      | Component-driven (batteries included) | Headless                                |
+| Bundle size (min+gzip) | From ~2.5 kB                            | ~12 kB                        | ~25 kB+                               | ~15 kB                                  |
+| Framework support      | React, Preact, Solid, Svelte, Vue, Qwik | Vue 3 (Vue 2 via legacy)      | Vue 3                                 | React, Vue, Solid, Svelte, Lit, Angular |
+
+The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and reactivity.
+
+## Which library should you use?
+
+**VeeValidate** is the most widely used Vue form library. It is headless, composables-based, and has strong schema support through Standard Schema. Good fit when you want a flexible logic layer and are comfortable wiring your own components.
+
+**FormKit** is component-driven and batteries-included. Inputs, layouts, accessibility, and styling come out of the box, with optional declarative form schemas. Best when you want a complete form solution with UI rather than a headless logic layer.
+
+**TanStack Form** is a good fit when you need fine-grained control over validation timing and built-in async validation handling without building that infrastructure yourself. It is also the natural choice if your team is already invested in the TanStack ecosystem and values a consistent mental model across data fetching, routing, and forms.
+
+**Formisch** makes the most sense for new projects in TypeScript-heavy codebases, especially when you expect forms to grow in complexity. The schema-first design means there is a single source of truth for types, runtime validation, and form structure, so there is less to keep aligned over time. Reactivity is fine-grained through Vue 3's composition API. The main consideration is that Formisch currently supports only [Valibot](https://valibot.dev) as the schema library.
+
+## Migrating from VeeValidate
+
+Migrating from VeeValidate to Formisch is not a drop-in replacement, but the conceptual gap is smaller than with a component-driven library. Both are headless and schema-friendly, so the main work is consolidating per-field validator rules into a single root Valibot schema and replacing VeeValidate's `useForm` / `useField` composables with Formisch's equivalents. The two libraries can coexist in the same application, so you can migrate one form at a time.
+
+## Next steps
+
+If you have decided that Formisch is a good fit, install it via the <Link href="/vue/guides/installation/">installation</Link> guide and start building by <Link href="/vue/guides/define-your-form/">defining your form</Link>.
