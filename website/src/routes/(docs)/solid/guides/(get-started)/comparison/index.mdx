@@ -20,7 +20,7 @@ Formisch is one of several form libraries available for SolidJS. The two most co
 | ---------------------- | --------------------------------------- | ------------------------------------ | --------------------------------------- |
 | Type source            | Inferred from schema                    | Inferred from validator or declared  | Inferred from `defaultValues`           |
 | Validation location    | Defined in schema                       | Validator package or `validate` fn   | Per-validator config                    |
-| Validation timing      | Form-wide `validate` / `revalidate`     | Per validator, debouncable           | Per-validator trigger                   |
+| Validation timing      | Form-wide `validate` / `revalidate`     | Per validator, with debounce         | Per-validator trigger                   |
 | Async validation       | Built-in via schema                     | Built-in                             | Built-in `isValidating`                 |
 | Reactivity scope       | Fine-grained per signal                 | Per Solid store subscription         | Per subscription                        |
 | Schema libraries       | Valibot                                 | Zod, Yup, Valibot, Vest, Superstruct | Standard Schema                         |
