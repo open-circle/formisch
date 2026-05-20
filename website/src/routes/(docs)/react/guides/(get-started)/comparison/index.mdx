@@ -1,0 +1,48 @@
+---
+title: Comparison
+description: >-
+  A concise comparison of Formisch with React Hook Form and TanStack Form
+  across TypeScript inference, validation, and re-render behavior, with a
+  short decision guide.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Comparison
+
+Formisch is one of several form libraries available for React. The two most common alternatives are [React Hook Form](https://react-hook-form.com) and [TanStack Form](https://tanstack.com/form/latest). This page is meant as a quick reference for picking the right tool. For a deeper explanation of the architectural differences and the reasoning behind each row of the table below, see our [long-form comparison article](/blog/react-form-library-comparison/).
+
+## At a glance
+
+|                        | **Formisch**                            | React Hook Form                     | TanStack Form                           |
+| ---------------------- | --------------------------------------- | ----------------------------------- | --------------------------------------- |
+| Type source            | Inferred from schema                    | Generic you declare                 | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                       | Per-field or resolver               | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`     | Form-wide `mode` option             | Per-validator trigger                   |
+| Async validation       | Built-in via schema                     | Manual loading state                | Built-in `isValidating`                 |
+| Re-render scope        | Automatic per signal                    | Manual via `watch` / `useFormState` | Automatic per subscription              |
+| Schema libraries       | Valibot                                 | Any via resolvers                   | Standard Schema                         |
+| Bundle size (min+gzip) | From ~2.5 kB                            | ~12 kB                              | ~15 kB                                  |
+| Framework support      | React, Preact, Solid, Svelte, Vue, Qwik | React                               | React, Vue, Solid, Svelte, Lit, Angular |
+
+The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and re-renders.
+
+## Which library should you use?
+
+**React Hook Form** is a mature, well-documented choice with a large community and years of production usage. For simple to moderately complex forms, it remains a reasonable default. The tradeoffs only become visible as forms grow: types and schema drift out of sync, validation rules spread across components, and re-render scope becomes your responsibility.
+
+**TanStack Form** is a good fit when you need fine-grained control over validation timing and built-in async validation handling without building that infrastructure yourself. It is also the natural choice if your team is already invested in the TanStack ecosystem and values a consistent mental model across data fetching, routing, and forms.
+
+**Formisch** makes the most sense for new projects in TypeScript-heavy codebases, especially when you expect forms to grow in complexity. The schema-first design means there is a single source of truth for types, runtime validation, and form structure, so there is less to keep aligned over time. The main consideration is that Formisch currently supports only [Valibot](https://valibot.dev) as the schema library.
+
+## Migrating from React Hook Form
+
+Migrating from React Hook Form to Formisch is a genuine rewrite of the form layer, not a drop-in replacement. The mental model is different: instead of starting from a component and attaching form behavior to it, you start from a schema and build the component around it. The two libraries can coexist in the same application, so you can migrate one form at a time.
+
+For a side-by-side mapping of common React Hook Form APIs to their Formisch equivalents, see the migration section of the [comparison article](/blog/react-form-library-comparison/).
+
+## Next steps
+
+If you have decided that Formisch is a good fit, install it via the <Link href="/react/guides/installation/">installation</Link> guide and start building by <Link href="/react/guides/define-your-form/">defining your form</Link>.

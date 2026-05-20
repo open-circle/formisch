@@ -4,6 +4,7 @@
 
 - [Introduction](/react/guides/introduction/)
 - [Installation](/react/guides/installation/)
+- [Comparison](/react/guides/comparison/)
 - [LLMs.txt](/react/guides/llms-txt/)
 
 ## Main concepts
