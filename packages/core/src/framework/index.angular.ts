@@ -34,13 +34,13 @@ export function createSignal<T>(): Signal<T | undefined>;
 export function createSignal<T>(value: T): Signal<T>;
 
 // @__NO_SIDE_EFFECTS__
-export function createSignal<T>(initialValue?: T): Signal<T | undefined> {
+export function createSignal(initialValue?: unknown): Signal<unknown> {
   const writableSignal = signal(initialValue);
   return {
     get value() {
       return writableSignal();
     },
-    set value(nextValue: T | undefined) {
+    set value(nextValue: unknown) {
       writableSignal.set(nextValue);
     },
   };
