@@ -1,23 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable jsdoc/require-returns-check */
-import type { Signal } from '../types/index.ts';
-
-/**
- * Framework type.
- */
-export type Framework =
-  | 'angular'
-  | 'preact'
-  | 'qwik'
-  | 'react'
-  | 'solid'
-  | 'svelte'
-  | 'vue';
+import { signal, untracked } from '@angular/core';
+import type { Signal } from '../types/signal.ts';
+import type { Framework } from './index.ts';
 
 /**
  * The current framework being used.
  */
-export const framework: Framework = '' as Framework;
+export const framework: Framework = 'angular';
 
 /**
  * Creates a unique identifier string.
@@ -26,7 +14,7 @@ export const framework: Framework = '' as Framework;
  */
 // @__NO_SIDE_EFFECTS__
 export function createId(): string {
-  throw new Error('No framework selected');
+  return Math.random().toString(36).slice(2);
 }
 
 /**
@@ -46,28 +34,37 @@ export function createSignal<T>(): Signal<T | undefined>;
 export function createSignal<T>(value: T): Signal<T>;
 
 // @__NO_SIDE_EFFECTS__
-export function createSignal(value?: unknown): Signal<unknown> {
-  throw new Error('No framework selected');
+export function createSignal<T>(initialValue?: T): Signal<T | undefined> {
+  const writableSignal = signal(initialValue);
+  return {
+    get value() {
+      return writableSignal();
+    },
+    set value(nextValue) {
+      writableSignal.set(nextValue);
+    },
+  };
 }
 
 /**
- * Batches multiple signal updates into a single update cycle.
+ * Batches multiple signal updates into a single update cycle. This is a
+ * no-op in Angular as batching is handled automatically.
  *
- * @param fn The function to execute in batch.
+ * @param fn The function to execute.
  *
  * @returns The return value of the function.
  */
 export function batch<T>(fn: () => T): T {
-  throw new Error('No framework selected');
+  return fn();
 }
 
 /**
  * Executes a function without tracking reactive dependencies.
  *
- * @param fn The function to execute without tracking.
+ * @param fn The function to execute.
  *
  * @returns The return value of the function.
  */
 export function untrack<T>(fn: () => T): T {
-  throw new Error('No framework selected');
+  return untracked(fn);
 }
