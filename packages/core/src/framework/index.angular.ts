@@ -1,5 +1,5 @@
 import { signal, untracked } from '@angular/core';
-import type { Signal } from '../types/signal.ts';
+import type { Signal } from '../types/signal/index.ts';
 import type { Framework } from './index.ts';
 
 /**
@@ -40,7 +40,7 @@ export function createSignal<T>(initialValue?: T): Signal<T | undefined> {
     get value() {
       return writableSignal();
     },
-    set value(nextValue) {
+    set value(nextValue: T | undefined) {
       writableSignal.set(nextValue);
     },
   };
