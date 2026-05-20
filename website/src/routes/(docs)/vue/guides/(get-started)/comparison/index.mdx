@@ -30,6 +30,16 @@ Formisch is one of several form libraries available for Vue. The three most comm
 
 The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and reactivity.
 
+## Why Formisch?
+
+Three reasons to pick Formisch over the alternatives above:
+
+**One schema, no second source of truth.** A single Valibot schema is everything the form needs: the runtime validator, the source of types, and the description of the form's structure — all at once. There is no separate TypeScript generic to declare, no `defaultValues` object to keep aligned with the schema, no resolver to configure. When the schema changes, every part of the form follows — at compile time and at runtime.
+
+**The smallest bundle, by a wide margin.** Formisch starts at ~2.5 kB and grows only as you import additional methods like `focus`, `getInput`, and `reset`. That is several times smaller than the alternatives in the table above — and it stays that way because the core is intentionally small and the library is fully tree-shakable, so methods you don't import don't end up in your bundle.
+
+**Type safety that stays fast.** Types flow from the schema through every API, including deeply nested paths and field arrays. The inference is structured to keep TypeScript editor performance from degrading as schemas grow — which matters in large codebases where heavily-generic form libraries become a friction point.
+
 ## Which library should you use?
 
 **VeeValidate** is the most widely used Vue form library. It is headless, composables-based, and has strong schema support through Standard Schema. Good fit when you want a flexible logic layer and are comfortable wiring your own components.

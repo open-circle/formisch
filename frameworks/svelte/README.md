@@ -59,7 +59,13 @@ In addition, Formisch offers several functions (we call them "methods") that can
 
 ## Comparison
 
-What makes Formisch unique is its framework-agnostic core, which is fully native to the framework you are using. It works by inserting framework-specific reactivity blocks when the core package is built. The result is a small bundle size and native performance for any UI update. This feature, along with a few others, distinguishes Formisch from other form libraries. My vision for Formisch is to create a framework-agnostic platform similar to [Vite](https://vite.dev/), but for forms.
+What makes Formisch unique is its framework-agnostic core, which is fully native to the framework you are using. It works by inserting framework-specific reactivity blocks when the core package is built, giving you native performance for any UI update. A modular methods API keeps bundles starting at just ~2.5 kB by only including the methods you import, and end-to-end type safety covers deeply nested paths and field arrays with TypeScript inference that stays fast even as forms grow.
+
+For a side-by-side look at how Formisch compares to Superforms and TanStack Form, see the [comparison guide](https://formisch.dev/svelte/guides/comparison/).
+
+## Vision
+
+My vision for Formisch is to create a framework-agnostic platform similar to [Vite](https://vite.dev/), but for forms — a shared core that lets the same mental model and codebase work natively across every modern UI framework.
 
 ## Partners
 
