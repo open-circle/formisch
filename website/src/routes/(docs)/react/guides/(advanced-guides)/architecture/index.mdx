@@ -107,9 +107,7 @@ First, the [React wrapper](https://github.com/open-circle/formisch/blob/main/fra
 ```ts
 const internalFormStore = useMemo(
   () =>
-    createFormStore(config, (input) =>
-      v.safeParseAsync(config.schema, input)
-    ),
+    createFormStore(config, (input) => v.safeParseAsync(config.schema, input)),
   []
 );
 ```
