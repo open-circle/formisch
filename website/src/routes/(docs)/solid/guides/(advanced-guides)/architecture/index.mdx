@@ -13,7 +13,7 @@ import { Link } from '~/components';
 
 # Architecture
 
-You don't need to read this guide to use Formisch. It's here for the curious — for people who want to understand why the bundle stays small, why updates are fine-grained, and how the same library can support SolidJS, React, Vue, Svelte, Preact and Qwik without forking the codebase. Each of those properties falls out of a few deliberate architectural choices.
+You don't need to read this guide to use Formisch. It's here for people who want to understand why the bundle stays small, why updates are fine-grained, and how the same library can support SolidJS, React, Vue, Svelte, Preact and Qwik without forking the codebase. Each of those properties falls out of a few deliberate architectural choices.
 
 ## Three packages, three responsibilities
 
@@ -31,13 +31,13 @@ Formisch is structured as three packages, each with a clear role:
                   └─ framework adapter           (createSignal, batch, untrack, createId)
 ```
 
-The modular architecture is what makes Formisch tree-shakeable. The core stays small, and every additional capability — `setInput`, `validate`, `reset`, `insert`, `move`, `focus` and the rest — is exported as its own function. A form that only imports `createForm`, `<Form />` and `<Field />` ships nothing else, even though `@formisch/solid` re-exports every method.
+The modular architecture is what makes Formisch tree-shakeable. The core stays small, and every additional capability (`setInput`, `validate`, `reset`, `insert`, `move`, `focus` and the rest) is exported as its own function. A form that only imports `createForm`, `<Form />` and `<Field />` ships nothing else, even though `@formisch/solid` re-exports every method.
 
 ## One core, one adapter per framework
 
 The core package is framework-agnostic, but it still needs _some_ reactivity primitive to build on. Formisch handles this by providing a subpath export for every supported framework (`@formisch/core/solid`, `@formisch/core/react`, `@formisch/core/svelte`, …), all built from the same source. The only file that differs between them [is a small adapter](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.ts) that exports four functions: `createSignal`, `batch`, `untrack` and `createId`.
 
-The swap happens at build time, not at runtime. A small [rolldown plugin](https://github.com/open-circle/formisch/blob/main/packages/core/tsdown.config.ts) sits in front of import resolution: whenever the bundler resolves an import of `./framework/index.ts`, the plugin looks for a sibling `./framework/index.solid.ts` (or `.react.ts`, `.svelte.ts`, …) and, if it exists, redirects the import there. The build runs once per framework, and each run produces a self-contained bundle with the framework-specific adapter inlined as if it had always been the only option.
+The swap happens at build time, not at runtime. A small [rolldown plugin](https://github.com/open-circle/formisch/blob/main/packages/core/tsdown.config.ts) sits in front of import resolution: whenever the bundler resolves an import of `./framework/index.ts`, the plugin looks for a sibling `./framework/index.solid.ts` (or `.react.ts`, `.svelte.ts`, …) and, if it exists, redirects the import there. The build runs once per framework, and each run produces a self-contained bundle with the framework-specific adapter inlined.
 
 For Solid, [the adapter](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.solid.ts) is a thin wrapper around the framework's own signal primitive:
 
@@ -57,11 +57,11 @@ export function createSignal<T>(initialValue: T): Signal<T> {
 }
 ```
 
-For frameworks that don't have native signals — like React — [the adapter](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.react.ts) implements a small pub/sub system that exposes the same `Signal<T>` shape. Every other file in `@formisch/core` only ever imports `createSignal`, `batch`, `untrack` and `createId`, never a framework directly. That's why the same [`createFormStore`](https://github.com/open-circle/formisch/blob/main/packages/core/src/form/createFormStore/createFormStore.ts) code path can power every framework binding without a single conditional.
+For frameworks that don't have native signals (like React), [the adapter](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.react.ts) implements a small pub/sub system that exposes the same `Signal<T>` shape. Every other file in `@formisch/core` only ever imports `createSignal`, `batch`, `untrack` and `createId`, never a framework directly. That's why the same [`createFormStore`](https://github.com/open-circle/formisch/blob/main/packages/core/src/form/createFormStore/createFormStore.ts) code path can power every framework binding without a single conditional.
 
-This is what makes Formisch different from most framework-agnostic libraries. The usual approach is to ship a runtime abstraction — a custom store, an observer protocol, a subscription layer — that lives in the bundle and has to be bridged into each framework. Formisch ships nothing like that. Where the framework has native signals, Formisch uses them directly; where it doesn't, the adapter is just enough pub/sub to drive re-renders. Either way, there is no extra layer between your form state and the framework's reactivity, and your bundle pays no overhead for portability. Form state lives in Solid's own signals, with full access to Solid's batching, scheduling and fine-grained tracking.
+This is what makes Formisch different from most framework-agnostic libraries. The usual approach is to ship a runtime abstraction (a custom store, an observer protocol, a subscription layer) that lives in the bundle and has to be bridged into each framework. Formisch ships nothing like that. Where the framework has native signals, Formisch uses them directly; where it doesn't, the adapter is just enough pub/sub to drive re-renders. Either way, there is no extra layer between your form state and the framework's reactivity, and your bundle pays no overhead for portability. Form state lives in Solid's own signals, with full access to Solid's batching, scheduling and fine-grained tracking.
 
-That Formisch is framework-agnostic is not a trade-off you make — it's a benefit you get. A bug surfaced by a Svelte user is a bug fixed for Solid, React, Vue and everyone else. An improvement to the recursive store builder, the validation orchestration or any individual method lands across every binding at once. There is one library to maintain, not one per framework, and every community pulls the rest forward.
+That Formisch is framework-agnostic is not a trade-off you make. It's a benefit you get. A bug surfaced by a Svelte user is a bug fixed for Solid, React, Vue and everyone else. An improvement to the recursive store builder, the validation orchestration or any individual method lands across every binding at once. There is one library to maintain, not one per framework, and every community pulls the rest forward.
 
 ## State lives in signals
 
@@ -74,9 +74,9 @@ interface Signal<T> {
 }
 ```
 
-Reads track, writes notify. There is no central store object that gets diffed and no equality check on the consumer side. Each field carries its own signals for `errors`, `isTouched`, `isDirty`, plus an `input` signal for value fields and a `children` collection for arrays and objects. When you call `setInput(form, { path: ['email'], input: 'a@b.c' })`, only the `input` signal of that one field is written, so only the consumers of that one signal — typically a single `<input />` — re-render.
+Reads track, writes notify. There is no central store object that gets diffed and no equality check on the consumer side. Each field carries its own signals for `errors`, `isTouched`, `isDirty`, plus an `input` signal for value fields and a `children` collection for arrays and objects. When you call `setInput(form, { path: ['email'], input: 'a@b.c' })`, only the `input` signal of that one field is written, so only the consumers of that one signal (typically a single `<input />`) re-render.
 
-This is the source of the fine-grained reactivity. The shape of the store is pre-allocated at form creation, matching the shape of your Valibot schema, so methods never have to look up paths in a generic object — they walk a typed tree of stores and update individual signals.
+This is the source of the fine-grained reactivity. The shape of the store is pre-allocated at form creation, matching the shape of your Valibot schema, so methods never have to look up paths in a generic object. They walk a typed tree of stores and update individual signals.
 
 ## What happens when you call `createForm`
 
@@ -135,7 +135,7 @@ The internal store is tucked away behind the [`INTERNAL`](https://github.com/ope
 
 ## Why this design pays off
 
-The same four properties keep coming back, and now you can see where they come from:
+Bundle size is the obvious payoff. The others are why the design is worth talking about:
 
 - **Small bundle size.** Because methods are individual modules re-exported from [`@formisch/solid`](https://github.com/open-circle/formisch/tree/main/frameworks/solid), a form that uses only <Link href="/solid/api/createForm/">`createForm`</Link> and <Link href="/solid/api/Field/">`<Field />`</Link> never pulls in <Link href="/methods/api/validate/">`validate`</Link>, <Link href="/methods/api/reset/">`reset`</Link>, <Link href="/methods/api/insert/">`insert`</Link> or the other operations. Tree-shaking gets to do real work.
 - **Fine-grained reactivity.** The store shape is pre-allocated at form creation, with one signal per piece of state. Methods mutate `.value` directly and Solid's own reactivity handles propagation. Updating one field does not invalidate the rest.
