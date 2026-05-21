@@ -117,7 +117,7 @@ Next, `createFormStore` calls [`initializeFieldStore`](https://github.com/open-c
 - A `v.object(...)` becomes an `InternalObjectStore` with a `children` record keyed by field name.
 - A `v.array(...)` or `v.tuple(...)` becomes an `InternalArrayStore` with a `children` list and its own `initialInput`, `startInput` and `input` signals so it can track structural changes.
 - A leaf like `v.string()` or `v.number()` becomes an `InternalValueStore` with an `input` signal that holds the current field value.
-- Wrapper schemas such as `v.optional`, `v.nullable`, `v.non_nullable` and `v.lazy` are unwrapped and recursed into.
+- Wrapper schemas such as `v.optional`, `v.nullable`, `v.nonNullable` and `v.lazy` are unwrapped and recursed into.
 - `v.union`, `v.variant` and `v.intersect` initialize every option into the same store, which is what lets you address discriminated fields with a single field path.
 
 At every level, the same three signals are created: `errors`, `isTouched` and `isDirty`. Once the field tree is built, three more signals are added to the form root: `isSubmitting`, `isSubmitted` and `isValidating`.

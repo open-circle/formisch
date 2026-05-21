@@ -89,38 +89,37 @@ function LoginForm() {
 }
 ```
 
-First, the [Preact wrapper](https://github.com/open-circle/formisch/blob/main/frameworks/preact/src/hooks/useForm/useForm.ts) hands the configuration to the core function [`createFormStore`](https://github.com/open-circle/formisch/blob/main/packages/core/src/form/createFormStore/createFormStore.ts), together with a parse closure that captures your schema. The whole construction lives inside a `useMemo` with an empty dependency array, so the form is built exactly once per component instance:
+First, the [Preact wrapper](https://github.com/open-circle/formisch/blob/main/frameworks/preact/src/hooks/useForm/useForm.ts) memoizes the whole form construction inside a single `useMemo` with an empty dependency array, so the form is built exactly once per component instance. Inside that callback, [`createFormStore`](https://github.com/open-circle/formisch/blob/main/packages/core/src/form/createFormStore/createFormStore.ts) is called with the configuration and a parse closure that captures your schema, then the public form store is assembled on top of the internal store it returns:
 
 ```ts
-const internalFormStore = createFormStore(config, (input) =>
-  v.safeParseAsync(config.schema, input)
-);
+const form = useMemo(() => {
+  const internalFormStore = createFormStore(config, (input) =>
+    v.safeParseAsync(config.schema, input)
+  );
+  return {
+    [INTERNAL]: internalFormStore,
+    isSubmitting: internalFormStore.isSubmitting,
+    isSubmitted: internalFormStore.isSubmitted,
+    isValidating: internalFormStore.isValidating,
+    isTouched: computed(() => getFieldBool(internalFormStore, 'isTouched')),
+    isDirty: computed(() => getFieldBool(internalFormStore, 'isDirty')),
+    isValid: computed(() => !getFieldBool(internalFormStore, 'errors')),
+    errors: internalFormStore.errors,
+  };
+}, []);
 ```
 
-Next, `createFormStore` calls [`initializeFieldStore`](https://github.com/open-circle/formisch/blob/main/packages/core/src/field/initializeFieldStore/initializeFieldStore.ts), which walks your Valibot schema recursively and builds the internal store hierarchy:
+The interesting work happens inside `createFormStore`. It calls [`initializeFieldStore`](https://github.com/open-circle/formisch/blob/main/packages/core/src/field/initializeFieldStore/initializeFieldStore.ts), which walks your Valibot schema recursively and builds the internal store hierarchy:
 
 - A `v.object(...)` becomes an `InternalObjectStore` with a `children` record keyed by field name.
 - A `v.array(...)` or `v.tuple(...)` becomes an `InternalArrayStore` with a `children` list and its own `initialInput`, `startInput` and `input` signals so it can track structural changes.
 - A leaf like `v.string()` or `v.number()` becomes an `InternalValueStore` with an `input` signal that holds the current field value.
-- Wrapper schemas such as `v.optional`, `v.nullable`, `v.non_nullable` and `v.lazy` are unwrapped and recursed into.
+- Wrapper schemas such as `v.optional`, `v.nullable`, `v.nonNullable` and `v.lazy` are unwrapped and recursed into.
 - `v.union`, `v.variant` and `v.intersect` initialize every option into the same store, which is what lets you address discriminated fields with a single field path.
 
 At every level, the same three signals are created: `errors`, `isTouched` and `isDirty`. Once the field tree is built, three more signals are added to the form root: `isSubmitting`, `isSubmitted` and `isValidating`.
 
-Finally, the Preact wrapper builds the public form store you actually receive. It's a small reactive object that sits on top of the internal store: the form-level signals are exposed directly, while derived state like `isTouched`, `isDirty` and `isValid` is wrapped in `computed` so it recomputes lazily as the underlying field signals change:
-
-```ts
-return {
-  [INTERNAL]: internalFormStore,
-  isSubmitting: internalFormStore.isSubmitting,
-  isSubmitted: internalFormStore.isSubmitted,
-  isValidating: internalFormStore.isValidating,
-  isTouched: computed(() => getFieldBool(internalFormStore, 'isTouched')),
-  isDirty: computed(() => getFieldBool(internalFormStore, 'isDirty')),
-  isValid: computed(() => !getFieldBool(internalFormStore, 'errors')),
-  errors: internalFormStore.errors,
-};
-```
+The form object the wrapper returns sits on top of that internal store. Form-level signals are exposed directly, while derived state like `isTouched`, `isDirty` and `isValid` is wrapped in `computed` so it recomputes lazily as the underlying field signals change.
 
 The internal store is tucked away behind the [`INTERNAL`](https://github.com/open-circle/formisch/blob/main/packages/core/src/values.ts) symbol. Methods like `setInput(form, …)` reach in via `form[INTERNAL]` to mutate signals, while your code only sees the public form store. This separation is what keeps the public API small and stable even as the internal shape evolves.
 
