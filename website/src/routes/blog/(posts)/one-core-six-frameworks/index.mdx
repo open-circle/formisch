@@ -38,11 +38,11 @@ Inside the core there's a single `framework/index.ts` that exposes the four func
 
 When the bundler resolves an import of `./framework/index.ts`, a small [rolldown plugin](https://github.com/open-circle/formisch/blob/main/packages/core/tsdown.config.ts) checks whether a sibling `./framework/index.{framework}.ts` exists. If it does, the plugin redirects the import there. The build runs once per framework with a different target, and each run produces a self-contained bundle with that framework's adapter inlined as if it had always been the only option.
 
-There are no conditionals at runtime. No feature detection. No `if (framework === 'solid')` anywhere in the source. The same `createFormStore` code path that runs in your Solid app runs in your Vue app — it just imports a different `createSignal` because the bundle it lives in was compiled with a different target.
+Because the framework target is baked in at build time, there's no runtime detection — no `import.meta` checks, no environment sniffing, no adapter to load. The same `createFormStore` code path that runs in your Solid app runs in your Vue app — it just imports a different `createSignal` because the bundle it lives in was compiled with a different target.
 
 ## What the adapters actually look like
 
-Because most modern frameworks already have a signal primitive that fits the `.value` getter/setter shape, most of the adapters are nearly invisible. Here are four of them, in full:
+Because most modern frameworks already have a signal primitive that fits the `.value` getter/setter shape, most of the adapters are nearly invisible. Here's the reactivity glue from four of them — each file also exports a `framework` constant and trivial `createId` helper, but the signal part is the only architecturally interesting bit:
 
 **Vue** ([`index.vue.ts`](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.vue.ts)):
 
@@ -108,4 +108,4 @@ Framework-agnostic is usually framed as a trade-off: you give up framework-nativ
 
 Pick your framework's installation guide, write a Valibot schema, and you'll be rendering a fully typed form in a few minutes. The [playground](https://formisch.dev/playground/) is the fastest way to try it without leaving your browser.
 
-If you want to keep going, every framework's docs has an architecture guide that walks through what happens when you call `createForm` or `useForm` — from the recursive store builder to the public form store. The full source is on [GitHub](https://github.com/open-circle/formisch), and contributions from any framework's community benefit all of them.
+If you want to keep going, every framework has its own architecture guide that walks through what happens when you call `createForm` or `useForm` — from the recursive store builder to the public form store. The full source is on [GitHub](https://github.com/open-circle/formisch), and contributions from any framework's community benefit all of them.
