@@ -23,3 +23,4 @@
 - [Nested fields](/vue/guides/nested-fields/)
 - [Field arrays](/vue/guides/field-arrays/)
 - [TypeScript](/vue/guides/typescript/)
+- [Architecture](/vue/guides/architecture/)

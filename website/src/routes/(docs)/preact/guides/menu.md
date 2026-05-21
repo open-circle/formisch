@@ -22,3 +22,4 @@
 - [Nested fields](/preact/guides/nested-fields/)
 - [Field arrays](/preact/guides/field-arrays/)
 - [TypeScript](/preact/guides/typescript/)
+- [Architecture](/preact/guides/architecture/)

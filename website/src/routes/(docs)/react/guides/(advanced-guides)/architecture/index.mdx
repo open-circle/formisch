@@ -1,0 +1,158 @@
+---
+title: Architecture
+description: >-
+  A look behind the scenes at how Formisch is structured. Learn how the core,
+  methods and framework packages fit together, how a single signal interface
+  plugs into each framework's native reactivity, and what happens when you
+  call `useForm`.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Architecture
+
+You don't need to read this guide to use Formisch. It's here for the curious — for people who want to understand why the bundle stays small, why updates are fine-grained, and how the same library can support React, SolidJS, Vue, Svelte, Preact and Qwik without forking the codebase. Each of those properties falls out of a few deliberate architectural choices.
+
+## Three packages, three responsibilities
+
+Formisch is structured as three packages, each with a clear role:
+
+- [`@formisch/core`](https://github.com/open-circle/formisch/tree/main/packages/core) is the framework-agnostic foundation. It contains the form and field store types, the recursive store builder that mirrors your Valibot schema, and the validation orchestration.
+- [`@formisch/methods`](https://github.com/open-circle/formisch/tree/main/packages/methods) exposes the form operations as standalone, tree-shakeable functions: <Link href="/methods/api/setInput/">`setInput`</Link>, <Link href="/methods/api/validate/">`validate`</Link>, <Link href="/methods/api/reset/">`reset`</Link>, <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/focus/">`focus`</Link> and so on. Each method lives in its own file and only imports the core helpers it actually needs.
+- [`@formisch/react`](https://github.com/open-circle/formisch/tree/main/frameworks/react) is the thin user-facing layer. It provides the <Link href="/react/api/useForm/">`useForm`</Link>, <Link href="/react/api/useField/">`useField`</Link> and <Link href="/react/api/useFieldArray/">`useFieldArray`</Link> hooks, the <Link href="/react/api/Form/">`<Form />`</Link>, <Link href="/react/api/Field/">`<Field />`</Link> and <Link href="/react/api/FieldArray/">`<FieldArray />`</Link> components, and re-exports every method from `@formisch/methods` so you only import from a single package.
+
+```
+@formisch/react
+  ├─ useForm, <Form />, <Field />, …             (React-specific reactive layer)
+  └─ re-exports @formisch/methods/react          (focus, reset, validate, …)
+         └─ @formisch/core/react                 (createFormStore, types, signals)
+                  └─ framework adapter           (createSignal, batch, untrack, createId)
+```
+
+The modular architecture is what makes Formisch tree-shakeable. The core stays small, and every additional capability — `setInput`, `validate`, `reset`, `insert`, `move`, `focus` and the rest — is exported as its own function. A form that only imports `useForm`, `<Form />` and `<Field />` ships nothing else, even though `@formisch/react` re-exports every method.
+
+## One core, one adapter per framework
+
+The core package is framework-agnostic, but it still needs _some_ reactivity primitive to build on. Formisch handles this by providing a subpath export for every supported framework (`@formisch/core/react`, `@formisch/core/solid`, `@formisch/core/vue`, …), all built from the same source. The only file that differs between them [is a small adapter](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.ts) that exports four functions: `createSignal`, `batch`, `untrack` and `createId`.
+
+The swap happens at build time, not at runtime. A small [rolldown plugin](https://github.com/open-circle/formisch/blob/main/packages/core/tsdown.config.ts) sits in front of import resolution: whenever the bundler resolves an import of `./framework/index.ts`, the plugin looks for a sibling `./framework/index.react.ts` (or `.solid.ts`, `.vue.ts`, …) and, if it exists, redirects the import there. The build runs once per framework, and each run produces a self-contained bundle with the framework-specific adapter inlined as if it had always been the only option.
+
+Since React doesn't have a native signal primitive, [the React adapter](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.react.ts) implements a small pub/sub system from scratch that exposes the `Signal<T>` shape:
+
+```ts
+export function createSignal<T>(value: T): Signal<T> {
+  const subscribers = new Set<Listener>();
+  return {
+    get value() {
+      if (listener) {
+        subscribers.add(listener);
+        listener[1].add(subscribers);
+      }
+      return value;
+    },
+    set value(newValue: T) {
+      if (newValue !== value) {
+        value = newValue;
+        // notify subscribers …
+      }
+    },
+  };
+}
+```
+
+A companion [`useSignals`](https://github.com/open-circle/formisch/blob/main/frameworks/react/src/hooks/useSignals/useSignals.ts) hook in the React wrapper registers your component as a listener and forces a re-render when any signal it read changes. For frameworks that already have native signals (Solid, Preact, Vue, Svelte, Qwik), the adapter is a thin wrapper around the framework's own primitive — sometimes just a single re-export. Every other file in `@formisch/core` only ever imports `createSignal`, `batch`, `untrack` and `createId`, never a framework directly. That's why the same [`createFormStore`](https://github.com/open-circle/formisch/blob/main/packages/core/src/form/createFormStore/createFormStore.ts) code path can power every framework binding without a single conditional.
+
+This is what makes Formisch different from most framework-agnostic libraries. The usual approach is to ship a runtime abstraction — a custom store, an observer protocol, a subscription layer — that lives in the bundle and has to be bridged into each framework. Formisch ships nothing like that. Where the framework has native signals, Formisch uses them directly; where it doesn't, the adapter is just enough pub/sub to drive re-renders. Either way, there is no extra layer between your form state and the framework's reactivity, and your bundle pays no overhead for portability. In React, form state lives in the same minimal pub/sub the wrapper already needs to subscribe components, with no second abstraction on top.
+
+That Formisch is framework-agnostic is not a trade-off you make — it's a benefit you get. A bug surfaced by a Svelte user is a bug fixed for React, Solid, Vue and everyone else. An improvement to the recursive store builder, the validation orchestration or any individual method lands across every binding at once. There is one library to maintain, not one per framework, and every community pulls the rest forward.
+
+## State lives in signals
+
+Every piece of reactive state in Formisch is a [`Signal<T>`](https://github.com/open-circle/formisch/blob/main/packages/core/src/types/signal/signal.ts) with the same minimal interface:
+
+```ts
+interface Signal<T> {
+  get value(): T;
+  set value(nextValue: T): void;
+}
+```
+
+Reads track, writes notify. There is no central store object that gets diffed and no equality check on the consumer side. Each field carries its own signals for `errors`, `isTouched`, `isDirty`, plus an `input` signal for value fields and a `children` collection for arrays and objects. When you call `setInput(form, { path: ['email'], input: 'a@b.c' })`, only the `input` signal of that one field is written, so only the components that read that one signal — typically a single `<input />` — re-render.
+
+This is the source of the fine-grained reactivity. The shape of the store is pre-allocated at form creation, matching the shape of your Valibot schema, so methods never have to look up paths in a generic object — they walk a typed tree of stores and update individual signals.
+
+## What happens when you call `useForm`
+
+When you call <Link href="/react/api/useForm/">`useForm`</Link>, three layers cooperate to produce the form store you receive.
+
+```tsx
+import { useForm } from '@formisch/react';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+function LoginForm() {
+  const loginForm = useForm({ schema: LoginSchema });
+  // …
+}
+```
+
+First, the [React wrapper](https://github.com/open-circle/formisch/blob/main/frameworks/react/src/hooks/useForm/useForm.ts) hands the configuration to the core function [`createFormStore`](https://github.com/open-circle/formisch/blob/main/packages/core/src/form/createFormStore/createFormStore.ts) inside a `useMemo`, together with a parse closure that captures your schema:
+
+```ts
+const internalFormStore = useMemo(
+  () =>
+    createFormStore(config, (input) => v.safeParseAsync(config.schema, input)),
+  []
+);
+```
+
+Next, `createFormStore` calls [`initializeFieldStore`](https://github.com/open-circle/formisch/blob/main/packages/core/src/field/initializeFieldStore/initializeFieldStore.ts), which walks your Valibot schema recursively and builds the internal store hierarchy:
+
+- A `v.object(...)` becomes an `InternalObjectStore` with a `children` record keyed by field name.
+- A `v.array(...)` or `v.tuple(...)` becomes an `InternalArrayStore` with a `children` list and its own `initialInput`, `startInput` and `input` signals so it can track structural changes.
+- A leaf like `v.string()` or `v.number()` becomes an `InternalValueStore` with an `input` signal that holds the current field value.
+- Wrapper schemas such as `v.optional`, `v.nullable`, `v.nonNullable` and `v.lazy` are unwrapped and recursed into.
+- `v.union`, `v.variant` and `v.intersect` initialize every option into the same store, which is what lets you address discriminated fields with a single field path.
+
+At every level, the same three signals are created: `errors`, `isTouched` and `isDirty`. Once the field tree is built, three more signals are added to the form root: `isSubmitting`, `isSubmitted` and `isValidating`.
+
+Finally, the React wrapper builds the public form store you actually receive. It's a small object that sits on top of the internal store: form-level signals are exposed through getters that read `internalFormStore.isSubmitting.value` and friends, while derived state like `isTouched`, `isDirty` and `isValid` is computed on demand from the field tree. The whole object is memoized so it survives re-renders:
+
+```ts
+return useMemo(
+  () => ({
+    [INTERNAL]: internalFormStore,
+    get isSubmitting() {
+      return internalFormStore.isSubmitting.value;
+    },
+    get isTouched() {
+      return getFieldBool(internalFormStore, 'isTouched');
+    },
+    // …
+  }),
+  [internalFormStore]
+);
+```
+
+At the very top of the hook body, before any of this, the wrapper calls `useSignals()` to bridge the signals into React's render cycle: it registers the component as a listener so any signal read by the getters above will trigger a re-render when it changes.
+
+The internal store is tucked away behind the [`INTERNAL`](https://github.com/open-circle/formisch/blob/main/packages/core/src/values.ts) symbol. Methods like `setInput(form, …)` reach in via `form[INTERNAL]` to mutate signals, while your code only sees the public form store. This separation is what keeps the public API small and stable even as the internal shape evolves.
+
+## Why this design pays off
+
+The same four properties keep coming back, and now you can see where they come from:
+
+- **Small bundle size.** Because methods are individual modules re-exported from [`@formisch/react`](https://github.com/open-circle/formisch/tree/main/frameworks/react), a form that uses only <Link href="/react/api/useForm/">`useForm`</Link> and <Link href="/react/api/Field/">`<Field />`</Link> never pulls in <Link href="/methods/api/validate/">`validate`</Link>, <Link href="/methods/api/reset/">`reset`</Link>, <Link href="/methods/api/insert/">`insert`</Link> or the other operations. Tree-shaking gets to do real work.
+- **Fine-grained reactivity.** The store shape is pre-allocated at form creation, with one signal per piece of state. Methods write `.value` directly, and only the components subscribed to that specific signal re-render. Updating one field does not invalidate the rest.
+- **Framework portability.** The entire library is parameterized over a four-function adapter. Adding a new framework means writing a small adapter that maps `createSignal`, `batch`, `untrack` and `createId` onto its primitives.
+- **Type safety.** Your Valibot schema is the single source of truth. It drives both runtime parsing and the inferred TypeScript types for paths, inputs and outputs, so there is no second declaration to keep in sync.
+
+## Further reading
+
+To see how these design choices stack up against Felte and TanStack Form, head to the <Link href="/react/guides/comparison/">comparison</Link> guide. For a closer look at how Valibot's inference flows into your editor, see <Link href="/react/guides/typescript/">TypeScript</Link>. And if you want to read the recursive walker, the adapter implementations, or how individual methods are written, the full source is on [GitHub](https://github.com/open-circle/formisch).

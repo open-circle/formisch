@@ -22,3 +22,4 @@
 - [Nested fields](/qwik/guides/nested-fields/)
 - [Field arrays](/qwik/guides/field-arrays/)
 - [TypeScript](/qwik/guides/typescript/)
+- [Architecture](/qwik/guides/architecture/)
