@@ -23,3 +23,4 @@
 - [Nested fields](/svelte/guides/nested-fields/)
 - [Field arrays](/svelte/guides/field-arrays/)
 - [TypeScript](/svelte/guides/typescript/)
+- [Architecture](/svelte/guides/architecture/)
