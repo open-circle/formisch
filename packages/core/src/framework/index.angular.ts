@@ -1,6 +1,8 @@
-import { signal, untracked } from '@angular/core';
+import { signal } from '@angular/core';
 import type { Signal } from '../types/signal/index.ts';
 import type { Framework } from './index.ts';
+
+export { untracked as untrack } from '@angular/core';
 
 /**
  * The current framework being used.
@@ -18,29 +20,20 @@ export function createId(): string {
 }
 
 /**
- * Creates a reactive signal without an initial value.
- *
- * @returns The created signal.
- */
-export function createSignal<T>(): Signal<T | undefined>;
-
-/**
  * Creates a reactive signal with an initial value.
  *
- * @param value The initial value.
+ * @param initialValue The initial value.
  *
  * @returns The created signal.
  */
-export function createSignal<T>(value: T): Signal<T>;
-
 // @__NO_SIDE_EFFECTS__
-export function createSignal(initialValue?: unknown): Signal<unknown> {
+export function createSignal<T>(initialValue: T): Signal<T> {
   const writableSignal = signal(initialValue);
   return {
     get value() {
       return writableSignal();
     },
-    set value(nextValue: unknown) {
+    set value(nextValue: T) {
       writableSignal.set(nextValue);
     },
   };
@@ -56,15 +49,4 @@ export function createSignal(initialValue?: unknown): Signal<unknown> {
  */
 export function batch<T>(fn: () => T): T {
   return fn();
-}
-
-/**
- * Executes a function without tracking reactive dependencies.
- *
- * @param fn The function to execute.
- *
- * @returns The return value of the function.
- */
-export function untrack<T>(fn: () => T): T {
-  return untracked(fn);
 }
