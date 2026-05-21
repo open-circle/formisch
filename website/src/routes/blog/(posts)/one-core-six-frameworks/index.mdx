@@ -3,7 +3,7 @@ cover: Architecture
 title: 'One core, six frameworks, zero runtime abstraction'
 description: >-
   Most framework-agnostic libraries ship a runtime adapter layer. Formisch
-  doesn't — the framework's own reactivity is swapped in at build time, so
+  doesn't. The framework's own reactivity is swapped in at build time, so
   at runtime form state lives in real Solid signals, Vue refs, or Svelte
   runes. Here's how the design works and what falls out of it.
 published: 2026-05-20
@@ -11,9 +11,9 @@ authors:
   - fabian-hiller
 ---
 
-Most "framework-agnostic" libraries are agnostic at runtime. They ship their own reactivity primitive — a custom store, an observer protocol, a subscription bus — and then bridge it into whichever framework you happen to be using. That bridge has a real cost: extra bytes in your bundle, an adapter layer your framework has to drive, and no integration with the framework's own batching or scheduling.
+Most "framework-agnostic" libraries are agnostic at runtime. They ship their own reactivity primitive (a custom store, an observer protocol, a subscription bus) and bridge it into whichever framework you're using. That bridge has a real cost: extra bytes in your bundle, an adapter layer your framework has to drive, and no integration with the framework's own batching or scheduling.
 
-[Formisch](https://formisch.dev) is a schema-first form library that supports six frameworks — SolidJS, React, Vue, Svelte, Preact and Qwik — and it doesn't take that approach. The framework's actual reactivity primitive is swapped in at _build time_, so at runtime there's nothing between your form state and the framework. In Solid, form state is real Solid signals. In Vue, real `shallowRef`s. In Svelte, real `$state` cells. No abstraction tax.
+[Formisch](https://formisch.dev), a schema-first form library for SolidJS, React, Vue, Svelte, Preact, and Qwik, takes a different approach. Instead of a runtime reactivity layer, it swaps in the framework's native primitive at build time. In Solid, form state is real Solid signals. In Vue, real `shallowRef`s. In Svelte, real `$state` cells. No runtime adapter or abstraction tax.
 
 This post is about why that distinction matters and how the design works.
 
@@ -28,21 +28,21 @@ interface Signal<T> {
 }
 ```
 
-Reads track, writes notify. That's the entire reactive contract the core relies on. Every field store in your form is built out of `Signal<T>` instances — one for `errors`, one for `isTouched`, one for `isDirty`, one for `input`, and so on. The shape is pre-allocated at form creation from your Valibot schema, so methods like `setInput` and `validate` don't look up paths in a generic object: they walk a typed tree of stores and write `.value` directly. Only the components that read that specific signal re-render.
+Reads track, writes notify. That's the entire reactive contract the core relies on. Every field store in your form is built out of `Signal<T>` instances: one for `errors`, one for `isTouched`, one for `isDirty`, one for `input`, and so on. The shape is pre-allocated at form creation from your Valibot schema, so methods like `setInput` and `validate` don't look up paths in a generic object. They walk a typed tree of stores and write `.value` directly. Only the components that read that specific signal re-render.
 
 The trick is that the core never picks an implementation of `Signal<T>`. It just imports it.
 
 ## The build-time swap
 
-Inside the core there's a single `framework/index.ts` that exposes the four functions. Next to it, six siblings: `index.solid.ts`, `index.react.ts`, `index.vue.ts`, `index.svelte.ts`, `index.preact.ts` and `index.qwik.ts`. None of them ship to your app on their own. The trick lives in the build.
+Inside the core there's a single `framework/index.ts` that exposes the four functions. Next to it, six siblings: `index.solid.ts`, `index.react.ts`, `index.vue.ts`, `index.svelte.ts`, `index.preact.ts` and `index.qwik.ts`. None of them ship to your app on their own. The switch happens at build time.
 
-When the bundler resolves an import of `./framework/index.ts`, a small [rolldown plugin](https://github.com/open-circle/formisch/blob/main/packages/core/tsdown.config.ts) checks whether a sibling `./framework/index.{framework}.ts` exists. If it does, the plugin redirects the import there. The build runs once per framework with a different target, and each run produces a self-contained bundle with that framework's adapter inlined as if it had always been the only option.
+When the bundler resolves an import of `./framework/index.ts`, a small [rolldown plugin](https://github.com/open-circle/formisch/blob/main/packages/core/tsdown.config.ts) checks whether a sibling `./framework/index.{framework}.ts` exists. If it does, the plugin redirects the import there. The build runs once per framework with a different target, and each run produces a self-contained bundle with that framework's adapter inlined.
 
-Because the framework target is baked in at build time, there's no runtime detection — no `import.meta` checks, no environment sniffing, no adapter to load. The same `createFormStore` code path that runs in your Solid app runs in your Vue app — it just imports a different `createSignal` because the bundle it lives in was compiled with a different target.
+Because the framework target is baked in at build time, there's no runtime detection: no `import.meta` checks, no environment sniffing, and no adapter to load. The same `createFormStore` code path that runs in your Solid app runs in your Vue app. It just imports a different `createSignal` because the bundle it lives in was compiled with a different target.
 
 ## What the adapters actually look like
 
-Because most modern frameworks already have a signal primitive that fits the `.value` getter/setter shape, most of the adapters are nearly invisible. Here's the reactivity glue from four of them — each file also exports a `framework` constant and trivial `createId` helper, but the signal part is the only architecturally interesting bit:
+Because most modern frameworks already have a signal primitive that fits the `.value` getter/setter shape, most of the adapters are nearly invisible. Here's the reactivity glue from four of them:
 
 **Vue** ([`index.vue.ts`](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.vue.ts)):
 
@@ -84,28 +84,30 @@ export function createSignal<T>(initialValue: T): Signal<T> {
 }
 ```
 
-**Svelte** ([`index.svelte.ts`](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.svelte.ts)) is similarly small — a thin wrapper around the `$state.raw` rune that exposes the same `.value` getter/setter.
+**Svelte** ([`index.svelte.ts`](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.svelte.ts)) is similarly small, a thin wrapper around the `$state.raw` rune that exposes the same `.value` getter/setter.
 
-The one exception is **React**, because React doesn't have a native signal primitive. [Its adapter](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.react.ts) hand-rolls a small pub/sub — around a hundred lines, including batching — and a companion `useSignals` hook in the React wrapper registers your component as a listener and force-updates it when any signal it read changes. Even so, the React adapter is just enough pub/sub to drive re-renders. There's no separate "Formisch reactivity layer" the bundle has to carry — only the minimum that React would need anyway.
+The one exception is **React**, because React doesn't have a native signal primitive. [Its adapter](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.react.ts) hand-rolls a small pub/sub (around a hundred lines, including batching) and a companion `useSignals` hook in the React wrapper registers your component as a listener and force-updates it when any signal it read changes. Even so, the React adapter is just enough pub/sub to drive re-renders. There's no separate "Formisch reactivity layer" the bundle has to carry, only the minimum that React would need anyway.
 
 In every case, your form state lives in something the framework's own scheduler already knows how to track.
 
 ## What you get for free
 
-The reason this design is worth talking about isn't bundle size — though that benefit is real. It's the second-order properties.
+Bundle size is the obvious benefit. But it's not the most important one.
 
-**Framework-native integration.** In Solid, your form state participates in `createMemo` and `untrack` natively. In Vue, it works with `computed` and `watch`. In Svelte, it slots into `$derived`. In Preact and Qwik, it works with their respective `computed` primitives. Because the signals _are_ the framework's signals, there's nothing to bridge — and your batching, scheduling and fine-grained tracking come along for free.
+**Framework-native integration.** In Solid, your form state participates in `createMemo` and `untrack` natively. In Vue, it works with `computed` and `watch`. In Svelte, it slots into `$derived`. In Preact and Qwik, it works with their respective `computed` primitives. Because the signals _are_ the framework's signals, there's nothing to bridge and your batching, scheduling and fine-grained tracking come along for free.
 
-**Tree-shakeable everything.** Each form operation — `setInput`, `validate`, `reset`, `insert`, `move`, `focus` and the rest — lives in its own module. A form that doesn't call `reset` doesn't ship `reset`. A form that only renders fields doesn't ship `validate`. The core stays small; everything else is opt-in.
+**Tree-shakeable everything.** Each form operation (`setInput`, `validate`, `reset`, `insert`, `move`, `focus` and the rest) lives in its own module. A form that doesn't call `reset` doesn't ship `reset`. A form that only renders fields doesn't ship `validate`. The core stays small; everything else is opt-in.
 
 **Type safety from one source.** The same Valibot schema you pass to the form drives both runtime parsing _and_ the inferred TypeScript types for paths, inputs and outputs. There is no second declaration to keep in sync, no resolver to configure, no helper type to import. Rename a field in your schema and every `<Field path={...} />` in your codebase is type-checked against the new shape immediately.
 
-**One library, six communities.** Because the core is genuinely shared, an improvement found by a Svelte user lands in React, Vue, Solid, Preact and Qwik at the same time. Same for bug fixes. Same for performance work. There's one implementation of the recursive store builder, one validation orchestration, one set of methods — and every framework community pulls the rest forward.
+**One library, six communities.** Because the core is genuinely shared, an improvement in Svelte benefits React, Vue, Solid, Preact and Qwik at the same time. Same for bug fixes and performance work. There's one implementation of the recursive store builder, one validation orchestration, one set of methods and every framework community benefits.
 
-Framework-agnostic is usually framed as a trade-off: you give up framework-native integration in exchange for portability. In Formisch's case, that trade-off doesn't exist. Building the abstraction at the source code level instead of the runtime level lets you have both.
+Framework-agnostic is usually framed as a trade-off: you give up framework-native integration in exchange for portability. In Formisch's case, that trade-off doesn't exist. Building the abstraction at the source code level instead of the runtime level means you get both.
 
 ## Try it out
 
-Pick your framework's installation guide, write a Valibot schema, and you'll be rendering a fully typed form in a few minutes. The [playground](https://formisch.dev/playground/) is the fastest way to try it without leaving your browser.
+The [playground](https://formisch.dev/playground/) runs in your browser, no install needed. When you're ready, pick your framework's guide and you'll have a typed form running in minutes.
 
-If you want to keep going, every framework has its own architecture guide that walks through what happens when you call `createForm` or `useForm` — from the recursive store builder to the public form store. The full source is on [GitHub](https://github.com/open-circle/formisch), and contributions from any framework's community benefit all of them.
+If you want to keep going, every framework has its own architecture guide that walks through what happens when you call `createForm` or `useForm`, from the recursive store builder to the public form store.
+
+The full source is on [GitHub](https://github.com/open-circle/formisch), and contributions from any framework's community benefit all of them.
