@@ -15,7 +15,7 @@ import { Link } from '~/components';
 
 Most "framework-agnostic" libraries are agnostic at runtime. They ship their own reactivity primitive (a custom store, an observer protocol, a subscription bus) and bridge it into whichever framework you're using. That bridge has a real cost: extra bytes in your bundle, an adapter layer your framework has to drive, and no integration with the framework's own batching or scheduling.
 
-<Link href="/">Formisch</Link>, a schema-first form library for SolidJS, React, Vue, Svelte, Preact, and Qwik, takes a different approach. Instead of a runtime reactivity layer, it swaps in the framework's native primitive at build time. In Solid, form state is real Solid signals. In Vue, real `shallowRef`s. In Svelte, real `$state` cells. No runtime adapter or abstraction tax.
+Formisch, a schema-first form library for SolidJS, React, Vue, Svelte, Preact, and Qwik, takes a different approach. Instead of a runtime reactivity layer, it swaps in the framework's native primitive at build time. In Solid, form state is real Solid signals. In Vue, real `shallowRef`s. In Svelte, real `$state` cells. No runtime adapter or abstraction tax.
 
 This post is about why that distinction matters and how the design works.
 
