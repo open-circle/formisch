@@ -58,12 +58,6 @@
     scrollbar-color: var(--color-slate-700) transparent;
   }
 
-  /* Monaco editor */
-  .monaco-editor,
-  .monaco-editor > div {
-    @apply border-0 outline-none lg:rounded-3xl;
-  }
-
   .dark .shiki,
   .dark .shiki span {
     color: var(--shiki-dark) !important;
