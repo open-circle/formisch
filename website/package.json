@@ -27,7 +27,6 @@
     "preview": "qwik build preview && vite preview --open",
     "serve": "wrangler pages dev ./dist --compatibility-flags=nodejs_als",
     "sitemap": "tsm ./scripts/sitemap.ts",
-    "sources": "tsm ./scripts/sources.ts",
     "start": "vite --open --mode ssr",
     "qwik": "qwik"
   },
