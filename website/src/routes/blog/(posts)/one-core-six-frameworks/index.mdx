@@ -6,20 +6,22 @@ description: >-
   doesn't. The framework's own reactivity is swapped in at build time, so
   at runtime form state lives in real Solid signals, Vue refs, or Svelte
   runes. Here's how the design works and what falls out of it.
-published: 2026-05-20
+published: 2026-05-22
 authors:
   - fabian-hiller
 ---
 
+import { Link } from '~/components';
+
 Most "framework-agnostic" libraries are agnostic at runtime. They ship their own reactivity primitive (a custom store, an observer protocol, a subscription bus) and bridge it into whichever framework you're using. That bridge has a real cost: extra bytes in your bundle, an adapter layer your framework has to drive, and no integration with the framework's own batching or scheduling.
 
-[Formisch](https://formisch.dev), a schema-first form library for SolidJS, React, Vue, Svelte, Preact, and Qwik, takes a different approach. Instead of a runtime reactivity layer, it swaps in the framework's native primitive at build time. In Solid, form state is real Solid signals. In Vue, real `shallowRef`s. In Svelte, real `$state` cells. No runtime adapter or abstraction tax.
+<Link href="/">Formisch</Link>, a schema-first form library for SolidJS, React, Vue, Svelte, Preact, and Qwik, takes a different approach. Instead of a runtime reactivity layer, it swaps in the framework's native primitive at build time. In Solid, form state is real Solid signals. In Vue, real `shallowRef`s. In Svelte, real `$state` cells. No runtime adapter or abstraction tax.
 
 This post is about why that distinction matters and how the design works.
 
 ## The four-function contract
 
-Almost every file in Formisch's core only ever imports four functions: `createSignal`, `batch`, `untrack` and `createId`. None of them know about a specific framework. They're declared once, abstractly, on a type that looks like this:
+Almost every file in Formisch's core only ever imports four functions: `createSignal`, `batch`, `untrack` and `createId`. None of them know about a specific framework. They're declared once, abstractly. `createSignal` returns a `Signal<T>` that looks like this:
 
 ```ts
 interface Signal<T> {
@@ -34,7 +36,7 @@ The trick is that the core never picks an implementation of `Signal<T>`. It just
 
 ## The build-time swap
 
-Inside the core there's a single `framework/index.ts` that exposes the four functions. Next to it, six siblings: `index.solid.ts`, `index.react.ts`, `index.vue.ts`, `index.svelte.ts`, `index.preact.ts` and `index.qwik.ts`. None of them ship to your app on their own. The switch happens at build time.
+Inside the core there's a single [`framework/index.ts`](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.ts) that exposes the four functions. Next to it, six siblings: `index.solid.ts`, `index.react.ts`, `index.vue.ts`, `index.svelte.ts`, `index.preact.ts` and `index.qwik.ts`. None of them ship to your app on their own. The switch happens at build time.
 
 When the bundler resolves an import of `./framework/index.ts`, a small [rolldown plugin](https://github.com/open-circle/formisch/blob/main/packages/core/tsdown.config.ts) checks whether a sibling `./framework/index.{framework}.ts` exists. If it does, the plugin redirects the import there. The build runs once per framework with a different target, and each run produces a self-contained bundle with that framework's adapter inlined.
 
@@ -86,7 +88,7 @@ export function createSignal<T>(initialValue: T): Signal<T> {
 
 **Svelte** ([`index.svelte.ts`](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.svelte.ts)) is similarly small, a thin wrapper around the `$state.raw` rune that exposes the same `.value` getter/setter.
 
-The one exception is **React**, because React doesn't have a native signal primitive. [Its adapter](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.react.ts) hand-rolls a small pub/sub (around a hundred lines, including batching) and a companion `useSignals` hook in the React wrapper registers your component as a listener and force-updates it when any signal it read changes. Even so, the React adapter is just enough pub/sub to drive re-renders. There's no separate "Formisch reactivity layer" the bundle has to carry, only the minimum that React would need anyway.
+The one exception is **React**, because React doesn't have a native signal primitive. [Its adapter](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.react.ts) hand-rolls a small pub/sub (around a hundred lines, including batching) and a companion [`useSignals`](https://github.com/open-circle/formisch/blob/main/frameworks/react/src/hooks/useSignals/useSignals.ts) hook in the React wrapper registers your component as a listener and force-updates it when any signal it read changes. Even so, the React adapter is just enough pub/sub to drive re-renders. There's no separate "Formisch reactivity layer" the bundle has to carry, only the minimum that React would need anyway.
 
 In every case, your form state lives in something the framework's own scheduler already knows how to track.
 
@@ -106,7 +108,7 @@ Framework-agnostic is usually framed as a trade-off: you give up framework-nativ
 
 ## Try it out
 
-The [playground](https://formisch.dev/playground/) runs in your browser, no install needed. When you're ready, pick your framework's guide and you'll have a typed form running in minutes.
+The <Link href="/playground/">playground</Link> runs in your browser, no install needed. When you're ready, pick your framework's guide and you'll have a typed form running in minutes.
 
 If you want to keep going, every framework has its own architecture guide that walks through what happens when you call `createForm` or `useForm`, from the recursive store builder to the public form store.
 
