@@ -23,3 +23,4 @@
 - [Nested fields](/solid/guides/nested-fields/)
 - [Field arrays](/solid/guides/field-arrays/)
 - [TypeScript](/solid/guides/typescript/)
+- [Architecture](/solid/guides/architecture/)

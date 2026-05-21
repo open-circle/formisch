@@ -23,3 +23,4 @@
 - [Nested fields](/react/guides/nested-fields/)
 - [Field arrays](/react/guides/field-arrays/)
 - [TypeScript](/react/guides/typescript/)
+- [Architecture](/react/guides/architecture/)
