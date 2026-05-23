@@ -14,7 +14,7 @@
     "build": "qwik build",
     "build.client": "vite build",
     "build.preview": "vite build --ssr src/entry.preview.tsx",
-    "build.server": "vite build -c adapters/vercel-edge/vite.config.ts",
+    "build.server": "vite build -c adapters/static/vite.config.ts",
     "build.types": "tsc --incremental --noEmit",
     "contributors": "tsm ./scripts/contributors.ts",
     "deploy": "vercel deploy",
@@ -24,8 +24,8 @@
     "format.check": "prettier --check .",
     "lint": "eslint \"src/**/*.ts*\"",
     "llms": "tsm ./scripts/llms.ts",
+    "og": "tsm ./scripts/og-images.ts",
     "preview": "qwik build preview && vite preview --open",
-    "serve": "wrangler pages dev ./dist --compatibility-flags=nodejs_als",
     "sitemap": "tsm ./scripts/sitemap.ts",
     "start": "vite --open --mode ssr",
     "qwik": "qwik"
@@ -40,12 +40,14 @@
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.25.0",
     "@typescript-eslint/utils": "^8.25.0",
+    "@vercel/og": "^0.6.5",
     "dotenv": "^16.4.7",
     "eslint": "^8.57.1",
     "eslint-plugin-qwik": "2.0.0-beta.9",
     "gray-matter": "^4.0.3",
     "prettier": "^3.5.2",
     "rehype-external-links": "^3.0.0",
+    "satori-html": "^0.3.2",
     "sharp": "^0.33.5",
     "shiki": "^3.13.0",
     "tailwindcss": "^4.1.13",
@@ -55,15 +57,11 @@
     "vercel": "^29.1.1",
     "vite": "^5.4.20",
     "vite-imagetools": "^7.0.5",
-    "vite-plugin-static-copy": "^2.2.0",
-    "vite-tsconfig-paths": "^5.1.4",
-    "wrangler": "^3.0.0"
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "dependencies": {
-    "@vercel/og": "^0.6.5",
     "@formisch/qwik": "workspace:*",
     "clsx": "^2.1.1",
-    "satori-html": "^0.3.2",
     "valibot": "^1.2.0"
   },
   "engines": {

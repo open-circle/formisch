@@ -1,54 +1,48 @@
 import { component$, useComputed$ } from '@qwik.dev/core';
 import { useDocumentHead, useLocation } from '@qwik.dev/router';
 import { FRAMEWORK_LIST } from '~/routes/plugin@framework';
-import { useTheme } from '~/routes/plugin@theme';
 import { getAreaName, getFrameworkName } from '~/utils';
+
+const THEME_INIT_SCRIPT = `try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}document.documentElement.classList.toggle('dark',t==='dark');}catch(e){}`;
+
+function ogImagePath(pathname: string): string {
+  if (pathname === '/') return '/og/index.png';
+  const slug = pathname.replace(/^\/+|\/+$/g, '').replace(/\//g, '_');
+  return `/og/${slug}.png`;
+}
 
 /**
  * Head content with title, meta, link, script and style elements.
  */
 export const HeadContent = component$(() => {
-  // Use head, location and theme
+  // Use head and location
   const head = useDocumentHead();
   const location = useLocation();
-  const theme = useTheme();
 
   // Compute document title
   const documentTitle = useComputed$(() => {
-    // Create title variable
     let title = '';
 
-    // Get framework, area and page from pathname
     const [, framework, area, page] = location.url.pathname.split('/');
 
-    // Add area name if available
     const areaName = getAreaName(area);
     if (areaName && page) {
       title += `${areaName}: `;
     }
 
-    // Add actual page title
     title += head.title;
 
-    // Add framework name if available
     const frameworkName = getFrameworkName(framework);
     if (frameworkName) {
       title += ` (${frameworkName})`;
     }
 
-    // Add suffix for non-homepage pages
     if (location.url.pathname !== '/') {
       title += ' | Formisch';
     }
 
-    // Return title
     return title;
   });
-
-  // Compute theme color code
-  const themeColor = useComputed$(() =>
-    theme.value === 'dark' ? '#111827' : '#fff'
-  );
 
   // Compute Open Graph type
   const ogType = useComputed$(() =>
@@ -63,27 +57,10 @@ export const HeadContent = component$(() => {
     () => head.meta.find((item) => item.name === 'description')?.content
   );
 
-  // Compute Open Graph image URL
-  const imageUrl = useComputed$(() => {
-    // Create base URL
-    let imageUrl = `${location.url.origin}/og-image`;
-
-    // Add title and path to URL
-    if (location.url.pathname !== '/') {
-      // eslint-disable-next-line qwik/valid-lexical-scope
-      imageUrl += `?title=${encodeURIComponent(head.title)}&path=${
-        location.url.pathname.split('/')[1]
-      }`;
-
-      // Add description to URL
-      if (description.value) {
-        imageUrl += `&description=${encodeURIComponent(description.value)}`;
-      }
-    }
-
-    // Return image URL
-    return imageUrl;
-  });
+  // Compute Open Graph image URL (points to pre-generated static PNG)
+  const imageUrl = useComputed$(
+    () => `${location.url.origin}${ogImagePath(location.url.pathname)}`
+  );
 
   // Compute docsearch framework
   const docsearchFramework = useComputed$(() => {
@@ -96,13 +73,25 @@ export const HeadContent = component$(() => {
 
   return (
     <>
+      {/* Pre-hydration theme + FOUC fix */}
+      <script dangerouslySetInnerHTML={THEME_INIT_SCRIPT} />
+
       {/* Document title */}
       <title>{documentTitle.value}</title>
 
       {/* Default metadata */}
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta name="theme-color" content={themeColor.value} />
+      <meta
+        name="theme-color"
+        media="(prefers-color-scheme: light)"
+        content="#fff"
+      />
+      <meta
+        name="theme-color"
+        media="(prefers-color-scheme: dark)"
+        content="#111827"
+      />
       <link rel="canonical" href={location.url.href} />
       <link rel="manifest" href="/manifest.json" />
 
@@ -160,13 +149,6 @@ export const HeadContent = component$(() => {
         data-domains="formisch.dev"
         data-strip-search="true"
       />
-
-      {/* Temporary solution until attribute can be rendered dynamically */}
-      {theme.value === 'dark' ? (
-        <script dangerouslySetInnerHTML="document.documentElement.classList.add('dark')" />
-      ) : (
-        <script dangerouslySetInnerHTML="document.documentElement.classList.remove('dark')" />
-      )}
     </>
   );
 });

@@ -1,5 +1,5 @@
 import { $, component$, useOnDocument, useSignal } from '@qwik.dev/core';
-import { Form, useLocation } from '@qwik.dev/router';
+import { useLocation } from '@qwik.dev/router';
 import clsx from 'clsx';
 import { useFocusTrap } from '~/hooks';
 import { AngleUpIcon } from '~/icons';
@@ -106,20 +106,18 @@ export const FrameworkPicker = component$<FrameworkPickerProps>((props) => {
             return (
               <>
                 {isPlaygroundRoute ? (
-                  <Form
+                  <button
                     key={item}
-                    action={setFramework}
-                    onSubmit$={() => (isOpen.value = false)}
+                    type="button"
+                    class="focus-ring flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3.5 py-2 hover:text-slate-900 dark:hover:text-slate-200"
+                    onClick$={() => {
+                      setFramework(item);
+                      isOpen.value = false;
+                    }}
                   >
-                    <input type="hidden" name="framework" value={item} />
-                    <button
-                      type="submit"
-                      class="focus-ring flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3.5 py-2 hover:text-slate-900 dark:hover:text-slate-200"
-                    >
-                      <FrameworkIcon class="mr-2.5 h-[22px]" />
-                      {getFrameworkName(item)}
-                    </button>
-                  </Form>
+                    <FrameworkIcon class="mr-2.5 h-[22px]" />
+                    {getFrameworkName(item)}
+                  </button>
                 ) : (
                   <Link
                     key={item}
