@@ -33,7 +33,7 @@ interface CreateTestStoreConfig<TSchema extends FormSchema> {
 export function createTestStore<TSchema extends FormSchema>(
   schema: TSchema,
   config: CreateTestStoreConfig<TSchema> = {}
-): BaseFormStore<TSchema> & InternalFormStore {
+): BaseFormStore<TSchema> & InternalFormStore<TSchema> {
   const {
     validate = 'submit',
     revalidate = 'input',
@@ -72,7 +72,7 @@ export function createTestStore<TSchema extends FormSchema>(
   // This mimics how BaseFormStore works
   const wrapper = {
     [INTERNAL]: internalStore,
-  } as BaseFormStore<TSchema> & InternalFormStore;
+  } as BaseFormStore<TSchema> & InternalFormStore<TSchema>;
 
   // Proxy all properties from internal to wrapper for easy access
   for (const key of Object.keys(internalStore)) {

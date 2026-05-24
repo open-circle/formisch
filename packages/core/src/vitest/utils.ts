@@ -28,7 +28,7 @@ interface CreateTestStoreConfig {
 export function createTestStore<TSchema extends FormSchema>(
   schema: TSchema,
   config: CreateTestStoreConfig = {}
-): InternalFormStore {
+): InternalFormStore<TSchema> {
   const { validate, revalidate, initialInput, issues } = config;
 
   const result: v.SafeParseResult<TSchema> = issues
@@ -46,6 +46,8 @@ export function createTestStore<TSchema extends FormSchema>(
       };
 
   const parse = vi.fn().mockResolvedValue(result);
+  // `createFormStore` returns a non-generic `InternalFormStore`, so cast back to
+  // the concrete schema to keep the generic parameter meaningful for callers.
   return createFormStore(
     {
       schema,
@@ -54,7 +56,7 @@ export function createTestStore<TSchema extends FormSchema>(
       revalidate,
     },
     parse
-  );
+  ) as InternalFormStore<TSchema>;
 }
 
 /**
