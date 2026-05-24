@@ -1,6 +1,13 @@
 import { makeEventListener } from '@solid-primitives/event-listener';
 import clsx from 'clsx';
-import { createEffect, createSignal, JSX, onCleanup, untrack } from 'solid-js';
+import {
+  createEffect,
+  createSignal,
+  JSX,
+  on,
+  onCleanup,
+  untrack,
+} from 'solid-js';
 import { isServer } from 'solid-js/web';
 
 type ExpandableProps = {
@@ -41,10 +48,14 @@ export function Expandable(props: ExpandableProps) {
   };
 
   // Expand or collapse content when expanded prop change
-  createEffect(() => {
-    props.expanded;
-    setTimeout(updateElementHeight);
-  });
+  createEffect(
+    on(
+      () => props.expanded,
+      () => {
+        setTimeout(updateElementHeight);
+      }
+    )
+  );
 
   // Update element height when window size change
   if (!isServer) {

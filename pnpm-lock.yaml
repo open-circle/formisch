@@ -732,6 +732,19 @@ importers:
       vinxi:
         specifier: ^0.5.8
         version: 0.5.8(@types/node@24.10.1)(db0@0.3.4)(ioredis@5.8.2)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(rolldown@1.0.0-beta.52)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+    devDependencies:
+      '@formisch/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      eslint:
+        specifier: ^9.31.0
+        version: 9.39.1(jiti@2.6.1)
+      eslint-plugin-solid:
+        specifier: ^0.14.5
+        version: 0.14.5(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
 
   playgrounds/svelte:
     dependencies:
@@ -13708,6 +13721,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@typescript-eslint/utils@8.46.2(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)':
+    dependencies:
+      '@eslint-community/eslint-utils': 4.9.0(eslint@9.39.1(jiti@2.6.1))
+      '@typescript-eslint/scope-manager': 8.46.2
+      '@typescript-eslint/types': 8.46.2
+      '@typescript-eslint/typescript-estree': 8.46.2(typescript@5.9.3)
+      eslint: 9.39.1(jiti@2.6.1)
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - supports-color
+
   '@typescript-eslint/utils@8.48.0(eslint@9.38.0(jiti@2.6.1))(typescript@5.8.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.0(eslint@9.38.0(jiti@2.6.1))
@@ -16074,6 +16098,19 @@ snapshots:
       known-css-properties: 0.30.0
       style-to-object: 1.0.12
       typescript: 5.8.3
+    transitivePeerDependencies:
+      - supports-color
+
+  eslint-plugin-solid@0.14.5(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
+    dependencies:
+      '@typescript-eslint/utils': 8.46.2(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+      eslint: 9.39.1(jiti@2.6.1)
+      estraverse: 5.3.0
+      is-html: 2.0.0
+      kebab-case: 1.0.2
+      known-css-properties: 0.30.0
+      style-to-object: 1.0.12
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
