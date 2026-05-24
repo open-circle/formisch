@@ -1,0 +1,71 @@
+{
+  "name": "@formisch/angular",
+  "description": "The lightweight, schema-first, and fully type-safe form library for Angular",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Fabian Hiller",
+  "homepage": "https://formisch.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/open-circle/formisch"
+  },
+  "keywords": [
+    "angular",
+    "form",
+    "typescript",
+    "schema",
+    "validation"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run --typecheck --passWithNoTests",
+    "lint": "eslint \"src/**/*.ts*\" && tsc --noEmit",
+    "lint.fix": "eslint \"src/**/*.ts*\" --fix",
+    "format": "prettier --write ./src",
+    "format.check": "prettier --check ./src"
+  },
+  "devDependencies": {
+    "@angular/common": "^19.0.0",
+    "@angular/compiler": "^19.0.0",
+    "@angular/core": "^19.0.0",
+    "@angular/platform-browser": "^19.0.0",
+    "@formisch/core": "workspace:*",
+    "@formisch/eslint-config": "workspace:*",
+    "@formisch/methods": "workspace:*",
+    "@types/node": "^24.0.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "^9.31.0",
+    "jsdom": "^26.1.0",
+    "tsdown": "^0.16.8",
+    "typescript": "~5.8.3",
+    "valibot": "^1.2.0",
+    "vitest": "^3.2.4",
+    "zone.js": "^0.15.0"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=17.0.0",
+    "typescript": ">=5",
+    "valibot": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  }
+}
