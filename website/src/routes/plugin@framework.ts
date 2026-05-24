@@ -29,7 +29,7 @@ import {
   VueLogo,
 } from '~/logos';
 
-const STORAGE_KEY = 'framework';
+const FRAMEWORK_KEY = 'framework';
 export const DEFAULT_FRAMEWORK: Framework = 'solid';
 
 export type Framework =
@@ -82,11 +82,13 @@ const FRAMEWORK_ICON_MAP: Record<
   vue: VueIcon,
 };
 
-function isFramework(value: string | undefined): value is Framework {
+export function isFramework(
+  value: string | null | undefined
+): value is Framework {
   return !!value && (FRAMEWORK_LIST as string[]).includes(value);
 }
 
-const FrameworkContext = createContextId<Signal<Framework>>('framework');
+const FrameworkContext = createContextId<Signal<Framework>>(FRAMEWORK_KEY);
 
 /**
  * Provides the framework signal. Mounted once near the root of the app.
@@ -119,25 +121,23 @@ export const useFrameworkProvider = () => {
     const firstSegment = pathname.split('/')[1];
     if (isFramework(firstSegment)) {
       try {
-        localStorage.setItem(STORAGE_KEY, firstSegment);
+        localStorage.setItem(FRAMEWORK_KEY, firstSegment);
       } catch {
         // ignore
       }
-      return;
-    }
 
-    // Otherwise restore from localStorage
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (isFramework(stored ?? undefined)) {
-        framework.value = stored as Framework;
+      // Otherwise restore from localStorage
+    } else {
+      try {
+        const stored = localStorage.getItem(FRAMEWORK_KEY);
+        if (isFramework(stored)) {
+          framework.value = stored;
+        }
+      } catch {
+        // ignore
       }
-    } catch {
-      // ignore
     }
   });
-
-  return framework;
 };
 
 /**
@@ -153,7 +153,7 @@ export const useSetFramework = (): QRL<(value: Framework) => void> => {
   return $((value: Framework) => {
     framework.value = value;
     try {
-      localStorage.setItem(STORAGE_KEY, value);
+      localStorage.setItem(FRAMEWORK_KEY, value);
     } catch {
       // ignore
     }

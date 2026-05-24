@@ -2,14 +2,12 @@ import { type ContentMenu, routeLoader$ } from '@qwik.dev/router';
 import {
   DEFAULT_FRAMEWORK,
   type Framework,
-  FRAMEWORK_LIST,
+  isFramework,
 } from './plugin@framework';
 
 function frameworkFromPathname(pathname: string): Framework {
   const first = pathname.split('/')[1];
-  return (FRAMEWORK_LIST as string[]).includes(first)
-    ? (first as Framework)
-    : DEFAULT_FRAMEWORK;
+  return isFramework(first) ? first : DEFAULT_FRAMEWORK;
 }
 
 /**
@@ -51,8 +49,11 @@ export const useOtherMenuHrefs = routeLoader$(async ({ pathname }) => {
       .map(async ([, readFile]) => (await readFile()).default)
   );
 
-  // Return all hrefs from other menus
+  // Return all defined hrefs from other menus
   return menus.flatMap((menu) =>
-    menu.items?.flatMap((item) => item.items).map((item) => item?.href)
+    (menu.items ?? [])
+      .flatMap((item) => item.items ?? [])
+      .map((item) => item.href)
+      .filter((href): href is string => href !== undefined)
   );
 });

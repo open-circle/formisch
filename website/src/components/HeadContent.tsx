@@ -1,11 +1,15 @@
 import { component$, useComputed$ } from '@qwik.dev/core';
 import { useDocumentHead, useLocation } from '@qwik.dev/router';
+import { CHAPTERS_KEY, HIDDEN_CLASS } from '~/routes/plugin@chapters';
 import { FRAMEWORK_LIST } from '~/routes/plugin@framework';
+import { THEME_KEY } from '~/routes/plugin@theme';
 import { getAreaName, getFrameworkName } from '~/utils';
 
-const THEME_INIT_SCRIPT = `try{var t=localStorage.getItem('theme');document.documentElement.classList.toggle('dark',t==='dark'||t!=='light'&&!matchMedia('(prefers-color-scheme:light)').matches);}catch(e){}`;
+// Keys and classes are imported from the plugins so these pre-hydration
+// scripts can never drift from the runtime stores that read the same values.
+const THEME_INIT_SCRIPT = `try{var t=localStorage.getItem('${THEME_KEY}');document.documentElement.classList.toggle('dark',t==='dark'||t!=='light'&&!matchMedia('(prefers-color-scheme:light)').matches);}catch(e){}`;
 
-const CHAPTERS_INIT_SCRIPT = `try{document.documentElement.classList.toggle('no-chapters',localStorage.getItem('chapters')==='false');}catch(e){}`;
+const CHAPTERS_INIT_SCRIPT = `try{document.documentElement.classList.toggle('${HIDDEN_CLASS}',localStorage.getItem('${CHAPTERS_KEY}')==='false');}catch(e){}`;
 
 function ogImagePath(pathname: string): string {
   if (pathname === '/') return '/og/index.png';
