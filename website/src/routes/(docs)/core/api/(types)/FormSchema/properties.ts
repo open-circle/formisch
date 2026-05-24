@@ -7,6 +7,16 @@ export const properties: Record<string, PropertyProps> = {
       options: [
         {
           type: 'custom',
+          name: 'IntersectSchema',
+          href: 'https://valibot.dev/api/IntersectSchema/',
+        },
+        {
+          type: 'custom',
+          name: 'IntersectSchemaAsync',
+          href: 'https://valibot.dev/api/IntersectSchemaAsync/',
+        },
+        {
+          type: 'custom',
           name: 'LooseObjectSchema',
           href: 'https://valibot.dev/api/LooseObjectSchema/',
         },
@@ -34,6 +44,26 @@ export const properties: Record<string, PropertyProps> = {
           type: 'custom',
           name: 'StrictObjectSchemaAsync',
           href: 'https://valibot.dev/api/StrictObjectSchemaAsync/',
+        },
+        {
+          type: 'custom',
+          name: 'UnionSchema',
+          href: 'https://valibot.dev/api/UnionSchema/',
+        },
+        {
+          type: 'custom',
+          name: 'UnionSchemaAsync',
+          href: 'https://valibot.dev/api/UnionSchemaAsync/',
+        },
+        {
+          type: 'custom',
+          name: 'VariantSchema',
+          href: 'https://valibot.dev/api/VariantSchema/',
+        },
+        {
+          type: 'custom',
+          name: 'VariantSchemaAsync',
+          href: 'https://valibot.dev/api/VariantSchemaAsync/',
         },
       ],
     },
