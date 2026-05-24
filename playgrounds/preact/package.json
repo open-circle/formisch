@@ -13,14 +13,14 @@
   "dependencies": {
     "@formisch/preact": "workspace:*",
     "@formkit/auto-animate": "^0.8.2",
-    "@preact/signals": "^2.2.1",
+    "@preact/signals": "^2.9.0",
     "clsx": "^2.1.1",
-    "preact": "^10.25.3",
+    "preact": "^10.29.2",
     "preact-iso": "^2.9.2",
     "valibot": "^1.2.0"
   },
   "devDependencies": {
-    "@preact/preset-vite": "^2.9.3",
+    "@preact/preset-vite": "^2.10.5",
     "@tailwindcss/vite": "^4.1.11",
     "eslint": "^9.31.0",
     "eslint-config-preact": "^2.0.0",
