@@ -26,6 +26,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./angular": {
+      "types": "./dist/index.angular.d.ts",
+      "default": "./dist/index.angular.js"
+    },
     "./preact": {
       "types": "./dist/index.preact.d.ts",
       "default": "./dist/index.preact.js"
@@ -68,6 +72,7 @@
     "build": "tsdown"
   },
   "devDependencies": {
+    "@angular/core": "^21.0.0",
     "@formisch/eslint-config": "workspace:*",
     "@preact/signals": "^2.2.1",
     "@qwik.dev/core": "2.0.0-beta.5",
@@ -86,6 +91,7 @@
     "vue": "^3.5.17"
   },
   "peerDependencies": {
+    "@angular/core": ">=17.0.0",
     "@qwik.dev/core": "^2.0.0",
     "solid-js": "^1.6.0",
     "svelte": "^5.29.0",
@@ -94,6 +100,9 @@
     "vue": "^3.3.0"
   },
   "peerDependenciesMeta": {
+    "@angular/core": {
+      "optional": true
+    },
     "@preact/signals": {
       "optional": true
     },

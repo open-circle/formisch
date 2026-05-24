@@ -6,6 +6,7 @@ import type { Signal } from '../types/index.ts';
  * Framework type.
  */
 export type Framework =
+  | 'angular'
   | 'preact'
   | 'qwik'
   | 'react'
