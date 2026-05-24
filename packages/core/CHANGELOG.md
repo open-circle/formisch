@@ -2,6 +2,11 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Add `FormSchema` type that constrains a form's root schema to object schemas (sync or async) and combinators (`intersect`, `union`, `variant`)
+- Change `FormConfig`, `InternalFormStore`, `BaseFormStore`, `SubmitHandler` and `SubmitEventHandler` generic constraints from `Schema` to `FormSchema`
+
 ## v0.6.4 (May 17, 2026)
 
 - Fix `initializeFieldStore` to throw an error when `variant` or `union` branches initialize the same key with incompatible store kinds (pull request #94)

@@ -2,6 +2,11 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Change `@formisch/core` to vX.X.X
+- Change method generic constraints from `Schema` to `FormSchema` so the form root must be an object schema (sync or async) or a combinator (`intersect`, `union`, `variant`)
+
 ## v0.7.2 (May 17, 2026)
 
 - Change `@formisch/core` to v0.6.4

@@ -2,6 +2,12 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Change `@formisch/core` to vX.X.X
+- Change `@formisch/methods` to vX.X.X
+- Change `useForm`, `useField`, `useFieldArray`, `Form`, `Field`, `FieldArray` and related types to constrain the form root to `FormSchema` (object schema or combinator)
+
 ## v0.4.6 (May 17, 2026)
 
 - Change `@formisch/core` to v0.6.4
