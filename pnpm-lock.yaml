@@ -35,6 +35,57 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
+  frameworks/angular:
+    devDependencies:
+      '@angular/common':
+        specifier: ^19.0.0
+        version: 19.2.22(@angular/core@19.2.22(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
+      '@angular/compiler':
+        specifier: ^19.0.0
+        version: 19.2.22
+      '@angular/core':
+        specifier: ^19.0.0
+        version: 19.2.22(rxjs@7.8.2)(zone.js@0.15.1)
+      '@angular/platform-browser':
+        specifier: ^19.0.0
+        version: 19.2.22(@angular/common@19.2.22(@angular/core@19.2.22(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.22(rxjs@7.8.2)(zone.js@0.15.1))
+      '@formisch/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@formisch/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@formisch/methods':
+        specifier: workspace:*
+        version: link:../../packages/methods
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.10.1
+      '@vitest/coverage-v8':
+        specifier: ^3.2.4
+        version: 3.2.4(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
+      eslint:
+        specifier: ^9.31.0
+        version: 9.39.1(jiti@2.6.1)
+      jsdom:
+        specifier: ^26.1.0
+        version: 26.1.0
+      tsdown:
+        specifier: ^0.16.8
+        version: 0.16.8(publint@0.3.15)(typescript@5.8.3)(vue-tsc@3.1.2(typescript@5.8.3))
+      typescript:
+        specifier: ~5.8.3
+        version: 5.8.3
+      valibot:
+        specifier: ^1.2.0
+        version: 1.2.0(typescript@5.8.3)
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      zone.js:
+        specifier: ^0.15.0
+        version: 0.15.1
+
   frameworks/preact:
     devDependencies:
       '@formisch/core':
@@ -397,7 +448,7 @@ importers:
     devDependencies:
       '@angular/core':
         specifier: ^21.0.0
-        version: 21.2.13(rxjs@7.8.2)
+        version: 21.2.13(rxjs@7.8.2)(zone.js@0.15.1)
       '@formisch/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
@@ -992,6 +1043,24 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
+  '@angular/common@19.2.22':
+    resolution: {integrity: sha512-OGvJkK9xvlXF0LsM8T2NTgL6ehr+P4t493xztdIwiO7CzseDzHCBNZ8L1TwaVqqP3Xj0UhGTtWXp7YN4N9+u7Q==}
+    engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
+    peerDependencies:
+      '@angular/core': 19.2.22
+      rxjs: ^6.5.3 || ^7.4.0
+
+  '@angular/compiler@19.2.22':
+    resolution: {integrity: sha512-NO3q39TMq88MRyBM9E/cSn4KFEItPrp79izX3nRkWlGQ0D9nJPdzm2cHtZoB9dCZ3N6EOazTgBK+2jKylQrUFQ==}
+    engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
+
+  '@angular/core@19.2.22':
+    resolution: {integrity: sha512-ImujBPIrV9eetYl2GaEBRw9CetklFtXB11oVaxOjflE2z6juTjugzXhszo/khMLj6UFfS+Anvp7Vv/Ot6DJL7A==}
+    engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
+    peerDependencies:
+      rxjs: ^6.5.3 || ^7.4.0
+      zone.js: ~0.15.0
+
   '@angular/core@21.2.13':
     resolution: {integrity: sha512-23tS4oNL8nvkHcI4l9rbruQs2WS4yqQmBVQxWakqS9cmRpArLGgveR+hKNU5tPXm5EAi8oLO34/Zy7z70jUpCg==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
@@ -1003,6 +1072,17 @@ packages:
       '@angular/compiler':
         optional: true
       zone.js:
+        optional: true
+
+  '@angular/platform-browser@19.2.22':
+    resolution: {integrity: sha512-7OE80uM3DYDXa8D+1c3D231yzfqWz+2YaQElKK5MTPIDobSA9Dsu4YIFX80FRFxaopo3673RepZgxxFx3KzRzA==}
+    engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
+    peerDependencies:
+      '@angular/animations': 19.2.22
+      '@angular/common': 19.2.22
+      '@angular/core': 19.2.22
+    peerDependenciesMeta:
+      '@angular/animations':
         optional: true
 
   '@asamuzakjp/css-color@3.2.0':
@@ -10475,6 +10555,9 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
+  zone.js@0.15.1:
+    resolution: {integrity: sha512-XE96n56IQpJM7NAoXswY3XRLcWFW83xe0BiAOeMD7K5k5xecOeul3Qcpx6GqEeeHNkW5DWL5zOyTbEfB4eti8w==}
+
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
@@ -10490,9 +10573,33 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
-  '@angular/core@21.2.13(rxjs@7.8.2)':
+  '@angular/common@19.2.22(@angular/core@19.2.22(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)':
+    dependencies:
+      '@angular/core': 19.2.22(rxjs@7.8.2)(zone.js@0.15.1)
+      rxjs: 7.8.2
+      tslib: 2.8.1
+
+  '@angular/compiler@19.2.22':
+    dependencies:
+      tslib: 2.8.1
+
+  '@angular/core@19.2.22(rxjs@7.8.2)(zone.js@0.15.1)':
     dependencies:
       rxjs: 7.8.2
+      tslib: 2.8.1
+      zone.js: 0.15.1
+
+  '@angular/core@21.2.13(rxjs@7.8.2)(zone.js@0.15.1)':
+    dependencies:
+      rxjs: 7.8.2
+      tslib: 2.8.1
+    optionalDependencies:
+      zone.js: 0.15.1
+
+  '@angular/platform-browser@19.2.22(@angular/common@19.2.22(@angular/core@19.2.22(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.22(rxjs@7.8.2)(zone.js@0.15.1))':
+    dependencies:
+      '@angular/common': 19.2.22(@angular/core@19.2.22(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
+      '@angular/core': 19.2.22(rxjs@7.8.2)(zone.js@0.15.1)
       tslib: 2.8.1
 
   '@asamuzakjp/css-color@3.2.0':
@@ -22285,5 +22392,7 @@ snapshots:
   zod@3.25.48: {}
 
   zod@3.25.76: {}
+
+  zone.js@0.15.1: {}
 
   zwitch@2.0.4: {}
