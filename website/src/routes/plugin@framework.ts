@@ -30,7 +30,7 @@ import {
 } from '~/logos';
 
 const STORAGE_KEY = 'framework';
-const DEFAULT_FRAMEWORK: Framework = 'solid';
+export const DEFAULT_FRAMEWORK: Framework = 'solid';
 
 export type Framework =
   | 'preact'
@@ -111,9 +111,12 @@ export const useFrameworkProvider = () => {
   });
 
   // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(() => {
+  useVisibleTask$(({ track }) => {
+    // Re-run on client-side navigation so the stored slug never goes stale
+    const pathname = track(() => location.url.pathname);
+
     // If URL already dictates the framework, persist it
-    const firstSegment = location.url.pathname.split('/')[1];
+    const firstSegment = pathname.split('/')[1];
     if (isFramework(firstSegment)) {
       try {
         localStorage.setItem(STORAGE_KEY, firstSegment);

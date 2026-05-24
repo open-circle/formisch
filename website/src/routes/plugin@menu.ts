@@ -1,7 +1,9 @@
 import { type ContentMenu, routeLoader$ } from '@qwik.dev/router';
-import { type Framework, FRAMEWORK_LIST } from './plugin@framework';
-
-const DEFAULT_FRAMEWORK: Framework = 'solid';
+import {
+  DEFAULT_FRAMEWORK,
+  type Framework,
+  FRAMEWORK_LIST,
+} from './plugin@framework';
 
 function frameworkFromPathname(pathname: string): Framework {
   const first = pathname.split('/')[1];

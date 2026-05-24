@@ -1,4 +1,10 @@
-import { $, component$, useOnDocument, useSignal } from '@qwik.dev/core';
+import {
+  $,
+  component$,
+  Fragment,
+  useOnDocument,
+  useSignal,
+} from '@qwik.dev/core';
 import { useLocation } from '@qwik.dev/router';
 import clsx from 'clsx';
 import { useFocusTrap } from '~/hooks';
@@ -104,10 +110,9 @@ export const FrameworkPicker = component$<FrameworkPickerProps>((props) => {
           (item) => {
             const FrameworkIcon = getFrameworkIcon(item);
             return (
-              <>
+              <Fragment key={item}>
                 {isPlaygroundRoute ? (
                   <button
-                    key={item}
                     type="button"
                     class="focus-ring flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3.5 py-2 hover:text-slate-900 dark:hover:text-slate-200"
                     onClick$={() => {
@@ -120,7 +125,6 @@ export const FrameworkPicker = component$<FrameworkPickerProps>((props) => {
                   </button>
                 ) : (
                   <Link
-                    key={item}
                     class="focus-ring flex items-center gap-2.5 rounded-xl px-3.5 py-2 hover:text-slate-900 dark:hover:text-slate-200"
                     href={getPathname(item)}
                     onClick$={() => (isOpen.value = false)}
@@ -129,7 +133,7 @@ export const FrameworkPicker = component$<FrameworkPickerProps>((props) => {
                     {getFrameworkName(item)}
                   </Link>
                 )}
-              </>
+              </Fragment>
             );
           }
         )}

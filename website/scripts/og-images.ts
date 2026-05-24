@@ -67,7 +67,9 @@ function extractFromTsx(source: string): {
   title?: string;
   description?: string;
 } {
-  const headMatch = source.match(/head:\s*DocumentHead\s*=\s*{([\s\S]*?)\n};/);
+  const headMatch = source.match(
+    /head:\s*DocumentHead\s*=\s*{([\s\S]*?)\n\s*};/
+  );
   if (!headMatch) return {};
   const block = headMatch[1];
   const titleMatch = block.match(new RegExp(`title:\\s*${QUOTED_STRING}`));
