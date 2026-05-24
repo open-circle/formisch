@@ -23,7 +23,8 @@
 
   // Update height when expanded prop changes
   $effect(() => {
-    expanded;
+    // Read `expanded` so the effect re-runs on change; height is applied next tick
+    void expanded;
     setTimeout(updateElementHeight);
   });
 
