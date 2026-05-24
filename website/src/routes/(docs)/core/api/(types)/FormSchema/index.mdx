@@ -11,7 +11,7 @@ import { properties } from './properties';
 
 # FormSchema
 
-Type definition that represents the Valibot object schemas allowed as the root of a form. Forms must have an object root; use <Link href="/core/api/Schema/">Schema</Link> for nested field schemas.
+Type definition that represents the Valibot object schemas allowed as the root of a form. This includes object schemas, combinators (`intersect`, `union`, `variant`) whose options resolve to objects, and `lazy` schemas wrapping any of these. Forms must have an object root; use <Link href="/core/api/Schema/">Schema</Link> for nested field schemas.
 
 ## Definition
 

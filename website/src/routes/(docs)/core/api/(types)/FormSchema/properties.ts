@@ -17,6 +17,16 @@ export const properties: Record<string, PropertyProps> = {
         },
         {
           type: 'custom',
+          name: 'LazySchema',
+          href: 'https://valibot.dev/api/LazySchema/',
+        },
+        {
+          type: 'custom',
+          name: 'LazySchemaAsync',
+          href: 'https://valibot.dev/api/LazySchemaAsync/',
+        },
+        {
+          type: 'custom',
           name: 'LooseObjectSchema',
           href: 'https://valibot.dev/api/LooseObjectSchema/',
         },

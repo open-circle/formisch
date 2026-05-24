@@ -47,28 +47,43 @@ type ObjectSchemaAsync =
     >;
 
 /**
- * Form schema type.
- *
- * Hint: Forms must have an object root, so only object schemas (sync or async)
- * and combinators (intersect, union, variant) whose options resolve to objects
- * are allowed at the top level. Use {@link Schema} for nested field schemas.
+ * Object root schema type.
  */
-export type FormSchema =
+type ObjectRootSchema =
   | ObjectSchema
-  | ObjectSchemaAsync
   | v.IntersectSchema<
       ObjectSchema[],
-      v.ErrorMessage<v.IntersectIssue> | undefined
-    >
-  | v.IntersectSchemaAsync<
-      (ObjectSchema | ObjectSchemaAsync)[],
       v.ErrorMessage<v.IntersectIssue> | undefined
     >
   | v.UnionSchema<
       ObjectSchema[],
       v.ErrorMessage<v.UnionIssue<v.BaseIssue<unknown>>> | undefined
+    >;
+
+/**
+ * Object root schema async type.
+ */
+type ObjectRootSchemaAsync =
+  | ObjectSchemaAsync
+  | v.IntersectSchemaAsync<
+      (ObjectSchema | ObjectSchemaAsync)[],
+      v.ErrorMessage<v.IntersectIssue> | undefined
     >
   | v.UnionSchemaAsync<
       (ObjectSchema | ObjectSchemaAsync)[],
       v.ErrorMessage<v.UnionIssue<v.BaseIssue<unknown>>> | undefined
     >;
+
+/**
+ * Form schema type.
+ *
+ * Hint: Forms must have an object root, so only object schemas (sync or async),
+ * combinators (intersect, union, variant) whose options resolve to objects, and
+ * `lazy` schemas wrapping any of these are allowed at the top level. Use
+ * {@link Schema} for nested field schemas.
+ */
+export type FormSchema =
+  | ObjectRootSchema
+  | ObjectRootSchemaAsync
+  | v.LazySchema<ObjectRootSchema>
+  | v.LazySchemaAsync<ObjectRootSchema | ObjectRootSchemaAsync>;
