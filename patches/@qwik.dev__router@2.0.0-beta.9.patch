@@ -1,30 +1,26 @@
-diff --git a/lib/index.qwik.cjs b/lib/index.qwik.cjs
-index 39a76a683c88ae66d7914da026ebd3a9e91187a1..96ffc368459ccb50cb8b73284dc3494eedf5de85 100644
---- a/lib/index.qwik.cjs
-+++ b/lib/index.qwik.cjs
-@@ -1477,8 +1477,8 @@ function flatten(issues) {
-   return flatErrors;
- }
- async function safeParseAsync(schema, input, config2) {
--  const dataset = await schema._run(
--    { typed: false, value: input },
-+  const dataset = await schema['~run'](
-+    { value: input },
-     getGlobalConfig(config2)
-   );
-   return {
-diff --git a/lib/index.qwik.mjs b/lib/index.qwik.mjs
-index b151703c8d21ed6b82afcaabff698251e9db446b..24a389317eef927874df3925a803854a9bea06ff 100644
---- a/lib/index.qwik.mjs
-+++ b/lib/index.qwik.mjs
-@@ -1459,8 +1459,8 @@ function flatten(issues) {
-   return flatErrors;
- }
- async function safeParseAsync(schema, input, config2) {
--  const dataset = await schema._run(
--    { typed: false, value: input },
-+  const dataset = await schema['~run'](
-+    { value: input },
-     getGlobalConfig(config2)
-   );
-   return {
+diff --git a/lib/ssg/node.cjs b/lib/ssg/node.cjs
+index 0a927887f21b7b5db685a658b8f8c162b86f4897..1f9f91f59cfccafd1a137c2047b4f2072ce834d5 100644
+--- a/lib/ssg/node.cjs
++++ b/lib/ssg/node.cjs
+@@ -1015,7 +1015,7 @@ ${bold(red(`!!! ${result.pathname}: Error during SSG`))}`);
+               if (!pathname.endsWith("/")) {
+                 const segments = pathname.split("/");
+                 const lastSegment = segments[segments.length - 1];
+-                if (!lastSegment.includes(".")) {
++                if (!/\.(html?|xml|json|txt|pdf|js|mjs|cjs|css|svg|png|jpe?g|gif|webp|ico|woff2?|ttf|otf|eot|map|md)$/i.test(lastSegment)) {
+                   pathname += "/";
+                 }
+               }
+diff --git a/lib/ssg/node.mjs b/lib/ssg/node.mjs
+index 25be196d288c6c64a252a159be50439923a71a4f..8d967381fc7c7d4efff862ea7a18024835a71b1b 100644
+--- a/lib/ssg/node.mjs
++++ b/lib/ssg/node.mjs
+@@ -978,7 +978,7 @@ ${bold(red(`!!! ${result.pathname}: Error during SSG`))}`);
+               if (!pathname.endsWith("/")) {
+                 const segments = pathname.split("/");
+                 const lastSegment = segments[segments.length - 1];
+-                if (!lastSegment.includes(".")) {
++                if (!/\.(html?|xml|json|txt|pdf|js|mjs|cjs|css|svg|png|jpe?g|gif|webp|ico|woff2?|ttf|otf|eot|map|md)$/i.test(lastSegment)) {
+                   pathname += "/";
+                 }
+               }

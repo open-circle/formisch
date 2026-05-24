@@ -1,10 +1,17 @@
-import type { Component, SVGProps } from '@qwik.dev/core/internal';
-import type { JSONValue } from '@qwik.dev/router';
 import {
-  type RequestEventAction,
-  routeAction$,
-  routeLoader$,
-} from '@qwik.dev/router';
+  $,
+  type Component,
+  createContextId,
+  type QRL,
+  type Signal,
+  useContext,
+  useContextProvider,
+  useSignal,
+  useTask$,
+  useVisibleTask$,
+} from '@qwik.dev/core';
+import type { SVGProps } from '@qwik.dev/core/internal';
+import { useLocation } from '@qwik.dev/router';
 import {
   PreactIcon,
   QwikIcon,
@@ -22,7 +29,8 @@ import {
   VueLogo,
 } from '~/logos';
 
-const COOKIE_NAME = 'framework';
+const FRAMEWORK_KEY = 'framework';
+export const DEFAULT_FRAMEWORK: Framework = 'solid';
 
 export type Framework =
   | 'preact'
@@ -74,65 +82,83 @@ const FRAMEWORK_ICON_MAP: Record<
   vue: VueIcon,
 };
 
-/**
- * Returns the value of the framework cookie.
- */
-function getCookie(request: RequestEventAction): Framework {
-  const value = request.cookie.get(COOKIE_NAME)?.value;
-  if (FRAMEWORK_LIST.includes(value as Framework)) {
-    return value as Framework;
-  }
-  return 'solid'; // default framework
+export function isFramework(
+  value: string | null | undefined
+): value is Framework {
+  return !!value && (FRAMEWORK_LIST as string[]).includes(value);
 }
 
+const FrameworkContext = createContextId<Signal<Framework>>(FRAMEWORK_KEY);
+
 /**
- * Sets the value of the framework cookie.
+ * Provides the framework signal. Mounted once near the root of the app.
+ *
+ * - Tracks the first URL segment when it matches a framework slug.
+ * - Otherwise falls back to the user's last choice from `localStorage` once
+ *   hydration runs, defaulting to `solid` during SSG.
  */
-function setCookie(request: RequestEventAction, framework: Framework): void {
-  if (getCookie(request) !== framework) {
-    request.cookie.set(COOKIE_NAME, framework, {
-      httpOnly: true,
-      maxAge: 31557600, // 1 year
-      path: '/',
-      sameSite: 'lax',
-      secure: import.meta.env.PROD,
-    });
-  }
-}
+export const useFrameworkProvider = () => {
+  const location = useLocation();
+  const framework = useSignal<Framework>(DEFAULT_FRAMEWORK);
+
+  useContextProvider(FrameworkContext, framework);
+
+  // Track URL changes so docs routes drive the framework
+  useTask$(({ track }) => {
+    const pathname = track(() => location.url.pathname);
+    const firstSegment = pathname.split('/')[1];
+    if (isFramework(firstSegment) && framework.value !== firstSegment) {
+      framework.value = firstSegment;
+    }
+  });
+
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(({ track }) => {
+    // Re-run on client-side navigation so the stored slug never goes stale
+    const pathname = track(() => location.url.pathname);
+
+    // If URL already dictates the framework, persist it
+    const firstSegment = pathname.split('/')[1];
+    if (isFramework(firstSegment)) {
+      try {
+        localStorage.setItem(FRAMEWORK_KEY, firstSegment);
+      } catch {
+        // ignore
+      }
+
+      // Otherwise restore from localStorage
+    } else {
+      try {
+        const stored = localStorage.getItem(FRAMEWORK_KEY);
+        if (isFramework(stored)) {
+          framework.value = stored;
+        }
+      } catch {
+        // ignore
+      }
+    }
+  });
+};
 
 /**
  * Returns the current framework.
  */
-export const useFramework = routeLoader$((request) => {
-  // Get first path segment
-  const firstSegment = request.url.pathname.split('/')[1];
-
-  // Special handling if path segment is a framework
-  if ((FRAMEWORK_LIST as string[]).includes(firstSegment)) {
-    const framework = firstSegment as Framework;
-
-    // Update framework cookie to match path segment
-    setCookie(request, framework);
-
-    // Return framework from the path segment
-    return framework;
-  }
-
-  // Otherwise, fall back to cookie value
-  return getCookie(request);
-});
+export const useFramework = () => useContext(FrameworkContext);
 
 /**
- * Sets the framework by updating the framework cookie.
+ * Returns a function that updates the preferred framework.
  */
-export const useSetFramework = routeAction$((form, request) => {
-  const framework = form.framework;
-
-  // Validate the framework value
-  if ((FRAMEWORK_LIST as JSONValue[]).includes(framework)) {
-    setCookie(request, framework as Framework);
-  }
-});
+export const useSetFramework = (): QRL<(value: Framework) => void> => {
+  const framework = useFramework();
+  return $((value: Framework) => {
+    framework.value = value;
+    try {
+      localStorage.setItem(FRAMEWORK_KEY, value);
+    } catch {
+      // ignore
+    }
+  });
+};
 
 /**
  * Returns the display name of the framework.

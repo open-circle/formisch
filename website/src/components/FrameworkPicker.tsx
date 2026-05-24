@@ -1,5 +1,11 @@
-import { $, component$, useOnDocument, useSignal } from '@qwik.dev/core';
-import { Form, useLocation } from '@qwik.dev/router';
+import {
+  $,
+  component$,
+  Fragment,
+  useOnDocument,
+  useSignal,
+} from '@qwik.dev/core';
+import { useLocation } from '@qwik.dev/router';
 import clsx from 'clsx';
 import { useFocusTrap } from '~/hooks';
 import { AngleUpIcon } from '~/icons';
@@ -104,25 +110,21 @@ export const FrameworkPicker = component$<FrameworkPickerProps>((props) => {
           (item) => {
             const FrameworkIcon = getFrameworkIcon(item);
             return (
-              <>
+              <Fragment key={item}>
                 {isPlaygroundRoute ? (
-                  <Form
-                    key={item}
-                    action={setFramework}
-                    onSubmit$={() => (isOpen.value = false)}
+                  <button
+                    type="button"
+                    class="focus-ring flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3.5 py-2 hover:text-slate-900 dark:hover:text-slate-200"
+                    onClick$={() => {
+                      setFramework(item);
+                      isOpen.value = false;
+                    }}
                   >
-                    <input type="hidden" name="framework" value={item} />
-                    <button
-                      type="submit"
-                      class="focus-ring flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3.5 py-2 hover:text-slate-900 dark:hover:text-slate-200"
-                    >
-                      <FrameworkIcon class="mr-2.5 h-[22px]" />
-                      {getFrameworkName(item)}
-                    </button>
-                  </Form>
+                    <FrameworkIcon class="mr-2.5 h-[22px]" />
+                    {getFrameworkName(item)}
+                  </button>
                 ) : (
                   <Link
-                    key={item}
                     class="focus-ring flex items-center gap-2.5 rounded-xl px-3.5 py-2 hover:text-slate-900 dark:hover:text-slate-200"
                     href={getPathname(item)}
                     onClick$={() => (isOpen.value = false)}
@@ -131,7 +133,7 @@ export const FrameworkPicker = component$<FrameworkPickerProps>((props) => {
                     {getFrameworkName(item)}
                   </Link>
                 )}
-              </>
+              </Fragment>
             );
           }
         )}

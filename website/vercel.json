@@ -1,21 +1,142 @@
 {
-  "buildCommand": "cd ../packages/core && pnpm build && cd ../methods && pnpm build && cd ../../frameworks/qwik && pnpm build && cd ../../website && pnpm sitemap && pnpm llms && pnpm build",
-  "headers": [
+  "buildCommand": "cd ../packages/core && pnpm build && cd ../methods && pnpm build && cd ../../frameworks/qwik && pnpm build && cd ../../website && pnpm sitemap && pnpm llms && pnpm og && pnpm build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": true,
+  "redirects": [
     {
-      "source": "/(.*)?service-worker.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
+      "source": "/playground",
+      "destination": "/playground/login/",
+      "statusCode": 302
     },
     {
-      "source": "/(assets|build)/(.*)",
+      "source": "/playground/",
+      "destination": "/playground/login/",
+      "statusCode": 302
+    },
+    {
+      "source": "/preact/guides",
+      "destination": "/preact/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/preact/guides/",
+      "destination": "/preact/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/qwik/guides",
+      "destination": "/qwik/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/qwik/guides/",
+      "destination": "/qwik/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/react/guides",
+      "destination": "/react/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/react/guides/",
+      "destination": "/react/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/solid/guides",
+      "destination": "/solid/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/solid/guides/",
+      "destination": "/solid/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/svelte/guides",
+      "destination": "/svelte/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/svelte/guides/",
+      "destination": "/svelte/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/vue/guides",
+      "destination": "/vue/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/vue/guides/",
+      "destination": "/vue/guides/introduction/",
+      "statusCode": 302
+    },
+    {
+      "source": "/core/api",
+      "destination": "/solid/api/",
+      "statusCode": 302
+    },
+    {
+      "source": "/core/api/",
+      "destination": "/solid/api/",
+      "statusCode": 302
+    }
+  ],
+  "headers": [
+    {
+      "source": "/build/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, s-maxage=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, s-maxage=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, s-maxage=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/og/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, s-maxage=86400"
+        }
+      ]
+    },
+    {
+      "source": "/q-data.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=60, s-maxage=31536000, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)/q-data.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=60, s-maxage=31536000, stale-while-revalidate=604800"
         }
       ]
     }

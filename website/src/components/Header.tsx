@@ -2,13 +2,11 @@ import {
   $,
   component$,
   type Signal,
-  useComputed$,
   useSignal,
   useTask$,
 } from '@qwik.dev/core';
-import { globalAction$, useLocation, valibot$ } from '@qwik.dev/router';
+import { useLocation } from '@qwik.dev/router';
 import clsx from 'clsx';
-import * as v from 'valibot';
 import { useFocusTrap } from '~/hooks';
 import { LogoIcon } from '~/icons';
 import { useFramework } from '~/routes/plugin@framework';
@@ -18,14 +16,6 @@ import { Link } from './Link';
 import { MainMenuToggle } from './MainMenuToggle';
 import { SearchToggle } from './SearchToggle';
 import { ThemeToggle } from './ThemeToggle';
-
-/**
- * Toggles the open state of the main menu.
- */
-export const useMainMenuToggle = globalAction$(
-  (values) => values,
-  valibot$(v.object({ state: v.picklist(['opened', 'closed']) }))
-);
 
 type HeaderProps = {
   searchOpen: Signal<boolean>;
@@ -43,14 +33,8 @@ export const Header = component$<HeaderProps>(({ searchOpen }) => {
   const rootElement = useSignal<HTMLElement>();
   const windowScrolled = useSignal(false);
 
-  // Use main menu toggle and compute open state
-  const toggle = useMainMenuToggle();
-  const isOpen = useComputed$(() =>
-    toggle.isRunning
-      ? // Optimistic UI
-        toggle.formData?.get('state') === 'opened'
-      : toggle.value?.state === 'opened'
-  );
+  // Main menu open state
+  const isOpen = useSignal(false);
 
   // Use focus trap for main menu
   useFocusTrap(rootElement, isOpen);
@@ -63,7 +47,7 @@ export const Header = component$<HeaderProps>(({ searchOpen }) => {
       location.prevUrl &&
       location.url.pathname !== location.prevUrl.pathname
     ) {
-      toggle.submit({ state: 'closed' });
+      isOpen.value = false;
     }
   });
 
@@ -121,7 +105,7 @@ export const Header = component$<HeaderProps>(({ searchOpen }) => {
           <GitHubIconLink />
           <ThemeToggle />
           <SearchToggle open={searchOpen} />
-          <MainMenuToggle action={toggle} open={isOpen.value} />
+          <MainMenuToggle toggle={isOpen} />
         </div>
 
         {/* Main menu */}
@@ -179,7 +163,9 @@ export const Header = component$<HeaderProps>(({ searchOpen }) => {
             ? 'delay-75 duration-300'
             : 'invisible opacity-0 duration-75'
         )}
-        onClick$={() => toggle.submit({ state: 'closed' })}
+        onClick$={() => {
+          isOpen.value = false;
+        }}
       />
     </header>
   );

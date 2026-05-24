@@ -1,12 +1,6 @@
-import { component$, createComputed$, useComputed$ } from '@qwik.dev/core';
-import {
-  type DocumentHead,
-  Form,
-  routeAction$,
-  valibot$,
-} from '@qwik.dev/router';
+import { component$, createComputed$, useSignal } from '@qwik.dev/core';
+import { type DocumentHead } from '@qwik.dev/router';
 import clsx from 'clsx';
-import * as v from 'valibot';
 import { ActionButton, ButtonGroup, Expandable, TextLink } from '~/components';
 import { PlusIcon } from '~/icons';
 import { blurredCodeDarkUrl, blurredCodeLightUrl } from '~/images';
@@ -32,27 +26,12 @@ export const head: DocumentHead = {
   ],
 };
 
-/**
- * Toggles the index of the FAQ.
- */
-export const useFaqToggle = routeAction$(
-  (values) => values,
-  valibot$(v.object({ index: v.string() }))
-);
-
 export default component$(() => {
   // Use current framework
   const framework = useFramework();
 
-  // Use FAQ toggle and compute its index
-  const faqToggle = useFaqToggle();
-  const faqIndex = useComputed$(
-    () =>
-      (faqToggle.isRunning
-        ? // Optimistic UI
-          faqToggle.formData?.get('index')
-        : faqToggle.value?.index) || '0'
-  );
+  // Index of the currently open FAQ entry
+  const faqIndex = useSignal(0);
 
   return (
     <main class="flex flex-1 flex-col items-center gap-24 py-24 md:gap-36 md:py-36 xl:gap-52 xl:py-52">
@@ -326,37 +305,35 @@ export default component$(() => {
               ),
             },
           ].map(({ heading, Text }, index) => {
-            const isOpen = createComputed$(
-              () => index.toString() === faqIndex.value
-            );
+            const isOpen = createComputed$(() => index === faqIndex.value);
             return (
               <li key={heading} class="flex flex-col px-8">
-                <Form action={faqToggle}>
-                  <input type="hidden" name="index" value={index} />
-                  <button
+                <button
+                  class={clsx(
+                    'focus-ring flex w-full justify-between gap-4 rounded-md transition-colors focus-visible:ring-offset-8 focus-visible:outline-offset-[6px]',
+                    isOpen.value
+                      ? 'text-sky-600 dark:text-sky-400'
+                      : 'text-slate-800 hover:text-slate-700 dark:text-slate-300 hover:dark:text-slate-400'
+                  )}
+                  type="button"
+                  disabled={isOpen.value}
+                  aria-expanded={isOpen.value}
+                  aria-controls={`faq-${index}`}
+                  onClick$={() => {
+                    faqIndex.value = index;
+                  }}
+                >
+                  <span class="text-left leading-relaxed font-medium md:text-xl lg:text-2xl">
+                    {heading}
+                  </span>
+                  <PlusIcon
                     class={clsx(
-                      'focus-ring flex w-full justify-between gap-4 rounded-md transition-colors focus-visible:ring-offset-8 focus-visible:outline-offset-[6px]',
-                      isOpen.value
-                        ? 'text-sky-600 dark:text-sky-400'
-                        : 'text-slate-800 hover:text-slate-700 dark:text-slate-300 hover:dark:text-slate-400'
+                      'mt-1.5 h-4 shrink-0 transition-transform lg:h-5',
+                      isOpen.value && 'rotate-45'
                     )}
-                    type="submit"
-                    disabled={isOpen.value}
-                    aria-expanded={isOpen.value}
-                    aria-controls={`faq-${index}`}
-                  >
-                    <span class="text-left leading-relaxed font-medium md:text-xl lg:text-2xl">
-                      {heading}
-                    </span>
-                    <PlusIcon
-                      class={clsx(
-                        'mt-1.5 h-4 shrink-0 transition-transform lg:h-5',
-                        isOpen.value && 'rotate-45'
-                      )}
-                      stroke-width={6}
-                    />
-                  </button>
-                </Form>
+                    stroke-width={6}
+                  />
+                </button>
                 <Expandable
                   id={`faq-${index}`}
                   class="overflow-hidden"
