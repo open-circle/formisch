@@ -4,7 +4,9 @@ import type { FormSchema } from './schema.ts';
 
 // Mirrors how the public APIs (e.g. `useForm`, `createForm`) constrain the form
 // root, so `@ts-expect-error` marks exactly the schemas a form must reject.
-function acceptFormSchema<TSchema extends FormSchema>(schema: TSchema): TSchema {
+function acceptFormSchema<TSchema extends FormSchema>(
+  schema: TSchema
+): TSchema {
   return schema;
 }
 
@@ -128,7 +130,10 @@ describe('FormSchema', () => {
     ).toEqualTypeOf<{ name: string }>();
 
     expectTypeOf(
-      v.parse(v.lazy(() => v.object({ name: v.string() })), { name: '' })
+      v.parse(
+        v.lazy(() => v.object({ name: v.string() })),
+        { name: '' }
+      )
     ).toEqualTypeOf<{ name: string }>();
 
     expectTypeOf(
