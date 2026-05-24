@@ -538,6 +538,9 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(typescript@5.8.3)
     devDependencies:
+      '@formisch/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
       '@preact/preset-vite':
         specifier: ^2.10.5
         version: 2.10.5(@babel/core@7.28.5)(preact@10.29.2)(rollup@4.52.5)(vite@6.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
@@ -13650,8 +13653,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.36.0(typescript@5.8.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.36.0(typescript@5.8.3)
-      '@typescript-eslint/types': 8.36.0
+      '@typescript-eslint/tsconfig-utils': 8.48.0(typescript@5.8.3)
+      '@typescript-eslint/types': 8.48.0
       debug: 4.4.3
       typescript: 5.8.3
     transitivePeerDependencies:

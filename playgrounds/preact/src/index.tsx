@@ -41,4 +41,4 @@ function Redirect() {
   return null;
 }
 
-render(<App />, document.getElementById('app'));
+render(<App />, document.getElementById('app')!);

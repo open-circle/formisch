@@ -20,6 +20,7 @@
     "valibot": "^1.2.0"
   },
   "devDependencies": {
+    "@formisch/eslint-config": "workspace:*",
     "@preact/preset-vite": "^2.10.5",
     "@tailwindcss/vite": "^4.1.11",
     "eslint": "^9.31.0",
@@ -27,8 +28,5 @@
     "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3",
     "vite": "^6.0.4"
-  },
-  "eslintConfig": {
-    "extends": "preact"
   }
 }

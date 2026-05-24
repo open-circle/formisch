@@ -1,4 +1,4 @@
-import { ReadonlySignal, useSignal, useSignalEffect } from '@preact/signals';
+import { ReadonlySignal } from '@preact/signals';
 import { Expandable } from './Expandable';
 
 type InputErrorProps = {

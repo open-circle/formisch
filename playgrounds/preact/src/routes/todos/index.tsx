@@ -53,9 +53,11 @@ export default function Page() {
     },
   });
 
-  const listElement = useRef<HTMLDivElement>();
+  const listElement = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    listElement.current && autoAnimate(listElement.current);
+    if (listElement.current) {
+      autoAnimate(listElement.current);
+    }
   }, []);
 
   return (
