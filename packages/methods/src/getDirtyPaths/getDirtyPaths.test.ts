@@ -1,4 +1,3 @@
-import type { InternalFieldStore } from '@formisch/core';
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
 import { createTestStore } from '../vitest/index.ts';
@@ -179,19 +178,5 @@ describe('getDirtyPaths', () => {
     expect(getDirtyPaths(store, { path: ['items'] })).toStrictEqual([
       ['items'],
     ]);
-  });
-
-  test('should return the root path when the form schema is an array and any item is dirty', () => {
-    const store = createTestStore(v.array(v.string()), {
-      initialInput: ['a', 'b', 'c'],
-    });
-    const rootStore = store as unknown as InternalFieldStore; // TODO: Fix typing of `createTestStore`
-    expect(rootStore.kind).toBe('array');
-    if (rootStore.kind === 'array') {
-      rootStore.children[1].input.value = 'B';
-      rootStore.children[1].isDirty.value = true;
-    }
-
-    expect(getDirtyPaths(store)).toStrictEqual([[]]);
   });
 });

@@ -4,7 +4,7 @@ import {
   getFieldBool,
   INTERNAL,
   type InternalFieldStore,
-  type Schema,
+  type FormSchema,
 } from '@formisch/core';
 
 /**
@@ -31,7 +31,7 @@ export interface PickDirtyConfig<TValue> {
  * @returns The dirty parts of the value, or `undefined`.
  */
 // @__NO_SIDE_EFFECTS__
-export function pickDirty<TSchema extends Schema, TValue>(
+export function pickDirty<TSchema extends FormSchema, TValue>(
   form: BaseFormStore<TSchema>,
   config: PickDirtyConfig<TValue>
 ): DeepPartial<TValue> | undefined {

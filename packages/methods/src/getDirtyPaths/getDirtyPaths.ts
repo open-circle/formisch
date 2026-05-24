@@ -6,7 +6,7 @@ import {
   type InternalFieldStore,
   type Path,
   type RequiredPath,
-  type Schema,
+  type FormSchema,
   type ValidPath,
 } from '@formisch/core';
 import type * as v from 'valibot';
@@ -25,7 +25,7 @@ export interface GetFormDirtyPathsConfig {
  * Get field dirty paths config interface.
  */
 export interface GetFieldDirtyPathsConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath,
 > {
   /**
@@ -44,9 +44,9 @@ export interface GetFieldDirtyPathsConfig<
  *
  * @returns The list of paths to dirty fields.
  */
-export function getDirtyPaths<TSchema extends Schema>(
+export function getDirtyPaths<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>
-): Path[];
+): RequiredPath[];
 
 /**
  * Returns a list of paths to dirty fields. Object branches are recursed into;
@@ -60,22 +60,22 @@ export function getDirtyPaths<TSchema extends Schema>(
  * @returns The list of paths to dirty fields.
  */
 export function getDirtyPaths<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath | undefined = undefined,
 >(
   form: BaseFormStore<TSchema>,
   config: TFieldPath extends RequiredPath
     ? GetFieldDirtyPathsConfig<TSchema, TFieldPath>
     : GetFormDirtyPathsConfig
-): Path[];
+): RequiredPath[];
 
 // @__NO_SIDE_EFFECTS__
 export function getDirtyPaths(
   form: BaseFormStore,
   config?:
     | GetFormDirtyPathsConfig
-    | GetFieldDirtyPathsConfig<Schema, RequiredPath>
-): Path[] {
+    | GetFieldDirtyPathsConfig<FormSchema, RequiredPath>
+): RequiredPath[] {
   const target = config?.path
     ? getFieldStore(form[INTERNAL], config.path)
     : form[INTERNAL];
@@ -91,19 +91,21 @@ export function getDirtyPaths(
 function collect(
   internalFieldStore: InternalFieldStore,
   currentPath: Path
-): Path[] {
-  // Arrays are atomic — emit the array's own path
+): RequiredPath[] {
+  // Arrays are atomic — emit the array's own path. With `FormSchema`
+  // enforcing object roots, `currentPath` is always non-empty here, but the
+  // guard keeps the cast honest.
   if (internalFieldStore.kind === 'array') {
-    return [currentPath];
+    return currentPath.length > 0 ? [currentPath as RequiredPath] : [];
   }
 
   // For objects: if input is null/undefined, treat as atomic (the whole
   // container changed). Otherwise recurse into dirty children.
   if (internalFieldStore.kind === 'object') {
     if (!internalFieldStore.input.value) {
-      return [currentPath];
+      return currentPath.length > 0 ? [currentPath as RequiredPath] : [];
     }
-    const paths: Path[] = [];
+    const paths: RequiredPath[] = [];
     for (const key in internalFieldStore.children) {
       const child = internalFieldStore.children[key];
       if (getFieldBool(child, 'isDirty')) {
@@ -114,5 +116,5 @@ function collect(
   }
 
   // Value field — emit its path
-  return [currentPath];
+  return currentPath.length > 0 ? [currentPath as RequiredPath] : [];
 }

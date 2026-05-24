@@ -6,7 +6,7 @@ import {
   INTERNAL,
   type PathValue,
   type RequiredPath,
-  type Schema,
+  type FormSchema,
   type ValidPath,
 } from '@formisch/core';
 import type * as v from 'valibot';
@@ -26,7 +26,7 @@ export interface GetFormDirtyInputConfig {
  * Get field dirty input config interface.
  */
 export interface GetFieldDirtyInputConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath,
 > {
   /**
@@ -46,7 +46,7 @@ export interface GetFieldDirtyInputConfig<
  *
  * @returns The dirty input of the form or specified field, or `undefined`.
  */
-export function getDirtyInput<TSchema extends Schema>(
+export function getDirtyInput<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>
 ): DeepPartial<v.InferInput<TSchema>> | undefined;
 
@@ -63,7 +63,7 @@ export function getDirtyInput<TSchema extends Schema>(
  * @returns The dirty input of the form or specified field, or `undefined`.
  */
 export function getDirtyInput<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath | undefined = undefined,
 >(
   form: BaseFormStore<TSchema>,
@@ -83,7 +83,7 @@ export function getDirtyInput(
   form: BaseFormStore,
   config?:
     | GetFormDirtyInputConfig
-    | GetFieldDirtyInputConfig<Schema, RequiredPath>
+    | GetFieldDirtyInputConfig<FormSchema, RequiredPath>
 ): unknown {
   return getDirtyFieldInput(
     config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL]
