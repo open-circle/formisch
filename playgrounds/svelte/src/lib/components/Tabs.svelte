@@ -36,7 +36,8 @@
 
   // Update indicator style when active element changes
   $effect(() => {
-    page.url.pathname;
+    // Read the pathname so the effect re-runs on navigation; applied next tick
+    void page.url.pathname;
     setTimeout(updateIndicatorStyle);
   });
 

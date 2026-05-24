@@ -4,14 +4,14 @@ import {
   type SubmitEventHandler,
 } from '@formisch/core/preact';
 import { handleSubmit } from '@formisch/methods/preact';
-import type { JSX } from 'preact';
+import type { FormHTMLAttributes, JSX } from 'preact';
 import type { FormStore } from '../../types/index.ts';
 
 /**
  * Form component props type.
  */
 export type FormProps<TSchema extends Schema = Schema> = Omit<
-  JSX.FormHTMLAttributes<HTMLFormElement>,
+  FormHTMLAttributes<HTMLFormElement>,
   'onSubmit' | 'novalidate' | 'noValidate'
 > & {
   /**

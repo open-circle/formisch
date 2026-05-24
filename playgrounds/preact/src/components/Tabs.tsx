@@ -1,8 +1,8 @@
 import { useSignal } from '@preact/signals';
 import clsx from 'clsx';
+import type { TargetedMouseEvent } from 'preact';
 import { useLocation } from 'preact-iso';
 import { useEffect, useRef } from 'preact/hooks';
-import { JSX } from 'preact/jsx-runtime';
 import { useEventListener } from '../hooks';
 
 type TabsProps = {
@@ -56,10 +56,8 @@ export function Tabs(props: TabsProps) {
    *
    * @param event A mouse event.
    */
-  const scrollIntoView = ({
-    currentTarget,
-  }: JSX.TargetedMouseEvent<EventTarget>) => {
-    (currentTarget as HTMLAnchorElement).scrollIntoView({
+  const scrollIntoView = (event: TargetedMouseEvent<EventTarget>) => {
+    (event.currentTarget as HTMLAnchorElement).scrollIntoView({
       block: 'nearest',
       inline: 'center',
     });

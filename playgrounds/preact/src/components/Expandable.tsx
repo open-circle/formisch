@@ -21,7 +21,7 @@ export function Expandable({
   ...props
 }: ExpandableProps) {
   // Use element and frozen children signals
-  const element = useSignal<HTMLDivElement>();
+  const element = useSignal<HTMLDivElement | null>(null);
   const frozenChildren = useSignal<ComponentChildren>(children);
 
   // Freeze error while element collapses to prevent UI from jumping

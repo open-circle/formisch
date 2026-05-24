@@ -8,7 +8,11 @@ import type {
   ValidPath,
 } from '@formisch/core/preact';
 import type { ReadonlySignal } from '@preact/signals';
-import type { JSX } from 'preact';
+import type {
+  FocusEventHandler,
+  GenericEventHandler,
+  InputEventHandler,
+} from 'preact';
 import type * as v from 'valibot';
 
 /**
@@ -26,23 +30,23 @@ export interface FieldElementProps {
   /**
    * The ref callback to register the field element.
    */
-  readonly ref: (element: FieldElement) => void;
+  readonly ref: (element: FieldElement | null) => void;
   /**
    * The focus event handler of the field element.
    */
-  readonly onFocus: JSX.FocusEventHandler<FieldElement>;
+  readonly onFocus: FocusEventHandler<FieldElement>;
   /**
    * The input event handler of the field element.
    */
-  readonly onInput: JSX.InputEventHandler<FieldElement>;
+  readonly onInput: InputEventHandler<FieldElement>;
   /**
    * The change event handler of the field element.
    */
-  readonly onChange: JSX.GenericEventHandler<FieldElement>;
+  readonly onChange: GenericEventHandler<FieldElement>;
   /**
    * The blur event handler of the field element.
    */
-  readonly onBlur: JSX.FocusEventHandler<FieldElement>;
+  readonly onBlur: FocusEventHandler<FieldElement>;
 }
 
 /**
