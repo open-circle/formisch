@@ -122,17 +122,31 @@ export const Header = component$<HeaderProps>(({ searchOpen }) => {
           )}
           id="main-menu"
         >
+          {/* `href` points at the real landing page to avoid a redirect hop,
+              while `match` is the section prefix used for active highlighting. */}
           {[
-            { label: 'Guides', href: `/${framework.value}/guides/` },
-            { label: 'API', href: `/${framework.value}/api/` },
-            { label: 'Blog', href: '/blog/' },
-            { label: 'Playground', href: '/playground/' },
-          ].map(({ label, href }) => (
+            {
+              label: 'Guides',
+              href: `/${framework.value}/guides/introduction/`,
+              match: `/${framework.value}/guides/`,
+            },
+            {
+              label: 'API',
+              href: `/${framework.value}/api/`,
+              match: `/${framework.value}/api/`,
+            },
+            { label: 'Blog', href: '/blog/', match: '/blog/' },
+            {
+              label: 'Playground',
+              href: '/playground/login/',
+              match: '/playground/',
+            },
+          ].map(({ label, href, match }) => (
             <Link
               key={href}
               class={clsx(
                 'focus-ring mx-4 rounded-lg px-4 py-3 text-lg transition-colors hover:text-slate-900 lg:px-3 lg:py-2 lg:text-[17px] lg:font-medium dark:hover:text-slate-200',
-                location.url.pathname.startsWith(href) &&
+                location.url.pathname.startsWith(match) &&
                   'docsearch-lvl0 text-slate-900 dark:text-slate-200'
               )}
               href={href}

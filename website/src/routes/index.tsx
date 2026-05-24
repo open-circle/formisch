@@ -55,7 +55,7 @@ export default component$(() => {
             variant="secondary"
             label="Playground"
             type="link"
-            href="/playground/"
+            href="/playground/login/"
           />
         </ButtonGroup>
         <div class="absolute top-0 left-0 -z-10 flex w-full justify-center overflow-x-clip">
@@ -361,7 +361,7 @@ export default component$(() => {
           variant="secondary"
           label="Playground"
           type="link"
-          href="/playground/"
+          href="/playground/login/"
         />
       </ButtonGroup>
     </main>
