@@ -28,7 +28,8 @@
     "@formisch/eslint-config": "workspace:*",
     "eslint": "^9.31.0",
     "eslint-plugin-solid": "^0.14.5",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite": "^6.3.3"
   },
   "engines": {
     "node": ">=22"

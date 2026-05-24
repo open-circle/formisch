@@ -6,7 +6,7 @@ import { Spinner } from './Spinner';
 type LinkProps = {
   type: 'link';
   href: string;
-  download?: boolean | string;
+  download?: string;
   target?: '_blank';
 };
 
