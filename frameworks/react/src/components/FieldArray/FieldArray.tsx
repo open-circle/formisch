@@ -1,6 +1,6 @@
 import {
+  type FormSchema,
   type RequiredPath,
-  type Schema,
   type ValidArrayPath,
 } from '@formisch/core/react';
 import type { ReactElement } from 'react';
@@ -12,7 +12,7 @@ import type { FieldArrayStore, FormStore } from '../../types/index.ts';
  * FieldArray component props interface.
  */
 export interface FieldArrayProps<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldArrayPath extends RequiredPath = RequiredPath,
 > {
   /**
@@ -43,7 +43,7 @@ export interface FieldArrayProps<
  */
 // @__NO_SIDE_EFFECTS__
 export function FieldArray<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 >({
   of,

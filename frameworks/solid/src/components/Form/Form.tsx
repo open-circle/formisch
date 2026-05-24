@@ -1,6 +1,6 @@
 import {
+  type FormSchema,
   INTERNAL,
-  type Schema,
   type SubmitEventHandler,
 } from '@formisch/core/solid';
 import { handleSubmit } from '@formisch/methods/solid';
@@ -10,7 +10,7 @@ import type { FormStore } from '../../types/index.ts';
 /**
  * Form component props type.
  */
-export type FormProps<TSchema extends Schema = Schema> = Omit<
+export type FormProps<TSchema extends FormSchema = FormSchema> = Omit<
   JSX.FormHTMLAttributes<HTMLFormElement>,
   'onSubmit' | 'novalidate' | 'noValidate'
 > & {
@@ -36,7 +36,7 @@ export type FormProps<TSchema extends Schema = Schema> = Omit<
  *
  * @returns The a native form element.
  */
-export function Form<TSchema extends Schema>(
+export function Form<TSchema extends FormSchema>(
   props: FormProps<TSchema>
 ): JSX.Element;
 

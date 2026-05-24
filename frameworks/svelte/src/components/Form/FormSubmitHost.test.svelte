@@ -1,7 +1,7 @@
-<script lang="ts" generics="TSchema extends Schema">
+<script lang="ts" generics="TSchema extends FormSchema">
   import type {
     DeepPartial,
-    Schema,
+    FormSchema,
     SubmitEventHandler,
   } from '@formisch/core/svelte';
   import type * as v from 'valibot';

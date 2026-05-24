@@ -5,13 +5,13 @@ export const properties: Record<string, PropertyProps> = {
     modifier: 'extends',
     type: {
       type: 'custom',
-      name: 'Schema',
-      href: '../Schema/',
+      name: 'FormSchema',
+      href: '../FormSchema/',
     },
     default: {
       type: 'custom',
-      name: 'Schema',
-      href: '../Schema/',
+      name: 'FormSchema',
+      href: '../FormSchema/',
     },
   },
   INTERNAL: {

@@ -5,12 +5,12 @@
   import { Field } from './index.ts';
 
   const schema = v.object({ name: v.string() });
-  type Schema = typeof schema;
+  type FormSchema = typeof schema;
 
   let {
     onField,
   }: {
-    onField: (field: FieldStore<Schema, ['name']>) => void;
+    onField: (field: FieldStore<FormSchema, ['name']>) => void;
   } = $props();
 
   const form = createForm({ schema, initialInput: { name: 'John' } });

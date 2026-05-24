@@ -39,6 +39,7 @@
 - [FieldStore](/solid/api/FieldStore/)
 - [FocusFieldConfig](/methods/api/FocusFieldConfig/)
 - [FormConfig](/solid/api/FormConfig/)
+- [FormSchema](/core/api/FormSchema/)
 - [FormStore](/solid/api/FormStore/)
 - [GetFieldErrorsConfig](/methods/api/GetFieldErrorsConfig/)
 - [GetFieldInputConfig](/methods/api/GetFieldInputConfig/)

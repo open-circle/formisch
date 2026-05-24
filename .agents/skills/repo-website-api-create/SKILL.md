@@ -75,8 +75,8 @@ export const properties: Record<string, PropertyProps> = {
     modifier: 'extends',
     type: {
       type: 'custom',
-      name: 'Schema',
-      href: '/core/api/Schema/',
+      name: 'FormSchema',
+      href: '/core/api/FormSchema/',
     },
   },
 
@@ -234,7 +234,7 @@ Parentheses folders don't appear in URLs:
 ### Link Patterns
 
 - **Relative paths within same section**: `../FormStore/`
-- **Absolute paths for cross-package**: `/core/api/Schema/`
+- **Absolute paths for cross-package**: `/core/api/FormSchema/`
 - **External links for Valibot**: `https://valibot.dev/api/InferInput/`
 
 ### Framework-Specific Terminology

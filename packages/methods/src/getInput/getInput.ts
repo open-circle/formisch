@@ -1,12 +1,12 @@
 import {
   type BaseFormStore,
+  type FormSchema,
   getFieldInput,
   getFieldStore,
   INTERNAL,
   type PartialValues,
   type PathValue,
   type RequiredPath,
-  type Schema,
   type ValidPath,
 } from '@formisch/core';
 import type * as v from 'valibot';
@@ -25,7 +25,7 @@ export interface GetFormInputConfig {
  * Get field input config interface.
  */
 export interface GetFieldInputConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath,
 > {
   /**
@@ -42,7 +42,7 @@ export interface GetFieldInputConfig<
  *
  * @returns The partial input values of the form or the specified field.
  */
-export function getInput<TSchema extends Schema>(
+export function getInput<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>
 ): PartialValues<v.InferInput<TSchema>>;
 
@@ -56,7 +56,7 @@ export function getInput<TSchema extends Schema>(
  * @returns The partial input values of the form or the specified field.
  */
 export function getInput<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath | undefined = undefined,
 >(
   form: BaseFormStore<TSchema>,
@@ -72,7 +72,7 @@ export function getInput<
 // @__NO_SIDE_EFFECTS__
 export function getInput(
   form: BaseFormStore,
-  config?: GetFormInputConfig | GetFieldInputConfig<Schema, RequiredPath>
+  config?: GetFormInputConfig | GetFieldInputConfig<FormSchema, RequiredPath>
 ): unknown {
   return getFieldInput(
     config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL]

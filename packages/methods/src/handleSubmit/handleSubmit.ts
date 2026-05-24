@@ -1,7 +1,7 @@
 import {
   type BaseFormStore,
+  type FormSchema,
   INTERNAL,
-  type Schema,
   type SubmitEventHandler,
   type SubmitHandler,
   validateFormInput,
@@ -17,7 +17,7 @@ import {
  *
  * @returns A submit event handler function to attach to the form element.
  */
-export function handleSubmit<TSchema extends Schema>(
+export function handleSubmit<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>,
   handler: SubmitHandler<TSchema>
 ): () => Promise<void>;
@@ -32,7 +32,7 @@ export function handleSubmit<TSchema extends Schema>(
  *
  * @returns A submit event handler function to attach to the form element.
  */
-export function handleSubmit<TSchema extends Schema>(
+export function handleSubmit<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>,
   handler: SubmitEventHandler<TSchema>
 ): (event: SubmitEvent) => Promise<void>;
@@ -40,7 +40,7 @@ export function handleSubmit<TSchema extends Schema>(
 // @__NO_SIDE_EFFECTS__
 export function handleSubmit(
   form: BaseFormStore,
-  handler: SubmitHandler<Schema> | SubmitEventHandler<Schema>
+  handler: SubmitHandler<FormSchema> | SubmitEventHandler<FormSchema>
 ): (event?: SubmitEvent) => Promise<void> {
   return async (event?: SubmitEvent) => {
     // Prevent default browser form submission

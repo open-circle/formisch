@@ -1,5 +1,5 @@
-<script lang="ts" generics="TSchema extends Schema">
-  import type { Schema, SubmitEventHandler } from '@formisch/core/svelte';
+<script lang="ts" generics="TSchema extends FormSchema">
+  import type { FormSchema, SubmitEventHandler } from '@formisch/core/svelte';
   import * as v from 'valibot';
   import { createForm } from '../../runes/createForm/createForm.svelte.ts';
   import { Form } from './index.ts';

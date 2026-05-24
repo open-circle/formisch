@@ -36,7 +36,7 @@ A concise guide for documenting Formisch source code with JSDoc and inline comme
 /**
  * Form store interface.
  */
-export interface FormStore<TSchema extends Schema> {
+export interface FormStore<TSchema extends FormSchema> {
   /**
    * Whether the form is currently submitting.
    */

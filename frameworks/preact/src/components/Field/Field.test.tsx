@@ -7,7 +7,7 @@ import type { FieldStore } from '../../types/index.ts';
 import { Field } from './Field.tsx';
 
 const schema = v.object({ name: v.string() });
-type Schema = typeof schema;
+type FormSchema = typeof schema;
 
 describe('Field', () => {
   test('should render JSX returned from children', () => {
@@ -27,7 +27,7 @@ describe('Field', () => {
 
   test('should invoke children with the field store', () => {
     const renderProp = vi.fn<
-      (field: FieldStore<Schema, ['name']>) => JSX.Element
+      (field: FieldStore<FormSchema, ['name']>) => JSX.Element
     >(() => <span />);
 
     function Test(): JSX.Element {

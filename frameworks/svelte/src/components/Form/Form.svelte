@@ -1,7 +1,7 @@
-<script lang="ts" generics="TSchema extends Schema = Schema">
+<script lang="ts" generics="TSchema extends FormSchema = FormSchema">
   import {
     INTERNAL,
-    type Schema,
+    type FormSchema,
     type SubmitEventHandler,
   } from '@formisch/core/svelte';
   import { handleSubmit } from '@formisch/methods/svelte';
@@ -12,7 +12,7 @@
   /**
    * Form component props type.
    */
-  export type FormProps<TSchema extends Schema = Schema> = Omit<
+  export type FormProps<TSchema extends FormSchema = FormSchema> = Omit<
     HTMLFormAttributes,
     'on:submit' | 'onsubmit' | 'novalidate'
   > & {

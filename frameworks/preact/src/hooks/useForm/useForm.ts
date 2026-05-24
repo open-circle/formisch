@@ -1,9 +1,9 @@
 import {
   createFormStore,
   type FormConfig,
+  type FormSchema,
   getFieldBool,
   INTERNAL,
-  type Schema,
   validateFormInput,
 } from '@formisch/core/preact';
 import { computed } from '@preact/signals';
@@ -19,7 +19,7 @@ import type { FormStore } from '../../types/index.ts';
  *
  * @returns The form store with reactive properties.
  */
-export function useForm<TSchema extends Schema>(
+export function useForm<TSchema extends FormSchema>(
   config: FormConfig<TSchema>
 ): FormStore<TSchema>;
 

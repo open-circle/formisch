@@ -2,11 +2,11 @@ import {
   type BaseFormStore,
   batch,
   type DeepPartial,
+  type FormSchema,
   getFieldStore,
   INTERNAL,
   type PathValue,
   type RequiredPath,
-  type Schema,
   setInitialFieldInput,
   untrack,
   validateFormInput,
@@ -36,7 +36,7 @@ interface ResetBaseConfig {
 /**
  * Reset form config interface.
  */
-export interface ResetFormConfig<TSchema extends Schema>
+export interface ResetFormConfig<TSchema extends FormSchema>
   extends ResetBaseConfig {
   /**
    * The path to a field. Leave undefined to reset the entire form.
@@ -57,7 +57,7 @@ export interface ResetFormConfig<TSchema extends Schema>
  * Reset field config interface.
  */
 export interface ResetFieldConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath,
 > extends ResetBaseConfig {
   /**
@@ -91,7 +91,7 @@ export function reset(form: BaseFormStore): void;
  * @param config The reset configuration specifying what to reset and what to keep.
  */
 export function reset<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath | undefined = undefined,
 >(
   form: BaseFormStore<TSchema>,
@@ -102,7 +102,9 @@ export function reset<
 
 export function reset(
   form: BaseFormStore,
-  config?: ResetFormConfig<Schema> | ResetFieldConfig<Schema, RequiredPath>
+  config?:
+    | ResetFormConfig<FormSchema>
+    | ResetFieldConfig<FormSchema, RequiredPath>
 ): void {
   batch(() => {
     untrack(() => {

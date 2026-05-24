@@ -4,6 +4,7 @@ import {
   copyItemState,
   createId,
   type DeepPartial,
+  type FormSchema,
   initializeFieldStore,
   INTERNAL,
   type InternalArrayStore,
@@ -12,7 +13,6 @@ import {
   type PathValue,
   type RequiredPath,
   resetItemState,
-  type Schema,
   untrack,
   type ValidArrayPath,
   validateIfRequired,
@@ -23,7 +23,7 @@ import type * as v from 'valibot';
  * Insert array field config interface.
  */
 export interface InsertConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 > {
   /**
@@ -52,7 +52,7 @@ export interface InsertConfig<
  * @param config The insert configuration specifying the path, index, and initial value.
  */
 export function insert<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 >(
   form: BaseFormStore<TSchema>,

@@ -1,10 +1,10 @@
-import type { BaseFormStore, Schema } from '@formisch/core/preact';
+import type { BaseFormStore, FormSchema } from '@formisch/core/preact';
 import type { ReadonlySignal } from '@preact/signals';
 
 /**
  * Form store interface.
  */
-export interface FormStore<TSchema extends Schema = Schema>
+export interface FormStore<TSchema extends FormSchema = FormSchema>
   extends BaseFormStore<TSchema> {
   /**
    * Whether the form is currently submitting.

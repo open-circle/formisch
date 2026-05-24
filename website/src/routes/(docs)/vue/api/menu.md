@@ -39,6 +39,7 @@
 - [FieldStore](/vue/api/FieldStore/)
 - [FocusFieldConfig](/methods/api/FocusFieldConfig/)
 - [FormConfig](/vue/api/FormConfig/)
+- [FormSchema](/core/api/FormSchema/)
 - [FormStore](/vue/api/FormStore/)
 - [GetFieldErrorsConfig](/methods/api/GetFieldErrorsConfig/)
 - [GetFieldInputConfig](/methods/api/GetFieldInputConfig/)

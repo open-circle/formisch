@@ -2,11 +2,11 @@ import {
   type BaseFormStore,
   batch,
   copyItemState,
+  type FormSchema,
   getFieldStore,
   INTERNAL,
   type InternalArrayStore,
   type RequiredPath,
-  type Schema,
   untrack,
   type ValidArrayPath,
   validateIfRequired,
@@ -17,7 +17,7 @@ import type * as v from 'valibot';
  * Remove array field config interface.
  */
 export interface RemoveConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 > {
   /**
@@ -38,7 +38,7 @@ export interface RemoveConfig<
  * @param config The remove configuration specifying the path and index.
  */
 export function remove<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 >(
   form: BaseFormStore<TSchema>,

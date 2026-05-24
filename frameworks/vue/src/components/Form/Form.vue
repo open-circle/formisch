@@ -1,7 +1,7 @@
-<script setup lang="ts" generic="TSchema extends Schema = Schema">
+<script setup lang="ts" generic="TSchema extends FormSchema = FormSchema">
 import {
+  type FormSchema,
   INTERNAL,
-  type Schema,
   type SubmitEventHandler,
 } from '@formisch/core/vue';
 import { handleSubmit } from '@formisch/methods/vue';
@@ -11,7 +11,7 @@ import type { FormStore } from '../../types/index.ts';
 /**
  * Form component props interface.
  */
-export interface FormProps<TSchema extends Schema = Schema> {
+export interface FormProps<TSchema extends FormSchema = FormSchema> {
   /**
    * The form store instance.
    */

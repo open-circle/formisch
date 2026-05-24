@@ -39,6 +39,7 @@
 - [FieldStore](/svelte/api/FieldStore/)
 - [FocusFieldConfig](/methods/api/FocusFieldConfig/)
 - [FormConfig](/svelte/api/FormConfig/)
+- [FormSchema](/core/api/FormSchema/)
 - [FormStore](/svelte/api/FormStore/)
 - [GetFieldErrorsConfig](/methods/api/GetFieldErrorsConfig/)
 - [GetFieldInputConfig](/methods/api/GetFieldInputConfig/)

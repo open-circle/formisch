@@ -3,8 +3,8 @@ import { type FieldSchema, initializeFieldStore } from '../../field/index.ts';
 import { createSignal } from '../../framework/index.ts';
 import type {
   FormConfig,
+  FormSchema,
   InternalFormStore,
-  Schema,
 } from '../../types/index.ts';
 
 /**
@@ -19,7 +19,7 @@ import type {
  */
 export function createFormStore(
   config: FormConfig,
-  parse: (input: unknown) => Promise<v.SafeParseResult<Schema>>
+  parse: (input: unknown) => Promise<v.SafeParseResult<FormSchema>>
 ): InternalFormStore {
   // Create partial store object
   const store: Partial<InternalFormStore> = {};

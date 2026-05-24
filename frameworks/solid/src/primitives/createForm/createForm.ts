@@ -1,9 +1,9 @@
 import {
   createFormStore,
   type FormConfig,
+  type FormSchema,
   getFieldBool,
   INTERNAL,
-  type Schema,
   validateFormInput,
 } from '@formisch/core/solid';
 import { createMemo } from 'solid-js';
@@ -18,7 +18,7 @@ import type { FormStore } from '../../types/index.ts';
  *
  * @returns The form store with reactive properties.
  */
-export function createForm<TSchema extends Schema>(
+export function createForm<TSchema extends FormSchema>(
   config: FormConfig<TSchema>
 ): FormStore<TSchema>;
 

@@ -8,7 +8,7 @@ import type { FieldArrayStore } from '../../types/index.ts';
 import { FieldArray } from './FieldArray.tsx';
 
 const schema = v.object({ items: v.array(v.string()) });
-type Schema = typeof schema;
+type FormSchema = typeof schema;
 
 describe('FieldArray', () => {
   test('should render JSX returned from children', () => {
@@ -28,7 +28,7 @@ describe('FieldArray', () => {
 
   test('should invoke children with the field array store', () => {
     const renderProp = vi.fn<
-      (field: FieldArrayStore<Schema, ['items']>) => ReactElement
+      (field: FieldArrayStore<FormSchema, ['items']>) => ReactElement
     >(() => <span />);
 
     function Test(): ReactElement {

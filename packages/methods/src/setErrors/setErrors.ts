@@ -1,9 +1,9 @@
 import {
   type BaseFormStore,
+  type FormSchema,
   getFieldStore,
   INTERNAL,
   type RequiredPath,
-  type Schema,
   type ValidPath,
 } from '@formisch/core';
 import type * as v from 'valibot';
@@ -26,7 +26,7 @@ export interface SetFormErrorsConfig {
  * Set field errors config interface.
  */
 export interface SetFieldErrorsConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath,
 > {
   /**
@@ -48,7 +48,7 @@ export interface SetFieldErrorsConfig<
  * @param config The set errors configuration specifying the path and error messages.
  */
 export function setErrors<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath | undefined = undefined,
 >(
   form: BaseFormStore<TSchema>,
@@ -59,7 +59,7 @@ export function setErrors<
 
 export function setErrors(
   form: BaseFormStore,
-  config: SetFormErrorsConfig | SetFieldErrorsConfig<Schema, RequiredPath>
+  config: SetFormErrorsConfig | SetFieldErrorsConfig<FormSchema, RequiredPath>
 ): void {
   (config.path
     ? getFieldStore(form[INTERNAL], config.path)

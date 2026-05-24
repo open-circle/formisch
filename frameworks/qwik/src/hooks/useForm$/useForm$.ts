@@ -1,9 +1,9 @@
 import {
   createFormStore,
   type FormConfig,
+  type FormSchema,
   getFieldBool,
   INTERNAL,
-  type Schema,
   validateFormInput,
 } from '@formisch/core/qwik';
 import type { QRL } from '@qwik.dev/core';
@@ -26,7 +26,7 @@ import { useResolvedQrl } from '../useResolvedQrl/useResolvedQrl.ts';
  *
  * @returns The form store with reactive properties.
  */
-export function useFormQrl<TSchema extends Schema>(
+export function useFormQrl<TSchema extends FormSchema>(
   configQrl: QRL<() => FormConfig<TSchema>>
 ): FormStore<TSchema>;
 

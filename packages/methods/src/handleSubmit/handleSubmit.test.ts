@@ -5,12 +5,15 @@ import { describe, expect, test, vi } from 'vitest';
 import { createTestStore } from '../vitest/index.ts';
 import { handleSubmit } from './handleSubmit.ts';
 
+const schema = v.object({ name: v.string() });
+type Schema = typeof schema;
+
 describe('handleSubmit', () => {
   test('should call handler with output on valid form', async () => {
-    const store = createTestStore(v.object({ name: v.string() }), {
+    const store = createTestStore(schema, {
       initialInput: { name: 'John' },
     });
-    const handler: SubmitEventHandler<typeof store.schema> = vi.fn();
+    const handler: SubmitEventHandler<Schema> = vi.fn();
     const event = new SubmitEvent('submit');
     vi.spyOn(event, 'preventDefault');
 
@@ -22,10 +25,10 @@ describe('handleSubmit', () => {
   });
 
   test('should call handler without event when none provided', async () => {
-    const store = createTestStore(v.object({ name: v.string() }), {
+    const store = createTestStore(schema, {
       initialInput: { name: 'John' },
     });
-    const handler: SubmitHandler<typeof store.schema> = vi.fn();
+    const handler: SubmitHandler<Schema> = vi.fn();
 
     const submitHandler = handleSubmit(store, handler) as () => Promise<void>;
     await submitHandler();
@@ -34,11 +37,11 @@ describe('handleSubmit', () => {
   });
 
   test('should set isSubmitting during submission', async () => {
-    const store = createTestStore(v.object({ name: v.string() }), {
+    const store = createTestStore(schema, {
       initialInput: { name: 'John' },
     });
     let submittingDuringCall = false;
-    const handler: SubmitEventHandler<typeof store.schema> = vi.fn(() => {
+    const handler: SubmitEventHandler<Schema> = vi.fn(() => {
       submittingDuringCall = store.isSubmitting.value;
     });
 
@@ -50,10 +53,10 @@ describe('handleSubmit', () => {
   });
 
   test('should set isSubmitted after form submission', async () => {
-    const store = createTestStore(v.object({ name: v.string() }), {
+    const store = createTestStore(schema, {
       initialInput: { name: 'John' },
     });
-    const handler: SubmitEventHandler<typeof store.schema> = vi.fn();
+    const handler: SubmitEventHandler<Schema> = vi.fn();
 
     const submitHandler = handleSubmit(store, handler);
     await submitHandler(new SubmitEvent('submit'));
@@ -62,7 +65,7 @@ describe('handleSubmit', () => {
   });
 
   test('should not call handler on invalid form', async () => {
-    const store = createTestStore(v.object({ name: v.string() }), {
+    const store = createTestStore(schema, {
       issues: [
         {
           kind: 'validation',
@@ -83,7 +86,7 @@ describe('handleSubmit', () => {
         },
       ],
     });
-    const handler: SubmitEventHandler<typeof store.schema> = vi.fn();
+    const handler: SubmitEventHandler<Schema> = vi.fn();
 
     const submitHandler = handleSubmit(store, handler);
     await submitHandler(new SubmitEvent('submit'));
@@ -92,7 +95,7 @@ describe('handleSubmit', () => {
   });
 
   test('should focus first error field on invalid form', async () => {
-    const store = createTestStore(v.object({ name: v.string() }), {
+    const store = createTestStore(schema, {
       issues: [
         {
           kind: 'validation',
@@ -119,7 +122,7 @@ describe('handleSubmit', () => {
 
     const submitHandler = handleSubmit(
       store,
-      vi.fn() as SubmitEventHandler<typeof store.schema>
+      vi.fn() as SubmitEventHandler<Schema>
     );
     await submitHandler(new SubmitEvent('submit'));
 
@@ -127,11 +130,11 @@ describe('handleSubmit', () => {
   });
 
   test('should set form errors when handler throws', async () => {
-    const store = createTestStore(v.object({ name: v.string() }), {
+    const store = createTestStore(schema, {
       initialInput: { name: 'John' },
     });
     const error = new Error('Submit failed');
-    const handler: SubmitEventHandler<typeof store.schema> = vi
+    const handler: SubmitEventHandler<Schema> = vi
       .fn()
       .mockRejectedValue(error);
 
@@ -142,10 +145,10 @@ describe('handleSubmit', () => {
   });
 
   test('should reset isSubmitting after error', async () => {
-    const store = createTestStore(v.object({ name: v.string() }), {
+    const store = createTestStore(schema, {
       initialInput: { name: 'John' },
     });
-    const handler: SubmitEventHandler<typeof store.schema> = vi
+    const handler: SubmitEventHandler<Schema> = vi
       .fn()
       .mockRejectedValue(new Error('Failed'));
 
@@ -156,10 +159,10 @@ describe('handleSubmit', () => {
   });
 
   test('should set generic error message for non-Error throws', async () => {
-    const store = createTestStore(v.object({ name: v.string() }), {
+    const store = createTestStore(schema, {
       initialInput: { name: 'John' },
     });
-    const handler: SubmitEventHandler<typeof store.schema> = vi
+    const handler: SubmitEventHandler<Schema> = vi
       .fn()
       .mockRejectedValue('string error');
 
@@ -170,10 +173,10 @@ describe('handleSubmit', () => {
   });
 
   test('should handle async handler', async () => {
-    const store = createTestStore(v.object({ name: v.string() }), {
+    const store = createTestStore(schema, {
       initialInput: { name: 'John' },
     });
-    const handler: SubmitEventHandler<typeof store.schema> = vi
+    const handler: SubmitEventHandler<Schema> = vi
       .fn()
       .mockResolvedValue(undefined);
 

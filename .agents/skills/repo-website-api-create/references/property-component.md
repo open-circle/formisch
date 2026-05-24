@@ -122,8 +122,8 @@ TSchema: {
   modifier: 'extends',
   type: {
     type: 'custom',
-    name: 'Schema',
-    href: '/core/api/Schema/',
+    name: 'FormSchema',
+    href: '/core/api/FormSchema/',
   },
 },
 ```
@@ -217,7 +217,7 @@ config: {
 href: '../FormStore/'
 
 // Absolute path for cross-package
-href: '/core/api/Schema/'
+href: '/core/api/FormSchema/'
 href: '/methods/api/validate/'
 ```
 

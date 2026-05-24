@@ -7,7 +7,7 @@ import type { FieldStore } from '../../types/index.ts';
 import Field from './Field.vue';
 
 const schema = v.object({ name: v.string() });
-type Schema = typeof schema;
+type FormSchema = typeof schema;
 
 describe('Field', () => {
   test('should render markup returned from default slot', () => {
@@ -30,7 +30,7 @@ describe('Field', () => {
   });
 
   test('should invoke default slot with the field store', () => {
-    const slotFn = vi.fn((field: FieldStore<Schema, ['name']>) => {
+    const slotFn = vi.fn((field: FieldStore<FormSchema, ['name']>) => {
       void field;
       return h('span');
     });
@@ -62,7 +62,7 @@ describe('Field', () => {
             Field,
             { of: form, path: ['name'] },
             {
-              default: (field: FieldStore<Schema, ['name']>) => [
+              default: (field: FieldStore<FormSchema, ['name']>) => [
                 h('input', {
                   'data-testid': 'input',
                   ...field.props,

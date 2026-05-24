@@ -1,9 +1,9 @@
 import {
   createFormStore,
   type FormConfig,
+  type FormSchema,
   getFieldBool,
   INTERNAL,
-  type Schema,
   validateFormInput,
 } from '@formisch/core/react';
 import { useLayoutEffect, useMemo } from 'react';
@@ -19,7 +19,7 @@ import { useSignals } from '../useSignals/index.ts';
  *
  * @returns The form store with reactive properties.
  */
-export function useForm<TSchema extends Schema>(
+export function useForm<TSchema extends FormSchema>(
   config: FormConfig<TSchema>
 ): FormStore<TSchema>;
 

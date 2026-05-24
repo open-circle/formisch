@@ -5,8 +5,8 @@ export const properties: Record<string, PropertyProps> = {
     modifier: 'extends',
     type: {
       type: 'custom',
-      name: 'Schema',
-      href: '/core/api/Schema/',
+      name: 'FormSchema',
+      href: '/core/api/FormSchema/',
     },
   },
   initialInput: {

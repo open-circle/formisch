@@ -1,7 +1,7 @@
 import {
   type BaseFormStore,
+  type FormSchema,
   INTERNAL,
-  type Schema,
   validateFormInput,
 } from '@formisch/core';
 import type * as v from 'valibot';
@@ -26,9 +26,11 @@ export interface ValidateFormConfig {
  *
  * @returns A promise resolving to the validation result.
  */
-export function validate<TSchema extends Schema>(
+export function validate<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>,
   config?: ValidateFormConfig
 ): Promise<v.SafeParseResult<TSchema>> {
-  return validateFormInput(form[INTERNAL], config);
+  return validateFormInput(form[INTERNAL], config) as Promise<
+    v.SafeParseResult<TSchema>
+  >;
 }

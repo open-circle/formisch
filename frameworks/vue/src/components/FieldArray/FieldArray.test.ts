@@ -8,7 +8,7 @@ import type { FieldArrayStore } from '../../types/index.ts';
 import FieldArray from './FieldArray.vue';
 
 const schema = v.object({ items: v.array(v.string()) });
-type Schema = typeof schema;
+type FormSchema = typeof schema;
 
 describe('FieldArray', () => {
   test('should render markup returned from default slot', () => {
@@ -31,7 +31,7 @@ describe('FieldArray', () => {
   });
 
   test('should invoke default slot with the field array store', () => {
-    const slotFn = vi.fn((field: FieldArrayStore<Schema, ['items']>) => {
+    const slotFn = vi.fn((field: FieldArrayStore<FormSchema, ['items']>) => {
       void field;
       return h('span');
     });
@@ -72,7 +72,7 @@ describe('FieldArray', () => {
               FieldArray,
               { of: form, path: ['items'] },
               {
-                default: (field: FieldArrayStore<Schema, ['items']>) =>
+                default: (field: FieldArrayStore<FormSchema, ['items']>) =>
                   h(
                     'span',
                     { 'data-testid': 'count' },

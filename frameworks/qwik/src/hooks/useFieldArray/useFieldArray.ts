@@ -1,10 +1,10 @@
 import {
+  type FormSchema,
   getFieldBool,
   getFieldStore,
   INTERNAL,
   type InternalArrayStore,
   type RequiredPath,
-  type Schema,
   type ValidArrayPath,
 } from '@formisch/core/qwik';
 import { createComputed$, useComputed$, useConstant } from '@qwik.dev/core';
@@ -16,7 +16,7 @@ import { usePathSignal } from '../usePathSignal/usePathSignal.ts';
  * Use field array config interface.
  */
 export interface UseFieldArrayConfig<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldArrayPath extends RequiredPath = RequiredPath,
 > {
   /**
@@ -35,7 +35,7 @@ export interface UseFieldArrayConfig<
  */
 // @ts-expect-error
 export function useFieldArray<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 >(
   form: FormStore<TSchema>,

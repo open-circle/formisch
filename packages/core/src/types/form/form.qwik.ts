@@ -2,7 +2,7 @@ import type { QRL } from '@qwik.dev/core';
 import type * as v from 'valibot';
 import type { INTERNAL } from '../../values.ts';
 import type { InternalObjectStore } from '../field/field.qwik.ts';
-import type { Schema } from '../schema/index.ts';
+import type { FormSchema } from '../schema/index.ts';
 import type { Signal } from '../signal/index.ts';
 import type { DeepPartial } from '../utils/index.ts';
 import type {
@@ -14,7 +14,7 @@ import type {
 /**
  * Form config interface.
  */
-export interface FormConfig<TSchema extends Schema = Schema> {
+export interface FormConfig<TSchema extends FormSchema = FormSchema> {
   /**
    * The schema of the form.
    */
@@ -36,7 +36,7 @@ export interface FormConfig<TSchema extends Schema = Schema> {
 /**
  * Internal form store interface.
  */
-export interface InternalFormStore<TSchema extends Schema = Schema>
+export interface InternalFormStore<TSchema extends FormSchema = FormSchema>
   extends InternalObjectStore {
   /**
    * The element of the form.
@@ -77,7 +77,7 @@ export interface InternalFormStore<TSchema extends Schema = Schema>
 /**
  * Base form store interface.
  */
-export interface BaseFormStore<TSchema extends Schema = Schema> {
+export interface BaseFormStore<TSchema extends FormSchema = FormSchema> {
   /**
    * The internal form store.
    *

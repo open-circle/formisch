@@ -9,7 +9,7 @@ import FieldUpdateHost from './FieldUpdateHost.test.svelte';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via `typeof schema`
 const schema = v.object({ name: v.string() });
-type Schema = typeof schema;
+type FormSchema = typeof schema;
 
 describe('Field', () => {
   test('should render markup returned from children snippet', () => {
@@ -19,7 +19,7 @@ describe('Field', () => {
   });
 
   test('should invoke children snippet with the field store', () => {
-    const onField = vi.fn<(field: FieldStore<Schema, ['name']>) => void>();
+    const onField = vi.fn<(field: FieldStore<FormSchema, ['name']>) => void>();
 
     render(FieldStoreHost, { props: { onField } });
 

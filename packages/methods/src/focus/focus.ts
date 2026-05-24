@@ -1,9 +1,9 @@
 import {
   type BaseFormStore,
+  type FormSchema,
   getFieldStore,
   INTERNAL,
   type RequiredPath,
-  type Schema,
   type ValidPath,
 } from '@formisch/core';
 import type * as v from 'valibot';
@@ -12,7 +12,7 @@ import type * as v from 'valibot';
  * Focus field config interface.
  */
 export interface FocusFieldConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath,
 > {
   /**
@@ -29,7 +29,10 @@ export interface FocusFieldConfig<
  * @param form The form store containing the field.
  * @param config The focus field configuration.
  */
-export function focus<TSchema extends Schema, TFieldPath extends RequiredPath>(
+export function focus<
+  TSchema extends FormSchema,
+  TFieldPath extends RequiredPath,
+>(
   form: BaseFormStore<TSchema>,
   config: FocusFieldConfig<TSchema, TFieldPath>
 ): void {

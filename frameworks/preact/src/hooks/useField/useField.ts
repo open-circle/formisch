@@ -1,11 +1,11 @@
 import {
+  type FormSchema,
   getElementInput,
   getFieldBool,
   getFieldInput,
   getFieldStore,
   INTERNAL,
   type RequiredPath,
-  type Schema,
   setFieldBool,
   setFieldInput,
   validateIfRequired,
@@ -21,7 +21,7 @@ import { usePathSignal } from '../usePathSignal/index.ts';
  * Use field config interface.
  */
 export interface UseFieldConfig<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldPath extends RequiredPath = RequiredPath,
 > {
   /**
@@ -39,7 +39,7 @@ export interface UseFieldConfig<
  * @returns The field store with reactive properties and element props.
  */
 export function useField<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath,
 >(
   form: FormStore<TSchema>,

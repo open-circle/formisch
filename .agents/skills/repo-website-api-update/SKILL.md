@@ -207,10 +207,10 @@ Creates a form store.
 
 ```typescript
 // ✅ Correct
-href: '/core/api/Schema/';
+href: '/core/api/FormSchema/';
 
 // ❌ Wrong - relative won't work across packages
-href: '../../../core/api/Schema/';
+href: '../../../core/api/FormSchema/';
 ```
 
 ### Qwik Routing (Exclude Parentheses)

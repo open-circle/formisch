@@ -39,6 +39,7 @@
 - [FieldStore](/react/api/FieldStore/)
 - [FocusFieldConfig](/methods/api/FocusFieldConfig/)
 - [FormConfig](/react/api/FormConfig/)
+- [FormSchema](/core/api/FormSchema/)
 - [FormStore](/react/api/FormStore/)
 - [GetFieldErrorsConfig](/methods/api/GetFieldErrorsConfig/)
 - [GetFieldInputConfig](/methods/api/GetFieldInputConfig/)

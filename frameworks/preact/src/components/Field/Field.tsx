@@ -1,6 +1,6 @@
 import {
+  type FormSchema,
   type RequiredPath,
-  type Schema,
   type ValidPath,
 } from '@formisch/core/preact';
 import type { JSX } from 'preact';
@@ -12,7 +12,7 @@ import type { FieldStore, FormStore } from '../../types/index.ts';
  * Field component props interface.
  */
 export interface FieldProps<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldPath extends RequiredPath = RequiredPath,
 > {
   /**
@@ -39,11 +39,10 @@ export interface FieldProps<
  * @returns The UI of the field to be rendered.
  */
 // @__NO_SIDE_EFFECTS__
-export function Field<TSchema extends Schema, TFieldPath extends RequiredPath>({
-  of,
-  path,
-  children,
-}: FieldProps<TSchema, TFieldPath>): JSX.Element {
+export function Field<
+  TSchema extends FormSchema,
+  TFieldPath extends RequiredPath,
+>({ of, path, children }: FieldProps<TSchema, TFieldPath>): JSX.Element {
   const field = useField(of, { path });
   return children(field);
 }

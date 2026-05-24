@@ -39,6 +39,7 @@
 - [FieldStore](/preact/api/FieldStore/)
 - [FocusFieldConfig](/methods/api/FocusFieldConfig/)
 - [FormConfig](/preact/api/FormConfig/)
+- [FormSchema](/core/api/FormSchema/)
 - [FormStore](/preact/api/FormStore/)
 - [GetFieldErrorsConfig](/methods/api/GetFieldErrorsConfig/)
 - [GetFieldInputConfig](/methods/api/GetFieldInputConfig/)

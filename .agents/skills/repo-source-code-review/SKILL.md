@@ -76,7 +76,7 @@ export function useField<TSchema, TFieldPath>(
 
 ```typescript
 export function useField<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath<TSchema>,
 >(
   form: FormStore<TSchema>,

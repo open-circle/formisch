@@ -2,13 +2,13 @@ import {
   type BaseFormStore,
   batch,
   copyItemState,
+  type FormSchema,
   getFieldStore,
   initializeFieldStore,
   INTERNAL,
   type InternalArrayStore,
   type InternalFieldStore,
   type RequiredPath,
-  type Schema,
   untrack,
   type ValidArrayPath,
   validateIfRequired,
@@ -19,7 +19,7 @@ import type * as v from 'valibot';
  * Move array field config interface.
  */
 export interface MoveConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 > {
   /**
@@ -44,7 +44,7 @@ export interface MoveConfig<
  * @param config The move configuration specifying the path and source/destination indices.
  */
 export function move<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 >(
   form: BaseFormStore<TSchema>,

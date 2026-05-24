@@ -1,0 +1,28 @@
+---
+title: FormSchema
+description: Type definition for Valibot object schemas allowed as the root of a form.
+source: /packages/core/src/types/schema.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# FormSchema
+
+Type definition that represents the Valibot object schemas allowed as the root of a form. Forms must have an object root; use <Link href="/core/api/Schema/">Schema</Link> for nested field schemas.
+
+## Definition
+
+- `FormSchema` <Property {...properties.FormSchema} />
+
+## Related
+
+### Primitives
+
+<ApiList items={[{ text: 'createForm', href: '/solid/api/createForm/' }]} />
+
+### Methods
+
+<ApiList items={[{ text: 'validate', href: '/methods/api/validate/' }]} />

@@ -1,11 +1,11 @@
 import {
   type BaseFormStore,
   batch,
+  type FormSchema,
   getFieldStore,
   INTERNAL,
   type InternalArrayStore,
   type RequiredPath,
-  type Schema,
   swapItemState,
   untrack,
   type ValidArrayPath,
@@ -17,7 +17,7 @@ import type * as v from 'valibot';
  * Swap array field config interface.
  */
 export interface SwapConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 > {
   /**
@@ -41,7 +41,7 @@ export interface SwapConfig<
  * @param config The swap configuration specifying the path and indices to swap.
  */
 export function swap<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 >(
   form: BaseFormStore<TSchema>,

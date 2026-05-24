@@ -1,10 +1,10 @@
 <script
   lang="ts"
-  generics="TSchema extends Schema, TFieldArrayPath extends RequiredPath"
+  generics="TSchema extends FormSchema, TFieldArrayPath extends RequiredPath"
 >
   import type {
     RequiredPath,
-    Schema,
+    FormSchema,
     ValidArrayPath,
   } from '@formisch/core/svelte';
   import type * as v from 'valibot';
@@ -16,7 +16,7 @@
    * Field array component props interface.
    */
   export interface FieldArrayProps<
-    TSchema extends Schema = Schema,
+    TSchema extends FormSchema = FormSchema,
     TFieldArrayPath extends RequiredPath = RequiredPath,
   > {
     /**

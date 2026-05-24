@@ -3,13 +3,13 @@ import {
   batch,
   createId,
   type DeepPartial,
+  type FormSchema,
   getFieldStore,
   INTERNAL,
   type InternalArrayStore,
   type PathValue,
   type RequiredPath,
   resetItemState,
-  type Schema,
   untrack,
   type ValidArrayPath,
   validateIfRequired,
@@ -20,7 +20,7 @@ import type * as v from 'valibot';
  * Replace array field config interface.
  */
 export interface ReplaceConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 > {
   /**
@@ -48,7 +48,7 @@ export interface ReplaceConfig<
  * @param config The replace configuration specifying the path, index, and initial input.
  */
 export function replace<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 >(
   form: BaseFormStore<TSchema>,

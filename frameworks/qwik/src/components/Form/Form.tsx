@@ -1,6 +1,6 @@
 import {
+  type FormSchema,
   INTERNAL,
-  type Schema,
   type SubmitEventHandler,
 } from '@formisch/core/qwik';
 import { handleSubmit } from '@formisch/methods/qwik';
@@ -11,7 +11,7 @@ import type { FormStore } from '../../types/index.ts';
 /**
  * Form component props type.
  */
-export type FormProps<TSchema extends Schema = Schema> = Omit<
+export type FormProps<TSchema extends FormSchema = FormSchema> = Omit<
   PropsOf<'form'>,
   'onSubmit$' | 'noValidate'
 > & {
@@ -32,7 +32,7 @@ export type FormProps<TSchema extends Schema = Schema> = Omit<
  * @returns The a native form element.
  */
 export const Form = component$(
-  <TSchema extends Schema>({
+  <TSchema extends FormSchema>({
     of,
     onSubmit$,
     ...other

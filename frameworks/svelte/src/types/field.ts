@@ -1,9 +1,9 @@
 import type {
   FieldElement,
+  FormSchema,
   PartialValues,
   PathValue,
   RequiredPath,
-  Schema,
   ValidArrayPath,
   ValidPath,
 } from '@formisch/core/svelte';
@@ -48,7 +48,7 @@ export interface FieldElementProps {
  * Field store interface.
  */
 export interface FieldStore<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldPath extends RequiredPath = RequiredPath,
 > {
   /**
@@ -91,7 +91,7 @@ export interface FieldStore<
  * Field array store interface.
  */
 export interface FieldArrayStore<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldArrayPath extends RequiredPath = RequiredPath,
 > {
   /**

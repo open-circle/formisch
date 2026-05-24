@@ -2,7 +2,7 @@
   import type {
     FormConfig,
     RequiredPath,
-    Schema,
+    FormSchema,
     SubmitHandler,
   } from '@formisch/core/svelte';
   import { Form } from '../components/Form/index.ts';
@@ -21,7 +21,7 @@
     onMounted,
     onsubmit = noop,
   }: {
-    config: FormConfig<Schema>;
+    config: FormConfig<FormSchema>;
     path: RequiredPath;
     onMounted?: (form: any, field: any) => void;
     onsubmit?: SubmitHandler<any>;

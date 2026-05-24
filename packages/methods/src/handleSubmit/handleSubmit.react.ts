@@ -1,6 +1,6 @@
 import {
   type BaseFormStore,
-  type Schema,
+  type FormSchema,
   type SubmitEventHandler,
   type SubmitHandler,
 } from '@formisch/core/react';
@@ -17,7 +17,7 @@ import { handleSubmit as baseHandleSubmit } from './handleSubmit.ts';
  *
  * @returns A submit event handler function to attach to the form element.
  */
-export function handleSubmit<TSchema extends Schema>(
+export function handleSubmit<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>,
   handler: SubmitHandler<TSchema>
 ): () => Promise<void>;
@@ -32,7 +32,7 @@ export function handleSubmit<TSchema extends Schema>(
  *
  * @returns A submit event handler function to attach to the form element.
  */
-export function handleSubmit<TSchema extends Schema>(
+export function handleSubmit<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>,
   handler: SubmitEventHandler<TSchema>
 ): (event: FormEvent<HTMLFormElement>) => Promise<void>;
@@ -40,7 +40,7 @@ export function handleSubmit<TSchema extends Schema>(
 // @__NO_SIDE_EFFECTS__
 export function handleSubmit(
   form: BaseFormStore,
-  handler: SubmitHandler<Schema> | SubmitEventHandler<Schema>
+  handler: SubmitHandler<FormSchema> | SubmitEventHandler<FormSchema>
 ): (event?: FormEvent<HTMLFormElement>) => Promise<void> {
   // @ts-expect-error: SubmitHandler uses FormEvent but base uses SubmitEvent
   return baseHandleSubmit(form, handler);

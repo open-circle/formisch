@@ -39,6 +39,7 @@
 - [FieldStore](/qwik/api/FieldStore/)
 - [FocusFieldConfig](/methods/api/FocusFieldConfig/)
 - [FormConfig](/qwik/api/FormConfig/)
+- [FormSchema](/core/api/FormSchema/)
 - [FormStore](/qwik/api/FormStore/)
 - [GetFieldErrorsConfig](/methods/api/GetFieldErrorsConfig/)
 - [GetFieldInputConfig](/methods/api/GetFieldInputConfig/)

@@ -9,7 +9,7 @@ import FieldArrayUpdateHost from './FieldArrayUpdateHost.test.svelte';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via `typeof schema`
 const schema = v.object({ items: v.array(v.string()) });
-type Schema = typeof schema;
+type FormSchema = typeof schema;
 
 describe('FieldArray', () => {
   test('should render markup returned from children snippet', () => {
@@ -20,7 +20,7 @@ describe('FieldArray', () => {
 
   test('should invoke children snippet with the field array store', () => {
     const onField =
-      vi.fn<(field: FieldArrayStore<Schema, ['items']>) => void>();
+      vi.fn<(field: FieldArrayStore<FormSchema, ['items']>) => void>();
 
     render(FieldArrayStoreHost, { props: { onField } });
 

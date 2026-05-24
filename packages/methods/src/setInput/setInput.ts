@@ -1,11 +1,11 @@
 import {
   type BaseFormStore,
   batch,
+  type FormSchema,
   getFieldStore,
   INTERNAL,
   type PathValue,
   type RequiredPath,
-  type Schema,
   setFieldInput,
   validateIfRequired,
   type ValidPath,
@@ -15,7 +15,7 @@ import type * as v from 'valibot';
 /**
  * Set form input config interface.
  */
-export interface SetFormInputConfig<TSchema extends Schema> {
+export interface SetFormInputConfig<TSchema extends FormSchema> {
   /**
    * The path to a field. Leave undefined to set the entire form input.
    */
@@ -30,7 +30,7 @@ export interface SetFormInputConfig<TSchema extends Schema> {
  * Set field input config interface.
  */
 export interface SetFieldInputConfig<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath,
 > {
   /**
@@ -51,7 +51,7 @@ export interface SetFieldInputConfig<
  * @param form The form store to set input on.
  * @param config The set form input configuration specifying the new input values.
  */
-export function setInput<TSchema extends Schema>(
+export function setInput<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>,
   config: SetFormInputConfig<TSchema>
 ): void;
@@ -65,7 +65,7 @@ export function setInput<TSchema extends Schema>(
  * @param config The set input configuration specifying the path and new value.
  */
 export function setInput<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath | undefined = undefined,
 >(
   form: BaseFormStore<TSchema>,
@@ -76,7 +76,9 @@ export function setInput<
 
 export function setInput(
   form: BaseFormStore,
-  config: SetFormInputConfig<Schema> | SetFieldInputConfig<Schema, RequiredPath>
+  config:
+    | SetFormInputConfig<FormSchema>
+    | SetFieldInputConfig<FormSchema, RequiredPath>
 ): void {
   batch(() => {
     const internalFormStore = form[INTERNAL];

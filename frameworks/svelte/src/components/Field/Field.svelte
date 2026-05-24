@@ -1,8 +1,12 @@
 <script
   lang="ts"
-  generics="TSchema extends Schema, TFieldPath extends RequiredPath"
+  generics="TSchema extends FormSchema, TFieldPath extends RequiredPath"
 >
-  import type { RequiredPath, Schema, ValidPath } from '@formisch/core/svelte';
+  import type {
+    RequiredPath,
+    FormSchema,
+    ValidPath,
+  } from '@formisch/core/svelte';
   import type * as v from 'valibot';
   import { useField } from '../../runes/index.ts';
   import type { FieldStore, FormStore } from '../../types/index.ts';
@@ -12,7 +16,7 @@
    * Field component props interface.
    */
   export interface FieldProps<
-    TSchema extends Schema = Schema,
+    TSchema extends FormSchema = FormSchema,
     TFieldPath extends RequiredPath = RequiredPath,
   > {
     /**

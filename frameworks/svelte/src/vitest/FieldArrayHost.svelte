@@ -1,5 +1,9 @@
 <script lang="ts">
-  import type { FormConfig, RequiredPath, Schema } from '@formisch/core/svelte';
+  import type {
+    FormConfig,
+    RequiredPath,
+    FormSchema,
+  } from '@formisch/core/svelte';
   import { insert } from '@formisch/methods/svelte';
   import { createForm } from '../runes/createForm/createForm.svelte.ts';
   import { useFieldArray } from '../runes/useFieldArray/useFieldArray.svelte.ts';
@@ -12,7 +16,7 @@
     config,
     path,
   }: {
-    config: FormConfig<Schema>;
+    config: FormConfig<FormSchema>;
     path: RequiredPath;
   } = $props();
 

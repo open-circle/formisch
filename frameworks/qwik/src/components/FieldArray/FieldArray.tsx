@@ -1,6 +1,6 @@
 import {
+  type FormSchema,
   type RequiredPath,
-  type Schema,
   type ValidArrayPath,
 } from '@formisch/core/qwik';
 import type { JSXOutput, QRL } from '@qwik.dev/core';
@@ -14,7 +14,7 @@ import type { FieldArrayStore, FormStore } from '../../types/index.ts';
  * FieldArray component props interface.
  */
 export interface FieldArrayProps<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldArrayPath extends RequiredPath = RequiredPath,
 > {
   /**
@@ -42,7 +42,7 @@ export interface FieldArrayProps<
  * @returns The UI of the field array to be rendered.
  */
 export const FieldArray = component$(
-  <TSchema extends Schema, TFieldArrayPath extends RequiredPath>({
+  <TSchema extends FormSchema, TFieldArrayPath extends RequiredPath>({
     of,
     path,
     render$,

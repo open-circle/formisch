@@ -116,10 +116,10 @@ generics: [{ type: 'custom', name: 'TFieldPath' }];
 
 ```typescript
 // ❌ Wrong - relative across packages
-href: '../../../core/api/Schema/';
+href: '../../../core/api/FormSchema/';
 
 // ✅ Correct - absolute path
-href: '/core/api/Schema/';
+href: '/core/api/FormSchema/';
 ```
 
 ## Verification Checklist

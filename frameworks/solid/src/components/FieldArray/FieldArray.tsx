@@ -1,6 +1,6 @@
 import {
+  type FormSchema,
   type RequiredPath,
-  type Schema,
   type ValidArrayPath,
 } from '@formisch/core/solid';
 import type { JSX } from 'solid-js';
@@ -12,7 +12,7 @@ import type { FieldArrayStore, FormStore } from '../../types/index.ts';
  * FieldArray component props interface.
  */
 export interface FieldArrayProps<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldArrayPath extends RequiredPath = RequiredPath,
 > {
   /**
@@ -42,13 +42,13 @@ export interface FieldArrayProps<
  */
 // @ts-expect-error
 export function FieldArray<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 >(props: FieldArrayProps<TSchema, TFieldArrayPath>): JSX.Element;
 
 // @__NO_SIDE_EFFECTS__
 export function FieldArray(props: FieldArrayProps): JSX.Element {
-  const field = useFieldArray<Schema, RequiredPath>(
+  const field = useFieldArray<FormSchema, RequiredPath>(
     () => props.of,
     () => ({ path: props.path })
   );

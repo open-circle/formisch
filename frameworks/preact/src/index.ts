@@ -5,6 +5,7 @@ export type {
   PartialValues,
   PathValue,
   RequiredPath,
+  FormSchema,
   Schema,
   SubmitEventHandler,
   SubmitHandler,

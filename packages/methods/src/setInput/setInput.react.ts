@@ -1,10 +1,10 @@
 import {
   type BaseFormStore,
   batch,
+  type FormSchema,
   getFieldStore,
   INTERNAL,
   type RequiredPath,
-  type Schema,
   setFieldInput,
   validateIfRequired,
 } from '@formisch/core/react';
@@ -23,7 +23,7 @@ export type { SetFieldInputConfig, SetFormInputConfig };
  * @param form The form store to set input on.
  * @param config The set form input configuration specifying the new input values.
  */
-export function setInput<TSchema extends Schema>(
+export function setInput<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>,
   config: SetFormInputConfig<TSchema>
 ): void;
@@ -37,7 +37,7 @@ export function setInput<TSchema extends Schema>(
  * @param config The set input configuration specifying the path and new value.
  */
 export function setInput<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldPath extends RequiredPath | undefined = undefined,
 >(
   form: BaseFormStore<TSchema>,
@@ -48,7 +48,9 @@ export function setInput<
 
 export function setInput(
   form: BaseFormStore,
-  config: SetFormInputConfig<Schema> | SetFieldInputConfig<Schema, RequiredPath>
+  config:
+    | SetFormInputConfig<FormSchema>
+    | SetFieldInputConfig<FormSchema, RequiredPath>
 ): void {
   batch(() => {
     const internalFormStore = form[INTERNAL];

@@ -1,9 +1,13 @@
 <script
   setup
   lang="ts"
-  generic="TSchema extends Schema, TFieldArrayPath extends RequiredPath"
+  generic="TSchema extends FormSchema, TFieldArrayPath extends RequiredPath"
 >
-import type { RequiredPath, Schema, ValidArrayPath } from '@formisch/core/vue';
+import type {
+  FormSchema,
+  RequiredPath,
+  ValidArrayPath,
+} from '@formisch/core/vue';
 import type * as v from 'valibot';
 import { useFieldArray } from '../../composables/index.ts';
 import type { FieldArrayStore, FormStore } from '../../types/index.ts';
@@ -12,7 +16,7 @@ import type { FieldArrayStore, FormStore } from '../../types/index.ts';
  * Field array component props interface.
  */
 export interface FieldArrayProps<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldArrayPath extends RequiredPath = RequiredPath,
 > {
   /**
