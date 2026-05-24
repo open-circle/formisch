@@ -31,7 +31,7 @@ export default component$(() => {
   const framework = useFramework();
 
   // Index of the currently open FAQ entry
-  const faqIndex = useSignal('0');
+  const faqIndex = useSignal(0);
 
   return (
     <main class="flex flex-1 flex-col items-center gap-24 py-24 md:gap-36 md:py-36 xl:gap-52 xl:py-52">
@@ -305,9 +305,7 @@ export default component$(() => {
               ),
             },
           ].map(({ heading, Text }, index) => {
-            const isOpen = createComputed$(
-              () => index.toString() === faqIndex.value
-            );
+            const isOpen = createComputed$(() => index === faqIndex.value);
             return (
               <li key={heading} class="flex flex-col px-8">
                 <button
@@ -322,7 +320,7 @@ export default component$(() => {
                   aria-expanded={isOpen.value}
                   aria-controls={`faq-${index}`}
                   onClick$={() => {
-                    faqIndex.value = index.toString();
+                    faqIndex.value = index;
                   }}
                 >
                   <span class="text-left leading-relaxed font-medium md:text-xl lg:text-2xl">
