@@ -62,7 +62,7 @@
   "dependencies": {
     "@formisch/qwik": "workspace:*",
     "clsx": "^2.1.1",
-    "valibot": "^1.2.0"
+    "valibot": "^1.4.1"
   },
   "engines": {
     "node": ">=22.0.0"

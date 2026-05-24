@@ -68,14 +68,14 @@
     "tsup": "^8.5.0",
     "tsup-preset-solid": "^2.2.0",
     "typescript": "^5.8.3",
-    "valibot": "^1.2.0",
+    "valibot": "^1.4.1",
     "vite-plugin-solid": "^2.11.6",
     "vitest": "3.2.4"
   },
   "peerDependencies": {
     "solid-js": "^1.6.0",
     "typescript": ">=5",
-    "valibot": "^1.0.0"
+    "valibot": "^1.4.1"
   },
   "peerDependenciesMeta": {
     "typescript": {

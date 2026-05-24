@@ -80,8 +80,8 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.8.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.8.3)
       vite:
         specifier: ^6.0.4
         version: 6.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
@@ -125,8 +125,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.8.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.8.3)
       vite:
         specifier: 7.0.4
         version: 7.0.4(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
@@ -137,8 +137,8 @@ importers:
   frameworks/react:
     dependencies:
       valibot:
-        specifier: ^1.0.0
-        version: 1.2.0(typescript@5.9.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.9.3)
     devDependencies:
       '@formisch/core':
         specifier: workspace:*
@@ -258,8 +258,8 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.8.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.8.3)
       vite-plugin-solid:
         specifier: ^2.11.6
         version: 2.11.10(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
@@ -327,8 +327,8 @@ importers:
         specifier: ^5.9.2
         version: 5.9.3
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.9.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.9.3)
       vite:
         specifier: ^7.1.5
         version: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
@@ -381,8 +381,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.3(@types/node@24.9.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(vue@3.5.22(typescript@5.8.3))(yaml@2.8.1)
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.8.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.8.3)
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.9.1)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
@@ -438,8 +438,8 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.8.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.8.3)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
@@ -508,8 +508,8 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.8.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.8.3)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
@@ -535,8 +535,8 @@ importers:
         specifier: ^2.9.2
         version: 2.11.0(preact-render-to-string@6.6.3(preact@10.29.2))(preact@10.29.2)
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.8.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.8.3)
     devDependencies:
       '@formisch/eslint-config':
         specifier: workspace:*
@@ -572,8 +572,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.8.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.8.3)
     devDependencies:
       '@eslint/js':
         specifier: ^9.31.0
@@ -651,8 +651,8 @@ importers:
         specifier: ^7.10.0
         version: 7.10.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.9.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.9.3)
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.1
@@ -727,8 +727,8 @@ importers:
         specifier: ^4.1.11
         version: 4.1.16
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.9.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.9.3)
       vinxi:
         specifier: ^0.5.8
         version: 0.5.8(@types/node@24.10.1)(db0@0.3.4)(ioredis@5.8.2)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(rolldown@1.0.0-beta.52)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
@@ -758,8 +758,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.9.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.9.3)
     devDependencies:
       '@eslint/compat':
         specifier: ^1.3.2
@@ -816,8 +816,8 @@ importers:
         specifier: ^0.8.2
         version: 0.8.4
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.8.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.8.3)
       vue:
         specifier: ^3.5.18
         version: 3.5.22(typescript@5.8.3)
@@ -895,8 +895,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.8.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.8.3)
     devDependencies:
       '@qwik.dev/core':
         specifier: 2.0.0-beta.9
@@ -9867,8 +9867,8 @@ packages:
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
 
-  valibot@1.2.0:
-    resolution: {integrity: sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==}
+  valibot@1.4.1:
+    resolution: {integrity: sha512-klCmFTz2jeDluy9RwX+F884TCiogtdBJ/YaxSx1EOBYXa3NXNWj8kR1jjN8rzluwojJVWWaHJ4r1U5LfICnM3g==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -12351,7 +12351,7 @@ snapshots:
       source-map: 0.7.6
       svgo: 3.3.2
       undici: 7.16.0
-      valibot: 1.2.0(typescript@5.8.3)
+      valibot: 1.4.1(typescript@5.8.3)
       vfile: 6.0.2
       vite: 6.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
       vite-imagetools: 7.1.1(rollup@4.52.5)
@@ -12368,7 +12368,7 @@ snapshots:
       source-map: 0.7.6
       svgo: 3.3.2
       undici: 7.16.0
-      valibot: 1.2.0(typescript@5.8.3)
+      valibot: 1.4.1(typescript@5.8.3)
       vfile: 6.0.3
       vite-imagetools: 7.1.1(rollup@4.52.5)
       zod: 3.25.48
@@ -21219,11 +21219,11 @@ snapshots:
 
   v8-compile-cache-lib@3.0.1: {}
 
-  valibot@1.2.0(typescript@5.8.3):
+  valibot@1.4.1(typescript@5.8.3):
     optionalDependencies:
       typescript: 5.8.3
 
-  valibot@1.2.0(typescript@5.9.3):
+  valibot@1.4.1(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
 
