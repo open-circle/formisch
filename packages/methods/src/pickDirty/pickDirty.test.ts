@@ -99,6 +99,40 @@ describe('pickDirty', () => {
     expect(pickDirty(store, { from: 'transformed-string' })).toBeUndefined();
   });
 
+  test('should pass through the supplied value when an object was cleared to null', () => {
+    const store = createTestStore(
+      v.object({ user: v.nullish(v.object({ name: v.string() })) }),
+      { initialInput: { user: { name: 'John' } } }
+    );
+    const userStore = store.children.user;
+    expect(userStore.kind).toBe('object');
+    if (userStore.kind === 'object') {
+      userStore.input.value = null;
+      userStore.isDirty.value = true;
+    }
+
+    expect(pickDirty(store, { from: { user: null } })).toStrictEqual({
+      user: null,
+    });
+  });
+
+  test('should skip a dirty key that is absent from the supplied value', () => {
+    const store = createTestStore(
+      v.object({ name: v.string(), email: v.string() }),
+      { initialInput: { name: 'John', email: 'a@example.com' } }
+    );
+    store.children.name.input.value = 'Jane';
+    store.children.name.isDirty.value = true;
+    store.children.email.input.value = 'b@example.com';
+    store.children.email.isDirty.value = true;
+
+    // `email` is dirty in the form but absent from `from` — it should be
+    // skipped rather than included as `undefined`.
+    expect(pickDirty(store, { from: { name: 'Jane' } })).toStrictEqual({
+      name: 'Jane',
+    });
+  });
+
   test('should skip keys where the value shape diverges and keep aligned siblings', () => {
     const store = createTestStore(
       v.object({

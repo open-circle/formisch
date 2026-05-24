@@ -11,7 +11,7 @@ import { properties } from './properties';
 
 # pickDirty
 
-Picks only the dirty parts of the given value, using the form's dirty tree as a structural mask. Object keys whose subtree contains no dirty descendant are omitted; arrays are treated as atomic and returned in full whenever any descendant is dirty. Returns `undefined` if no field is dirty or if the value's shape does not align with the form. Useful for filtering a validated output to just the changed parts before submitting.
+Picks only the dirty parts of the given value, using the form's dirty tree as a structural mask. Object keys whose subtree contains no dirty descendant are omitted; arrays are treated as atomic and returned in full whenever any descendant is dirty. Returns `undefined` if no field is dirty or if the root shape diverges; per-branch shape divergence is silently skipped. Useful for filtering a validated output to just the changed parts before submitting.
 
 ```ts
 const dirty = pickDirty<TSchema, TValue>(form, config);

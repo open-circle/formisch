@@ -98,7 +98,7 @@ const Schema = v.object({
 });
 ```
 
-After validation, `output.name` has whitespace trimmed and `output.age` is a number. <Link href="/methods/api/getDirtyInput/">`getDirtyInput`</Link> would give you the raw strings, because the dirty state is bound to the input form — not to the validated output.
+After validation, `output.name` has whitespace trimmed and `output.age` is a number. <Link href="/methods/api/getDirtyInput/">`getDirtyInput`</Link> would give you the raw strings, because the dirty state is bound to the form input — not to the validated output.
 
 <Link href="/methods/api/pickDirty/">`pickDirty(form, { from: output })`</Link> is the bridge: it walks the form's dirty tree as a structural mask and reads the corresponding values from the output you supply. The result preserves the transformed types.
 
@@ -125,6 +125,8 @@ Sparse arrays don't round-trip safely. Serializers compact them, `JSON.stringify
 This differs from objects, where clean keys are omitted. Objects model keyed dictionaries; arrays model ordered sequences.
 
 ## Common patterns
+
+The snippets below assume `form` is your form store (the result of <Link href="/vue/api/useForm/">`useForm`</Link>).
 
 ### Skip submission when nothing changed
 

@@ -1,10 +1,10 @@
 import {
   type BaseFormStore,
   type DeepPartial,
+  type FormSchema,
   getFieldBool,
   INTERNAL,
   type InternalFieldStore,
-  type FormSchema,
 } from '@formisch/core';
 
 /**
@@ -21,9 +21,10 @@ export interface PickDirtyConfig<TValue> {
  * Picks only the dirty parts of the given value, using the form's dirty
  * tree as a structural mask. Object keys whose subtree contains no dirty
  * descendant are omitted; arrays are treated as atomic and returned in full
- * whenever any descendant is dirty. Returns `undefined` if no field is dirty
- * or if the value's shape does not align with the form. Useful for filtering
- * a validated output to just the changed parts before submitting.
+ * whenever any descendant is dirty. Returns `undefined` if no field is
+ * dirty or if the root shape diverges; per-branch shape divergence is
+ * silently skipped. Useful for filtering a validated output to just the
+ * changed parts before submitting.
  *
  * @param form The form store providing the dirty mask.
  * @param config The pick dirty configuration.
@@ -59,12 +60,22 @@ function pickFromField(
   // If field store is array, return the value if it is an array (atomic).
   // Otherwise the shapes diverged and there is nothing safe to pluck.
   if (internalFieldStore.kind === 'array') {
+    // Array was cleared to null/undefined — pass through whatever the
+    // supplied value holds at this path.
+    if (!internalFieldStore.input.value) {
+      return value;
+    }
     return Array.isArray(value) ? value : SKIP;
   }
 
   // If field store is object, recurse only into dirty branches when the
   // value is a non-array object. Skip when shapes diverge.
   if (internalFieldStore.kind === 'object') {
+    // Object was cleared to null/undefined — pass through whatever the
+    // supplied value holds at this path.
+    if (!internalFieldStore.input.value) {
+      return value;
+    }
     if (value === null || typeof value !== 'object' || Array.isArray(value)) {
       return SKIP;
     }
@@ -72,7 +83,9 @@ function pickFromField(
     let added = false;
     for (const key in internalFieldStore.children) {
       const child = internalFieldStore.children[key];
-      if (getFieldBool(child, 'isDirty')) {
+      // Skip absent keys so a transformed value that omits a dirty key
+      // doesn't get an unintended `undefined` written into the result.
+      if (getFieldBool(child, 'isDirty') && key in value) {
         const childResult = pickFromField(
           child,
           (value as Record<string, unknown>)[key]
