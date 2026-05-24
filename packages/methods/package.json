@@ -20,6 +20,10 @@
   ],
   "type": "module",
   "exports": {
+    "./angular": {
+      "types": "./dist/index.angular.d.ts",
+      "default": "./dist/index.angular.js"
+    },
     "./preact": {
       "types": "./dist/index.preact.d.ts",
       "default": "./dist/index.preact.js"
