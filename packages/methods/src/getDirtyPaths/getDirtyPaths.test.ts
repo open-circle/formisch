@@ -109,6 +109,23 @@ describe('getDirtyPaths', () => {
     expect(getDirtyPaths(store)).toStrictEqual([['user']]);
   });
 
+  test('should return the object path when an object transitioned from nullish without a dirty descendant', () => {
+    const store = createTestStore(
+      v.object({ user: v.nullish(v.object({ name: v.string() })) }),
+      { initialInput: { user: null } }
+    );
+    const userStore = store.children.user;
+    expect(userStore.kind).toBe('object');
+    if (userStore.kind === 'object') {
+      // Simulate `setInput(form, { path: ['user'], input: {} })`: the object's
+      // own dirty flag flips, but the child `name` stays at its initial value.
+      userStore.input.value = true;
+      userStore.isDirty.value = true;
+    }
+
+    expect(getDirtyPaths(store)).toStrictEqual([['user']]);
+  });
+
   test('should scope to the given path', () => {
     const store = createTestStore(
       v.object({

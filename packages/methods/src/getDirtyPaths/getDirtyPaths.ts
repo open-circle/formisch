@@ -105,10 +105,22 @@ function collectDirtyPaths(
     // Hint: We skip a per-child `getFieldBool` pre-check because the
     // recursion already prunes clean subtrees. Pre-checking would walk
     // every dirty subtree twice.
+    const lengthBefore = paths.length;
     for (const key in internalFieldStore.children) {
       currentPath.push(key);
       collectDirtyPaths(internalFieldStore.children[key], currentPath, paths);
       currentPath.pop();
+    }
+
+    // If no descendant emitted a path but the object itself flipped dirty
+    // (e.g. transitioned from nullish to a non-nullish object), emit the
+    // object's own path so the change isn't silently dropped.
+    if (
+      paths.length === lengthBefore &&
+      internalFieldStore.isDirty.value &&
+      currentPath.length > 0
+    ) {
+      paths.push([...currentPath] as unknown as RequiredPath);
     }
 
     // Otherwise, if field store is a value, emit its path if dirty
