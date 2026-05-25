@@ -1,15 +1,15 @@
 import {
   Component,
   computed,
-  ContentChild,
+  contentChild,
   DestroyRef,
   inject,
-  Input,
   input,
   type InputSignal,
-  TemplateRef,
+  type Signal,
+  TemplateRef
 } from '@angular/core';
-import { NgIf, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import {
   type FieldElement,
   getElementInput,
@@ -46,25 +46,24 @@ import type { FieldStore, FormStore } from '../../types/index.ts';
 @Component({
   selector: 'formisch-field',
   standalone: true,
-  imports: [NgIf, NgTemplateOutlet],
+  imports: [NgTemplateOutlet],
   template: `
-    <ng-container
-      *ngIf="template"
-      [ngTemplateOutlet]="template"
-      [ngTemplateOutletContext]="{ $implicit: field }"
-    />
-  `,
+    @if (template()) {
+      <ng-container
+        [ngTemplateOutlet]="template()!"
+        [ngTemplateOutletContext]="{ $implicit: field }"
+      />
+    }
+`,
 })
 export class FormischField<
   TSchema extends Schema = Schema,
   TFieldPath extends RequiredPath = RequiredPath,
 > {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  @Input({ isSignal: true } as any) of: InputSignal<FormStore<TSchema>> = input.required<FormStore<TSchema>>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  @Input({ isSignal: true } as any) path: InputSignal<ValidPath<v.InferInput<TSchema>, TFieldPath>> = input.required<ValidPath<v.InferInput<TSchema>, TFieldPath>>();
+  readonly of: InputSignal<FormStore<TSchema>> = input.required<FormStore<TSchema>>();
+  readonly path: InputSignal<ValidPath<v.InferInput<TSchema>, TFieldPath>> = input.required<ValidPath<v.InferInput<TSchema>, TFieldPath>>();
 
-  @ContentChild(TemplateRef) protected template: TemplateRef<{ $implicit: FieldStore<TSchema, TFieldPath> }> | undefined;
+  protected readonly template: Signal<TemplateRef<unknown> | undefined> = contentChild(TemplateRef);
 
   private readonly internalFormStore = computed(() => this.of()[INTERNAL]);
   private readonly internalFieldStore = computed(() =>
@@ -114,7 +113,7 @@ export class FormischField<
         },
         ref(element) {
           if (element) {
-            internalFieldStore().elements.push(element as FieldElement);
+            internalFieldStore().elements.push(element);
           }
         },
         onFocus() {

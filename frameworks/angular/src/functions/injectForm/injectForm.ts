@@ -37,7 +37,9 @@ export function injectForm(config: FormConfig): FormStore {
   );
 
   if (config.validate === 'initial') {
-    afterNextRender(() => validateFormInput(internalFormStore));
+    afterNextRender(() => {
+      void validateFormInput(internalFormStore);
+    });
   }
 
   return {
