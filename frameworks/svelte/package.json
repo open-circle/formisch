@@ -1,7 +1,7 @@
 {
   "name": "@formisch/svelte",
   "description": "The lightweight, schema-first, and fully type-safe form library for Svelte",
-  "version": "0.7.6",
+  "version": "0.8.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",

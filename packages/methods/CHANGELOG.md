@@ -2,12 +2,12 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v0.8.0 (May 24, 2026)
 
 - Add `pickDirty` method to filter an externally-supplied value down to its dirty parts using the form's dirty mask (issue #21, pull request #98)
 - Add `getDirtyPaths` method to list the paths of dirty fields in a form or specific field (issue #21, pull request #98)
 - Add `getDirtyInput` method to retrieve only the dirty input values of a form or specific field (issue #21, pull request #98)
-- Change `@formisch/core` to vX.X.X
+- Change `@formisch/core` to v0.7.0
 - Change method generic constraints from `Schema` to `FormSchema` so the form root must be an object schema (sync or async) or a combinator (`intersect`, `union`, `variant`)
 
 ## v0.7.2 (May 17, 2026)

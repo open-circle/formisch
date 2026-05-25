@@ -2,7 +2,7 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v0.7.0 (May 24, 2026)
 
 - Add `FormSchema` type that constrains a form's root schema to object schemas (sync or async) and combinators (`intersect`, `union`, `variant`)
 - Add `getDirtyFieldInput` to extract only the dirty input of a field store (issue #21, pull request #98)
