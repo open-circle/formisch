@@ -30,7 +30,7 @@ import {
 } from '~/logos';
 
 const FRAMEWORK_KEY = 'framework';
-export const DEFAULT_FRAMEWORK: Framework = 'solid';
+export const DEFAULT_FRAMEWORK: Framework = 'react';
 
 export type Framework =
   | 'preact'
@@ -95,7 +95,7 @@ const FrameworkContext = createContextId<Signal<Framework>>(FRAMEWORK_KEY);
  *
  * - Tracks the first URL segment when it matches a framework slug.
  * - Otherwise falls back to the user's last choice from `localStorage` once
- *   hydration runs, defaulting to `solid` during SSG.
+ *   hydration runs, defaulting to `react` during SSG.
  */
 export const useFrameworkProvider = () => {
   const location = useLocation();
