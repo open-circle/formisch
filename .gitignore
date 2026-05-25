@@ -17,6 +17,9 @@ backups
 .netlify
 .vercel
 
+# Claude generated files
+docs/superpowers
+
 # Others
 logs
 *.log
