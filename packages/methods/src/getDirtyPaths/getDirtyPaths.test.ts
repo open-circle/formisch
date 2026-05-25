@@ -126,6 +126,27 @@ describe('getDirtyPaths', () => {
     expect(getDirtyPaths(store)).toStrictEqual([['user']]);
   });
 
+  test('should emit only the leaf path when both the object and a descendant are dirty', () => {
+    const store = createTestStore(
+      v.object({ user: v.nullish(v.object({ name: v.string() })) }),
+      { initialInput: { user: null } }
+    );
+    const userStore = store.children.user;
+    expect(userStore.kind).toBe('object');
+    if (userStore.kind === 'object') {
+      // Simulate `setInput(form, { path: ['user'], input: { name: 'John' } })`:
+      // both the object itself (null → object) and the `name` child flip dirty.
+      userStore.input.value = true;
+      userStore.isDirty.value = true;
+      userStore.children.name.input.value = 'John';
+      userStore.children.name.isDirty.value = true;
+    }
+
+    // Only the leaf path is emitted — the parent's dirty state is implied by
+    // the descendant path and should not double-emit.
+    expect(getDirtyPaths(store)).toStrictEqual([['user', 'name']]);
+  });
+
   test('should scope to the given path', () => {
     const store = createTestStore(
       v.object({
