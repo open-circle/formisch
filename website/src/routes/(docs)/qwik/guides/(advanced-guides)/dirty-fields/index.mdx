@@ -67,16 +67,13 @@ Because dirty state is bound to the form input, `getDirtyInput` always returns t
 
 ### `getDirtyPaths`
 
-Returns a list of paths to dirty fields. Use it when you want to drive your own walker — for example, generating a patch payload or computing a structural diff.
+Returns a list of paths to dirty fields. Use it for logging, telemetry, or driving a custom walker over the form's dirty state.
 
 ```tsx
-import { getDirtyPaths, getInput } from '@formisch/qwik';
+import { getDirtyPaths } from '@formisch/qwik';
 
-const patch = getDirtyPaths(profileForm).map((path) => ({
-  operation: 'replace',
-  path,
-  value: getInput(profileForm, { path }),
-}));
+const dirtyPaths = getDirtyPaths(profileForm);
+// e.g. [['email'], ['user', 'name']]
 ```
 
 Arrays are atomic: only the array's own path is returned, never the paths of individual items.
@@ -176,19 +173,6 @@ const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
     await api.update(dirty);
   }
 };
-```
-
-### Build a patch payload
-
-```tsx
-import { getDirtyPaths, getInput } from '@formisch/qwik';
-
-const patch = getDirtyPaths(form).map((path) => ({
-  operation: 'replace',
-  path,
-  value: getInput(form, { path }),
-}));
-await api.patch(patch);
 ```
 
 ## Performance

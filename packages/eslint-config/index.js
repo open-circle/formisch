@@ -119,5 +119,29 @@ export function createSourceConfig(options = {}) {
   };
 }
 
+/**
+ * Creates a test file configuration object that relaxes rules which are
+ * impractical in tests (e.g. local `type` aliases for type assertions).
+ *
+ * @param options Configuration options.
+ * @param options.files The file patterns to match (default: src/**\/*.{test,test-d}.{ts,tsx}).
+ * @param options.extraRules Additional rules to merge.
+ *
+ * @returns The ESLint configuration object for test files.
+ */
+export function createTestConfig(options = {}) {
+  const {
+    files = ['src/**/*.{test,test-d}.{ts,tsx}'],
+    extraRules = {},
+  } = options;
+  return {
+    files,
+    rules: {
+      '@typescript-eslint/consistent-type-definitions': 'off',
+      ...extraRules,
+    },
+  };
+}
+
 // Re-export plugins and tseslint for framework configs
 export { eslint, importPlugin, jsdoc, pluginSecurity, tseslint };

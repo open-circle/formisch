@@ -10,21 +10,20 @@ import {
 /**
  * Pick dirty config interface.
  */
-export interface PickDirtyConfig<TValue> {
+export interface PickDirtyConfig<TValue extends object> {
   /**
-   * The value to filter down to its dirty parts.
+   * The value to filter down to its dirty parts. Must be structurally
+   * compatible with the form's schema.
    */
   readonly from: TValue;
 }
 
 /**
- * Picks only the dirty parts of the given value, using the form's dirty
- * tree as a structural mask. Object keys whose subtree contains no dirty
- * descendant are omitted; arrays are treated as atomic and returned in full
- * whenever any descendant is dirty. Returns `undefined` if no field is
- * dirty or if the root shape diverges; per-branch shape divergence is
- * silently skipped. Useful for filtering a validated output to just the
- * changed parts before submitting.
+ * Picks only the dirty parts of the given value, using the form's dirty fields
+ * as a structural mask. Arrays are treated as atomic and object keys without a
+ * dirty descendant are omitted. Returns `undefined` if no field is dirty.
+ * Useful for filtering a validated output down to its changed parts before
+ * submitting.
  *
  * @param form The form store providing the dirty mask.
  * @param config The pick dirty configuration.
@@ -32,73 +31,65 @@ export interface PickDirtyConfig<TValue> {
  * @returns The dirty parts of the value, or `undefined`.
  */
 // @__NO_SIDE_EFFECTS__
-export function pickDirty<TSchema extends FormSchema, TValue>(
+export function pickDirty<TSchema extends FormSchema, TValue extends object>(
   form: BaseFormStore<TSchema>,
   config: PickDirtyConfig<TValue>
 ): DeepPartial<TValue> | undefined {
-  const result = pickFromField(form[INTERNAL], config.from);
-  return result === SKIP ? undefined : (result as DeepPartial<TValue>);
+  // If no field is dirty, return undefined
+  if (!getFieldBool(form[INTERNAL], 'isDirty')) {
+    return undefined;
+  }
+
+  // Pick the dirty parts of the value using the form as a mask
+  const result = pickFieldValue(form[INTERNAL], config.from);
+
+  // Return undefined if no dirty property ended up in the result, which can
+  // happen when every dirty key is absent from the supplied value
+  return Object.keys(result as object).length
+    ? (result as DeepPartial<TValue>)
+    : undefined;
 }
 
-// Sentinel returned when a subtree contributes nothing to the result.
-// Distinct from `undefined` so that a dirty leaf whose value is `undefined`
-// is still included rather than skipped.
-const SKIP = Symbol();
-
-// Recursively walks the form's dirty tree alongside the supplied value,
-// plucking only the parts that correspond to dirty fields and whose shape
-// aligns with the form. Returns `SKIP` when nothing should be included.
-function pickFromField(
+/**
+ * Recursively picks the dirty parts of a value using the field store as a
+ * structural mask, reading from the supplied value rather than the form's own
+ * input. Objects with non-nullish input recurse into their dirty children that
+ * are present in the value, while arrays, primitives, nullish-cleared fields
+ * and shape-diverging values are returned as-is.
+ *
+ * @param internalFieldStore The field store used as the dirty mask.
+ * @param value The value to pick the dirty parts from.
+ *
+ * @returns The dirty parts of the value.
+ */
+// @__NO_SIDE_EFFECTS__
+function pickFieldValue(
   internalFieldStore: InternalFieldStore,
   value: unknown
 ): unknown {
-  // Bail with sentinel if no descendant is dirty
-  if (!getFieldBool(internalFieldStore, 'isDirty')) {
-    return SKIP;
-  }
-
-  // If field store is array, return the value if it is an array (atomic).
-  // Otherwise the shapes diverged and there is nothing safe to pluck.
-  if (internalFieldStore.kind === 'array') {
-    // Array was cleared to null/undefined — pass through whatever the
-    // supplied value holds at this path.
-    if (!internalFieldStore.input.value) {
-      return value;
-    }
-    return Array.isArray(value) ? value : SKIP;
-  }
-
-  // If field store is object, recurse only into dirty branches when the
-  // value is a non-array object. Skip when shapes diverge.
-  if (internalFieldStore.kind === 'object') {
-    // Object was cleared to null/undefined — pass through whatever the
-    // supplied value holds at this path.
-    if (!internalFieldStore.input.value) {
-      return value;
-    }
-    if (value === null || typeof value !== 'object' || Array.isArray(value)) {
-      return SKIP;
-    }
+  // If field store is object with non-nullish input and the value is a
+  // matching (non-array) object, recurse into children
+  if (
+    internalFieldStore.kind === 'object' &&
+    internalFieldStore.input.value &&
+    value &&
+    typeof value === 'object' &&
+    !Array.isArray(value)
+  ) {
+    // Collect dirty parts from each dirty property present in value
     const result: Record<string, unknown> = {};
-    let added = false;
     for (const key in internalFieldStore.children) {
       const child = internalFieldStore.children[key];
-      // Skip absent keys so a transformed value that omits a dirty key
-      // doesn't get an unintended `undefined` written into the result.
       if (getFieldBool(child, 'isDirty') && key in value) {
-        const childResult = pickFromField(
+        result[key] = pickFieldValue(
           child,
           (value as Record<string, unknown>)[key]
         );
-        if (childResult !== SKIP) {
-          result[key] = childResult;
-          added = true;
-        }
       }
     }
-    return added ? result : SKIP;
+    return result;
   }
 
-  // Return value as-is for primitive value field
+  // Otherwise, field is atomic or its shape diverges, so return as-is
   return value;
 }

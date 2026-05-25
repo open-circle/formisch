@@ -1,6 +1,7 @@
 import {
   baseConfigs,
   createSourceConfig,
+  createTestConfig,
   tseslint,
 } from '@formisch/eslint-config';
 
@@ -14,5 +15,6 @@ export default tseslint.config(
       // Methods-specific rules
       '@typescript-eslint/no-empty-object-type': 'off',
     },
-  })
+  }),
+  createTestConfig({ files: ['src/**/*.{test,test-d}.ts'] })
 );

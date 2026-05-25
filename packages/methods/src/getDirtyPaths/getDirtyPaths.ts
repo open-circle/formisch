@@ -1,12 +1,13 @@
 import {
   type BaseFormStore,
+  type DirtyPath,
+  type FormSchema,
   getFieldBool,
   getFieldStore,
   INTERNAL,
   type InternalFieldStore,
-  type Path,
+  type PathKey,
   type RequiredPath,
-  type FormSchema,
   type ValidPath,
 } from '@formisch/core';
 import type * as v from 'valibot';
@@ -35,29 +36,29 @@ export interface GetFieldDirtyPathsConfig<
 }
 
 /**
- * Returns a list of paths to dirty fields. Object branches are recursed into;
- * arrays are treated as atomic — when any descendant of an array is dirty,
- * only the array's own path is returned. Returns an empty array if no field
- * in the inspected subtree is dirty.
+ * Returns a list of paths to the dirty fields of a specific field or the
+ * entire form. Arrays are treated as atomic and contribute only their own
+ * path if any item is dirty, while object branches are recursed into. Returns
+ * an empty list if no field in the inspected subtree is dirty.
  *
  * @param form The form store to inspect.
  *
- * @returns The list of paths to dirty fields.
+ * @returns The list of paths to the dirty fields.
  */
 export function getDirtyPaths<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>
-): RequiredPath[];
+): DirtyPath<v.InferInput<TSchema>>[];
 
 /**
- * Returns a list of paths to dirty fields. Object branches are recursed into;
- * arrays are treated as atomic — when any descendant of an array is dirty,
- * only the array's own path is returned. Returns an empty array if no field
- * in the inspected subtree is dirty.
+ * Returns a list of paths to the dirty fields of a specific field or the
+ * entire form. Arrays are treated as atomic and contribute only their own
+ * path if any item is dirty, while object branches are recursed into. Returns
+ * an empty list if no field in the inspected subtree is dirty.
  *
  * @param form The form store to inspect.
- * @param config The configuration with a `path` to scope the search.
+ * @param config The get dirty paths configuration.
  *
- * @returns The list of paths to dirty fields.
+ * @returns The list of paths to the dirty fields.
  */
 export function getDirtyPaths<
   TSchema extends FormSchema,
@@ -67,7 +68,7 @@ export function getDirtyPaths<
   config: TFieldPath extends RequiredPath
     ? GetFieldDirtyPathsConfig<TSchema, TFieldPath>
     : GetFormDirtyPathsConfig
-): RequiredPath[];
+): DirtyPath<v.InferInput<TSchema>>[];
 
 // @__NO_SIDE_EFFECTS__
 export function getDirtyPaths(
@@ -76,45 +77,52 @@ export function getDirtyPaths(
     | GetFormDirtyPathsConfig
     | GetFieldDirtyPathsConfig<FormSchema, RequiredPath>
 ): RequiredPath[] {
-  const target = config?.path
+  // Get field store of form or specified field
+  const internalFieldStore = config?.path
     ? getFieldStore(form[INTERNAL], config.path)
     : form[INTERNAL];
 
-  // Bail with an empty list if no descendant is dirty
-  if (!getFieldBool(target, 'isDirty')) {
-    return [];
-  }
+  // Collect paths of dirty fields via a single recursive walk
+  const paths: RequiredPath[] = [];
+  collectDirtyPaths(
+    internalFieldStore,
+    config?.path ? [...config.path] : [],
+    paths
+  );
 
-  return collect(target, config?.path ? [...config.path] : []);
+  // Return collected paths
+  return paths;
 }
 
-function collect(
+// @__NO_SIDE_EFFECTS__
+function collectDirtyPaths(
   internalFieldStore: InternalFieldStore,
-  currentPath: Path
-): RequiredPath[] {
-  // Arrays are atomic — emit the array's own path. With `FormSchema`
-  // enforcing object roots, `currentPath` is always non-empty here, but the
-  // guard keeps the cast honest.
-  if (internalFieldStore.kind === 'array') {
-    return currentPath.length > 0 ? [currentPath as RequiredPath] : [];
-  }
-
-  // For objects: if input is null/undefined, treat as atomic (the whole
-  // container changed). Otherwise recurse into dirty children.
-  if (internalFieldStore.kind === 'object') {
-    if (!internalFieldStore.input.value) {
-      return currentPath.length > 0 ? [currentPath as RequiredPath] : [];
-    }
-    const paths: RequiredPath[] = [];
+  currentPath: PathKey[],
+  paths: RequiredPath[]
+): void {
+  // If field store is object with non-nullish input, recurse into children
+  if (internalFieldStore.kind === 'object' && internalFieldStore.input.value) {
+    // Hint: We skip a per-child `getFieldBool` pre-check because the
+    // recursion already prunes clean subtrees. Pre-checking would walk
+    // every dirty subtree twice.
     for (const key in internalFieldStore.children) {
-      const child = internalFieldStore.children[key];
-      if (getFieldBool(child, 'isDirty')) {
-        paths.push(...collect(child, [...currentPath, key]));
-      }
+      currentPath.push(key);
+      collectDirtyPaths(internalFieldStore.children[key], currentPath, paths);
+      currentPath.pop();
     }
-    return paths;
-  }
 
-  // Value field — emit its path
-  return currentPath.length > 0 ? [currentPath as RequiredPath] : [];
+    // Otherwise, if field store is a value, emit its path if dirty
+  } else if (internalFieldStore.kind === 'value') {
+    if (internalFieldStore.isDirty.value && currentPath.length > 0) {
+      paths.push([...currentPath] as unknown as RequiredPath);
+    }
+
+    // Otherwise, field is atomic (array or cleared object) — emit its path
+    // if any dirty content exists
+  } else if (
+    getFieldBool(internalFieldStore, 'isDirty') &&
+    currentPath.length > 0
+  ) {
+    paths.push([...currentPath] as unknown as RequiredPath);
+  }
 }

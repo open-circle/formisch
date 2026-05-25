@@ -1,12 +1,12 @@
 import {
   type BaseFormStore,
   type DeepPartial,
+  type FormSchema,
   getDirtyFieldInput,
   getFieldStore,
   INTERNAL,
   type PathValue,
   type RequiredPath,
-  type FormSchema,
   type ValidPath,
 } from '@formisch/core';
 import type * as v from 'valibot';
@@ -37,10 +37,9 @@ export interface GetFieldDirtyInputConfig<
 
 /**
  * Retrieves only the dirty input values of a specific field or the entire
- * form. Object keys whose subtree contains no dirty descendant are omitted;
- * arrays are treated as atomic and returned in full whenever any descendant
- * is dirty. Returns `undefined` if no field in the inspected subtree is
- * dirty.
+ * form. Arrays are treated as atomic and returned in full if any item is
+ * dirty, while object keys without a dirty descendant are omitted. Returns
+ * `undefined` if no field in the inspected subtree is dirty.
  *
  * @param form The form store to retrieve dirty input from.
  *
@@ -52,10 +51,9 @@ export function getDirtyInput<TSchema extends FormSchema>(
 
 /**
  * Retrieves only the dirty input values of a specific field or the entire
- * form. Object keys whose subtree contains no dirty descendant are omitted;
- * arrays are treated as atomic and returned in full whenever any descendant
- * is dirty. Returns `undefined` if no field in the inspected subtree is
- * dirty.
+ * form. Arrays are treated as atomic and returned in full if any item is
+ * dirty, while object keys without a dirty descendant are omitted. Returns
+ * `undefined` if no field in the inspected subtree is dirty.
  *
  * @param form The form store to retrieve dirty input from.
  * @param config The get dirty input configuration.
