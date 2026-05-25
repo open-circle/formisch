@@ -3,7 +3,6 @@ import {
   Component,
   ElementRef,
   inject,
-  Input,
   input,
   type InputSignal,
 } from '@angular/core';
@@ -32,11 +31,10 @@ import type { FormStore } from '../../types/index.ts';
   template: `<form novalidate (submit)="handleFormSubmit($event)"><ng-content /></form>`,
 })
 export class FormischForm<TSchema extends Schema = Schema> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  @Input({ isSignal: true } as any) of: InputSignal<FormStore<TSchema>> = input.required<FormStore<TSchema>>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  @Input({ isSignal: true } as any) submitFn: InputSignal<SubmitEventHandler<TSchema>> = input.required<SubmitEventHandler<TSchema>>();
+  readonly of: InputSignal<FormStore<TSchema>> = input.required<FormStore<TSchema>>();
+  readonly submitFn: InputSignal<SubmitEventHandler<TSchema>> = input.required<SubmitEventHandler<TSchema>>();
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   private readonly hostEl: ElementRef<HTMLElement> = inject(ElementRef);
 
   constructor() {
@@ -50,6 +48,6 @@ export class FormischForm<TSchema extends Schema = Schema> {
   }
 
   protected handleFormSubmit(event: SubmitEvent): void {
-    handleSubmit(this.of(), this.submitFn())(event);
+    void handleSubmit(this.of(), this.submitFn())(event);
   }
 }

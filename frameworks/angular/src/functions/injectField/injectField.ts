@@ -88,7 +88,7 @@ export function injectField(
       autofocus: !!internalFieldStore.errors.value,
       ref(element) {
         if (element) {
-          internalFieldStore.elements.push(element as FieldElement);
+          internalFieldStore.elements.push(element);
         }
       },
       onFocus() {
