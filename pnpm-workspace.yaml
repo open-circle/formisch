@@ -4,3 +4,25 @@ packages:
   - 'playgrounds/*'
   - 'scripts'
   - 'website'
+
+# Supply-chain hardening (pnpm v11+).
+# pnpm v11 enables `minimumReleaseAge` (1 day), `blockExoticSubdeps`, and
+# `strictDepBuilds` by default. We extend the release-age window to 7 days
+# for a larger detection buffer against malicious releases.
+#minimumReleaseAge: 10080  # minutes — 7 days
+
+# Packages always exempt from the release-age cooldown. `valibot` is
+# maintained by the same author as formisch (Fabian Hiller) and is treated
+# as a first-party dependency, so we adopt its releases without waiting.
+minimumReleaseAgeExclude:
+  - valibot
+
+# Allowlist of packages whose install / postinstall scripts are permitted to
+# run. Under v11 defaults, every other package's build scripts are denied.
+# Add entries here only after auditing what the script does.
+allowBuilds:
+  '@parcel/watcher': true # native file watcher used transitively by dev servers / Tailwind v4
+  deasync: true # C++ addon used transitively by the Vercel CLI
+  esbuild: true # selects per-OS native binary; required for Vite / Qwik builds
+  sharp: true # website only — fetches/builds native image-processing binaries
+  vercel: true # website deploy CLI (`pnpm -C website deploy`)
