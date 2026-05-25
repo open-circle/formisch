@@ -1,11 +1,15 @@
 import { describe, expectTypeOf, test } from 'vitest';
 import type {
+  DirtyPath,
   ExactKeysOf,
   ExactKeysOfArrayPath,
   ExactRequired,
+  Path,
+  PathKey,
   PathValue,
   PropertiesOf,
   PropertiesOfArrayPath,
+  RequiredPath,
   ValidArrayPath,
   ValidPath,
 } from './path.ts';
@@ -604,5 +608,99 @@ describe('ValidArrayPath', () => {
         ['rows', number, 'tags']
       >
     >().toEqualTypeOf<['rows', number, 'tags']>();
+  });
+});
+
+describe('DirtyPath', () => {
+  test('should return the keys of a flat object as single-segment paths', () => {
+    expectTypeOf<DirtyPath<{ name: string; age: number }>>().toEqualTypeOf<
+      readonly ['name'] | readonly ['age']
+    >();
+  });
+
+  test('should include both the parent path and nested paths for object children', () => {
+    expectTypeOf<
+      DirtyPath<{ user: { email: string; name: string } }>
+    >().toEqualTypeOf<
+      readonly ['user'] | readonly ['user', 'email'] | readonly ['user', 'name']
+    >();
+  });
+
+  test('should treat arrays and tuples of every shape as atomic', () => {
+    expectTypeOf<
+      DirtyPath<{
+        tags: string[];
+        users: { name: string }[];
+        matrix: number[][];
+        pairs: [number, number][];
+        coords: [number, number];
+        nodes: [{ x: number }, { y: number }];
+      }>
+    >().toEqualTypeOf<
+      | readonly ['tags']
+      | readonly ['users']
+      | readonly ['matrix']
+      | readonly ['pairs']
+      | readonly ['coords']
+      | readonly ['nodes']
+    >();
+  });
+
+  test('should recurse into object siblings while array and tuple siblings stay atomic', () => {
+    expectTypeOf<
+      DirtyPath<{
+        items: string[];
+        coords: [number, number];
+        user: { name: string; address: { city: string } };
+      }>
+    >().toEqualTypeOf<
+      | readonly ['items']
+      | readonly ['coords']
+      | readonly ['user']
+      | readonly ['user', 'name']
+      | readonly ['user', 'address']
+      | readonly ['user', 'address', 'city']
+    >();
+  });
+
+  test('should return `never` for non-object roots', () => {
+    expectTypeOf<DirtyPath<string>>().toBeNever();
+    expectTypeOf<DirtyPath<string[]>>().toBeNever();
+    expectTypeOf<DirtyPath<[number, string]>>().toBeNever();
+  });
+
+  test('should narrow paths up to the configured depth', () => {
+    expectTypeOf<
+      DirtyPath<{ a: { b: { c: { d: { e: string } } } } }>
+    >().toEqualTypeOf<
+      | readonly ['a']
+      | readonly ['a', 'b']
+      | readonly ['a', 'b', 'c']
+      | readonly ['a', 'b', 'c', 'd']
+      | readonly ['a', 'b', 'c', 'd', 'e']
+    >();
+  });
+
+  test('should fall back to RequiredPath for paths deeper than the depth limit', () => {
+    type Result = DirtyPath<{
+      a: { b: { c: { d: { e: { f: string } } } } };
+    }>;
+    // The path `['a', 'b', 'c', 'd', 'e', 'f']` is past depth 5, so the last
+    // segments collapse to `PathKey, ...Path` (RequiredPath catch-all).
+    expectTypeOf<
+      readonly ['a', 'b', 'c', 'd', 'e', PathKey, ...Path]
+    >().toMatchTypeOf<Result>();
+  });
+
+  test('should merge keys across object union members', () => {
+    expectTypeOf<
+      DirtyPath<{ shared: string } & ({ a: string } | { b: number })>
+    >().toEqualTypeOf<readonly ['shared'] | readonly ['a'] | readonly ['b']>();
+  });
+
+  test('should be a subtype of RequiredPath', () => {
+    expectTypeOf<
+      DirtyPath<{ name: string; user: { email: string } }>
+    >().toMatchTypeOf<RequiredPath>();
   });
 });

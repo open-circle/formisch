@@ -21,6 +21,7 @@
 - [Special inputs](/vue/guides/special-inputs/)
 - [Controlled fields](/vue/guides/controlled-fields/)
 - [Nested fields](/vue/guides/nested-fields/)
+- [Dirty fields](/vue/guides/dirty-fields/)
 - [Field arrays](/vue/guides/field-arrays/)
 - [TypeScript](/vue/guides/typescript/)
 - [Architecture](/vue/guides/architecture/)

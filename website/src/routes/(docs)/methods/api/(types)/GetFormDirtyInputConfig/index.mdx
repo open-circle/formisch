@@ -1,0 +1,25 @@
+---
+title: GetFormDirtyInputConfig
+description: Configuration interface for retrieving form-level dirty input.
+source: /packages/methods/src/getDirtyInput/getDirtyInput.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Property } from '~/components';
+import { properties } from './properties';
+
+# GetFormDirtyInputConfig
+
+Configuration interface for retrieving form-level dirty input. Used by the `getDirtyInput` method when no specific field path is provided.
+
+## Definition
+
+- `GetFormDirtyInputConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'getDirtyInput', href: '../getDirtyInput/' }]} />

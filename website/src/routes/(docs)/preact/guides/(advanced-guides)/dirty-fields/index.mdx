@@ -1,0 +1,182 @@
+---
+title: Dirty fields
+description: >-
+  Learn how to work with dirty form state in Formisch. This guide covers the
+  three dirty-extraction methods, when to reach for each, and why pickDirty
+  exists alongside getDirtyInput.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Dirty fields
+
+When a user edits a form, Formisch tracks which fields have changed since they were initialized. The library exposes three methods for working with that dirty state: <Link href="/methods/api/getDirtyInput/">`getDirtyInput`</Link>, <Link href="/methods/api/getDirtyPaths/">`getDirtyPaths`</Link>, and <Link href="/methods/api/pickDirty/">`pickDirty`</Link>. This guide explains what each one is for, when to reach for it, and why `pickDirty` exists alongside the others.
+
+## What "dirty" means
+
+A field is dirty when its current input differs from its start input. The form starts clean. As the user types, only the fields they touch flip to dirty. Resetting a field (or resetting the form with a new `initialInput`) clears the dirty flag.
+
+> The dirty flag is per-field. Editing a deeply nested value does not flip its ancestors' flags. The dirty-extraction methods walk the tree internally to find dirty descendants, which is why all three methods do the same kind of work under the hood.
+
+## The three methods
+
+### `getDirtyInput`
+
+Returns the dirty subtree of the form's input. Use it when you want to ship the values the user typed — typically for a PATCH endpoint that accepts the same shape as your form input.
+
+```tsx
+import {
+  Form,
+  getDirtyInput,
+  type SubmitHandler,
+  useForm,
+} from '@formisch/preact';
+import * as v from 'valibot';
+
+const UserSchema = v.object({
+  name: v.pipe(v.string(), v.nonEmpty()),
+  email: v.pipe(v.string(), v.email()),
+});
+
+export default function EditProfile({ user }) {
+  const profileForm = useForm({
+    schema: UserSchema,
+    initialInput: user,
+  });
+
+  const onSubmit: SubmitHandler<typeof UserSchema> = async () => {
+    const dirty = getDirtyInput(profileForm);
+    if (dirty) {
+      await api.patchUser(user.id, dirty);
+    }
+  };
+
+  return (
+    <Form of={profileForm} onSubmit={onSubmit}>
+      {/* fields */}
+    </Form>
+  );
+}
+```
+
+If only `email` was edited, `dirty` is `{ email: 'new@example.com' }`. If nothing was edited, it is `undefined`.
+
+Because dirty state is bound to the form input, `getDirtyInput` always returns the raw user input. Schema transformations such as `v.trim()` or `v.toNumber()` are not applied to the returned values. When you need the validated and transformed output instead, reach for `pickDirty` (see <Link href="#why-pickdirty-exists">below</Link>).
+
+### `getDirtyPaths`
+
+Returns a list of paths to dirty fields. Use it for logging, telemetry, or driving a custom walker over the form's dirty state.
+
+```tsx
+import { getDirtyPaths } from '@formisch/preact';
+
+const dirtyPaths = getDirtyPaths(profileForm);
+// e.g. [['email'], ['user', 'name']]
+```
+
+Arrays are atomic: only the array's own path is returned, never the paths of individual items.
+
+### `pickDirty`
+
+Filters a user-supplied value down to its dirty parts using the form's dirty mask. Use it when you have a separately-derived value — most commonly the validated and transformed output from a submit handler — and you want only its dirty parts.
+
+```tsx
+import { pickDirty, type SubmitHandler } from '@formisch/preact';
+
+const onSubmit: SubmitHandler<typeof UserSchema> = async (output) => {
+  const dirty = pickDirty(profileForm, { from: output });
+  if (dirty) {
+    await api.update(dirty);
+  }
+};
+```
+
+## Why `pickDirty` exists
+
+Dirty state is tracked against the form **input** — the raw values the user typed. But Valibot schemas can transform that input into a different output shape before it reaches your submit handler:
+
+```tsx
+import * as v from 'valibot';
+
+const Schema = v.object({
+  name: v.pipe(v.string(), v.trim()),
+  age: v.pipe(v.string(), v.toNumber()),
+});
+```
+
+After validation, `output.name` has whitespace trimmed and `output.age` is a number. <Link href="/methods/api/getDirtyInput/">`getDirtyInput`</Link> would give you the raw strings, because the dirty state is bound to the form input — not to the validated output.
+
+<Link href="/methods/api/pickDirty/">`pickDirty(form, { from: output })`</Link> is the bridge: it walks the form's dirty tree as a structural mask and reads the corresponding values from the output you supply. The result preserves the transformed types.
+
+```tsx
+import { pickDirty, type SubmitHandler } from '@formisch/preact';
+
+const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
+  // output.age is a number — pickDirty preserves that.
+  const dirty = pickDirty(form, { from: output });
+  if (dirty) {
+    await api.update(dirty);
+  }
+};
+```
+
+If the schema reshapes the output entirely — for example, by combining several input fields into a single output value — `pickDirty` returns `undefined` because the shape no longer aligns with the form's input shape.
+
+## Atomic arrays
+
+All three methods treat arrays as atomic. When any descendant of an array is dirty, the full array is returned (or its own path, for `getDirtyPaths`). The methods never produce sparse arrays.
+
+Sparse arrays don't round-trip safely. Serializers compact them, `JSON.stringify` writes `null` for holes, and indices lose positional meaning. Returning the full current array preserves order and lets the server treat the array as a complete replacement.
+
+This differs from objects, where clean keys are omitted. Objects model keyed dictionaries; arrays model ordered sequences.
+
+## Common patterns
+
+The snippets below assume `form` is your form store (the result of <Link href="/preact/api/useForm/">`useForm`</Link>).
+
+### Skip submission when nothing changed
+
+The form's `isDirty` flag is the cheapest way to ask "is anything dirty?" — it short-circuits on the first dirty field it finds and doesn't allocate. Use it when all you need is the yes/no answer. If you actually consume the output of `getDirtyInput`, `getDirtyPaths`, or `pickDirty`, call that method directly — its return value already signals "nothing dirty", so checking `form.isDirty` first would just walk the tree twice.
+
+```tsx
+import type { SubmitHandler } from '@formisch/preact';
+
+const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
+  if (!form.isDirty) {
+    return;
+  }
+  await api.update(output);
+};
+```
+
+### Send only the dirty raw input
+
+```tsx
+import { getDirtyInput } from '@formisch/preact';
+
+const dirty = getDirtyInput(form);
+if (dirty) {
+  await api.patch(dirty);
+}
+```
+
+### Send only the dirty validated output
+
+```tsx
+import { pickDirty, type SubmitHandler } from '@formisch/preact';
+
+const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
+  const dirty = pickDirty(form, { from: output });
+  if (dirty) {
+    await api.update(dirty);
+  }
+};
+```
+
+## Performance
+
+All three methods walk the form's field tree and call `getFieldBool` recursively to skip clean subtrees. Cost is effectively linear in field count for typical balanced forms (shallow and wide) and degrades toward `O(N²)` for deeply nested trees with few siblings at each level.
+
+Call these methods from submit or blur handlers — not from tight reactive loops on every keystroke. For very large or deeply nested forms (thousands of fields), profile before binding them to high-frequency events.

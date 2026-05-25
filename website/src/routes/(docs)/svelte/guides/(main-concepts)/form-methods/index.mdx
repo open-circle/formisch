@@ -27,6 +27,19 @@ To retrieve values from your form, you can use:
 
 Formisch uses reactive stores internally which means that reading values with these methods is reactive. When the form state changes, any component or subscription that uses these methods will automatically update to reflect the new state.
 
+## Dirty state
+
+To work with the dirty state of your form, Formisch provides three methods:
+
+- <Link href="/methods/api/getDirtyInput/">`getDirtyInput`</Link>: Get the dirty
+  parts of the form input
+- <Link href="/methods/api/getDirtyPaths/">`getDirtyPaths`</Link>: Get the paths
+  of dirty fields
+- <Link href="/methods/api/pickDirty/">`pickDirty`</Link>: Filter an
+  externally-supplied value down to its dirty parts using the form's dirty mask
+
+See the <Link href="/svelte/guides/dirty-fields/">dirty fields</Link> guide for when to reach for each.
+
 ## Setting values
 
 To manually update form values or errors, use:

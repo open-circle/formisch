@@ -1,0 +1,29 @@
+---
+title: PickDirtyConfig
+description: Configuration interface for picking dirty parts of a value.
+source: /packages/methods/src/pickDirty/pickDirty.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Property } from '~/components';
+import { properties } from './properties';
+
+# PickDirtyConfig
+
+Configuration interface for picking dirty parts of a value. Used by the `pickDirty` method.
+
+## Generics
+
+- `TValue` <Property {...properties.TValue} />
+
+## Definition
+
+- `PickDirtyConfig`
+  - `from` <Property {...properties.from} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'pickDirty', href: '../pickDirty/' }]} />

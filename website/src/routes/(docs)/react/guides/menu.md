@@ -21,6 +21,7 @@
 - [Special inputs](/react/guides/special-inputs/)
 - [Controlled fields](/react/guides/controlled-fields/)
 - [Nested fields](/react/guides/nested-fields/)
+- [Dirty fields](/react/guides/dirty-fields/)
 - [Field arrays](/react/guides/field-arrays/)
 - [TypeScript](/react/guides/typescript/)
 - [Architecture](/react/guides/architecture/)

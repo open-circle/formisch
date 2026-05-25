@@ -21,6 +21,7 @@
 - [Special inputs](/svelte/guides/special-inputs/)
 - [Controlled fields](/svelte/guides/controlled-fields/)
 - [Nested fields](/svelte/guides/nested-fields/)
+- [Dirty fields](/svelte/guides/dirty-fields/)
 - [Field arrays](/svelte/guides/field-arrays/)
 - [TypeScript](/svelte/guides/typescript/)
 - [Architecture](/svelte/guides/architecture/)

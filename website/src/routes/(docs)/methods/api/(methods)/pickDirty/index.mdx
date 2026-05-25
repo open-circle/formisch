@@ -1,0 +1,50 @@
+---
+title: pickDirty
+description: Filters an externally-supplied value down to its dirty parts using the form's dirty mask.
+source: /packages/methods/src/pickDirty/pickDirty.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Property } from '~/components';
+import { properties } from './properties';
+
+# pickDirty
+
+Picks only the dirty parts of the given value, using the form's dirty tree as a structural mask. Object keys whose subtree contains no dirty descendant are omitted; arrays are treated as atomic and returned in full whenever any descendant is dirty. Returns `undefined` if no field is dirty. Where the supplied value's shape diverges from the form's input shape — for example, a field expected to be an object holds a primitive, `null` or array — that branch is returned as-is. Useful for filtering a validated output to just the changed parts before submitting.
+
+```ts
+const dirty = pickDirty<TSchema, TValue>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TValue` <Property {...properties.TValue} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+The `form` parameter is the form store providing the dirty mask. The `config` parameter must include a `from` value to filter. The value's shape is expected to match the form's input shape — wherever the shapes diverge (e.g. an object key in the form holds a primitive, `null` or array in the supplied value), that branch is returned as-is so the divergence is preserved in the result. Use this when a Valibot schema transformation produces a value of a different shape than the form's input and you want to ship only the dirty parts of that output.
+
+Internally, the function walks the form's field tree alongside the supplied value, using `getFieldBool` to skip clean subtrees and a constant-time check at each node to verify shape alignment. Because the dirty check is itself recursive, the cost is effectively linear in field count for typical balanced forms (shallow and wide) and degrades toward `O(N²)` for deeply nested trees. Call this method from submit or blur handlers rather than from tight reactive loops on large forms.
+
+## Returns
+
+- `result` <Property {...properties.result} />
+
+## Related
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'getDirtyInput', href: '../getDirtyInput/' },
+    { text: 'getDirtyPaths', href: '../getDirtyPaths/' },
+    { text: 'getInput', href: '../getInput/' },
+  ]}
+/>

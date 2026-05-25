@@ -1,0 +1,30 @@
+---
+title: GetFieldDirtyPathsConfig
+description: Configuration interface for inspecting field-scoped dirty paths.
+source: /packages/methods/src/getDirtyPaths/getDirtyPaths.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Property } from '~/components';
+import { properties } from './properties';
+
+# GetFieldDirtyPathsConfig
+
+Configuration interface for inspecting field-scoped dirty paths. Used by the `getDirtyPaths` method when a specific field path is provided.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Definition
+
+- `GetFieldDirtyPathsConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'getDirtyPaths', href: '../getDirtyPaths/' }]} />

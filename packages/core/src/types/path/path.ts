@@ -245,3 +245,45 @@ export type ValidArrayPath<TValue, TPath extends RequiredPath> =
   TPath extends LazyArrayPath<Required<TValue>, TPath>
     ? TPath
     : LazyArrayPath<Required<TValue>, TPath>;
+
+/**
+ * Recursive helper for `DirtyPath` that prepends `TKey` to each deeper path,
+ * or falls through to `never` when the child is not an object.
+ */
+type DeepDirtyPath<TChild, TKey extends PathKey, TDepth extends 0[]> =
+  TChild extends Record<PropertyKey, unknown>
+    ? readonly [TKey, ...DirtyPath<TChild, [...TDepth, 0]>]
+    : never;
+
+/**
+ * Returns the union of all `RequiredPath`s that `getDirtyPaths` can emit
+ * for a given input type. Object fields contribute their own path and the
+ * paths of their descendants; arrays and tuples are atomic and contribute
+ * only their own path, because dirty arrays are returned as complete units.
+ *
+ * Narrowing is exact for the first 5 levels of nesting; deeper paths fall
+ * back to `RequiredPath` to keep the result a complete superset of any
+ * path the runtime can address.
+ *
+ * Hint: Arrays and tuples are atomic because they don't structurally
+ * extend `Record<PropertyKey, unknown>` and so fall through to `never`
+ * via `DeepDirtyPath` — no explicit array check is needed. `TDepth` is
+ * a tuple-length counter capped at 5 to bound TypeScript instantiation
+ * cost.
+ */
+export type DirtyPath<
+  TValue,
+  TDepth extends 0[] = [],
+> = TDepth['length'] extends 5
+  ? RequiredPath
+  : TValue extends Record<PropertyKey, unknown>
+    ? {
+        [TKey in ExactKeysOf<TValue>]:
+          | readonly [TKey]
+          | DeepDirtyPath<
+              NonNullable<PropertiesOf<TValue>[TKey]>,
+              TKey,
+              TDepth
+            >;
+      }[ExactKeysOf<TValue>]
+    : never;
