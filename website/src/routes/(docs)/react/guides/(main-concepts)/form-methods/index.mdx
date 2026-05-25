@@ -27,6 +27,19 @@ To retrieve values from your form, you can use:
 
 Formisch plugs into React's render cycle, so reading values with these methods inside components stays reactive. When the form state changes, components that rely on these values automatically re-render without manual subscriptions.
 
+## Dirty state
+
+To work with the dirty state of your form, Formisch provides three methods:
+
+- <Link href="/methods/api/getDirtyInput/">`getDirtyInput`</Link>: Get the dirty
+  parts of the form input
+- <Link href="/methods/api/getDirtyPaths/">`getDirtyPaths`</Link>: Get the paths
+  of dirty fields
+- <Link href="/methods/api/pickDirty/">`pickDirty`</Link>: Filter an
+  externally-supplied value down to its dirty parts using the form's dirty mask
+
+See the <Link href="/react/guides/dirty-fields/">dirty fields</Link> guide for when to reach for each.
+
 ## Setting values
 
 To manually update form values or errors, use:
