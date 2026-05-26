@@ -63,7 +63,9 @@ interface NumberInputProps extends Omit<FieldElementProps, 'onInput$'> {
 export const NumberInput = component$<NumberInputProps>(
   ({ input, label, errors, name, onInput$, ...inputProps }) => {
     // Update computed value if not NaN
-    const value = useComputed$(() => (!Number.isNaN(input) ? input : undefined));
+    const value = useComputed$(() =>
+      !Number.isNaN(input) ? input : undefined
+    );
 
     return (
       <div>
