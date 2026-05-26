@@ -20,7 +20,7 @@ As soon as your forms become more complex, for example you set initial values or
 
 ## Simple text inputs
 
-For most input types including text, email, number, and date, you simply add the `v-model` directive. Vue automatically handles type conversions for you:
+For a text input you simply add the `v-model` directive:
 
 ```vue
 <template>
@@ -30,21 +30,25 @@ For most input types including text, email, number, and date, you simply add the
 </template>
 ```
 
-### Vue's automatic type handling
+## Numbers and dates
 
-Vue's `v-model` automatically handles different input types without special code:
+In Vue you don't wire up an input handler — `v-model` reads and writes the value through the `field.input` setter. That makes numbers and dates mostly automatic.
 
-**Number inputs** - Vue converts between strings and numbers automatically:
+### Number inputs
+
+For `<input type="number" />`, the `.number` modifier converts the value to a real number that matches a `v.number()` schema. Vue applies it automatically for number inputs, but you can also add it explicitly:
 
 ```vue
 <template>
   <Field :of="form" :path="['age']" v-slot="field">
-    <input v-model="field.input" v-bind="field.props" type="number" />
+    <input v-model.number="field.input" v-bind="field.props" type="number" />
   </Field>
 </template>
 ```
 
-**Date inputs** - Vue handles the date string format automatically:
+### Date inputs
+
+An `<input type="date" />` exposes its value as a `yyyy-mm-dd` string, which `v-model` stores as-is. This pairs directly with a `v.string()` schema:
 
 ```vue
 <template>
@@ -54,7 +58,26 @@ Vue's `v-model` automatically handles different input types without special code
 </template>
 ```
 
-This works seamlessly whether your schema expects strings, numbers, or dates - Vue will handle the conversion.
+If your schema expects a real `Date` (`v.date()`), Vue has no modifier for this, so convert in both directions yourself:
+
+```vue
+<script setup lang="ts">
+function parseDate(event: Event) {
+  return (event.target as HTMLInputElement).valueAsDate ?? undefined;
+}
+</script>
+
+<template>
+  <Field :of="form" :path="['birthday']" v-slot="field">
+    <input
+      v-bind="field.props"
+      type="date"
+      :value="field.input?.toISOString().split('T', 1)[0] ?? ''"
+      @input="field.input = parseDate($event)"
+    />
+  </Field>
+</template>
+```
 
 ## Checkboxes
 

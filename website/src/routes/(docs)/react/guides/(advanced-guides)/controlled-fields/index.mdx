@@ -34,22 +34,25 @@ The HTML `<input type="file" />` element is an exception because it cannot be co
 
 ## Numbers and dates
 
-To make the fields of numbers and dates controlled, further steps are required, because the `<input />` element natively understands only strings as value.
+Fields defined with a `v.number()` or `v.date()` schema need extra steps to be controlled, because the `<input />` element natively understands only strings as value.
 
 ### Number input example
 
-Since not every input into an `<input type="number" />` field is a valid number, for example when typing floating numbers, the value may be `NaN` in between. You have to catch this case, otherwise the whole input will be removed when `NaN` is passed. It is best to encapsulate this logic in a separate component as described in the <Link href="/react/guides/input-components/">input components</Link> guide.
+An `<input type="number" />` only reads and writes strings. So if you spread `field.props` onto it, `field.input` holds a string like `"123"`, even though it is typed as `number`. To store a real number, override the change handler with one that converts the value via `valueAsNumber` and forwards it to `field.onChange`.
+
+You also have to handle `NaN`. While typing a floating point number, the value can briefly be `NaN`, for example right after typing `1.`. If you don't catch this for the displayed value, the input is cleared. It is best to encapsulate both in a separate component as described in the <Link href="/react/guides/input-components/">input components</Link> guide.
 
 ```tsx
 import type { FieldElementProps } from '@formisch/react';
 import { useMemo, useRef } from 'react';
 
-interface NumberInputProps extends FieldElementProps {
+interface NumberInputProps extends Omit<FieldElementProps, 'onChange'> {
   label?: string;
   placeholder?: string;
   input: number | undefined;
   errors: [string, ...string[]] | null;
   required?: boolean;
+  onChange: (value: number | undefined) => void;
 }
 
 export function NumberInput({
@@ -57,6 +60,7 @@ export function NumberInput({
   input,
   errors,
   name,
+  onChange,
   ...inputProps
 }: NumberInputProps) {
   const prevValue = useRef<number | undefined>();
@@ -78,7 +82,15 @@ export function NumberInput({
         name={name}
         id={name}
         type="number"
-        value={value}
+        value={value ?? ''}
+        // Convert string to number before storing
+        onChange={(event) =>
+          onChange(
+            event.currentTarget.value === ''
+              ? undefined
+              : event.currentTarget.valueAsNumber
+          )
+        }
         aria-invalid={!!errors}
         aria-errormessage={`${name}-error`}
       />
@@ -88,20 +100,37 @@ export function NumberInput({
 }
 ```
 
+Pass `field.onChange` after spreading `field.props` so it overrides the native handler.
+
+```tsx
+<Field of={form} path={['age']}>
+  {(field) => (
+    <NumberInput
+      {...field.props}
+      label="Age"
+      input={field.input}
+      errors={field.errors}
+      onChange={field.onChange}
+    />
+  )}
+</Field>
+```
+
 ### Date input example
 
-A date or a number representing a date must be converted to a string before it can be passed to an `<input type="date" />` field. Since it is a calculated value, you can use `useMemo` for this.
+The same applies to dates. An `<input type="date" />` works with `yyyy-mm-dd` strings, while you usually want to store a `Date`. So you convert in both directions: format the `Date` for display, and parse the entered string back with `valueAsDate` before storing it.
 
 ```tsx
 import type { FieldElementProps } from '@formisch/react';
 import { useMemo } from 'react';
 
-interface DateInputProps extends FieldElementProps {
+interface DateInputProps extends Omit<FieldElementProps, 'onChange'> {
   label?: string;
   placeholder?: string;
-  input: Date | number | undefined;
+  input: Date | undefined;
   errors: [string, ...string[]] | null;
   required?: boolean;
+  onChange: (value: Date | undefined) => void;
 }
 
 export function DateInput({
@@ -109,25 +138,31 @@ export function DateInput({
   input,
   errors,
   name,
+  onChange,
   ...inputProps
 }: DateInputProps) {
-  // Transform date or number to string
-  const value = useMemo(() => {
-    return input &&
-      !Number.isNaN(typeof input === 'number' ? input : input.getTime())
-      ? new Date(input).toISOString().split('T', 1)[0]
-      : '';
-  }, [input]);
+  // Transform date to string
+  const value = useMemo(
+    () =>
+      input && !Number.isNaN(input.getTime())
+        ? input.toISOString().split('T', 1)[0]
+        : '',
+    [input]
+  );
 
   return (
     <div>
-      {label && <label htmlFor={name}>{name}</label>}
+      {label && <label htmlFor={name}>{label}</label>}
       <input
         {...inputProps}
         name={name}
         id={name}
         type="date"
         value={value}
+        // Convert string to date before storing
+        onChange={(event) =>
+          onChange(event.currentTarget.valueAsDate ?? undefined)
+        }
         aria-invalid={!!errors}
         aria-errormessage={`${name}-error`}
       />
@@ -135,6 +170,22 @@ export function DateInput({
     </div>
   );
 }
+```
+
+As with the number input, pass `field.onChange` after the spread to override the native handler.
+
+```tsx
+<Field of={form} path={['birthday']}>
+  {(field) => (
+    <DateInput
+      {...field.props}
+      label="Birthday"
+      input={field.input}
+      errors={field.errors}
+      onChange={field.onChange}
+    />
+  )}
+</Field>
 ```
 
 ## Custom inputs and component libraries
