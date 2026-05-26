@@ -52,6 +52,8 @@ Use Svelte's `{#snippet children(field)}` syntax to define how the field should 
 </Form>
 ```
 
+> **Important:** The event handlers in `field.props` read the value from the DOM as a string. Fields with a non-string schema like `v.number()` or `v.date()` therefore need to be controlled to store the value with the correct type. See the <Link href="/svelte/guides/controlled-fields/">controlled fields</Link> guide to learn more.
+
 > **Important:** If you plan to set initial values with `initialInput` or programmatically control field values using methods like <Link href="/methods/api/setInput/">`setInput`</Link> or <Link href="/methods/api/reset/">`reset`</Link>, you must make your fields controlled by setting the appropriate attributes (like `value`, `checked`, or `selected`). See the <Link href="/svelte/guides/controlled-fields/">controlled fields</Link> guide to learn more.
 
 ### Headless design

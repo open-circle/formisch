@@ -34,24 +34,27 @@ The HTML `<input type="file" />` element is an exception because it cannot be co
 
 ## Numbers and dates
 
-To make the fields of numbers and dates controlled, further steps are required, because the `<input />` element natively understands only strings as value.
+Fields defined with a `v.number()` or `v.date()` schema need extra steps to be controlled, because the `<input />` element natively understands only strings as value.
 
 ### Number input example
 
-Since not every input into an `<input type="number" />` field is a valid number, for example when typing floating numbers, the value may be `NaN` in between. You have to catch this case, otherwise the whole input will be removed when `NaN` is passed. It is best to encapsulate this logic in a separate component as described in the <Link href="/preact/guides/input-components/">input components</Link> guide.
+An `<input type="number" />` only reads and writes strings. So if you spread `field.props` onto it, `field.input` holds a string like `"123"`, even though it is typed as `number`. To store a real number, override the input handler with one that converts the value via `valueAsNumber` and forwards it to `field.onInput`.
+
+You also have to handle `NaN`. While typing a floating point number, the value can briefly be `NaN`, for example right after typing `1.`. If you don't catch this for the displayed value, the input is cleared. It is best to encapsulate both in a separate component as described in the <Link href="/preact/guides/input-components/">input components</Link> guide.
 
 ```tsx
 import type { FieldElementProps } from '@formisch/preact';
 import type { ReadonlySignal } from '@preact/signals';
 import { useSignal, useSignalEffect } from '@preact/signals';
 
-interface NumberInputProps extends FieldElementProps {
+interface NumberInputProps extends Omit<FieldElementProps, 'onInput'> {
   type: 'number';
   label?: string;
   placeholder?: string;
   input: ReadonlySignal<number | undefined>;
   errors: ReadonlySignal<[string, ...string[]] | null>;
   required?: boolean;
+  onInput: (value: number | undefined) => void;
 }
 
 export function NumberInput({
@@ -60,6 +63,7 @@ export function NumberInput({
   errors,
   name,
   required,
+  onInput,
   ...inputProps
 }: NumberInputProps) {
   // Update signal if value is not `NaN`
@@ -79,6 +83,14 @@ export function NumberInput({
         id={name}
         required={required}
         value={signal.value}
+        // Convert string to number before storing
+        onInput={(event) =>
+          onInput(
+            event.currentTarget.value === ''
+              ? undefined
+              : event.currentTarget.valueAsNumber
+          )
+        }
         aria-invalid={!!errors.value}
         aria-errormessage={`${name}-error`}
       />
@@ -88,22 +100,40 @@ export function NumberInput({
 }
 ```
 
+Pass `field.onInput` after spreading `field.props` so it overrides the native handler.
+
+```tsx
+<Field of={form} path={['age']}>
+  {(field) => (
+    <NumberInput
+      {...field.props}
+      type="number"
+      label="Age"
+      input={field.input}
+      errors={field.errors}
+      onInput={field.onInput}
+    />
+  )}
+</Field>
+```
+
 ### Date input example
 
-A date or a number representing a date must be converted to a string before it can be passed to an `<input type="date" />` field. Since it is a calculated value, you can use `useMemo` for this.
+The same applies to dates. An `<input type="date" />` works with `yyyy-mm-dd` strings, while you usually want to store a `Date`. So you convert in both directions: format the `Date` for display, and parse the entered string back with `valueAsDate` before storing it.
 
 ```tsx
 import type { FieldElementProps } from '@formisch/preact';
 import type { ReadonlySignal } from '@preact/signals';
 import { useMemo } from 'preact/hooks';
 
-interface DateInputProps extends FieldElementProps {
+interface DateInputProps extends Omit<FieldElementProps, 'onInput'> {
   type: 'date';
   label?: string;
   placeholder?: string;
-  input: ReadonlySignal<Date | number | undefined>;
+  input: ReadonlySignal<Date | undefined>;
   errors: ReadonlySignal<[string, ...string[]] | null>;
   required?: boolean;
+  onInput: (value: Date | undefined) => void;
 }
 
 export function DateInput({
@@ -112,26 +142,30 @@ export function DateInput({
   errors,
   name,
   required,
+  onInput,
   ...inputProps
 }: DateInputProps) {
-  // Transform date or number to string
+  // Transform date to string
   const getValue = useMemo(() => {
     const value = input.value;
-    return value &&
-      !Number.isNaN(typeof value === 'number' ? value : value.getTime())
-      ? new Date(value).toISOString().split('T', 1)[0]
+    return value && !Number.isNaN(value.getTime())
+      ? value.toISOString().split('T', 1)[0]
       : '';
   }, [input.value]);
 
   return (
     <div>
-      {label && <label for={name}>{name}</label>}
+      {label && <label for={name}>{label}</label>}
       <input
         {...inputProps}
         name={name}
         id={name}
         required={required}
         value={getValue}
+        // Convert string to date before storing
+        onInput={(event) =>
+          onInput(event.currentTarget.valueAsDate ?? undefined)
+        }
         aria-invalid={!!errors.value}
         aria-errormessage={`${name}-error`}
       />
@@ -139,6 +173,23 @@ export function DateInput({
     </div>
   );
 }
+```
+
+As with the number input, pass `field.onInput` after the spread to override the native handler.
+
+```tsx
+<Field of={form} path={['birthday']}>
+  {(field) => (
+    <DateInput
+      {...field.props}
+      type="date"
+      label="Birthday"
+      input={field.input}
+      errors={field.errors}
+      onInput={field.onInput}
+    />
+  )}
+</Field>
 ```
 
 ## Custom inputs and component libraries
