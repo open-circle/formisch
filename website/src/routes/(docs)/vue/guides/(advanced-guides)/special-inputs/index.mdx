@@ -91,7 +91,7 @@ An HTML `<select />` element allows you to select a string from a predefined lis
 ```vue
 <template>
   <Field :of="form" :path="['framework']" v-slot="field">
-    <select v-bind="field.props">
+    <select v-bind="field.props" v-model="field.input">
       <option
         v-for="option in [
           { label: 'Preact', value: 'preact' },
@@ -100,7 +100,6 @@ An HTML `<select />` element allows you to select a string from a predefined lis
         ]"
         :key="option.value"
         :value="option.value"
-        :selected="field.input === option.value"
       >
         {{ option.label }}
       </option>
