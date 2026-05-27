@@ -73,10 +73,10 @@ A group of radio buttons, while similar to an array of checkboxes, will only all
       :key="color.value"
     >
       <input
-        v-bind="field.props"
         type="radio"
         :value="color.value"
-        :checked="field.input === color.value"
+        v-bind="field.props"
+        v-model="field.input"
       />
       {{ color.label }}
     </label>
