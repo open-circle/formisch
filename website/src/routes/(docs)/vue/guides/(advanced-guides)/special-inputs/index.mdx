@@ -25,7 +25,7 @@ A simple checkbox represents a boolean and is `true` when checked or `false` oth
 <template>
   <Field :of="form" :path="['cookies']" v-slot="field">
     <label>
-      <input v-bind="field.props" type="checkbox" :checked="field.input" />
+      <input type="checkbox" v-bind="field.props" v-model="field.input" />
       Yes, I want cookies
     </label>
   </Field>
@@ -46,10 +46,10 @@ However, you can also use multiple checkboxes to represent an array of strings. 
       :key="fruit.value"
     >
       <input
-        v-bind="field.props"
         type="checkbox"
         :value="fruit.value"
-        :checked="field.input?.includes(fruit.value)"
+        v-bind="field.props"
+        v-model="field.input"
       />
       {{ fruit.label }}
     </label>
@@ -73,10 +73,10 @@ A group of radio buttons, while similar to an array of checkboxes, will only all
       :key="color.value"
     >
       <input
-        v-bind="field.props"
         type="radio"
         :value="color.value"
-        :checked="field.input === color.value"
+        v-bind="field.props"
+        v-model="field.input"
       />
       {{ color.label }}
     </label>
@@ -91,7 +91,7 @@ An HTML `<select />` element allows you to select a string from a predefined lis
 ```vue
 <template>
   <Field :of="form" :path="['framework']" v-slot="field">
-    <select v-bind="field.props">
+    <select v-bind="field.props" v-model="field.input">
       <option
         v-for="option in [
           { label: 'Preact', value: 'preact' },
@@ -100,7 +100,6 @@ An HTML `<select />` element allows you to select a string from a predefined lis
         ]"
         :key="option.value"
         :value="option.value"
-        :selected="field.input === option.value"
       >
         {{ option.label }}
       </option>
@@ -114,7 +113,7 @@ However, if you set the `multiple` attribute, multiple options can be selected m
 ```vue
 <template>
   <Field :of="form" :path="['frameworks']" v-slot="field">
-    <select v-bind="field.props" multiple>
+    <select multiple v-bind="field.props" v-model="field.input">
       <option
         v-for="option in [
           { label: 'Preact', value: 'preact' },
@@ -123,7 +122,6 @@ However, if you set the `multiple` attribute, multiple options can be selected m
         ]"
         :key="option.value"
         :value="option.value"
-        :selected="field.input?.includes(option.value)"
       >
         {{ option.label }}
       </option>

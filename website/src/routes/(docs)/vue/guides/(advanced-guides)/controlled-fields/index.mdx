@@ -88,7 +88,7 @@ For checkboxes, you need to bind to the `checked` attribute and handle both bool
 ```vue
 <template>
   <Field :of="form" :path="['acceptTerms']" v-slot="field">
-    <input v-bind="field.props" type="checkbox" :checked="field.input" />
+    <input type="checkbox" v-bind="field.props" v-model="field.input" />
   </Field>
 </template>
 ```
@@ -100,10 +100,10 @@ For checkboxes, you need to bind to the `checked` attribute and handle both bool
   <Field :of="form" :path="['interests']" v-slot="field">
     <label v-for="option in options" :key="option.value">
       <input
-        v-bind="field.props"
         type="checkbox"
         :value="option.value"
-        :checked="field.input?.includes(option.value)"
+        v-bind="field.props"
+        v-model="field.input"
       />
       {{ option.label }}
     </label>
@@ -120,12 +120,11 @@ For select elements, you need to bind to the `selected` attribute:
 ```vue
 <template>
   <Field :of="form" :path="['country']" v-slot="field">
-    <select v-bind="field.props">
+    <select v-bind="field.props" v-model="field.input">
       <option
         v-for="option in options"
         :key="option.value"
         :value="option.value"
-        :selected="field.input === option.value"
       >
         {{ option.label }}
       </option>
@@ -139,12 +138,11 @@ For select elements, you need to bind to the `selected` attribute:
 ```vue
 <template>
   <Field :of="form" :path="['languages']" v-slot="field">
-    <select v-bind="field.props" multiple>
+    <select multiple v-bind="field.props" v-model="field.input">
       <option
         v-for="option in options"
         :key="option.value"
         :value="option.value"
-        :selected="field.input?.includes(option.value)"
       >
         {{ option.label }}
       </option>
