@@ -100,10 +100,10 @@ For checkboxes, you need to bind to the `checked` attribute and handle both bool
   <Field :of="form" :path="['interests']" v-slot="field">
     <label v-for="option in options" :key="option.value">
       <input
-        v-bind="field.props"
         type="checkbox"
         :value="option.value"
-        :checked="field.input?.includes(option.value)"
+        v-bind="field.props"
+        v-model="field.input"
       />
       {{ option.label }}
     </label>
