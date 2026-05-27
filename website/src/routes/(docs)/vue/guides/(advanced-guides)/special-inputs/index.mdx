@@ -113,7 +113,7 @@ However, if you set the `multiple` attribute, multiple options can be selected m
 ```vue
 <template>
   <Field :of="form" :path="['frameworks']" v-slot="field">
-    <select v-bind="field.props" multiple>
+    <select multiple v-bind="field.props" v-model="field.input">
       <option
         v-for="option in [
           { label: 'Preact', value: 'preact' },
@@ -122,7 +122,6 @@ However, if you set the `multiple` attribute, multiple options can be selected m
         ]"
         :key="option.value"
         :value="option.value"
-        :selected="field.input?.includes(option.value)"
       >
         {{ option.label }}
       </option>
