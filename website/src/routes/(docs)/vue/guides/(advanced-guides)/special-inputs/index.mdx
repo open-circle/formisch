@@ -46,10 +46,10 @@ However, you can also use multiple checkboxes to represent an array of strings. 
       :key="fruit.value"
     >
       <input
-        v-bind="field.props"
         type="checkbox"
         :value="fruit.value"
-        :checked="field.input?.includes(fruit.value)"
+        v-bind="field.props"
+        v-model="field.input"
       />
       {{ fruit.label }}
     </label>
