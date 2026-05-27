@@ -25,7 +25,7 @@ A simple checkbox represents a boolean and is `true` when checked or `false` oth
 <template>
   <Field :of="form" :path="['cookies']" v-slot="field">
     <label>
-      <input v-bind="field.props" type="checkbox" :checked="field.input" />
+      <input type="checkbox" v-bind="field.props" v-model="field.input" />
       Yes, I want cookies
     </label>
   </Field>
