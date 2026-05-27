@@ -88,7 +88,7 @@ For checkboxes, you need to bind to the `checked` attribute and handle both bool
 ```vue
 <template>
   <Field :of="form" :path="['acceptTerms']" v-slot="field">
-    <input v-bind="field.props" type="checkbox" :checked="field.input" />
+    <input type="checkbox" v-bind="field.props" v-model="field.input" />
   </Field>
 </template>
 ```
