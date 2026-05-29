@@ -23,4 +23,18 @@ export const routes: Routes = [
         (m) => m.TodosComponent
       ),
   },
+  {
+    path: 'special',
+    loadComponent: () =>
+      import('./routes/special/special.component.ts').then(
+        (m) => m.SpecialComponent
+      ),
+  },
+  {
+    path: 'nested',
+    loadComponent: () =>
+      import('./routes/nested/nested.component.ts').then(
+        (m) => m.NestedComponent
+      ),
+  },
 ];

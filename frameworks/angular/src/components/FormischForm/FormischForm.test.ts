@@ -32,14 +32,14 @@ describe('FormischForm', () => {
   it('renders a native form element', async () => {
     const fixture = TestBed.createComponent(TestHost);
     await fixture.whenStable();
-    const form = fixture.nativeElement.querySelector('form');
+    const form = (fixture.nativeElement as HTMLElement).querySelector('form');
     expect(form).not.toBeNull();
   });
 
   it('sets novalidate on the form element', async () => {
     const fixture = TestBed.createComponent(TestHost);
     await fixture.whenStable();
-    const form = fixture.nativeElement.querySelector('form');
+    const form = (fixture.nativeElement as HTMLElement).querySelector('form');
     expect(form.hasAttribute('novalidate')).toBe(true);
   });
 
