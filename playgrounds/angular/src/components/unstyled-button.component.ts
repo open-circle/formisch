@@ -54,7 +54,10 @@ export class UnstyledButtonComponent {
     this.clicked.emit();
     if (!handler) return;
     this.isLoading.set(true);
-    await handler();
-    this.isLoading.set(false);
+    try {
+      await handler();
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 }

@@ -25,6 +25,7 @@ interface SelectOption {
         <select
           [id]="name()"
           [name]="name()"
+          [value]="multiple() ? values() : (input() ?? '')"
           [multiple]="!!multiple()"
           [required]="!!required()"
           [class]="selectClasses()"
@@ -39,7 +40,7 @@ interface SelectOption {
             <option value="" disabled hidden>{{ placeholder() }}</option>
           }
           @for (option of options(); track option.value) {
-            <option [value]="option.value" [selected]="isSelected(option.value)">
+            <option [value]="option.value">
               {{ option.label }}
             </option>
           }
@@ -74,10 +75,6 @@ export class SelectComponent {
     if (val && typeof val === 'string') return [val];
     return [];
   });
-
-  protected isSelected(value: string): boolean {
-    return this.values().includes(value);
-  }
 
   protected readonly containerClasses = () =>
     clsx('px-8 lg:px-10', this.class());
