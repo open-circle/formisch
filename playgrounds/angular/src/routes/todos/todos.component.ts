@@ -5,12 +5,19 @@ import {
   FormischField,
   FormischFieldArray,
   insert,
+  move,
   remove,
+  replace,
+  swap,
   injectForm,
 } from '@formisch/angular';
+import { AutoAnimateDirective } from '../../components/auto-animate.directive.ts';
 import { FormHeaderComponent } from '../../components/form-header.component.ts';
 import { FormFooterComponent } from '../../components/form-footer.component.ts';
 import { TextInputComponent } from '../../components/text-input.component.ts';
+import { InputLabelComponent } from '../../components/input-label.component.ts';
+import { InputErrorsComponent } from '../../components/input-errors.component.ts';
+import { ColorButtonComponent } from '../../components/color-button.component.ts';
 
 const TodosSchema = v.object({
   heading: v.pipe(
@@ -42,9 +49,13 @@ const TodosSchema = v.object({
     FormischForm,
     FormischField,
     FormischFieldArray,
+    AutoAnimateDirective,
     FormHeaderComponent,
     FormFooterComponent,
     TextInputComponent,
+    InputLabelComponent,
+    InputErrorsComponent,
+    ColorButtonComponent,
   ],
   template: `
     <formisch-form
@@ -74,71 +85,80 @@ const TodosSchema = v.object({
 
         <formisch-field-array [of]="form" [path]="['todos']">
           <ng-template let-fieldArray>
-            <div class="space-y-6 px-8 lg:px-10">
-              <label class="mb-2 inline-block font-medium md:text-lg lg:text-xl">
-                Todos
-              </label>
+            <div class="space-y-5 px-8 lg:px-10">
+              <app-input-label label="Todos" margin="none" [required]="true" />
 
-              @if (fieldArray.errors()) {
-                <div class="text-sm text-red-500 md:text-base lg:text-lg dark:text-red-400">
-                  {{ fieldArray.errors()![0] }}
+              <div>
+                <div auto-animate class="space-y-5">
+                  @for (item of fieldArray.items(); track item; let index = $index) {
+                    <div class="flex flex-wrap gap-5 rounded-2xl border-2 border-slate-200 bg-slate-100/25 p-5 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/10 dark:hover:border-slate-700">
+                      <formisch-field [of]="form" [path]="['todos', index, 'label']">
+                        <ng-template let-field>
+                          <app-text-input
+                            [name]="field.props.name"
+                            [value]="field.input()"
+                            [errors]="field.errors()"
+                            type="text"
+                            class="w-full p-0! md:w-auto md:flex-1"
+                            placeholder="Enter task"
+                            [required]="true"
+                            (fieldFocus)="field.props.onFocus($event)"
+                            (fieldChange)="field.props.onChange($event)"
+                            (fieldBlur)="field.props.onBlur($event)"
+                          />
+                        </ng-template>
+                      </formisch-field>
+
+                      <formisch-field [of]="form" [path]="['todos', index, 'deadline']">
+                        <ng-template let-field>
+                          <app-text-input
+                            [name]="field.props.name"
+                            [value]="field.input()"
+                            [errors]="field.errors()"
+                            type="date"
+                            class="flex-1 p-0!"
+                            [required]="true"
+                            (fieldFocus)="field.props.onFocus($event)"
+                            (fieldChange)="field.props.onChange($event)"
+                            (fieldBlur)="field.props.onBlur($event)"
+                          />
+                        </ng-template>
+                      </formisch-field>
+
+                      <app-color-button
+                        color="red"
+                        label="Delete"
+                        width="auto"
+                        (clicked)="handleRemove(index)"
+                      />
+                    </div>
+                  }
                 </div>
-              }
+                <app-input-errors name="todos" [errors]="fieldArray.errors()" />
+              </div>
 
-              @for (item of fieldArray.items(); track item; let i = $index) {
-                <div class="flex gap-4">
-                  <div class="flex-1 space-y-4">
-                    <formisch-field [of]="form" [path]="['todos', i, 'label']">
-                      <ng-template let-field>
-                        <app-text-input
-                          [name]="field.props.name"
-                          [value]="field.input()"
-                          [errors]="field.errors()"
-                          type="text"
-                          label="Label"
-                          placeholder="Buy groceries"
-                          [required]="true"
-                          (fieldFocus)="field.props.onFocus($event)"
-                          (fieldChange)="field.props.onChange($event)"
-                          (fieldBlur)="field.props.onBlur($event)"
-                        />
-                      </ng-template>
-                    </formisch-field>
-
-                    <formisch-field [of]="form" [path]="['todos', i, 'deadline']">
-                      <ng-template let-field>
-                        <app-text-input
-                          [name]="field.props.name"
-                          [value]="field.input()"
-                          [errors]="field.errors()"
-                          type="date"
-                          label="Deadline"
-                          [required]="true"
-                          (fieldFocus)="field.props.onFocus($event)"
-                          (fieldChange)="field.props.onChange($event)"
-                          (fieldBlur)="field.props.onBlur($event)"
-                        />
-                      </ng-template>
-                    </formisch-field>
-                  </div>
-
-                  <button
-                    type="button"
-                    class="mt-8 self-start rounded-xl bg-red-600/10 px-3 py-2 text-sm text-red-600 hover:bg-red-600/20 dark:bg-red-400/10 dark:text-red-400 dark:hover:bg-red-400/20"
-                    (click)="handleRemove(i)"
-                  >
-                    Remove
-                  </button>
-                </div>
-              }
-
-              <button
-                type="button"
-                class="rounded-xl bg-sky-600/10 px-4 py-2 text-sm text-sky-600 hover:bg-sky-600/20 dark:bg-sky-400/10 dark:text-sky-400 dark:hover:bg-sky-400/20"
-                (click)="handleInsert()"
-              >
-                Add todo
-              </button>
+              <div class="flex flex-wrap gap-5">
+                <app-color-button
+                  color="green"
+                  label="Add new"
+                  (clicked)="handleInsert()"
+                />
+                <app-color-button
+                  color="yellow"
+                  label="Move first to end"
+                  (clicked)="handleMoveFirstToEnd(fieldArray.items().length)"
+                />
+                <app-color-button
+                  color="purple"
+                  label="Swap first two"
+                  (clicked)="handleSwapFirstTwo()"
+                />
+                <app-color-button
+                  color="blue"
+                  label="Replace first"
+                  (clicked)="handleReplaceFirst()"
+                />
+              </div>
             </div>
           </ng-template>
         </formisch-field-array>
@@ -168,5 +188,24 @@ export class TodosComponent {
 
   handleRemove(index: number): void {
     remove(this.form, { path: ['todos'], at: index });
+  }
+
+  handleMoveFirstToEnd(length: number): void {
+    move(this.form, { path: ['todos'], from: 0, to: length - 1 });
+  }
+
+  handleSwapFirstTwo(): void {
+    swap(this.form, { path: ['todos'], at: 0, and: 1 });
+  }
+
+  handleReplaceFirst(): void {
+    replace(this.form, {
+      path: ['todos'],
+      at: 0,
+      initialInput: {
+        label: Math.random().toString(36).slice(2),
+        deadline: new Date().toISOString().split('T')[0],
+      },
+    });
   }
 }

@@ -34,14 +34,14 @@ describe('FormischField', () => {
   it('renders the template with the field store', async () => {
     const fixture = TestBed.createComponent(TestHost);
     await fixture.whenStable();
-    const input = fixture.nativeElement.querySelector('[data-testid="input"]');
+    const input = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="input"]');
     expect(input).not.toBeNull();
   });
 
   it('passes the field name prop to the template context', async () => {
     const fixture = TestBed.createComponent(TestHost);
     await fixture.whenStable();
-    const input = fixture.nativeElement.querySelector('[data-testid="input"]');
+    const input = (fixture.nativeElement as HTMLElement).querySelector('[data-testid="input"]');
     expect(input.getAttribute('name')).not.toBeNull();
   });
 });

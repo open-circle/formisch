@@ -17,7 +17,8 @@
     "@formisch/angular": "workspace:*",
     "@tailwindcss/vite": "^4.1.17",
     "clsx": "^2.1.1",
-    "valibot": "^1.2.0"
+    "valibot": "^1.2.0",
+    "@formkit/auto-animate": "^0.8.4"
   },
   "devDependencies": {
     "@analogjs/vite-plugin-angular": "^1.10.0",

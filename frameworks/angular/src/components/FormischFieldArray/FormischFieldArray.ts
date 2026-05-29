@@ -1,13 +1,13 @@
 import {
   Component,
   computed,
-  ContentChild,
-  Input,
+  contentChild,
   input,
   type InputSignal,
+  type Signal,
   TemplateRef,
 } from '@angular/core';
-import { NgIf, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import {
   getFieldBool,
   getFieldStore,
@@ -38,25 +38,24 @@ import type { FieldArrayStore, FormStore } from '../../types/index.ts';
 @Component({
   selector: 'formisch-field-array',
   standalone: true,
-  imports: [NgIf, NgTemplateOutlet],
+  imports: [NgTemplateOutlet],
   template: `
-    <ng-container
-      *ngIf="template"
-      [ngTemplateOutlet]="template"
-      [ngTemplateOutletContext]="{ $implicit: fieldArray }"
-    />
+    @if (template()) {
+      <ng-container
+        [ngTemplateOutlet]="template()!"
+        [ngTemplateOutletContext]="{ $implicit: fieldArray }"
+      />
+    }
   `,
 })
 export class FormischFieldArray<
   TSchema extends Schema = Schema,
   TFieldArrayPath extends RequiredPath = RequiredPath,
 > {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  @Input({ isSignal: true } as any) of: InputSignal<FormStore<TSchema>> = input.required<FormStore<TSchema>>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  @Input({ isSignal: true } as any) path: InputSignal<ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>> = input.required<ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>>();
+  readonly of: InputSignal<FormStore<TSchema>> = input.required<FormStore<TSchema>>();
+  readonly path: InputSignal<ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>> = input.required<ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>>();
 
-  @ContentChild(TemplateRef) protected template: TemplateRef<{ $implicit: FieldArrayStore<TSchema, TFieldArrayPath> }> | undefined;
+  protected readonly template: Signal<TemplateRef<unknown> | undefined> = contentChild(TemplateRef);
 
   private readonly internalFieldStore = computed(
     () =>
