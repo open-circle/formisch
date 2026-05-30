@@ -1,6 +1,5 @@
 import {
   Component,
-  computed,
   contentChild,
   input,
   type InputSignal,
@@ -9,16 +8,13 @@ import {
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import {
-  getFieldBool,
-  getFieldStore,
-  INTERNAL,
-  type InternalArrayStore,
   type RequiredPath,
   type Schema,
   type ValidArrayPath,
 } from '@formisch/core/angular';
 import type * as v from 'valibot';
 import type { FieldArrayStore, FormStore } from '../../types/index.ts';
+import { injectFieldArray } from '../../functions/injectFieldArray/injectFieldArray.ts';
 
 /**
  * Headless field array component that provides reactive field array state via an Angular template.
@@ -56,32 +52,5 @@ export class FormischFieldArray<
   readonly path: InputSignal<ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>> = input.required<ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>>();
 
   protected readonly template: Signal<TemplateRef<unknown> | undefined> = contentChild(TemplateRef);
-
-  private readonly internalFieldStore = computed(
-    () =>
-      getFieldStore(this.of()[INTERNAL], this.path()) as InternalArrayStore
-  );
-
-  protected readonly fieldArray: FieldArrayStore<TSchema, TFieldArrayPath> =
-    (() => {
-      const internalFieldStore = this.internalFieldStore;
-      const pathSignal = this.path;
-
-      return {
-        get path() {
-          return pathSignal();
-        },
-        items: computed(() => internalFieldStore().items.value),
-        errors: computed(() => internalFieldStore().errors.value),
-        isTouched: computed(() =>
-          getFieldBool(internalFieldStore(), 'isTouched')
-        ),
-        isDirty: computed(() =>
-          getFieldBool(internalFieldStore(), 'isDirty')
-        ),
-        isValid: computed(
-          () => !getFieldBool(internalFieldStore(), 'errors')
-        ),
-      };
-    })() as FieldArrayStore<TSchema, TFieldArrayPath>;
+  protected readonly fieldArray: FieldArrayStore<TSchema, TFieldArrayPath> = injectFieldArray(this.of, { path: this.path });
 }
