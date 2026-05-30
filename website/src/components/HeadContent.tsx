@@ -1,6 +1,9 @@
 import { component$, useComputed$ } from '@qwik.dev/core';
 import { useDocumentHead, useLocation } from '@qwik.dev/router';
-import { CHAPTERS_KEY, HIDDEN_CLASS } from '~/routes/plugin@chapters';
+import {
+  CHAPTERS_HIDDEN_CLASS,
+  CHAPTERS_KEY,
+} from '~/routes/plugin@chapters';
 import { FRAMEWORK_LIST } from '~/routes/plugin@framework';
 import { THEME_KEY } from '~/routes/plugin@theme';
 import { getAreaName, getFrameworkName } from '~/utils';
@@ -9,7 +12,7 @@ import { getAreaName, getFrameworkName } from '~/utils';
 // scripts can never drift from the runtime stores that read the same values.
 const THEME_INIT_SCRIPT = `try{var t=localStorage.getItem('${THEME_KEY}');document.documentElement.classList.toggle('dark',t==='dark'||t!=='light'&&!matchMedia('(prefers-color-scheme:light)').matches);}catch(e){}`;
 
-const CHAPTERS_INIT_SCRIPT = `try{document.documentElement.classList.toggle('${HIDDEN_CLASS}',localStorage.getItem('${CHAPTERS_KEY}')==='false');}catch(e){}`;
+const CHAPTERS_INIT_SCRIPT = `try{document.documentElement.classList.toggle('${CHAPTERS_HIDDEN_CLASS}',localStorage.getItem('${CHAPTERS_KEY}')==='false');}catch(e){}`;
 
 function ogImagePath(pathname: string): string {
   if (pathname === '/') return '/og/index.png';

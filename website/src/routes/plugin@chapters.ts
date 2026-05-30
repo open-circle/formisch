@@ -16,7 +16,7 @@ export const CHAPTERS_KEY = 'chapters';
  * via the `chapters` / `no-chapters` Tailwind variants, and an inline script
  * in the document head sets it before first paint to avoid layout shift.
  */
-export const HIDDEN_CLASS = 'no-chapters';
+export const CHAPTERS_HIDDEN_CLASS = 'no-chapters';
 
 const ChaptersContext = createContextId<Signal<boolean>>(CHAPTERS_KEY);
 
@@ -40,7 +40,10 @@ export const useChaptersProvider = () => {
 
     // Keep the signal and the root class in sync (the inline head script has
     // already applied the class before paint).
-    document.documentElement.classList.toggle(HIDDEN_CLASS, !chapters.value);
+    document.documentElement.classList.toggle(
+      CHAPTERS_HIDDEN_CLASS,
+      !chapters.value
+    );
   });
 };
 
@@ -62,6 +65,6 @@ export const useChaptersToggle = (): QRL<() => void> => {
     } catch {
       // ignore
     }
-    document.documentElement.classList.toggle(HIDDEN_CLASS, !next);
+    document.documentElement.classList.toggle(CHAPTERS_HIDDEN_CLASS, !next);
   });
 };
