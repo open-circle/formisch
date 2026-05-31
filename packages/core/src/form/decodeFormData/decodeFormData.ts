@@ -377,12 +377,19 @@ export function decodeFormData<TSchema extends FormSchema>(
           break;
         }
 
-        // Throw on oversized array index, including indices sent as strings
-        // (see MAX_ARRAY_LENGTH)
-        if (Array.isArray(parentValue) && Number(segment) >= MAX_ARRAY_LENGTH) {
-          throw new Error(
-            `Array exceeds the maximum length of ${MAX_ARRAY_LENGTH}`
-          );
+        // Arrays are indexed by numbers; string segments would write properties
+        // like `length` or `push` that inflate or corrupt them
+        if (Array.isArray(parentValue)) {
+          if (typeof segment === 'string') {
+            break;
+          }
+
+          // Throw on oversized array index (see MAX_ARRAY_LENGTH)
+          if (segment >= MAX_ARRAY_LENGTH) {
+            throw new Error(
+              `Array exceeds the maximum length of ${MAX_ARRAY_LENGTH}`
+            );
+          }
         }
 
         // Get child schema for current segment

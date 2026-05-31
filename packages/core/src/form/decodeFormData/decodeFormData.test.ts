@@ -716,12 +716,17 @@ describe('decodeFormData', () => {
       );
     });
 
-    test('should throw for an oversized array index sent as a string', () => {
-      const schema = v.object({ flags: v.array(v.boolean()) });
-      const formData = createFormData([['["flags","1000000000"]', 'on']]);
-      expect(() => decodeFormData(schema, formData)).toThrowError(
-        'Array exceeds the maximum length of 5000'
-      );
+    test('should ignore string properties on arrays', () => {
+      const schema = v.object({ flags: v.array(v.string()) });
+      const formData = createFormData([
+        ['["flags","length"]', '1000000000'], // would inflate via `length`
+        ['["flags","push"]', 'x'], // would clobber the `push` method
+        ['["flags","1000000000"]', 'x'], // numeric index sent as a string
+        ['["flags"]', 'real'], // later append must still work
+      ]);
+      expect(decodeFormData(schema, formData)).toStrictEqual({
+        flags: ['real'],
+      });
     });
   });
 
