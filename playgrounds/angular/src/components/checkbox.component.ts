@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { type FieldElementProps, FormischFieldRef } from '@formisch/angular';
 import { InputErrorsComponent } from './input-errors.component.ts';
 
 /**
@@ -8,7 +9,7 @@ import { InputErrorsComponent } from './input-errors.component.ts';
 @Component({
   selector: 'app-checkbox',
   standalone: true,
-  imports: [InputErrorsComponent],
+  imports: [InputErrorsComponent, FormischFieldRef],
   host: { class: 'block px-8 lg:px-10' },
   template: `
     <label class="flex space-x-4 font-medium select-none md:text-lg lg:text-xl">
@@ -21,8 +22,10 @@ import { InputErrorsComponent } from './input-errors.component.ts';
         [checked]="!!input()"
         [required]="!!required()"
         [attr.aria-invalid]="!!errors()"
-        [attr.aria-errormessage]="name() + '-error'"
+        [attr.aria-errormessage]="errors() ? name() + '-error' : null"
+        [formischFieldRef]="fieldRef()"
         (focus)="fieldFocus.emit($event)"
+        (input)="fieldInput.emit($event)"
         (change)="fieldChange.emit($event)"
         (blur)="fieldBlur.emit($event)"
       />
@@ -41,8 +44,10 @@ export class CheckboxComponent {
   readonly input = input<boolean | undefined>();
   readonly required = input<boolean>(false);
   readonly errors = input<[string, ...string[]] | null>(null);
+  readonly fieldRef = input<FieldElementProps['ref']>();
 
   readonly fieldFocus = output<FocusEvent>();
+  readonly fieldInput = output<Event>();
   readonly fieldChange = output<Event>();
   readonly fieldBlur = output<FocusEvent>();
 }

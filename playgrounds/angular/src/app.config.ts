@@ -6,8 +6,5 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes.ts';
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-    provideZonelessChangeDetection(),
-    provideRouter(routes),
-  ],
+  providers: [provideZonelessChangeDetection(), provideRouter(routes)],
 };

@@ -1,5 +1,6 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { getFieldStore, INTERNAL } from '@formisch/core/angular';
 import * as v from 'valibot';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { injectForm } from '../injectForm/index.ts';
@@ -63,5 +64,30 @@ describe('injectField', () => {
   it('exposes a name prop as JSON-stringified path', () => {
     const { field } = setup();
     expect(field.props.name).toBe('["email"]');
+  });
+
+  it('updates the input value when props.onInput is called', () => {
+    const { field } = setup();
+    const element = document.createElement('input');
+    element.value = 'test@example.com';
+    field.props.onInput({ currentTarget: element } as unknown as Event);
+    expect(field.input()).toBe('test@example.com');
+  });
+
+  it('does not change the input value when props.onChange is called', () => {
+    const { field } = setup();
+    field.props.onChange(new Event('change'));
+    expect(field.input()).toBeUndefined();
+  });
+
+  it('registers and unregisters the element via props.ref', () => {
+    const { form, field } = setup();
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    const element = document.createElement('input');
+    const cleanup = field.props.ref(element);
+    expect(internalFieldStore.elements).toContain(element);
+    expect(typeof cleanup).toBe('function');
+    cleanup?.();
+    expect(internalFieldStore.elements).not.toContain(element);
   });
 });

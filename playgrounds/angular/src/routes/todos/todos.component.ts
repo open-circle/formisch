@@ -76,7 +76,9 @@ const TodosSchema = v.object({
               label="Heading"
               placeholder="Shopping list"
               [required]="true"
+              [fieldRef]="field.props.ref"
               (fieldFocus)="field.props.onFocus($event)"
+              (fieldInput)="field.props.onInput($event)"
               (fieldChange)="field.props.onChange($event)"
               (fieldBlur)="field.props.onBlur($event)"
             />
@@ -112,7 +114,9 @@ const TodosSchema = v.object({
                             class="p-0!"
                             placeholder="Enter task"
                             [required]="true"
+                            [fieldRef]="field.props.ref"
                             (fieldFocus)="field.props.onFocus($event)"
+                            (fieldInput)="field.props.onInput($event)"
                             (fieldChange)="field.props.onChange($event)"
                             (fieldBlur)="field.props.onBlur($event)"
                           />
@@ -132,7 +136,9 @@ const TodosSchema = v.object({
                             type="date"
                             class="p-0!"
                             [required]="true"
+                            [fieldRef]="field.props.ref"
                             (fieldFocus)="field.props.onFocus($event)"
+                            (fieldInput)="field.props.onInput($event)"
                             (fieldChange)="field.props.onChange($event)"
                             (fieldBlur)="field.props.onBlur($event)"
                           />

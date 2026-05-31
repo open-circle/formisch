@@ -73,7 +73,9 @@ const NestedFormSchema = v.object({
                           type="text"
                           class="p-0!"
                           placeholder="Enter item"
+                          [fieldRef]="field.props.ref"
                           (fieldFocus)="field.props.onFocus($event)"
+                          (fieldInput)="field.props.onInput($event)"
                           (fieldChange)="field.props.onChange($event)"
                           (fieldBlur)="field.props.onBlur($event)"
                         />
@@ -123,7 +125,9 @@ const NestedFormSchema = v.object({
                                   class="p-0!"
                                   type="text"
                                   placeholder="Enter option"
+                                  [fieldRef]="field.props.ref"
                                   (fieldFocus)="field.props.onFocus($event)"
+                                  (fieldInput)="field.props.onInput($event)"
                                   (fieldChange)="field.props.onChange($event)"
                                   (fieldBlur)="field.props.onBlur($event)"
                                 />

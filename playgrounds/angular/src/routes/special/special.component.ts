@@ -60,7 +60,9 @@ const SpecialFormSchema = v.object({
               [errors]="field.errors()"
               type="number"
               label="Number"
+              [fieldRef]="field.props.ref"
               (fieldFocus)="field.props.onFocus($event)"
+              (fieldInput)="field.props.onInput($event)"
               (fieldChange)="field.props.onChange($event)"
               (fieldBlur)="field.props.onBlur($event)"
             />
@@ -74,7 +76,9 @@ const SpecialFormSchema = v.object({
               [input]="field.input()"
               [errors]="field.errors()"
               label="Range"
+              [fieldRef]="field.props.ref"
               (fieldFocus)="field.props.onFocus($event)"
+              (fieldInput)="field.props.onInput($event)"
               (fieldChange)="field.props.onChange($event)"
               (fieldBlur)="field.props.onBlur($event)"
             />
@@ -100,7 +104,9 @@ const SpecialFormSchema = v.object({
                   [input]="field.input().includes(option.value)"
                   [errors]="field.errors()"
                   class="p-0!"
+                  [fieldRef]="field.props.ref"
                   (fieldFocus)="field.props.onFocus($event)"
+                  (fieldInput)="field.props.onInput($event)"
                   (fieldChange)="field.props.onChange($event)"
                   (fieldBlur)="field.props.onBlur($event)"
                 />
@@ -116,7 +122,9 @@ const SpecialFormSchema = v.object({
               [input]="field.input()"
               [errors]="field.errors()"
               label="Checkbox boolean"
+              [fieldRef]="field.props.ref"
               (fieldFocus)="field.props.onFocus($event)"
+              (fieldInput)="field.props.onInput($event)"
               (fieldChange)="field.props.onChange($event)"
               (fieldBlur)="field.props.onBlur($event)"
             />
@@ -131,7 +139,9 @@ const SpecialFormSchema = v.object({
               [options]="radioOptions"
               [input]="field.input()"
               [errors]="field.errors()"
+              [fieldRef]="field.props.ref"
               (fieldFocus)="field.props.onFocus($event)"
+              (fieldInput)="field.props.onInput($event)"
               (fieldChange)="field.props.onChange($event)"
               (fieldBlur)="field.props.onBlur($event)"
             />
@@ -147,7 +157,9 @@ const SpecialFormSchema = v.object({
               [errors]="field.errors()"
               label="Select array"
               [multiple]="true"
+              [fieldRef]="field.props.ref"
               (fieldFocus)="field.props.onFocus($event)"
+              (fieldInput)="field.props.onInput($event)"
               (fieldChange)="field.props.onChange($event)"
               (fieldBlur)="field.props.onBlur($event)"
             />
@@ -162,7 +174,9 @@ const SpecialFormSchema = v.object({
               [options]="selectOptions"
               [errors]="field.errors()"
               label="Select string"
+              [fieldRef]="field.props.ref"
               (fieldFocus)="field.props.onFocus($event)"
+              (fieldInput)="field.props.onInput($event)"
               (fieldChange)="field.props.onChange($event)"
               (fieldBlur)="field.props.onBlur($event)"
             />
@@ -177,7 +191,9 @@ const SpecialFormSchema = v.object({
               [errors]="field.errors()"
               label="File list"
               [multiple]="true"
+              [fieldRef]="field.props.ref"
               (fieldFocus)="field.props.onFocus($event)"
+              (fieldInput)="field.props.onInput($event)"
               (fieldChange)="field.props.onChange($event)"
               (fieldBlur)="field.props.onBlur($event)"
             />
@@ -191,7 +207,9 @@ const SpecialFormSchema = v.object({
               [input]="field.input()"
               [errors]="field.errors()"
               label="File item"
+              [fieldRef]="field.props.ref"
               (fieldFocus)="field.props.onFocus($event)"
+              (fieldInput)="field.props.onInput($event)"
               (fieldChange)="field.props.onChange($event)"
               (fieldBlur)="field.props.onBlur($event)"
             />

@@ -100,14 +100,20 @@ export function injectField(
       },
       ref(element) {
         if (element) {
-          internalFieldStore().elements.push(element);
+          const fieldStore = internalFieldStore();
+          fieldStore.elements.push(element);
+          return () => {
+            fieldStore.elements = fieldStore.elements.filter(
+              (currentElement) => currentElement !== element
+            );
+          };
         }
       },
       onFocus() {
         setFieldBool(internalFieldStore(), 'isTouched', true);
         validateIfRequired(internalFormStore(), internalFieldStore(), 'touch');
       },
-      onChange(event) {
+      onInput(event) {
         setFieldInput(
           internalFormStore(),
           path(),
@@ -117,6 +123,8 @@ export function injectField(
           )
         );
         validateIfRequired(internalFormStore(), internalFieldStore(), 'input');
+      },
+      onChange() {
         validateIfRequired(internalFormStore(), internalFieldStore(), 'change');
       },
       onBlur() {

@@ -17,27 +17,31 @@ import clsx from 'clsx';
   template: `
     @if (label()) {
       @let labelClass = labelClasses();
-      @if (component() === 'legend') {
-        <legend [class]="labelClass">
-          {{ label() }}
-          @if (required()) {
-            <span class="ml-1 text-red-600 dark:text-red-400">*</span>
-          }
-        </legend>
-      } @else if (name()) {
-        <label [for]="name()" [class]="labelClass">
-          {{ label() }}
-          @if (required()) {
-            <span class="ml-1 text-red-600 dark:text-red-400">*</span>
-          }
-        </label>
-      } @else {
-        <div [class]="labelClass">
-          {{ label() }}
-          @if (required()) {
-            <span class="ml-1 text-red-600 dark:text-red-400">*</span>
-          }
-        </div>
+      @switch (component() ?? (name() ? 'label' : 'div')) {
+        @case ('legend') {
+          <legend [class]="labelClass">
+            {{ label() }}
+            @if (required()) {
+              <span class="ml-1 text-red-600 dark:text-red-400">*</span>
+            }
+          </legend>
+        }
+        @case ('label') {
+          <label [for]="name()" [class]="labelClass">
+            {{ label() }}
+            @if (required()) {
+              <span class="ml-1 text-red-600 dark:text-red-400">*</span>
+            }
+          </label>
+        }
+        @default {
+          <div [class]="labelClass">
+            {{ label() }}
+            @if (required()) {
+              <span class="ml-1 text-red-600 dark:text-red-400">*</span>
+            }
+          </div>
+        }
       }
     }
   `,

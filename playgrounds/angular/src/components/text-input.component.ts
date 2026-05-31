@@ -1,4 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
+import { type FieldElementProps, FormischFieldRef } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
 import { InputLabelComponent } from './input-label.component.ts';
@@ -10,7 +11,7 @@ import { InputLabelComponent } from './input-label.component.ts';
 @Component({
   selector: 'app-text-input',
   standalone: true,
-  imports: [InputLabelComponent, InputErrorsComponent],
+  imports: [InputLabelComponent, InputErrorsComponent, FormischFieldRef],
   host: { class: 'block px-8 lg:px-10' },
   template: `
     <app-input-label
@@ -27,8 +28,10 @@ import { InputLabelComponent } from './input-label.component.ts';
       [attr.aria-invalid]="!!errors()"
       [attr.aria-errormessage]="errors() ? name() + '-error' : null"
       [class]="inputClass()"
+      [formischFieldRef]="fieldRef()"
       (focus)="fieldFocus.emit($event)"
-      (input)="fieldChange.emit($event)"
+      (input)="fieldInput.emit($event)"
+      (change)="fieldChange.emit($event)"
       (blur)="fieldBlur.emit($event)"
     />
     <app-input-errors [name]="name()" [errors]="errors()" />
@@ -42,8 +45,10 @@ export class TextInputComponent {
   readonly required = input<boolean>(false);
   readonly value = input<string | number | undefined>();
   readonly errors = input<[string, ...string[]] | null>(null);
+  readonly fieldRef = input<FieldElementProps['ref']>();
 
   readonly fieldFocus = output<FocusEvent>();
+  readonly fieldInput = output<Event>();
   readonly fieldChange = output<Event>();
   readonly fieldBlur = output<FocusEvent>();
 

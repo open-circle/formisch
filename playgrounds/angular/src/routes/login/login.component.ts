@@ -47,7 +47,9 @@ const LoginSchema = v.object({
               label="Email"
               placeholder="example@email.com"
               [required]="true"
+              [fieldRef]="field.props.ref"
               (fieldFocus)="field.props.onFocus($event)"
+              (fieldInput)="field.props.onInput($event)"
               (fieldChange)="field.props.onChange($event)"
               (fieldBlur)="field.props.onBlur($event)"
             />
@@ -64,7 +66,9 @@ const LoginSchema = v.object({
               label="Password"
               placeholder="********"
               [required]="true"
+              [fieldRef]="field.props.ref"
               (fieldFocus)="field.props.onFocus($event)"
+              (fieldInput)="field.props.onInput($event)"
               (fieldChange)="field.props.onChange($event)"
               (fieldBlur)="field.props.onBlur($event)"
             />

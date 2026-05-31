@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import type { FieldElementProps } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
 import { InputLabelComponent } from './input-label.component.ts';
@@ -21,7 +22,7 @@ interface RadioOption {
     <fieldset
       [class]="containerClasses()"
       [attr.aria-invalid]="!!errors()"
-      [attr.aria-errormessage]="name() + '-error'"
+      [attr.aria-errormessage]="errors() ? name() + '-error' : null"
     >
       <app-input-label
         component="legend"
@@ -37,7 +38,9 @@ interface RadioOption {
             [label]="option.label"
             [value]="option.value"
             [checked]="input() === option.value"
+            [fieldRef]="fieldRef()"
             (fieldFocus)="fieldFocus.emit($event)"
+            (fieldInput)="fieldInput.emit($event)"
             (fieldChange)="fieldChange.emit($event)"
             (fieldBlur)="fieldBlur.emit($event)"
           />
@@ -55,8 +58,10 @@ export class RadioGroupComponent {
   readonly input = input<string | undefined>();
   readonly errors = input<[string, ...string[]] | null>(null);
   readonly class = input<string>('');
+  readonly fieldRef = input<FieldElementProps['ref']>();
 
   readonly fieldFocus = output<FocusEvent>();
+  readonly fieldInput = output<Event>();
   readonly fieldChange = output<Event>();
   readonly fieldBlur = output<FocusEvent>();
 

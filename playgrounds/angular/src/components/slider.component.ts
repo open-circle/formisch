@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { type FieldElementProps, FormischFieldRef } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
 import { InputLabelComponent } from './input-label.component.ts';
@@ -11,7 +12,7 @@ import { InputLabelComponent } from './input-label.component.ts';
 @Component({
   selector: 'app-slider',
   standalone: true,
-  imports: [InputLabelComponent, InputErrorsComponent],
+  imports: [InputLabelComponent, InputErrorsComponent, FormischFieldRef],
   template: `
     <div [class]="containerClasses()">
       <app-input-label
@@ -30,8 +31,10 @@ import { InputLabelComponent } from './input-label.component.ts';
         [attr.step]="step()"
         [attr.aria-invalid]="!!errors()"
         [attr.aria-errormessage]="errors() ? name() + '-error' : null"
+        [formischFieldRef]="fieldRef()"
         (focus)="fieldFocus.emit($event)"
-        (input)="fieldChange.emit($event)"
+        (input)="fieldInput.emit($event)"
+        (change)="fieldChange.emit($event)"
         (blur)="fieldBlur.emit($event)"
       />
       <app-input-errors [name]="name()" [errors]="errors()" />
@@ -48,8 +51,10 @@ export class SliderComponent {
   readonly input = input<string | number | undefined>();
   readonly errors = input<[string, ...string[]] | null>(null);
   readonly class = input<string>('');
+  readonly fieldRef = input<FieldElementProps['ref']>();
 
   readonly fieldFocus = output<FocusEvent>();
+  readonly fieldInput = output<Event>();
   readonly fieldChange = output<Event>();
   readonly fieldBlur = output<FocusEvent>();
 

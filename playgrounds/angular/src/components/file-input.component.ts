@@ -1,4 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
+import { type FieldElementProps, FormischFieldRef } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
 import { InputLabelComponent } from './input-label.component.ts';
@@ -11,7 +12,7 @@ import { InputLabelComponent } from './input-label.component.ts';
 @Component({
   selector: 'app-file-input',
   standalone: true,
-  imports: [InputLabelComponent, InputErrorsComponent],
+  imports: [InputLabelComponent, InputErrorsComponent, FormischFieldRef],
   template: `
     <div [class]="containerClasses()">
       <app-input-label
@@ -29,8 +30,10 @@ import { InputLabelComponent } from './input-label.component.ts';
           [attr.accept]="accept()"
           [multiple]="!!multiple()"
           [attr.aria-invalid]="!!errors()"
-          [attr.aria-errormessage]="name() + '-error'"
+          [attr.aria-errormessage]="errors() ? name() + '-error' : null"
+          [formischFieldRef]="fieldRef()"
           (focus)="fieldFocus.emit($event)"
+          (input)="fieldInput.emit($event)"
           (change)="fieldChange.emit($event)"
           (blur)="fieldBlur.emit($event)"
         />
@@ -48,8 +51,10 @@ export class FileInputComponent {
   readonly input = input<File | File[] | null | undefined>();
   readonly errors = input<[string, ...string[]] | null>(null);
   readonly class = input<string>('');
+  readonly fieldRef = input<FieldElementProps['ref']>();
 
   readonly fieldFocus = output<FocusEvent>();
+  readonly fieldInput = output<Event>();
   readonly fieldChange = output<Event>();
   readonly fieldBlur = output<FocusEvent>();
 

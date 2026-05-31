@@ -23,15 +23,22 @@ export interface FieldElementProps {
    */
   readonly autofocus: boolean;
   /**
-   * The ref callback to register the field element.
+   * The ref callback to register the field element. Returns a cleanup function
+   * that unregisters the element when invoked.
    */
-  readonly ref: (element: FieldElement | null) => void;
+  readonly ref: (element: FieldElement | null) => (() => void) | undefined;
   /**
    * The focus event handler of the field element.
    */
   readonly onFocus: (event: FocusEvent) => void;
   /**
-   * The change event handler of the field element.
+   * The input event handler of the field element. Updates the field input and
+   * validates on the `input` event.
+   */
+  readonly onInput: (event: Event) => void;
+  /**
+   * The change event handler of the field element. Validates on the `change`
+   * event.
    */
   readonly onChange: (event: Event) => void;
   /**
