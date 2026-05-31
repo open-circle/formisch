@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { getFieldStore, INTERNAL } from '@formisch/core/angular';
 import * as v from 'valibot';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { CONTROL } from '../../types/control.ts';
 import { injectForm } from '../injectForm/index.ts';
 import { injectField } from './injectField.ts';
 
@@ -55,36 +56,36 @@ describe('injectField', () => {
     expect(field.isValid()).toBe(true);
   });
 
-  it('updates input signal when onInput is called', () => {
+  it('exposes the name as a JSON-stringified path signal', () => {
     const { field } = setup();
-    field.onInput('test@example.com');
+    expect(field.name()).toBe('["email"]');
+  });
+
+  it('updates the input signal when setInput is called', () => {
+    const { field } = setup();
+    field.setInput('test@example.com');
     expect(field.input()).toBe('test@example.com');
   });
 
-  it('exposes a name prop as JSON-stringified path', () => {
-    const { field } = setup();
-    expect(field.props.name).toBe('["email"]');
-  });
-
-  it('updates the input value when props.onInput is called', () => {
+  it('updates the input value when the control onInput is called', () => {
     const { field } = setup();
     const element = document.createElement('input');
     element.value = 'test@example.com';
-    field.props.onInput({ currentTarget: element } as unknown as Event);
+    field[CONTROL].onInput({ currentTarget: element } as unknown as Event);
     expect(field.input()).toBe('test@example.com');
   });
 
-  it('does not change the input value when props.onChange is called', () => {
+  it('does not change the input value when the control onChange is called', () => {
     const { field } = setup();
-    field.props.onChange(new Event('change'));
+    field[CONTROL].onChange();
     expect(field.input()).toBeUndefined();
   });
 
-  it('registers and unregisters the element via props.ref', () => {
+  it('registers and unregisters the element via the control ref', () => {
     const { form, field } = setup();
     const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
     const element = document.createElement('input');
-    const cleanup = field.props.ref(element);
+    const cleanup = field[CONTROL].ref(element);
     expect(internalFieldStore.elements).toContain(element);
     expect(typeof cleanup).toBe('function');
     cleanup?.();

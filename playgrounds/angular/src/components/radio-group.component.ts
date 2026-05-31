@@ -1,5 +1,5 @@
-import { Component, input, output } from '@angular/core';
-import type { FieldElementProps } from '@formisch/angular';
+import { Component, input } from '@angular/core';
+import type { FieldStore } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
 import { InputLabelComponent } from './input-label.component.ts';
@@ -17,12 +17,15 @@ interface RadioOption {
 @Component({
   selector: 'app-radio-group',
   standalone: true,
+  host: { class: 'block' },
   imports: [InputLabelComponent, InputErrorsComponent, RadioComponent],
   template: `
     <fieldset
       [class]="containerClasses()"
-      [attr.aria-invalid]="!!errors()"
-      [attr.aria-errormessage]="errors() ? name() + '-error' : null"
+      [attr.aria-invalid]="!!field().errors()"
+      [attr.aria-errormessage]="
+        field().errors() ? field().name() + '-error' : null
+      "
     >
       <app-input-label
         component="legend"
@@ -34,36 +37,22 @@ interface RadioOption {
       >
         @for (option of options(); track option.value) {
           <app-radio
-            [name]="name()"
+            [field]="field()"
             [label]="option.label"
             [value]="option.value"
-            [checked]="input() === option.value"
-            [fieldRef]="fieldRef()"
-            (fieldFocus)="fieldFocus.emit($event)"
-            (fieldInput)="fieldInput.emit($event)"
-            (fieldChange)="fieldChange.emit($event)"
-            (fieldBlur)="fieldBlur.emit($event)"
           />
         }
       </div>
-      <app-input-errors [name]="name()" [errors]="errors()" />
+      <app-input-errors [name]="field().name()" [errors]="field().errors()" />
     </fieldset>
   `,
 })
 export class RadioGroupComponent {
-  readonly name = input.required<string>();
+  readonly field = input.required<FieldStore<any, any>>();
   readonly label = input<string>();
   readonly options = input.required<RadioOption[]>();
   readonly required = input<boolean>(false);
-  readonly input = input<string | undefined>();
-  readonly errors = input<[string, ...string[]] | null>(null);
   readonly class = input<string>('');
-  readonly fieldRef = input<FieldElementProps['ref']>();
-
-  readonly fieldFocus = output<FocusEvent>();
-  readonly fieldInput = output<Event>();
-  readonly fieldChange = output<Event>();
-  readonly fieldBlur = output<FocusEvent>();
 
   protected readonly containerClasses = () =>
     clsx('px-8 lg:px-10', this.class());

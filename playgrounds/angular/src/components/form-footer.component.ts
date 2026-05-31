@@ -23,9 +23,9 @@ import { ActionButtonComponent } from './action-button.component.ts';
   `,
 })
 export class FormFooterComponent {
-  readonly of = input.required<FormStore>();
+  readonly form = input.required<FormStore>();
 
   protected handleReset(): void {
-    reset(this.of());
+    reset(this.form());
   }
 }

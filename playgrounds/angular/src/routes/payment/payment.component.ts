@@ -66,116 +66,73 @@ const PaymentSchema = v.intersect([
     SelectComponent,
   ],
   template: `
-    <formisch-form
-      [of]="form"
-      [submitFn]="handleSubmit"
+    <form
+      [formischForm]="form"
+      (formischSubmit)="handleSubmit($event)"
       class="space-y-12 md:space-y-14 lg:space-y-16"
     >
-      <app-form-header [of]="form" heading="Payment form" />
+      <app-form-header [form]="form" heading="Payment form" />
 
       <div class="space-y-8 md:space-y-10 lg:space-y-12">
-        <formisch-field [of]="form" [path]="['owner']">
-          <ng-template let-field>
-            <app-text-input
-              [name]="field.props.name"
-              [value]="field.input()"
-              [errors]="field.errors()"
-              type="text"
-              label="Owner"
-              placeholder="John Doe"
-              [required]="true"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['owner'] of form; let field">
+          <app-text-input
+            [field]="field"
+            type="text"
+            label="Owner"
+            placeholder="John Doe"
+            [required]="true"
+          />
+        </ng-container>
 
-        <formisch-field [of]="form" [path]="['type']">
-          <ng-template let-field>
-            <app-select
-              [name]="field.props.name"
-              [input]="field.input()"
-              [options]="paymentTypes"
-              [errors]="field.errors()"
-              label="Type"
-              placeholder="Card or PayPal?"
-              [required]="true"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['type'] of form; let field">
+          <app-select
+            [field]="field"
+            [options]="paymentTypes"
+            label="Type"
+            placeholder="Card or PayPal?"
+            [required]="true"
+          />
+        </ng-container>
 
         @if (paymentType() === 'card') {
-          <formisch-field [of]="form" [path]="['card', 'number']">
-            <ng-template let-field>
-              <app-text-input
-                [name]="field.props.name"
-                [value]="field.input()"
-                [errors]="field.errors()"
-                type="text"
-                label="Number"
-                placeholder="1234 1234 1234 1234"
-                [required]="true"
-                [fieldRef]="field.props.ref"
-                (fieldFocus)="field.props.onFocus($event)"
-                (fieldInput)="field.props.onInput($event)"
-                (fieldChange)="field.props.onChange($event)"
-                (fieldBlur)="field.props.onBlur($event)"
-              />
-            </ng-template>
-          </formisch-field>
+          <ng-container *formischField="['card', 'number'] of form; let field">
+            <app-text-input
+              [field]="field"
+              type="text"
+              label="Number"
+              placeholder="1234 1234 1234 1234"
+              [required]="true"
+            />
+          </ng-container>
 
-          <formisch-field [of]="form" [path]="['card', 'expiration']">
-            <ng-template let-field>
-              <app-text-input
-                [name]="field.props.name"
-                [value]="field.input()"
-                [errors]="field.errors()"
-                type="text"
-                label="Expiration"
-                placeholder="MM/YY"
-                [required]="true"
-                [fieldRef]="field.props.ref"
-                (fieldFocus)="field.props.onFocus($event)"
-                (fieldInput)="field.props.onInput($event)"
-                (fieldChange)="field.props.onChange($event)"
-                (fieldBlur)="field.props.onBlur($event)"
-              />
-            </ng-template>
-          </formisch-field>
+          <ng-container
+            *formischField="['card', 'expiration'] of form; let field"
+          >
+            <app-text-input
+              [field]="field"
+              type="text"
+              label="Expiration"
+              placeholder="MM/YY"
+              [required]="true"
+            />
+          </ng-container>
         }
 
         @if (paymentType() === 'paypal') {
-          <formisch-field [of]="form" [path]="['paypal', 'email']">
-            <ng-template let-field>
-              <app-text-input
-                [name]="field.props.name"
-                [value]="field.input()"
-                [errors]="field.errors()"
-                type="email"
-                label="Email"
-                placeholder="example@email.com"
-                [required]="true"
-                [fieldRef]="field.props.ref"
-                (fieldFocus)="field.props.onFocus($event)"
-                (fieldInput)="field.props.onInput($event)"
-                (fieldChange)="field.props.onChange($event)"
-                (fieldBlur)="field.props.onBlur($event)"
-              />
-            </ng-template>
-          </formisch-field>
+          <ng-container *formischField="['paypal', 'email'] of form; let field">
+            <app-text-input
+              [field]="field"
+              type="email"
+              label="Email"
+              placeholder="example@email.com"
+              [required]="true"
+            />
+          </ng-container>
         }
       </div>
 
-      <app-form-footer [of]="form" />
-    </formisch-form>
+      <app-form-footer [form]="form" />
+    </form>
   `,
 })
 export class PaymentComponent {
@@ -190,7 +147,7 @@ export class PaymentComponent {
     getInput(this.form, { path: ['type'] })
   );
 
-  readonly handleSubmit = (output: v.InferOutput<typeof PaymentSchema>) => {
+  handleSubmit(output: v.InferOutput<typeof PaymentSchema>): void {
     console.log(output);
-  };
+  }
 }

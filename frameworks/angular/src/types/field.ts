@@ -1,6 +1,5 @@
 import type { Signal } from '@angular/core';
 import type {
-  FieldElement,
   FormSchema,
   PartialValues,
   PathValue,
@@ -9,43 +8,7 @@ import type {
   ValidPath,
 } from '@formisch/core/angular';
 import type * as v from 'valibot';
-
-/**
- * Field element props interface.
- */
-export interface FieldElementProps {
-  /**
-   * The name attribute of the field element.
-   */
-  readonly name: string;
-  /**
-   * Whether to autofocus the field element when there are errors.
-   */
-  readonly autofocus: boolean;
-  /**
-   * The ref callback to register the field element. Returns a cleanup function
-   * that unregisters the element when invoked.
-   */
-  readonly ref: (element: FieldElement | null) => (() => void) | undefined;
-  /**
-   * The focus event handler of the field element.
-   */
-  readonly onFocus: (event: FocusEvent) => void;
-  /**
-   * The input event handler of the field element. Updates the field input and
-   * validates on the `input` event.
-   */
-  readonly onInput: (event: Event) => void;
-  /**
-   * The change event handler of the field element. Validates on the `change`
-   * event.
-   */
-  readonly onChange: (event: Event) => void;
-  /**
-   * The blur event handler of the field element.
-   */
-  readonly onBlur: (event: FocusEvent) => void;
-}
+import type { CONTROL, FieldControl } from './control.ts';
 
 /**
  * Field store interface.
@@ -58,6 +21,10 @@ export interface FieldStore<
    * The path to the field within the form.
    */
   readonly path: ValidPath<v.InferInput<TSchema>, TFieldPath>;
+  /**
+   * The name of the field element as a reactive signal.
+   */
+  readonly name: Signal<string>;
   /**
    * The current input value of the field as a reactive signal.
    */
@@ -83,13 +50,13 @@ export interface FieldStore<
   /**
    * Sets the field input value programmatically.
    */
-  readonly onInput: (
+  readonly setInput: (
     value: PartialValues<PathValue<v.InferInput<TSchema>, TFieldPath>>
   ) => void;
   /**
-   * The props to spread onto the field element for integration.
+   * The element-binding contract consumed by the `[formischControl]` directive.
    */
-  readonly props: FieldElementProps;
+  readonly [CONTROL]: FieldControl;
 }
 
 /**

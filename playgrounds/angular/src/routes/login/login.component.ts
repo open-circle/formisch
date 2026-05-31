@@ -29,61 +29,43 @@ const LoginSchema = v.object({
     TextInputComponent,
   ],
   template: `
-    <formisch-form
-      [of]="form"
-      [submitFn]="handleSubmit"
+    <form
+      [formischForm]="form"
+      (formischSubmit)="handleSubmit($event)"
       class="space-y-12 md:space-y-14 lg:space-y-16"
     >
-      <app-form-header [of]="form" heading="Login form" />
+      <app-form-header [form]="form" heading="Login form" />
 
       <div class="space-y-8 md:space-y-10 lg:space-y-12">
-        <formisch-field [of]="form" [path]="['email']">
-          <ng-template let-field>
-            <app-text-input
-              [name]="field.props.name"
-              [value]="field.input()"
-              [errors]="field.errors()"
-              type="email"
-              label="Email"
-              placeholder="example@email.com"
-              [required]="true"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['email'] of form; let field">
+          <app-text-input
+            [field]="field"
+            type="email"
+            label="Email"
+            placeholder="example@email.com"
+            [required]="true"
+          />
+        </ng-container>
 
-        <formisch-field [of]="form" [path]="['password']">
-          <ng-template let-field>
-            <app-text-input
-              [name]="field.props.name"
-              [value]="field.input()"
-              [errors]="field.errors()"
-              type="password"
-              label="Password"
-              placeholder="********"
-              [required]="true"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['password'] of form; let field">
+          <app-text-input
+            [field]="field"
+            type="password"
+            label="Password"
+            placeholder="********"
+            [required]="true"
+          />
+        </ng-container>
       </div>
 
-      <app-form-footer [of]="form" />
-    </formisch-form>
+      <app-form-footer [form]="form" />
+    </form>
   `,
 })
 export class LoginComponent {
   readonly form = injectForm({ schema: LoginSchema });
 
-  readonly handleSubmit = (output: v.InferOutput<typeof LoginSchema>) => {
+  handleSubmit(output: v.InferOutput<typeof LoginSchema>): void {
     console.log(output);
-  };
+  }
 }

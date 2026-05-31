@@ -1,5 +1,5 @@
-import { Component, computed, input, output } from '@angular/core';
-import { type FieldElementProps, FormischFieldRef } from '@formisch/angular';
+import { Component, computed, input } from '@angular/core';
+import { type FieldStore, FormischControl } from '@formisch/angular';
 import clsx from 'clsx';
 import { AngleDownIconComponent } from '../icons/angle-down-icon.component.ts';
 import { InputErrorsComponent } from './input-errors.component.ts';
@@ -18,34 +18,32 @@ interface SelectOption {
 @Component({
   selector: 'app-select',
   standalone: true,
+  host: { class: 'block' },
   imports: [
     InputLabelComponent,
     InputErrorsComponent,
     AngleDownIconComponent,
-    FormischFieldRef,
+    FormischControl,
   ],
   template: `
     <div [class]="containerClasses()">
       <app-input-label
-        [name]="name()"
+        [name]="field().name()"
         [label]="label()"
         [required]="required()"
       />
       <div class="relative flex items-center">
         <select
-          [id]="name()"
-          [name]="name()"
+          [id]="field().name()"
           [multiple]="!!multiple()"
           [required]="!!required()"
           [class]="selectClasses()"
           [attr.size]="size()"
-          [attr.aria-invalid]="!!errors()"
-          [attr.aria-errormessage]="errors() ? name() + '-error' : null"
-          [formischFieldRef]="fieldRef()"
-          (focus)="fieldFocus.emit($event)"
-          (input)="fieldInput.emit($event)"
-          (change)="fieldChange.emit($event)"
-          (blur)="fieldBlur.emit($event)"
+          [attr.aria-invalid]="!!field().errors()"
+          [attr.aria-errormessage]="
+            field().errors() ? field().name() + '-error' : null
+          "
+          [formischControl]="field()"
         >
           <option value="" disabled hidden [selected]="!values().length">
             {{ placeholder() }}
@@ -65,32 +63,28 @@ interface SelectOption {
           />
         }
       </div>
-      <app-input-errors [name]="name()" [errors]="errors()" />
+      <app-input-errors [name]="field().name()" [errors]="field().errors()" />
     </div>
   `,
 })
 export class SelectComponent {
-  readonly name = input.required<string>();
+  readonly field = input.required<FieldStore<any, any>>();
   readonly label = input<string>();
   readonly options = input.required<SelectOption[]>();
   readonly multiple = input<boolean>(false);
   readonly size = input<number>();
   readonly placeholder = input<string>();
   readonly required = input<boolean>(false);
-  readonly input = input<string | string[] | null | undefined>();
-  readonly errors = input<[string, ...string[]] | null>(null);
   readonly class = input<string>('');
-  readonly fieldRef = input<FieldElementProps['ref']>();
 
-  readonly fieldFocus = output<FocusEvent>();
-  readonly fieldInput = output<Event>();
-  readonly fieldChange = output<Event>();
-  readonly fieldBlur = output<FocusEvent>();
-
-  protected readonly values = computed(() => {
-    const val = this.input();
-    if (Array.isArray(val)) return val;
-    if (val && typeof val === 'string') return [val];
+  protected readonly values = computed<string[]>(() => {
+    const value = this.field().input();
+    if (Array.isArray(value)) {
+      return value as string[];
+    }
+    if (value && typeof value === 'string') {
+      return [value];
+    }
     return [];
   });
 
@@ -104,7 +98,7 @@ export class SelectComponent {
   protected readonly selectClasses = computed(() =>
     clsx(
       'w-full appearance-none space-y-2 rounded-2xl border-2 bg-transparent px-5 outline-none md:text-lg lg:space-y-3 lg:px-6 lg:text-xl',
-      this.errors()
+      this.field().errors()
         ? 'border-red-600/50 dark:border-red-400/50'
         : 'border-slate-200 hover:border-slate-300 focus:border-sky-600/50 dark:border-slate-800 dark:hover:border-slate-700 dark:focus:border-sky-400/50',
       this.multiple() ? 'py-5' : 'h-14 md:h-16 lg:h-[70px]',

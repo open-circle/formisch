@@ -30,10 +30,10 @@ import { ActionButtonComponent } from './action-button.component.ts';
   `,
 })
 export class FormHeaderComponent {
-  readonly of = input.required<FormStore>();
+  readonly form = input.required<FormStore>();
   readonly heading = input.required<string>();
 
   protected handleReset(): void {
-    reset(this.of());
+    reset(this.form());
   }
 }

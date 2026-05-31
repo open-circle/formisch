@@ -58,134 +58,107 @@ const TodosSchema = v.object({
     ColorButtonComponent,
   ],
   template: `
-    <formisch-form
-      [of]="form"
-      [submitFn]="handleSubmit"
+    <form
+      [formischForm]="form"
+      (formischSubmit)="handleSubmit($event)"
       class="space-y-12 md:space-y-14 lg:space-y-16"
     >
-      <app-form-header [of]="form" heading="Todo form" />
+      <app-form-header [form]="form" heading="Todo form" />
 
       <div class="space-y-8 md:space-y-10 lg:space-y-12">
-        <formisch-field [of]="form" [path]="['heading']">
-          <ng-template let-field>
-            <app-text-input
-              [name]="field.props.name"
-              [value]="field.input()"
-              [errors]="field.errors()"
-              type="text"
-              label="Heading"
-              placeholder="Shopping list"
-              [required]="true"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['heading'] of form; let field">
+          <app-text-input
+            [field]="field"
+            type="text"
+            label="Heading"
+            placeholder="Shopping list"
+            [required]="true"
+          />
+        </ng-container>
 
-        <formisch-field-array [of]="form" [path]="['todos']">
-          <ng-template let-fieldArray>
-            <div class="space-y-5 px-8 lg:px-10">
-              <app-input-label label="Todos" margin="none" [required]="true" />
+        <ng-container *formischFieldArray="['todos'] of form; let fieldArray">
+          <div class="space-y-5 px-8 lg:px-10">
+            <app-input-label label="Todos" margin="none" [required]="true" />
 
-              <div>
-                <div auto-animate class="space-y-5">
-                  @for (
-                    item of fieldArray.items();
-                    track item;
-                    let index = $index
-                  ) {
-                    <div
-                      class="flex flex-wrap gap-5 rounded-2xl border-2 border-slate-200 bg-slate-100/25 p-5 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/10 dark:hover:border-slate-700"
+            <div>
+              <div auto-animate class="space-y-5">
+                @for (
+                  item of fieldArray.items();
+                  track item;
+                  let index = $index
+                ) {
+                  <div
+                    class="flex flex-wrap gap-5 rounded-2xl border-2 border-slate-200 bg-slate-100/25 p-5 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/10 dark:hover:border-slate-700"
+                  >
+                    <ng-container
+                      *formischField="
+                        ['todos', index, 'label'] of form;
+                        let field
+                      "
                     >
-                      <formisch-field
-                        [of]="form"
-                        [path]="['todos', index, 'label']"
-                        class="w-full md:w-auto md:flex-1"
-                      >
-                        <ng-template let-field>
-                          <app-text-input
-                            [name]="field.props.name"
-                            [value]="field.input()"
-                            [errors]="field.errors()"
-                            type="text"
-                            class="p-0!"
-                            placeholder="Enter task"
-                            [required]="true"
-                            [fieldRef]="field.props.ref"
-                            (fieldFocus)="field.props.onFocus($event)"
-                            (fieldInput)="field.props.onInput($event)"
-                            (fieldChange)="field.props.onChange($event)"
-                            (fieldBlur)="field.props.onBlur($event)"
-                          />
-                        </ng-template>
-                      </formisch-field>
-
-                      <formisch-field
-                        [of]="form"
-                        [path]="['todos', index, 'deadline']"
-                        class="flex-1"
-                      >
-                        <ng-template let-field>
-                          <app-text-input
-                            [name]="field.props.name"
-                            [value]="field.input()"
-                            [errors]="field.errors()"
-                            type="date"
-                            class="p-0!"
-                            [required]="true"
-                            [fieldRef]="field.props.ref"
-                            (fieldFocus)="field.props.onFocus($event)"
-                            (fieldInput)="field.props.onInput($event)"
-                            (fieldChange)="field.props.onChange($event)"
-                            (fieldBlur)="field.props.onBlur($event)"
-                          />
-                        </ng-template>
-                      </formisch-field>
-
-                      <app-color-button
-                        color="red"
-                        label="Delete"
-                        width="auto"
-                        (clicked)="handleRemove(index)"
+                      <app-text-input
+                        [field]="field"
+                        type="text"
+                        class="w-full p-0! md:w-auto md:flex-1"
+                        placeholder="Enter task"
+                        [required]="true"
                       />
-                    </div>
-                  }
-                </div>
-                <app-input-errors name="todos" [errors]="fieldArray.errors()" />
-              </div>
+                    </ng-container>
 
-              <div class="flex flex-wrap gap-5">
-                <app-color-button
-                  color="green"
-                  label="Add new"
-                  (clicked)="handleInsert()"
-                />
-                <app-color-button
-                  color="yellow"
-                  label="Move first to end"
-                  (clicked)="handleMoveFirstToEnd(fieldArray.items().length)"
-                />
-                <app-color-button
-                  color="purple"
-                  label="Swap first two"
-                  (clicked)="handleSwapFirstTwo()"
-                />
-                <app-color-button
-                  color="blue"
-                  label="Replace first"
-                  (clicked)="handleReplaceFirst()"
-                />
+                    <ng-container
+                      *formischField="
+                        ['todos', index, 'deadline'] of form;
+                        let field
+                      "
+                    >
+                      <app-text-input
+                        [field]="field"
+                        type="date"
+                        class="flex-1 p-0!"
+                        [required]="true"
+                      />
+                    </ng-container>
+
+                    <app-color-button
+                      color="red"
+                      label="Delete"
+                      width="auto"
+                      (clicked)="handleRemove(index)"
+                    />
+                  </div>
+                }
               </div>
+              <app-input-errors name="todos" [errors]="fieldArray.errors()" />
             </div>
-          </ng-template>
-        </formisch-field-array>
+
+            <div class="flex flex-wrap gap-5">
+              <app-color-button
+                color="green"
+                label="Add new"
+                (clicked)="handleInsert()"
+              />
+              <app-color-button
+                color="yellow"
+                label="Move first to end"
+                (clicked)="handleMoveFirstToEnd(fieldArray.items().length)"
+              />
+              <app-color-button
+                color="purple"
+                label="Swap first two"
+                (clicked)="handleSwapFirstTwo()"
+              />
+              <app-color-button
+                color="blue"
+                label="Replace first"
+                (clicked)="handleReplaceFirst()"
+              />
+            </div>
+          </div>
+        </ng-container>
       </div>
 
-      <app-form-footer [of]="form" />
-    </formisch-form>
+      <app-form-footer [form]="form" />
+    </form>
   `,
 })
 export class TodosComponent {
@@ -197,9 +170,9 @@ export class TodosComponent {
     },
   });
 
-  readonly handleSubmit = (output: v.InferOutput<typeof TodosSchema>) => {
+  handleSubmit(output: v.InferOutput<typeof TodosSchema>): void {
     console.log(output);
-  };
+  }
 
   handleInsert(): void {
     insert(this.form, {

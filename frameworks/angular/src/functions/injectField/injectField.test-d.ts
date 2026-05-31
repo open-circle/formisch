@@ -26,11 +26,11 @@ describe('injectField', () => {
     >();
   });
 
-  test('should narrow onInput value type for primitive leaves', () => {
+  test('should narrow setInput value type for primitive leaves', () => {
     const schema = v.object({ name: v.string() });
     const form = injectForm({ schema });
 
-    expectTypeOf(injectField(form, { path: ['name'] }).onInput).toEqualTypeOf<
+    expectTypeOf(injectField(form, { path: ['name'] }).setInput).toEqualTypeOf<
       (value: string | undefined) => void
     >();
   });
@@ -63,13 +63,12 @@ describe('injectField', () => {
     expectTypeOf(field.isValid).toEqualTypeOf<Signal<boolean>>();
   });
 
-  test('should expose props with name and autofocus', () => {
+  test('should expose the name as a string signal', () => {
     const schema = v.object({ email: v.pipe(v.string(), v.email()) });
     const form = injectForm({ schema });
     const field = injectField(form, { path: ['email'] });
 
-    expectTypeOf(field.props.name).toEqualTypeOf<string>();
-    expectTypeOf(field.props.autofocus).toEqualTypeOf<boolean>();
+    expectTypeOf(field.name).toEqualTypeOf<Signal<string>>();
   });
 
   test('should reject invalid paths', () => {

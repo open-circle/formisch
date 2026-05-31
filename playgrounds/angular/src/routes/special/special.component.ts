@@ -44,46 +44,21 @@ const SpecialFormSchema = v.object({
     FileInputComponent,
   ],
   template: `
-    <formisch-form
-      [of]="form"
-      [submitFn]="handleSubmit"
+    <form
+      [formischForm]="form"
+      (formischSubmit)="handleSubmit($event)"
       class="space-y-12 md:space-y-14 lg:space-y-16"
     >
-      <app-form-header [of]="form" heading="Special form" />
+      <app-form-header [form]="form" heading="Special form" />
 
       <div class="space-y-8 md:space-y-10 lg:space-y-12">
-        <formisch-field [of]="form" [path]="['number']">
-          <ng-template let-field>
-            <app-text-input
-              [name]="field.props.name"
-              [value]="field.input()"
-              [errors]="field.errors()"
-              type="number"
-              label="Number"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['number'] of form; let field">
+          <app-text-input [field]="field" type="number" label="Number" />
+        </ng-container>
 
-        <formisch-field [of]="form" [path]="['range']">
-          <ng-template let-field>
-            <app-slider
-              [name]="field.props.name"
-              [input]="field.input()"
-              [errors]="field.errors()"
-              label="Range"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['range'] of form; let field">
+          <app-slider [field]="field" label="Range" />
+        </ng-container>
 
         <label
           class="block px-8 font-medium md:text-lg lg:mb-5 lg:px-10 lg:text-xl"
@@ -91,134 +66,63 @@ const SpecialFormSchema = v.object({
           Checkbox array
         </label>
 
-        <div
-          class="mx-8 flex flex-wrap gap-6 rounded-2xl border-2 border-slate-200 p-6 lg:gap-10 lg:p-10 dark:border-slate-800"
+        <ng-container *formischField="['checkbox', 'array'] of form; let field">
+          <div
+            class="mx-8 flex flex-wrap gap-6 rounded-2xl border-2 border-slate-200 p-6 lg:gap-10 lg:p-10 dark:border-slate-800"
+          >
+            @for (option of checkboxOptions; track option.value) {
+              <app-checkbox
+                [field]="field"
+                [label]="option.label"
+                [value]="option.value"
+                class="p-0!"
+              />
+            }
+          </div>
+        </ng-container>
+
+        <ng-container
+          *formischField="['checkbox', 'boolean'] of form; let field"
         >
-          @for (option of checkboxOptions; track option.value) {
-            <formisch-field [of]="form" [path]="['checkbox', 'array']">
-              <ng-template let-field>
-                <app-checkbox
-                  [name]="field.props.name"
-                  [label]="option.label"
-                  [value]="option.value"
-                  [input]="field.input().includes(option.value)"
-                  [errors]="field.errors()"
-                  class="p-0!"
-                  [fieldRef]="field.props.ref"
-                  (fieldFocus)="field.props.onFocus($event)"
-                  (fieldInput)="field.props.onInput($event)"
-                  (fieldChange)="field.props.onChange($event)"
-                  (fieldBlur)="field.props.onBlur($event)"
-                />
-              </ng-template>
-            </formisch-field>
-          }
-        </div>
+          <app-checkbox [field]="field" label="Checkbox boolean" />
+        </ng-container>
 
-        <formisch-field [of]="form" [path]="['checkbox', 'boolean']">
-          <ng-template let-field>
-            <app-checkbox
-              [name]="field.props.name"
-              [input]="field.input()"
-              [errors]="field.errors()"
-              label="Checkbox boolean"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['radio'] of form; let field">
+          <app-radio-group
+            [field]="field"
+            label="Radio group"
+            [options]="radioOptions"
+          />
+        </ng-container>
 
-        <formisch-field [of]="form" [path]="['radio']">
-          <ng-template let-field>
-            <app-radio-group
-              [name]="field.props.name"
-              label="Radio group"
-              [options]="radioOptions"
-              [input]="field.input()"
-              [errors]="field.errors()"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['select', 'array'] of form; let field">
+          <app-select
+            [field]="field"
+            [options]="selectOptions"
+            label="Select array"
+            [multiple]="true"
+          />
+        </ng-container>
 
-        <formisch-field [of]="form" [path]="['select', 'array']">
-          <ng-template let-field>
-            <app-select
-              [name]="field.props.name"
-              [input]="field.input()"
-              [options]="selectOptions"
-              [errors]="field.errors()"
-              label="Select array"
-              [multiple]="true"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['select', 'string'] of form; let field">
+          <app-select
+            [field]="field"
+            [options]="selectOptions"
+            label="Select string"
+          />
+        </ng-container>
 
-        <formisch-field [of]="form" [path]="['select', 'string']">
-          <ng-template let-field>
-            <app-select
-              [name]="field.props.name"
-              [input]="field.input()"
-              [options]="selectOptions"
-              [errors]="field.errors()"
-              label="Select string"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['file', 'list'] of form; let field">
+          <app-file-input [field]="field" label="File list" [multiple]="true" />
+        </ng-container>
 
-        <formisch-field [of]="form" [path]="['file', 'list']">
-          <ng-template let-field>
-            <app-file-input
-              [name]="field.props.name"
-              [input]="field.input()"
-              [errors]="field.errors()"
-              label="File list"
-              [multiple]="true"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
-
-        <formisch-field [of]="form" [path]="['file', 'item']">
-          <ng-template let-field>
-            <app-file-input
-              [name]="field.props.name"
-              [input]="field.input()"
-              [errors]="field.errors()"
-              label="File item"
-              [fieldRef]="field.props.ref"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldInput)="field.props.onInput($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
-            />
-          </ng-template>
-        </formisch-field>
+        <ng-container *formischField="['file', 'item'] of form; let field">
+          <app-file-input [field]="field" label="File item" />
+        </ng-container>
       </div>
 
-      <app-form-footer [of]="form" />
-    </formisch-form>
+      <app-form-footer [form]="form" />
+    </form>
   `,
 })
 export class SpecialComponent {
@@ -242,7 +146,7 @@ export class SpecialComponent {
     { label: 'Option 3', value: 'option_3' },
   ];
 
-  readonly handleSubmit = (output: v.InferOutput<typeof SpecialFormSchema>) => {
+  handleSubmit(output: v.InferOutput<typeof SpecialFormSchema>): void {
     console.log(output);
-  };
+  }
 }

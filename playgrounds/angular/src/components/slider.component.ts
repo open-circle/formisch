@@ -1,5 +1,5 @@
-import { Component, input, output } from '@angular/core';
-import { type FieldElementProps, FormischFieldRef } from '@formisch/angular';
+import { Component, computed, input } from '@angular/core';
+import { type FieldStore, FormischControl } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
 import { InputLabelComponent } from './input-label.component.ts';
@@ -12,51 +12,46 @@ import { InputLabelComponent } from './input-label.component.ts';
 @Component({
   selector: 'app-slider',
   standalone: true,
-  imports: [InputLabelComponent, InputErrorsComponent, FormischFieldRef],
+  host: { class: 'block' },
+  imports: [InputLabelComponent, InputErrorsComponent, FormischControl],
   template: `
     <div [class]="containerClasses()">
       <app-input-label
-        [name]="name()"
+        [name]="field().name()"
         [label]="label()"
         [required]="required()"
       />
       <input
         class="w-full"
         type="range"
-        [id]="name()"
-        [name]="name()"
-        [value]="input()"
+        [id]="field().name()"
+        [value]="value()"
         [attr.min]="min()"
         [attr.max]="max()"
         [attr.step]="step()"
-        [attr.aria-invalid]="!!errors()"
-        [attr.aria-errormessage]="errors() ? name() + '-error' : null"
-        [formischFieldRef]="fieldRef()"
-        (focus)="fieldFocus.emit($event)"
-        (input)="fieldInput.emit($event)"
-        (change)="fieldChange.emit($event)"
-        (blur)="fieldBlur.emit($event)"
+        [attr.aria-invalid]="!!field().errors()"
+        [attr.aria-errormessage]="
+          field().errors() ? field().name() + '-error' : null
+        "
+        [formischControl]="field()"
       />
-      <app-input-errors [name]="name()" [errors]="errors()" />
+      <app-input-errors [name]="field().name()" [errors]="field().errors()" />
     </div>
   `,
 })
 export class SliderComponent {
-  readonly name = input.required<string>();
+  readonly field = input.required<FieldStore<any, any>>();
   readonly label = input<string>();
   readonly min = input<number>();
   readonly max = input<number>();
   readonly step = input<number>();
   readonly required = input<boolean>(false);
-  readonly input = input<string | number | undefined>();
-  readonly errors = input<[string, ...string[]] | null>(null);
   readonly class = input<string>('');
-  readonly fieldRef = input<FieldElementProps['ref']>();
 
-  readonly fieldFocus = output<FocusEvent>();
-  readonly fieldInput = output<Event>();
-  readonly fieldChange = output<Event>();
-  readonly fieldBlur = output<FocusEvent>();
+  protected readonly value = computed<string | number>(() => {
+    const input = this.field().input();
+    return input == null ? '' : (input as string | number);
+  });
 
   protected readonly containerClasses = () =>
     clsx('px-8 lg:px-10', this.class());

@@ -1,5 +1,5 @@
-import { Component, computed, input, output } from '@angular/core';
-import { type FieldElementProps, FormischFieldRef } from '@formisch/angular';
+import { Component, computed, input } from '@angular/core';
+import { type FieldStore, FormischControl } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
 import { InputLabelComponent } from './input-label.component.ts';
@@ -12,11 +12,12 @@ import { InputLabelComponent } from './input-label.component.ts';
 @Component({
   selector: 'app-file-input',
   standalone: true,
-  imports: [InputLabelComponent, InputErrorsComponent, FormischFieldRef],
+  host: { class: 'block' },
+  imports: [InputLabelComponent, InputErrorsComponent, FormischControl],
   template: `
     <div [class]="containerClasses()">
       <app-input-label
-        [name]="name()"
+        [name]="field().name()"
         [label]="label()"
         [required]="required()"
       />
@@ -25,49 +26,40 @@ import { InputLabelComponent } from './input-label.component.ts';
         <input
           class="absolute h-full w-full cursor-pointer opacity-0"
           type="file"
-          [id]="name()"
-          [name]="name()"
+          [id]="field().name()"
           [attr.accept]="accept()"
           [multiple]="!!multiple()"
-          [attr.aria-invalid]="!!errors()"
-          [attr.aria-errormessage]="errors() ? name() + '-error' : null"
-          [formischFieldRef]="fieldRef()"
-          (focus)="fieldFocus.emit($event)"
-          (input)="fieldInput.emit($event)"
-          (change)="fieldChange.emit($event)"
-          (blur)="fieldBlur.emit($event)"
+          [attr.aria-invalid]="!!field().errors()"
+          [attr.aria-errormessage]="
+            field().errors() ? field().name() + '-error' : null
+          "
+          [formischControl]="field()"
         />
       </label>
-      <app-input-errors [name]="name()" [errors]="errors()" />
+      <app-input-errors [name]="field().name()" [errors]="field().errors()" />
     </div>
   `,
 })
 export class FileInputComponent {
-  readonly name = input.required<string>();
+  readonly field = input.required<FieldStore<any, any>>();
   readonly label = input<string>();
   readonly accept = input<string>();
   readonly multiple = input<boolean>(false);
   readonly required = input<boolean>(false);
-  readonly input = input<File | File[] | null | undefined>();
-  readonly errors = input<[string, ...string[]] | null>(null);
   readonly class = input<string>('');
-  readonly fieldRef = input<FieldElementProps['ref']>();
 
-  readonly fieldFocus = output<FocusEvent>();
-  readonly fieldInput = output<Event>();
-  readonly fieldChange = output<Event>();
-  readonly fieldBlur = output<FocusEvent>();
-
-  protected readonly files = computed(() => {
-    const val = this.input();
-    if (!val) return [];
-    return Array.isArray(val) ? val : [val];
+  protected readonly files = computed<File[]>(() => {
+    const value = this.field().input();
+    if (!value) {
+      return [];
+    }
+    return (Array.isArray(value) ? value : [value]) as File[];
   });
 
   protected readonly displayText = computed(() => {
     const files = this.files();
     if (files.length) {
-      return `Selected file${this.multiple() ? 's' : ''}: ${files.map((f) => f.name).join(', ')}`;
+      return `Selected file${this.multiple() ? 's' : ''}: ${files.map((file) => file.name).join(', ')}`;
     }
     return `Click or drag and drop file${this.multiple() ? 's' : ''}`;
   });

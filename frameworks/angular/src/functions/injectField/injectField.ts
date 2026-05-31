@@ -19,6 +19,7 @@ import {
   type ValidPath,
 } from '@formisch/core/angular';
 import type * as v from 'valibot';
+import { CONTROL } from '../../types/control.ts';
 import type {
   FieldStore,
   FormStore,
@@ -48,7 +49,8 @@ export interface InjectFieldConfig<
  * @param form The form store instance.
  * @param config The field configuration.
  *
- * @returns The field store with reactive Signal properties and element props.
+ * @returns The field store with reactive Signal properties, a `setInput`
+ *   method, and an element-binding contract for `[formischControl]`.
  */
 export function injectField<
   TSchema extends FormSchema,
@@ -82,22 +84,17 @@ export function injectField(
     get path() {
       return path();
     },
+    name: computed(() => internalFieldStore().name),
     input: computed(() => getFieldInput(internalFieldStore())),
     errors: computed(() => internalFieldStore().errors.value),
     isTouched: computed(() => getFieldBool(internalFieldStore(), 'isTouched')),
     isDirty: computed(() => getFieldBool(internalFieldStore(), 'isDirty')),
     isValid: computed(() => !getFieldBool(internalFieldStore(), 'errors')),
-    onInput(value) {
+    setInput(value) {
       setFieldInput(internalFormStore(), path(), value);
       validateIfRequired(internalFormStore(), internalFieldStore(), 'input');
     },
-    props: {
-      get name() {
-        return internalFieldStore().name;
-      },
-      get autofocus() {
-        return !!internalFieldStore().errors.value;
-      },
+    [CONTROL]: {
       ref(element) {
         if (element) {
           const fieldStore = internalFieldStore();
@@ -108,10 +105,6 @@ export function injectField(
             );
           };
         }
-      },
-      onFocus() {
-        setFieldBool(internalFieldStore(), 'isTouched', true);
-        validateIfRequired(internalFormStore(), internalFieldStore(), 'touch');
       },
       onInput(event) {
         setFieldInput(
@@ -126,6 +119,10 @@ export function injectField(
       },
       onChange() {
         validateIfRequired(internalFormStore(), internalFieldStore(), 'change');
+      },
+      onFocus() {
+        setFieldBool(internalFieldStore(), 'isTouched', true);
+        validateIfRequired(internalFormStore(), internalFieldStore(), 'touch');
       },
       onBlur() {
         validateIfRequired(internalFormStore(), internalFieldStore(), 'blur');
