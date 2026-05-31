@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { reset, type FormStore } from '@formisch/angular';
+import { type FormStore, reset } from '@formisch/angular';
 import { ActionButtonComponent } from './action-button.component.ts';
 
 /**
@@ -9,6 +9,7 @@ import { ActionButtonComponent } from './action-button.component.ts';
   selector: 'app-form-footer',
   standalone: true,
   imports: [ActionButtonComponent],
+  host: { class: 'block' },
   template: `
     <footer class="flex space-x-6 px-8 md:space-x-8 lg:hidden">
       <app-action-button variant="primary" label="Submit" type="submit" />

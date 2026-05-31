@@ -1,8 +1,8 @@
 import { Component, computed, input, output } from '@angular/core';
 import clsx from 'clsx';
-import { InputLabelComponent } from './input-label.component.ts';
-import { InputErrorsComponent } from './input-errors.component.ts';
 import { AngleDownIconComponent } from '../icons/angle-down-icon.component.ts';
+import { InputErrorsComponent } from './input-errors.component.ts';
+import { InputLabelComponent } from './input-label.component.ts';
 
 interface SelectOption {
   label: string;
@@ -20,33 +20,41 @@ interface SelectOption {
   imports: [InputLabelComponent, InputErrorsComponent, AngleDownIconComponent],
   template: `
     <div [class]="containerClasses()">
-      <app-input-label [name]="name()" [label]="label()" [required]="required()" />
+      <app-input-label
+        [name]="name()"
+        [label]="label()"
+        [required]="required()"
+      />
       <div class="relative flex items-center">
         <select
           [id]="name()"
           [name]="name()"
-          [value]="multiple() ? values() : (input() ?? '')"
           [multiple]="!!multiple()"
           [required]="!!required()"
           [class]="selectClasses()"
           [attr.size]="size()"
           [attr.aria-invalid]="!!errors()"
-          [attr.aria-errormessage]="name() + '-error'"
+          [attr.aria-errormessage]="errors() ? name() + '-error' : null"
           (focus)="fieldFocus.emit($event)"
           (change)="fieldChange.emit($event)"
           (blur)="fieldBlur.emit($event)"
         >
-          @if (placeholder()) {
-            <option value="" disabled hidden>{{ placeholder() }}</option>
-          }
+          <option value="" disabled hidden [selected]="!values().length">
+            {{ placeholder() }}
+          </option>
           @for (option of options(); track option.value) {
-            <option [value]="option.value">
+            <option
+              [value]="option.value"
+              [selected]="isSelected(option.value)"
+            >
               {{ option.label }}
             </option>
           }
         </select>
         @if (!multiple()) {
-          <app-angle-down-icon class="pointer-events-none absolute right-6 h-5 lg:right-8 lg:h-6" />
+          <app-angle-down-icon
+            class="pointer-events-none absolute right-6 h-5 lg:right-8 lg:h-6"
+          />
         }
       </div>
       <app-input-errors [name]="name()" [errors]="errors()" />
@@ -78,6 +86,10 @@ export class SelectComponent {
 
   protected readonly containerClasses = () =>
     clsx('px-8 lg:px-10', this.class());
+
+  protected isSelected(value: string): boolean {
+    return this.values().includes(value);
+  }
 
   protected readonly selectClasses = computed(() =>
     clsx(

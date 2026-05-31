@@ -1,10 +1,10 @@
 import type { Signal } from '@angular/core';
-import type { BaseFormStore, Schema } from '@formisch/core/angular';
+import type { BaseFormStore, FormSchema } from '@formisch/core/angular';
 
 /**
  * Form store interface.
  */
-export interface FormStore<TSchema extends Schema = Schema>
+export interface FormStore<TSchema extends FormSchema = FormSchema>
   extends BaseFormStore<TSchema> {
   /**
    * Whether the form is currently submitting.

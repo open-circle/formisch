@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import clsx from 'clsx';
-import { InputLabelComponent } from './input-label.component.ts';
 import { InputErrorsComponent } from './input-errors.component.ts';
+import { InputLabelComponent } from './input-label.component.ts';
 import { RadioComponent } from './radio.component.ts';
 
 interface RadioOption {
@@ -23,8 +23,14 @@ interface RadioOption {
       [attr.aria-invalid]="!!errors()"
       [attr.aria-errormessage]="name() + '-error'"
     >
-      <app-input-label component="legend" [label]="label()" [required]="required()" />
-      <div class="flex flex-wrap gap-6 rounded-2xl border-2 border-slate-200 p-6 lg:gap-10 lg:p-10 dark:border-slate-800">
+      <app-input-label
+        component="legend"
+        [label]="label()"
+        [required]="required()"
+      />
+      <div
+        class="flex flex-wrap gap-6 rounded-2xl border-2 border-slate-200 p-6 lg:gap-10 lg:p-10 dark:border-slate-800"
+      >
         @for (option of options(); track option.value) {
           <app-radio
             [name]="name()"

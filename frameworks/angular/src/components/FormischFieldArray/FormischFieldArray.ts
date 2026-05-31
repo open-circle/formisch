@@ -1,23 +1,19 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   Component,
-  computed,
   contentChild,
   input,
   type InputSignal,
   type Signal,
   TemplateRef,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
 import {
-  getFieldBool,
-  getFieldStore,
-  INTERNAL,
-  type InternalArrayStore,
+  type FormSchema,
   type RequiredPath,
-  type Schema,
   type ValidArrayPath,
 } from '@formisch/core/angular';
 import type * as v from 'valibot';
+import { injectFieldArray } from '../../functions/index.ts';
 import type { FieldArrayStore, FormStore } from '../../types/index.ts';
 
 /**
@@ -39,6 +35,9 @@ import type { FieldArrayStore, FormStore } from '../../types/index.ts';
   selector: 'formisch-field-array',
   standalone: true,
   imports: [NgTemplateOutlet],
+  // Render as a block-level box so the projected content participates in the
+  // surrounding layout (flex and `space-y` spacing) like a plain element would.
+  styles: ':host { display: block; }',
   template: `
     @if (template()) {
       <ng-container
@@ -49,39 +48,19 @@ import type { FieldArrayStore, FormStore } from '../../types/index.ts';
   `,
 })
 export class FormischFieldArray<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldArrayPath extends RequiredPath = RequiredPath,
 > {
-  readonly of: InputSignal<FormStore<TSchema>> = input.required<FormStore<TSchema>>();
-  readonly path: InputSignal<ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>> = input.required<ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>>();
+  readonly of: InputSignal<FormStore<TSchema>> =
+    input.required<FormStore<TSchema>>();
+  readonly path: InputSignal<
+    ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>
+  > = input.required<ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>>();
 
-  protected readonly template: Signal<TemplateRef<unknown> | undefined> = contentChild(TemplateRef);
-
-  private readonly internalFieldStore = computed(
-    () =>
-      getFieldStore(this.of()[INTERNAL], this.path()) as InternalArrayStore
-  );
-
+  protected readonly template: Signal<TemplateRef<unknown> | undefined> =
+    contentChild(TemplateRef);
   protected readonly fieldArray: FieldArrayStore<TSchema, TFieldArrayPath> =
-    (() => {
-      const internalFieldStore = this.internalFieldStore;
-      const pathSignal = this.path;
-
-      return {
-        get path() {
-          return pathSignal();
-        },
-        items: computed(() => internalFieldStore().items.value),
-        errors: computed(() => internalFieldStore().errors.value),
-        isTouched: computed(() =>
-          getFieldBool(internalFieldStore(), 'isTouched')
-        ),
-        isDirty: computed(() =>
-          getFieldBool(internalFieldStore(), 'isDirty')
-        ),
-        isValid: computed(
-          () => !getFieldBool(internalFieldStore(), 'errors')
-        ),
-      };
-    })() as FieldArrayStore<TSchema, TFieldArrayPath>;
+    injectFieldArray<TSchema, TFieldArrayPath>(this.of, {
+      path: this.path,
+    });
 }

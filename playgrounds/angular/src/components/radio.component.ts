@@ -7,7 +7,9 @@ import { Component, input, output } from '@angular/core';
   selector: 'app-radio',
   standalone: true,
   template: `
-    <label class="flex cursor-pointer items-center space-x-3 font-medium select-none md:text-lg lg:text-xl">
+    <label
+      class="flex cursor-pointer items-center space-x-3 font-medium select-none md:text-lg lg:text-xl"
+    >
       <input
         class="h-4 w-4 cursor-pointer lg:h-5 lg:w-5"
         type="radio"

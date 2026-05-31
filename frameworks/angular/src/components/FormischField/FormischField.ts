@@ -1,30 +1,19 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   Component,
-  computed,
   contentChild,
-  DestroyRef,
-  inject,
   input,
   type InputSignal,
   type Signal,
-  TemplateRef
+  TemplateRef,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
 import {
-  type FieldElement,
-  getElementInput,
-  getFieldBool,
-  getFieldInput,
-  getFieldStore,
-  INTERNAL,
+  type FormSchema,
   type RequiredPath,
-  type Schema,
-  setFieldBool,
-  setFieldInput,
-  validateIfRequired,
   type ValidPath,
 } from '@formisch/core/angular';
 import type * as v from 'valibot';
+import { injectField } from '../../functions/index.ts';
 import type { FieldStore, FormStore } from '../../types/index.ts';
 
 /**
@@ -47,6 +36,9 @@ import type { FieldStore, FormStore } from '../../types/index.ts';
   selector: 'formisch-field',
   standalone: true,
   imports: [NgTemplateOutlet],
+  // Render as a block-level box so the projected field participates in the
+  // surrounding layout (flex and `space-y` spacing) like a plain element would.
+  styles: ':host { display: block; }',
   template: `
     @if (template()) {
       <ng-container
@@ -54,104 +46,21 @@ import type { FieldStore, FormStore } from '../../types/index.ts';
         [ngTemplateOutletContext]="{ $implicit: field }"
       />
     }
-`,
+  `,
 })
 export class FormischField<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldPath extends RequiredPath = RequiredPath,
 > {
-  readonly of: InputSignal<FormStore<TSchema>> = input.required<FormStore<TSchema>>();
-  readonly path: InputSignal<ValidPath<v.InferInput<TSchema>, TFieldPath>> = input.required<ValidPath<v.InferInput<TSchema>, TFieldPath>>();
+  readonly of: InputSignal<FormStore<TSchema>> =
+    input.required<FormStore<TSchema>>();
+  readonly path: InputSignal<ValidPath<v.InferInput<TSchema>, TFieldPath>> =
+    input.required<ValidPath<v.InferInput<TSchema>, TFieldPath>>();
 
-  protected readonly template: Signal<TemplateRef<unknown> | undefined> = contentChild(TemplateRef);
-
-  private readonly internalFormStore = computed(() => this.of()[INTERNAL]);
-  private readonly internalFieldStore = computed(() =>
-    getFieldStore(this.internalFormStore(), this.path())
-  );
-  private readonly destroyRef = inject(DestroyRef);
-
-  protected readonly field: FieldStore<TSchema, TFieldPath> = (() => {
-    const internalFormStore = this.internalFormStore;
-    const internalFieldStore = this.internalFieldStore;
-    const pathSignal = this.path;
-    const destroyRef = this.destroyRef;
-
-    destroyRef.onDestroy(() => {
-      internalFieldStore().elements = internalFieldStore().elements.filter(
-        (element) => element.isConnected
-      );
-    });
-
-    return {
-      get path() {
-        return pathSignal();
-      },
-      input: computed(() => getFieldInput(internalFieldStore())),
-      errors: computed(() => internalFieldStore().errors.value),
-      isTouched: computed(() =>
-        getFieldBool(internalFieldStore(), 'isTouched')
-      ),
-      isDirty: computed(() => getFieldBool(internalFieldStore(), 'isDirty')),
-      isValid: computed(
-        () => !getFieldBool(internalFieldStore(), 'errors')
-      ),
-      onInput(value) {
-        setFieldInput(internalFormStore(), pathSignal(), value);
-        validateIfRequired(
-          internalFormStore(),
-          internalFieldStore(),
-          'input'
-        );
-      },
-      props: {
-        get name() {
-          return internalFieldStore().name;
-        },
-        get autofocus() {
-          return !!internalFieldStore().errors.value;
-        },
-        ref(element) {
-          if (element) {
-            internalFieldStore().elements.push(element);
-          }
-        },
-        onFocus() {
-          setFieldBool(internalFieldStore(), 'isTouched', true);
-          validateIfRequired(
-            internalFormStore(),
-            internalFieldStore(),
-            'touch'
-          );
-        },
-        onChange(event) {
-          setFieldInput(
-            internalFormStore(),
-            pathSignal(),
-            getElementInput(
-              event.currentTarget as FieldElement,
-              internalFieldStore()
-            )
-          );
-          validateIfRequired(
-            internalFormStore(),
-            internalFieldStore(),
-            'input'
-          );
-          validateIfRequired(
-            internalFormStore(),
-            internalFieldStore(),
-            'change'
-          );
-        },
-        onBlur() {
-          validateIfRequired(
-            internalFormStore(),
-            internalFieldStore(),
-            'blur'
-          );
-        },
-      },
-    };
-  })() as FieldStore<TSchema, TFieldPath>;
+  protected readonly template: Signal<TemplateRef<unknown> | undefined> =
+    contentChild(TemplateRef);
+  protected readonly field: FieldStore<TSchema, TFieldPath> = injectField<
+    TSchema,
+    TFieldPath
+  >(this.of, { path: this.path });
 }

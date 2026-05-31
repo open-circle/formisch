@@ -13,10 +13,14 @@ describe('injectFieldArray', () => {
     const form = injectForm({ schema });
     const fieldArray = injectFieldArray(form, { path: ['todos'] });
 
-    expectTypeOf(fieldArray).toExtend<FieldArrayStore<typeof schema, ['todos']>>();
+    expectTypeOf(fieldArray).toExtend<
+      FieldArrayStore<typeof schema, ['todos']>
+    >();
     expectTypeOf(fieldArray.path).toEqualTypeOf<['todos']>();
     expectTypeOf(fieldArray.items).toEqualTypeOf<Signal<string[]>>();
-    expectTypeOf(fieldArray.errors).toEqualTypeOf<Signal<[string, ...string[]] | null>>();
+    expectTypeOf(fieldArray.errors).toEqualTypeOf<
+      Signal<[string, ...string[]] | null>
+    >();
     expectTypeOf(fieldArray.isTouched).toEqualTypeOf<Signal<boolean>>();
     expectTypeOf(fieldArray.isDirty).toEqualTypeOf<Signal<boolean>>();
     expectTypeOf(fieldArray.isValid).toEqualTypeOf<Signal<boolean>>();

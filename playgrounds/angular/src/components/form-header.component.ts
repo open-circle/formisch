@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { reset, type FormStore } from '@formisch/angular';
+import { type FormStore, reset } from '@formisch/angular';
 import { ActionButtonComponent } from './action-button.component.ts';
 
 /**
@@ -9,9 +9,12 @@ import { ActionButtonComponent } from './action-button.component.ts';
   selector: 'app-form-header',
   standalone: true,
   imports: [ActionButtonComponent],
+  host: { class: 'block' },
   template: `
     <header class="flex items-center justify-between px-8 lg:px-10">
-      <h1 class="text-2xl text-slate-900 md:text-3xl lg:text-4xl dark:text-slate-200">
+      <h1
+        class="text-2xl text-slate-900 md:text-3xl lg:text-4xl dark:text-slate-200"
+      >
         {{ heading() }}
       </h1>
       <div class="hidden lg:flex lg:space-x-8">

@@ -1,21 +1,21 @@
 import { Component } from '@angular/core';
-import * as v from 'valibot';
 import {
-  FormischForm,
   FormischField,
   FormischFieldArray,
+  FormischForm,
+  injectForm,
   insert,
   move,
   remove,
   replace,
   swap,
-  injectForm,
 } from '@formisch/angular';
+import * as v from 'valibot';
 import { AutoAnimateDirective } from '../../components/auto-animate.directive.ts';
-import { FormHeaderComponent } from '../../components/form-header.component.ts';
-import { FormFooterComponent } from '../../components/form-footer.component.ts';
-import { TextInputComponent } from '../../components/text-input.component.ts';
 import { ColorButtonComponent } from '../../components/color-button.component.ts';
+import { FormFooterComponent } from '../../components/form-footer.component.ts';
+import { FormHeaderComponent } from '../../components/form-header.component.ts';
+import { TextInputComponent } from '../../components/text-input.component.ts';
 
 const NestedFormSchema = v.object({
   items: v.array(
@@ -51,17 +51,27 @@ const NestedFormSchema = v.object({
         <ng-template let-fieldArray>
           <div class="space-y-7 px-8 lg:px-10">
             <div auto-animate class="space-y-5">
-              @for (item of fieldArray.items(); track item; let itemIndex = $index) {
-                <div class="flex-1 space-y-5 rounded-2xl border-2 border-slate-200 bg-slate-100/25 py-6 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/10 dark:hover:border-slate-700">
+              @for (
+                item of fieldArray.items();
+                track item;
+                let itemIndex = $index
+              ) {
+                <div
+                  class="flex-1 space-y-5 rounded-2xl border-2 border-slate-200 bg-slate-100/25 py-6 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/10 dark:hover:border-slate-700"
+                >
                   <div class="flex space-x-5 px-6">
-                    <formisch-field [of]="form" [path]="['items', itemIndex, 'label']">
+                    <formisch-field
+                      [of]="form"
+                      [path]="['items', itemIndex, 'label']"
+                      class="flex-1"
+                    >
                       <ng-template let-field>
                         <app-text-input
                           [name]="field.props.name"
                           [value]="field.input()"
                           [errors]="field.errors()"
                           type="text"
-                          class="flex-1 p-0!"
+                          class="p-0!"
                           placeholder="Enter item"
                           (fieldFocus)="field.props.onFocus($event)"
                           (fieldChange)="field.props.onChange($event)"
@@ -83,18 +93,34 @@ const NestedFormSchema = v.object({
                     role="separator"
                   ></div>
 
-                  <formisch-field-array [of]="form" [path]="['items', itemIndex, 'options']">
+                  <formisch-field-array
+                    [of]="form"
+                    [path]="['items', itemIndex, 'options']"
+                  >
                     <ng-template let-optionsArray>
                       <div auto-animate class="space-y-5 px-6">
-                        @for (opt of optionsArray.items(); track opt; let optionIndex = $index) {
+                        @for (
+                          opt of optionsArray.items();
+                          track opt;
+                          let optionIndex = $index
+                        ) {
                           <div class="flex space-x-5">
-                            <formisch-field [of]="form" [path]="['items', itemIndex, 'options', optionIndex]">
+                            <formisch-field
+                              [of]="form"
+                              [path]="[
+                                'items',
+                                itemIndex,
+                                'options',
+                                optionIndex,
+                              ]"
+                              class="flex-1"
+                            >
                               <ng-template let-field>
                                 <app-text-input
                                   [name]="field.props.name"
                                   [value]="field.input()"
                                   [errors]="field.errors()"
-                                  class="flex-1 p-0!"
+                                  class="p-0!"
                                   type="text"
                                   placeholder="Enter option"
                                   (fieldFocus)="field.props.onFocus($event)"
@@ -122,7 +148,12 @@ const NestedFormSchema = v.object({
                           <app-color-button
                             color="yellow"
                             label="Move first to end"
-                            (clicked)="moveOptionFirstToEnd(itemIndex, optionsArray.items().length)"
+                            (clicked)="
+                              moveOptionFirstToEnd(
+                                itemIndex,
+                                optionsArray.items().length
+                              )
+                            "
                           />
                           <app-color-button
                             color="purple"
@@ -183,7 +214,10 @@ export class NestedComponent {
   };
 
   addItem(): void {
-    insert(this.form, { path: ['items'], initialInput: { label: '', options: [''] } });
+    insert(this.form, {
+      path: ['items'],
+      initialInput: { label: '', options: [''] },
+    });
   }
 
   moveItemFirstToEnd(length: number): void {
@@ -195,7 +229,11 @@ export class NestedComponent {
   }
 
   replaceFirst(): void {
-    replace(this.form, { path: ['items'], at: 0, initialInput: { label: '', options: [''] } });
+    replace(this.form, {
+      path: ['items'],
+      at: 0,
+      initialInput: { label: '', options: [''] },
+    });
   }
 
   removeItem(index: number): void {
@@ -203,11 +241,18 @@ export class NestedComponent {
   }
 
   addOption(itemIndex: number): void {
-    insert(this.form, { path: ['items', itemIndex, 'options'], initialInput: '' });
+    insert(this.form, {
+      path: ['items', itemIndex, 'options'],
+      initialInput: '',
+    });
   }
 
   moveOptionFirstToEnd(itemIndex: number, length: number): void {
-    move(this.form, { path: ['items', itemIndex, 'options'], from: 0, to: length - 1 });
+    move(this.form, {
+      path: ['items', itemIndex, 'options'],
+      from: 0,
+      to: length - 1,
+    });
   }
 
   swapOptionsFirstTwo(itemIndex: number): void {
@@ -215,6 +260,9 @@ export class NestedComponent {
   }
 
   removeOption(itemIndex: number, optionIndex: number): void {
-    remove(this.form, { path: ['items', itemIndex, 'options'], at: optionIndex });
+    remove(this.form, {
+      path: ['items', itemIndex, 'options'],
+      at: optionIndex,
+    });
   }
 }

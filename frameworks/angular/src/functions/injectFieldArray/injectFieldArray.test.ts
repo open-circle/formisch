@@ -1,9 +1,7 @@
-import {
-  provideExperimentalZonelessChangeDetection,
-} from '@angular/core';
+import { provideExperimentalZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import * as v from 'valibot';
-import { describe, beforeEach, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { injectForm } from '../injectForm/index.ts';
 import { injectFieldArray } from './injectFieldArray.ts';
 

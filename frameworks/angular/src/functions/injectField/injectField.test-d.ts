@@ -30,9 +30,9 @@ describe('injectField', () => {
     const schema = v.object({ name: v.string() });
     const form = injectForm({ schema });
 
-    expectTypeOf(
-      injectField(form, { path: ['name'] }).onInput
-    ).toEqualTypeOf<(value: string | undefined) => void>();
+    expectTypeOf(injectField(form, { path: ['name'] }).onInput).toEqualTypeOf<
+      (value: string | undefined) => void
+    >();
   });
 
   test('should narrow input type through nested object and array index paths', () => {
@@ -45,9 +45,9 @@ describe('injectField', () => {
     expectTypeOf(
       injectField(form, { path: ['user', 'email'] }).input
     ).toEqualTypeOf<Signal<string | undefined>>();
-    expectTypeOf(
-      injectField(form, { path: ['tags', 0] }).input
-    ).toEqualTypeOf<Signal<string | undefined>>();
+    expectTypeOf(injectField(form, { path: ['tags', 0] }).input).toEqualTypeOf<
+      Signal<string | undefined>
+    >();
   });
 
   test('should expose Signal boolean state properties', () => {
@@ -55,7 +55,9 @@ describe('injectField', () => {
     const form = injectForm({ schema });
     const field = injectField(form, { path: ['email'] });
 
-    expectTypeOf(field.errors).toEqualTypeOf<Signal<[string, ...string[]] | null>>();
+    expectTypeOf(field.errors).toEqualTypeOf<
+      Signal<[string, ...string[]] | null>
+    >();
     expectTypeOf(field.isTouched).toEqualTypeOf<Signal<boolean>>();
     expectTypeOf(field.isDirty).toEqualTypeOf<Signal<boolean>>();
     expectTypeOf(field.isValid).toEqualTypeOf<Signal<boolean>>();

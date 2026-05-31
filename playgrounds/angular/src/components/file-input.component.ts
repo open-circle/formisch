@@ -1,7 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 import clsx from 'clsx';
-import { InputLabelComponent } from './input-label.component.ts';
 import { InputErrorsComponent } from './input-errors.component.ts';
+import { InputLabelComponent } from './input-label.component.ts';
 
 /**
  * File input field that users can click or drag files into. Various
@@ -14,10 +14,12 @@ import { InputErrorsComponent } from './input-errors.component.ts';
   imports: [InputLabelComponent, InputErrorsComponent],
   template: `
     <div [class]="containerClasses()">
-      <app-input-label [name]="name()" [label]="label()" [required]="required()" />
-      <label
-        [class]="labelClasses()"
-      >
+      <app-input-label
+        [name]="name()"
+        [label]="label()"
+        [required]="required()"
+      />
+      <label [class]="labelClasses()">
         {{ displayText() }}
         <input
           class="absolute h-full w-full cursor-pointer opacity-0"

@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
+import { FormischField, FormischForm, injectForm } from '@formisch/angular';
 import * as v from 'valibot';
-import { FormischForm, FormischField, injectForm } from '@formisch/angular';
-import { FormHeaderComponent } from '../../components/form-header.component.ts';
-import { FormFooterComponent } from '../../components/form-footer.component.ts';
-import { TextInputComponent } from '../../components/text-input.component.ts';
-import { SliderComponent } from '../../components/slider.component.ts';
 import { CheckboxComponent } from '../../components/checkbox.component.ts';
+import { FileInputComponent } from '../../components/file-input.component.ts';
+import { FormFooterComponent } from '../../components/form-footer.component.ts';
+import { FormHeaderComponent } from '../../components/form-header.component.ts';
 import { RadioGroupComponent } from '../../components/radio-group.component.ts';
 import { SelectComponent } from '../../components/select.component.ts';
-import { FileInputComponent } from '../../components/file-input.component.ts';
+import { SliderComponent } from '../../components/slider.component.ts';
+import { TextInputComponent } from '../../components/text-input.component.ts';
 
 const SpecialFormSchema = v.object({
   number: v.optional(v.string()),
@@ -81,11 +81,15 @@ const SpecialFormSchema = v.object({
           </ng-template>
         </formisch-field>
 
-        <label class="block px-8 font-medium md:text-lg lg:mb-5 lg:px-10 lg:text-xl">
+        <label
+          class="block px-8 font-medium md:text-lg lg:mb-5 lg:px-10 lg:text-xl"
+        >
           Checkbox array
         </label>
 
-        <div class="mx-8 flex flex-wrap gap-6 rounded-2xl border-2 border-slate-200 p-6 lg:gap-10 lg:p-10 dark:border-slate-800">
+        <div
+          class="mx-8 flex flex-wrap gap-6 rounded-2xl border-2 border-slate-200 p-6 lg:gap-10 lg:p-10 dark:border-slate-800"
+        >
           @for (option of checkboxOptions; track option.value) {
             <formisch-field [of]="form" [path]="['checkbox', 'array']">
               <ng-template let-field>

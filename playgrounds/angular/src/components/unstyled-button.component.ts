@@ -17,22 +17,26 @@ import { SpinnerComponent } from './spinner.component.ts';
       (click)="handleClick()"
     >
       <span
-        [class]="clsx(
-          'transition-[opacity,transform,visibility] duration-200',
-          isLoading() || loading()
-            ? 'invisible translate-x-5 opacity-0'
-            : 'visible delay-300'
-        )"
+        [class]="
+          clsx(
+            'transition-[opacity,transform,visibility] duration-200',
+            isLoading() || loading()
+              ? 'invisible translate-x-5 opacity-0'
+              : 'visible delay-300'
+          )
+        "
       >
         <ng-content />
       </span>
       <span
-        [class]="clsx(
-          'absolute duration-200',
-          isLoading() || loading()
-            ? 'visible delay-300'
-            : 'invisible -translate-x-5 opacity-0'
-        )"
+        [class]="
+          clsx(
+            'absolute duration-200',
+            isLoading() || loading()
+              ? 'visible delay-300'
+              : 'invisible -translate-x-5 opacity-0'
+          )
+        "
       >
         <app-spinner />
       </span>

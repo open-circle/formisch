@@ -5,9 +5,7 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./routes/login/login.component.ts').then(
-        (m) => m.LoginComponent
-      ),
+      import('./routes/login/login.component.ts').then((m) => m.LoginComponent),
   },
   {
     path: 'payment',
@@ -19,9 +17,7 @@ export const routes: Routes = [
   {
     path: 'todos',
     loadComponent: () =>
-      import('./routes/todos/todos.component.ts').then(
-        (m) => m.TodosComponent
-      ),
+      import('./routes/todos/todos.component.ts').then((m) => m.TodosComponent),
   },
   {
     path: 'special',

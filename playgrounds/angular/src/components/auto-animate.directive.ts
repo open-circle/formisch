@@ -1,4 +1,10 @@
-import { afterNextRender, Directive, ElementRef, inject, input } from '@angular/core';
+import {
+  afterNextRender,
+  Directive,
+  ElementRef,
+  inject,
+  input,
+} from '@angular/core';
 import autoAnimate, { type AutoAnimateOptions } from '@formkit/auto-animate';
 
 /**

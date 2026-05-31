@@ -13,7 +13,6 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
-import { filter } from 'rxjs/operators';
 import { disableTransitions } from './utils/disable-transitions.ts';
 
 interface IndicatorStyle {
@@ -29,8 +28,12 @@ interface IndicatorStyle {
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   template: `
-    <div class="scrollbar-none flex scroll-px-8 overflow-x-auto scroll-smooth px-8">
-      <div class="relative flex-1 border-b-2 border-b-slate-200 dark:border-b-slate-800">
+    <div
+      class="scrollbar-none flex scroll-px-8 overflow-x-auto scroll-smooth px-8"
+    >
+      <div
+        class="relative flex-1 border-b-2 border-b-slate-200 dark:border-b-slate-800"
+      >
         <nav #navEl class="flex space-x-8 lg:space-x-14">
           @for (tab of tabs; track tab.path) {
             <a
@@ -44,7 +47,8 @@ interface IndicatorStyle {
                   : 'hover:text-slate-900 dark:hover:text-slate-200')
               "
               (click)="scrollIntoView($event)"
-            >{{ tab.label }}</a>
+              >{{ tab.label }}</a
+            >
           }
         </nav>
         @if (indicatorStyle()) {
@@ -70,17 +74,18 @@ export class AppComponent {
     { path: '/nested', label: 'Nested' },
   ];
 
-  private readonly navEl =
-    viewChild<ElementRef<HTMLElement>>('navEl');
+  private readonly navEl = viewChild<ElementRef<HTMLElement>>('navEl');
   protected readonly indicatorStyle = signal<IndicatorStyle | undefined>(
     undefined
   );
 
   constructor() {
     const router = inject(Router);
-    router.events
-      .pipe(filter((e) => e instanceof NavigationEnd))
-      .subscribe(() => setTimeout(() => this.updateIndicatorStyle()));
+    router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        setTimeout(() => this.updateIndicatorStyle());
+      }
+    });
   }
 
   @HostListener('window:resize')
@@ -92,8 +97,8 @@ export class AppComponent {
   private updateIndicatorStyle(): void {
     const nav = this.navEl()?.nativeElement;
     if (!nav) return;
-    const activeEl = [...nav.children].find(
-      (el) => (el as HTMLAnchorElement).href?.endsWith(location.pathname)
+    const activeEl = [...nav.children].find((el) =>
+      (el as HTMLAnchorElement).href?.endsWith(location.pathname)
     ) as HTMLAnchorElement | undefined;
     this.indicatorStyle.set(
       activeEl

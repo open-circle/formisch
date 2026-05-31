@@ -1,7 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 import clsx from 'clsx';
-import { InputLabelComponent } from './input-label.component.ts';
 import { InputErrorsComponent } from './input-errors.component.ts';
+import { InputLabelComponent } from './input-label.component.ts';
 
 /**
  * Text input field that users can type into. Various decorations can be
@@ -11,24 +11,27 @@ import { InputErrorsComponent } from './input-errors.component.ts';
   selector: 'app-text-input',
   standalone: true,
   imports: [InputLabelComponent, InputErrorsComponent],
+  host: { class: 'block px-8 lg:px-10' },
   template: `
-    <div [class]="containerClasses()">
-      <app-input-label [name]="name()" [label]="label()" [required]="required()" />
-      <input
-        [name]="name()"
-        [type]="type()"
-        [id]="name()"
-        [value]="value() ?? ''"
-        [placeholder]="placeholder() ?? ''"
-        [attr.aria-invalid]="!!errors()"
-        [attr.aria-errormessage]="name() + '-error'"
-        [class]="inputClass()"
-        (focus)="fieldFocus.emit($event)"
-        (input)="fieldChange.emit($event)"
-        (blur)="fieldBlur.emit($event)"
-      />
-      <app-input-errors [name]="name()" [errors]="errors()" />
-    </div>
+    <app-input-label
+      [name]="name()"
+      [label]="label()"
+      [required]="required()"
+    />
+    <input
+      [name]="name()"
+      [type]="type()"
+      [id]="name()"
+      [value]="value() ?? ''"
+      [placeholder]="placeholder() ?? ''"
+      [attr.aria-invalid]="!!errors()"
+      [attr.aria-errormessage]="errors() ? name() + '-error' : null"
+      [class]="inputClass()"
+      (focus)="fieldFocus.emit($event)"
+      (input)="fieldChange.emit($event)"
+      (blur)="fieldBlur.emit($event)"
+    />
+    <app-input-errors [name]="name()" [errors]="errors()" />
   `,
 })
 export class TextInputComponent {
@@ -39,14 +42,10 @@ export class TextInputComponent {
   readonly required = input<boolean>(false);
   readonly value = input<string | number | undefined>();
   readonly errors = input<[string, ...string[]] | null>(null);
-  readonly class = input<string>('');
 
   readonly fieldFocus = output<FocusEvent>();
   readonly fieldChange = output<Event>();
   readonly fieldBlur = output<FocusEvent>();
-
-  protected readonly containerClasses = () =>
-    clsx('px-8 lg:px-10', this.class());
 
   protected readonly inputClass = computed(() =>
     clsx(

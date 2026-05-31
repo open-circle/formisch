@@ -7,6 +7,13 @@ import clsx from 'clsx';
 @Component({
   selector: 'app-input-label',
   standalone: true,
+  // Behave like Solid's label element: an inline-block box when a label is
+  // shown (so `space-y` spacing works), and no box at all otherwise so it
+  // never adds a phantom line for label-less fields.
+  host: {
+    '[class.inline-block]': '!!label()',
+    '[class.hidden]': '!label()',
+  },
   template: `
     @if (label()) {
       @let labelClass = labelClasses();

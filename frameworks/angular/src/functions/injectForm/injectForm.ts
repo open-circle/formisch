@@ -6,9 +6,9 @@ import {
 import {
   createFormStore,
   type FormConfig,
+  type FormSchema,
   getFieldBool,
   INTERNAL,
-  type Schema,
   validateFormInput,
 } from '@formisch/core/angular';
 import * as v from 'valibot';
@@ -24,7 +24,7 @@ import type { FormStore } from '../../types/index.ts';
  *
  * @returns The form store with reactive Signal properties.
  */
-export function injectForm<TSchema extends Schema>(
+export function injectForm<TSchema extends FormSchema>(
   config: FormConfig<TSchema>
 ): FormStore<TSchema>;
 

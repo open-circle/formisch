@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import clsx from 'clsx';
-import { InputLabelComponent } from './input-label.component.ts';
 import { InputErrorsComponent } from './input-errors.component.ts';
+import { InputLabelComponent } from './input-label.component.ts';
 
 /**
  * Range slider that allows users to select predefined numbers. Various
@@ -14,7 +14,11 @@ import { InputErrorsComponent } from './input-errors.component.ts';
   imports: [InputLabelComponent, InputErrorsComponent],
   template: `
     <div [class]="containerClasses()">
-      <app-input-label [name]="name()" [label]="label()" [required]="required()" />
+      <app-input-label
+        [name]="name()"
+        [label]="label()"
+        [required]="required()"
+      />
       <input
         class="w-full"
         type="range"
@@ -25,7 +29,7 @@ import { InputErrorsComponent } from './input-errors.component.ts';
         [attr.max]="max()"
         [attr.step]="step()"
         [attr.aria-invalid]="!!errors()"
-        [attr.aria-errormessage]="name() + '-error'"
+        [attr.aria-errormessage]="errors() ? name() + '-error' : null"
         (focus)="fieldFocus.emit($event)"
         (input)="fieldChange.emit($event)"
         (blur)="fieldBlur.emit($event)"

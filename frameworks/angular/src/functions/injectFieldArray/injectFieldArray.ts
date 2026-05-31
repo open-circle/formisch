@@ -1,30 +1,34 @@
+import { assertInInjectionContext, computed } from '@angular/core';
 import {
-  assertInInjectionContext,
-  computed,
-} from '@angular/core';
-import {
+  type FormSchema,
   getFieldBool,
   getFieldStore,
   INTERNAL,
   type InternalArrayStore,
   type RequiredPath,
-  type Schema,
   type ValidArrayPath,
 } from '@formisch/core/angular';
 import type * as v from 'valibot';
-import type { FieldArrayStore, FormStore } from '../../types/index.ts';
+import type {
+  FieldArrayStore,
+  FormStore,
+  SignalOrValue,
+} from '../../types/index.ts';
+import { readSignalOrValue } from '../../utils/index.ts';
 
 /**
  * Inject field array config interface.
  */
 export interface InjectFieldArrayConfig<
-  TSchema extends Schema = Schema,
+  TSchema extends FormSchema = FormSchema,
   TFieldArrayPath extends RequiredPath = RequiredPath,
 > {
   /**
    * The path to the field array within the form schema.
    */
-  readonly path: ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>;
+  readonly path: SignalOrValue<
+    ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>
+  >;
 }
 
 /**
@@ -38,33 +42,38 @@ export interface InjectFieldArrayConfig<
  *
  * @returns The field array store with reactive Signal properties.
  */
-// @ts-expect-error
 export function injectFieldArray<
-  TSchema extends Schema,
+  TSchema extends FormSchema,
   TFieldArrayPath extends RequiredPath,
 >(
-  form: FormStore<TSchema>,
+  form: SignalOrValue<FormStore<TSchema>>,
   config: InjectFieldArrayConfig<TSchema, TFieldArrayPath>
 ): FieldArrayStore<TSchema, TFieldArrayPath>;
 
 // @__NO_SIDE_EFFECTS__
 export function injectFieldArray(
-  form: FormStore,
+  form: SignalOrValue<FormStore>,
   config: InjectFieldArrayConfig
 ): FieldArrayStore {
   assertInInjectionContext(injectFieldArray);
 
-  const internalFieldStore = getFieldStore(
-    form[INTERNAL],
-    config.path
-  ) as InternalArrayStore;
+  const path = computed(() => readSignalOrValue(config.path));
+  const internalFieldStore = computed(
+    () =>
+      getFieldStore(
+        readSignalOrValue(form)[INTERNAL],
+        path()
+      ) as InternalArrayStore
+  );
 
   return {
-    path: config.path,
-    items: computed(() => internalFieldStore.items.value),
-    errors: computed(() => internalFieldStore.errors.value),
-    isTouched: computed(() => getFieldBool(internalFieldStore, 'isTouched')),
-    isDirty: computed(() => getFieldBool(internalFieldStore, 'isDirty')),
-    isValid: computed(() => !getFieldBool(internalFieldStore, 'errors')),
+    get path() {
+      return path();
+    },
+    items: computed(() => internalFieldStore().items.value),
+    errors: computed(() => internalFieldStore().errors.value),
+    isTouched: computed(() => getFieldBool(internalFieldStore(), 'isTouched')),
+    isDirty: computed(() => getFieldBool(internalFieldStore(), 'isDirty')),
+    isValid: computed(() => !getFieldBool(internalFieldStore(), 'errors')),
   };
 }

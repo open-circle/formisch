@@ -21,6 +21,6 @@ html {
 }
 
 /* Reset appearance */
-[type='date'] {
+input[type='date'] {
   @apply flex appearance-none items-center justify-start;
 }

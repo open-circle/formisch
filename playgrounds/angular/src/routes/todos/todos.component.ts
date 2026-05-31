@@ -1,23 +1,23 @@
 import { Component } from '@angular/core';
-import * as v from 'valibot';
 import {
-  FormischForm,
   FormischField,
   FormischFieldArray,
+  FormischForm,
+  injectForm,
   insert,
   move,
   remove,
   replace,
   swap,
-  injectForm,
 } from '@formisch/angular';
+import * as v from 'valibot';
 import { AutoAnimateDirective } from '../../components/auto-animate.directive.ts';
-import { FormHeaderComponent } from '../../components/form-header.component.ts';
-import { FormFooterComponent } from '../../components/form-footer.component.ts';
-import { TextInputComponent } from '../../components/text-input.component.ts';
-import { InputLabelComponent } from '../../components/input-label.component.ts';
-import { InputErrorsComponent } from '../../components/input-errors.component.ts';
 import { ColorButtonComponent } from '../../components/color-button.component.ts';
+import { FormFooterComponent } from '../../components/form-footer.component.ts';
+import { FormHeaderComponent } from '../../components/form-header.component.ts';
+import { InputErrorsComponent } from '../../components/input-errors.component.ts';
+import { InputLabelComponent } from '../../components/input-label.component.ts';
+import { TextInputComponent } from '../../components/text-input.component.ts';
 
 const TodosSchema = v.object({
   heading: v.pipe(
@@ -90,16 +90,26 @@ const TodosSchema = v.object({
 
               <div>
                 <div auto-animate class="space-y-5">
-                  @for (item of fieldArray.items(); track item; let index = $index) {
-                    <div class="flex flex-wrap gap-5 rounded-2xl border-2 border-slate-200 bg-slate-100/25 p-5 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/10 dark:hover:border-slate-700">
-                      <formisch-field [of]="form" [path]="['todos', index, 'label']">
+                  @for (
+                    item of fieldArray.items();
+                    track item;
+                    let index = $index
+                  ) {
+                    <div
+                      class="flex flex-wrap gap-5 rounded-2xl border-2 border-slate-200 bg-slate-100/25 p-5 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/10 dark:hover:border-slate-700"
+                    >
+                      <formisch-field
+                        [of]="form"
+                        [path]="['todos', index, 'label']"
+                        class="w-full md:w-auto md:flex-1"
+                      >
                         <ng-template let-field>
                           <app-text-input
                             [name]="field.props.name"
                             [value]="field.input()"
                             [errors]="field.errors()"
                             type="text"
-                            class="w-full p-0! md:w-auto md:flex-1"
+                            class="p-0!"
                             placeholder="Enter task"
                             [required]="true"
                             (fieldFocus)="field.props.onFocus($event)"
@@ -109,14 +119,18 @@ const TodosSchema = v.object({
                         </ng-template>
                       </formisch-field>
 
-                      <formisch-field [of]="form" [path]="['todos', index, 'deadline']">
+                      <formisch-field
+                        [of]="form"
+                        [path]="['todos', index, 'deadline']"
+                        class="flex-1"
+                      >
                         <ng-template let-field>
                           <app-text-input
                             [name]="field.props.name"
                             [value]="field.input()"
                             [errors]="field.errors()"
                             type="date"
-                            class="flex-1 p-0!"
+                            class="p-0!"
                             [required]="true"
                             (fieldFocus)="field.props.onFocus($event)"
                             (fieldChange)="field.props.onChange($event)"
@@ -171,7 +185,6 @@ const TodosSchema = v.object({
 export class TodosComponent {
   readonly form = injectForm({
     schema: TodosSchema,
-    validate: 'blur',
     initialInput: {
       heading: '',
       todos: [{ label: '', deadline: '' }],
@@ -183,7 +196,10 @@ export class TodosComponent {
   };
 
   handleInsert(): void {
-    insert(this.form, { path: ['todos'], initialInput: { label: '', deadline: '' } });
+    insert(this.form, {
+      path: ['todos'],
+      initialInput: { label: '', deadline: '' },
+    });
   }
 
   handleRemove(index: number): void {

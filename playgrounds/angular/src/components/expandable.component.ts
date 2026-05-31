@@ -15,12 +15,9 @@ import clsx from 'clsx';
 @Component({
   selector: 'app-expandable',
   standalone: true,
+  host: { class: 'block' },
   template: `
-    <div
-      #el
-      [class]="classes()"
-      [attr.aria-hidden]="!expanded()"
-    >
+    <div #el [class]="classes()" [attr.aria-hidden]="!expanded()">
       <ng-content />
     </div>
   `,
@@ -32,7 +29,7 @@ export class ExpandableComponent {
 
   protected readonly classes = computed(() =>
     clsx(
-      'm-0! h-0 origin-top overflow-hidden duration-200',
+      'm-0! h-0 origin-top duration-200',
       !this.expanded() && 'invisible -translate-y-2 scale-y-75 opacity-0'
     )
   );

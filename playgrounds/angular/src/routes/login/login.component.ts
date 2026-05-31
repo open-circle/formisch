@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
+import { FormischField, FormischForm, injectForm } from '@formisch/angular';
 import * as v from 'valibot';
-import { FormischForm, FormischField, injectForm } from '@formisch/angular';
-import { FormHeaderComponent } from '../../components/form-header.component.ts';
 import { FormFooterComponent } from '../../components/form-footer.component.ts';
+import { FormHeaderComponent } from '../../components/form-header.component.ts';
 import { TextInputComponent } from '../../components/text-input.component.ts';
 
 const LoginSchema = v.object({
@@ -21,7 +21,13 @@ const LoginSchema = v.object({
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormischForm, FormischField, FormHeaderComponent, FormFooterComponent, TextInputComponent],
+  imports: [
+    FormischForm,
+    FormischField,
+    FormHeaderComponent,
+    FormFooterComponent,
+    TextInputComponent,
+  ],
   template: `
     <formisch-form
       [of]="form"
@@ -71,7 +77,7 @@ const LoginSchema = v.object({
   `,
 })
 export class LoginComponent {
-  readonly form = injectForm({ schema: LoginSchema, validate: 'blur' });
+  readonly form = injectForm({ schema: LoginSchema });
 
   readonly handleSubmit = (output: v.InferOutput<typeof LoginSchema>) => {
     console.log(output);

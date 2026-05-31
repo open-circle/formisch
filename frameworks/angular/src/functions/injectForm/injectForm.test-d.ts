@@ -19,7 +19,9 @@ describe('injectForm', () => {
     expectTypeOf(form.isTouched).toEqualTypeOf<Signal<boolean>>();
     expectTypeOf(form.isDirty).toEqualTypeOf<Signal<boolean>>();
     expectTypeOf(form.isValid).toEqualTypeOf<Signal<boolean>>();
-    expectTypeOf(form.errors).toEqualTypeOf<Signal<[string, ...string[]] | null>>();
+    expectTypeOf(form.errors).toEqualTypeOf<
+      Signal<[string, ...string[]] | null>
+    >();
   });
 
   test('should accept full, partial, and reject mistyped initialInput', () => {

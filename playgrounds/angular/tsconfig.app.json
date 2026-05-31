@@ -13,6 +13,9 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
+    "outDir": "./node_modules/.tmp/app",
+    "rootDir": "../..",
+    "rewriteRelativeImportExtensions": true,
     /* Angular */
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
@@ -27,6 +30,9 @@
     "paths": {
       "@formisch/angular": ["../../frameworks/angular/src/index.ts"]
     }
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": true
   },
   "include": ["src"]
 }
