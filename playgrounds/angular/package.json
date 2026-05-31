@@ -18,7 +18,7 @@
     "@formkit/auto-animate": "^0.8.4",
     "@tailwindcss/vite": "^4.1.17",
     "clsx": "^2.1.1",
-    "valibot": "^1.2.0"
+    "valibot": "^1.4.1"
   },
   "devDependencies": {
     "@analogjs/vite-plugin-angular": "^2.5.2",

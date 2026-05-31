@@ -604,8 +604,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.9.3)
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.9.3)
     devDependencies:
       '@analogjs/vite-plugin-angular':
         specifier: ^2.5.2
@@ -11686,14 +11686,6 @@ packages:
 
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
-
-  valibot@1.2.0:
-    resolution: {integrity: sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==}
-    peerDependencies:
-      typescript: '>=5'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   valibot@1.4.1:
     resolution: {integrity: sha512-klCmFTz2jeDluy9RwX+F884TCiogtdBJ/YaxSx1EOBYXa3NXNWj8kR1jjN8rzluwojJVWWaHJ4r1U5LfICnM3g==}
@@ -25065,10 +25057,6 @@ snapshots:
       sade: 1.8.1
 
   v8-compile-cache-lib@3.0.1: {}
-
-  valibot@1.2.0(typescript@5.9.3):
-    optionalDependencies:
-      typescript: 5.9.3
 
   valibot@1.4.1(typescript@5.8.3):
     optionalDependencies:
