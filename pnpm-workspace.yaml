@@ -6,6 +6,7 @@ packages:
   - 'website'
 allowBuilds:
   '@parcel/watcher': true
+  better-sqlite3: true
   deasync: true
   esbuild: true
   sharp: true
