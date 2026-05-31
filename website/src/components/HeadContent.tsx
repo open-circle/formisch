@@ -1,9 +1,6 @@
 import { component$, useComputed$ } from '@qwik.dev/core';
 import { useDocumentHead, useLocation } from '@qwik.dev/router';
-import {
-  CHAPTERS_HIDDEN_CLASS,
-  CHAPTERS_KEY,
-} from '~/routes/plugin@chapters';
+import { CHAPTERS_HIDDEN_CLASS, CHAPTERS_KEY } from '~/routes/plugin@chapters';
 import { FRAMEWORK_LIST } from '~/routes/plugin@framework';
 import { THEME_KEY } from '~/routes/plugin@theme';
 import { getAreaName, getFrameworkName } from '~/utils';

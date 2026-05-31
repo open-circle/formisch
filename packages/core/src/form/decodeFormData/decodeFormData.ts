@@ -301,6 +301,13 @@ function fillDefaults(
     }
 
     // Otherwise, if schema has options, complete for each option
+    // Hint: Defaults from every option are applied because the matching branch
+    // of a union or variant is only known during validation, not while
+    // decoding. This is correct for intersect (all options apply) and harmless
+    // for object options (unknown keys are ignored on parse). A `strictObject`
+    // option may reject the extra keys though, so reliably decoding such a
+    // variant would require resolving its branch via the discriminator, which
+    // is not possible before validation.
   } else if (
     unwrappedSchema.type === 'union' ||
     unwrappedSchema.type === 'intersect' ||
@@ -370,8 +377,9 @@ export function decodeFormData<TSchema extends FormSchema>(
           break;
         }
 
-        // Throw on oversized array index (see MAX_ARRAY_LENGTH)
-        if (typeof segment === 'number' && segment >= MAX_ARRAY_LENGTH) {
+        // Throw on oversized array index, including indices sent as strings
+        // (see MAX_ARRAY_LENGTH)
+        if (Array.isArray(parentValue) && Number(segment) >= MAX_ARRAY_LENGTH) {
           throw new Error(
             `Array exceeds the maximum length of ${MAX_ARRAY_LENGTH}`
           );
@@ -406,6 +414,11 @@ export function decodeFormData<TSchema extends FormSchema>(
               schemaType === 'strict_tuple'
                 ? []
                 : {};
+
+            // Otherwise, stop on conflicting scalar value to avoid writing a
+            // property to a non-object, which throws in strict mode
+          } else if (typeof parentValue[segment] !== 'object') {
+            break;
           }
           parentValue = parentValue[segment];
           parentSchema = childSchema;

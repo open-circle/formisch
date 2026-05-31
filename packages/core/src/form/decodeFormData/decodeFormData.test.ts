@@ -273,6 +273,15 @@ describe('decodeFormData', () => {
         nested: 'hello',
       });
     });
+
+    test('should not crash on a scalar entry before a nested entry', () => {
+      const schema = v.object({ user: v.object({ age: v.number() }) });
+      const formData = createFormData([
+        ['["user"]', 'x'],
+        ['["user","age"]', '1'],
+      ]);
+      expect(decodeFormData(schema, formData)).toStrictEqual({ user: 'x' });
+    });
   });
 
   describe('arrays', () => {
@@ -702,6 +711,14 @@ describe('decodeFormData', () => {
     test('should throw when an array index exceeds the maximum length', () => {
       const schema = v.object({ flags: v.array(v.boolean()) });
       const formData = createFormData([['["flags",1000000000]', 'on']]);
+      expect(() => decodeFormData(schema, formData)).toThrowError(
+        'Array exceeds the maximum length of 5000'
+      );
+    });
+
+    test('should throw for an oversized array index sent as a string', () => {
+      const schema = v.object({ flags: v.array(v.boolean()) });
+      const formData = createFormData([['["flags","1000000000"]', 'on']]);
       expect(() => decodeFormData(schema, formData)).toThrowError(
         'Array exceeds the maximum length of 5000'
       );
