@@ -1,6 +1,6 @@
 import {
   Component,
-  provideExperimentalZonelessChangeDetection,
+  provideZonelessChangeDetection,
   type Type,
 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -39,7 +39,7 @@ describe('FormischField', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [TestHost],
-      providers: [provideExperimentalZonelessChangeDetection()],
+      providers: [provideZonelessChangeDetection()],
     });
   });
 

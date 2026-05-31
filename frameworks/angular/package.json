@@ -41,11 +41,11 @@
     "format.check": "prettier --check ./src"
   },
   "devDependencies": {
-    "@angular/common": "^19.0.0",
-    "@angular/compiler": "^19.0.0",
-    "@angular/compiler-cli": "^19.0.0",
-    "@angular/core": "^19.0.0",
-    "@angular/platform-browser": "^19.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/compiler-cli": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
     "@formisch/core": "workspace:*",
     "@formisch/eslint-config": "workspace:*",
     "@formisch/methods": "workspace:*",
@@ -55,7 +55,7 @@
     "jsdom": "^26.1.0",
     "rolldown": "1.0.0-beta.52",
     "rolldown-plugin-dts": "^0.18.1",
-    "typescript": "~5.8.3",
+    "typescript": "~5.9.3",
     "valibot": "^1.4.1",
     "vitest": "^3.2.4",
     "zone.js": "^0.15.0"

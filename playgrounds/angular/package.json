@@ -9,24 +9,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@angular/common": "^19.0.0",
-    "@angular/compiler": "^19.0.0",
-    "@angular/core": "^19.0.0",
-    "@angular/platform-browser": "^19.0.0",
-    "@angular/router": "^19.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
+    "@angular/router": "^21.0.0",
     "@formisch/angular": "workspace:*",
+    "@formkit/auto-animate": "^0.8.4",
     "@tailwindcss/vite": "^4.1.17",
     "clsx": "^2.1.1",
-    "valibot": "^1.2.0",
-    "@formkit/auto-animate": "^0.8.4"
+    "valibot": "^1.2.0"
   },
   "devDependencies": {
-    "@analogjs/vite-plugin-angular": "^1.10.0",
-    "@angular/build": "^19.0.0",
-    "@angular/compiler-cli": "^19.0.0",
+    "@analogjs/vite-plugin-angular": "^2.5.2",
+    "@angular/build": "^21.0.0",
+    "@angular/compiler-cli": "^21.0.0",
     "@types/node": "^24.10.1",
     "tailwindcss": "^4.1.17",
-    "typescript": "~5.8.3",
+    "typescript": "~5.9.3",
     "vite": "^7.2.4"
   }
 }

@@ -1,4 +1,4 @@
-import { provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import * as v from 'valibot';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -12,7 +12,7 @@ const Schema = v.object({
 describe('injectFieldArray', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideExperimentalZonelessChangeDetection()],
+      providers: [provideZonelessChangeDetection()],
     });
   });
 
