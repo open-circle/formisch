@@ -303,6 +303,43 @@ jobs:
         run: pnpm test
         working-directory: frameworks/vue
 
+  # frameworks/angular
+  angular_prettier:
+    name: Run Prettier in frameworks/angular
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: frameworks/angular
+
+  angular_eslint:
+    name: Run ESLint in frameworks/angular
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: frameworks/angular
+
+  angular_vitest:
+    name: Run Vitest in frameworks/angular
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Vitest tests
+        run: pnpm test
+        working-directory: frameworks/angular
+
   # website
   website_prettier:
     name: Run Prettier in website

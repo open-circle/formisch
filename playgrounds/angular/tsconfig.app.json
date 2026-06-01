@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": false,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "outDir": "./node_modules/.tmp/app",
+    "rootDir": "../..",
+    "rewriteRelativeImportExtensions": true,
+    /* Angular */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": false,
+    "strictPropertyInitialization": false,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "paths": {
+      "@formisch/angular": ["../../frameworks/angular/src/index.ts"]
+    }
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  },
+  "include": ["src"]
+}

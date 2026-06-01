@@ -20,6 +20,10 @@
   ],
   "type": "module",
   "exports": {
+    "./angular": {
+      "types": "./dist/index.angular.d.ts",
+      "default": "./dist/index.angular.js"
+    },
     "./preact": {
       "types": "./dist/index.preact.d.ts",
       "default": "./dist/index.preact.js"
@@ -62,6 +66,7 @@
     "build": "tsdown"
   },
   "devDependencies": {
+    "@angular/core": "^21.0.0",
     "@formisch/core": "workspace:*",
     "@formisch/eslint-config": "workspace:*",
     "@types/node": "24.0.13",
@@ -77,11 +82,15 @@
     "vitest": "3.2.4"
   },
   "peerDependencies": {
+    "@angular/core": ">=17.0.0",
     "react": "^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "typescript": ">=5",
     "valibot": "^1.4.1"
   },
   "peerDependenciesMeta": {
+    "@angular/core": {
+      "optional": true
+    },
     "react": {
       "optional": true
     },

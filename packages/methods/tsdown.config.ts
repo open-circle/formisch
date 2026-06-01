@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import type { RolldownPluginOption } from 'rolldown';
 import { defineConfig, type UserConfig, type UserConfigFn } from 'tsdown';
 
-type Framework = 'preact' | 'qwik' | 'react' | 'solid' | 'svelte' | 'vue';
+type Framework = 'angular' | 'preact' | 'qwik' | 'react' | 'solid' | 'svelte' | 'vue';
 
 /**
  * Rolldown plugin to rewrite framework-specific imports.
@@ -89,6 +89,7 @@ function defineFrameworkConfig(
   return defineConfig({
     entry: ['./src/index.ts'],
     external: [
+      '@angular/core',
       '@formisch/core',
       `@formisch/core/${framework}`,
       '@preact/signals',
@@ -113,6 +114,7 @@ function defineFrameworkConfig(
 }
 
 const config: (UserConfig | UserConfigFn)[] = [
+  defineFrameworkConfig('angular'),
   defineFrameworkConfig('preact'),
   defineFrameworkConfig('qwik'),
   defineFrameworkConfig('react'),
