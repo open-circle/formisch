@@ -15,7 +15,7 @@ export function Radio(props: RadioProps) {
   const [, inputProps] = splitProps(props, ['class', 'label']);
 
   return (
-    <label class="flex cursor-pointer select-none items-center space-x-3 font-medium md:text-lg lg:text-xl">
+    <label class="flex cursor-pointer items-center space-x-3 font-medium select-none md:text-lg lg:text-xl">
       <input
         {...inputProps}
         class="h-4 w-4 cursor-pointer lg:h-5 lg:w-5"

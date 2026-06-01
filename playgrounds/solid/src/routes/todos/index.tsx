@@ -99,7 +99,7 @@ export default function TodosPage() {
                             {(field) => (
                               <TextInput
                                 {...field.props}
-                                class="p-0! w-full md:w-auto md:flex-1"
+                                class="w-full p-0! md:w-auto md:flex-1"
                                 input={field.input}
                                 errors={field.errors}
                                 type="text"
@@ -116,7 +116,7 @@ export default function TodosPage() {
                             {(field) => (
                               <TextInput
                                 {...field.props}
-                                class="p-0! flex-1"
+                                class="flex-1 p-0!"
                                 type="date"
                                 input={field.input}
                                 errors={field.errors}

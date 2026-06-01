@@ -93,7 +93,7 @@ export default component$(() => {
                           input={field.input}
                           errors={field.errors}
                           type="text"
-                          class="p-0! flex-1"
+                          class="flex-1 p-0!"
                           placeholder="Enter item"
                         />
                       )}
@@ -134,7 +134,7 @@ export default component$(() => {
                                   {...field.props}
                                   input={field.input}
                                   errors={field.errors}
-                                  class="p-0! flex-1"
+                                  class="flex-1 p-0!"
                                   type="text"
                                   placeholder="Enter option"
                                 />
