@@ -1,7 +1,7 @@
 import {
   Directive,
-  ElementRef,
   effect,
+  ElementRef,
   inject,
   input,
   type InputSignal,

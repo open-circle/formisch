@@ -43,10 +43,7 @@ describe('FormischForm', () => {
       selector: 'formisch-form-test-host',
       standalone: true,
       imports: [FormischForm],
-      template: `<form
-        [formischForm]="form"
-        [formischSubmit]="handleSubmit"
-      >
+      template: `<form [formischForm]="form" [formischSubmit]="handleSubmit">
         <button type="submit" data-testid="submit">Submit</button>
       </form>`,
     })
