@@ -1,12 +1,14 @@
 import {
   Component,
   provideZonelessChangeDetection,
+  signal,
   type Type,
+  type WritableSignal,
 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { INTERNAL } from '@formisch/core/angular';
+import { INTERNAL, type SubmitEventHandler } from '@formisch/core/angular';
 import * as v from 'valibot';
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { injectForm } from '../../functions/index.ts';
 import type { FormStore } from '../../types/index.ts';
 import { loadDistComponent } from '../../vitest/loadDistComponent.ts';
@@ -19,17 +21,31 @@ let TestHost: Type<{
   form: FormStore<typeof Schema>;
   submitted: v.InferOutput<typeof Schema> | undefined;
 }>;
+let AsyncSubmitHost: Type<{
+  form: FormStore<typeof Schema>;
+  submitted: v.InferOutput<typeof Schema> | undefined;
+  resolveSubmit: (() => void) | undefined;
+}>;
+let RejectSubmitHost: Type<{
+  form: FormStore<typeof Schema>;
+}>;
+let SwapHost: Type<{
+  firstForm: FormStore<typeof Schema>;
+  secondForm: FormStore<typeof Schema>;
+  useFirstForm: WritableSignal<boolean>;
+}>;
 
 describe('FormischForm', () => {
   beforeAll(async () => {
     const FormischForm = await loadDistComponent('FormischForm');
 
     @Component({
+      selector: 'formisch-form-test-host',
       standalone: true,
       imports: [FormischForm],
       template: `<form
         [formischForm]="form"
-        (formischSubmit)="submitted = $event"
+        [formischSubmit]="handleSubmit"
       >
         <button type="submit" data-testid="submit">Submit</button>
       </form>`,
@@ -40,17 +56,96 @@ describe('FormischForm', () => {
         initialInput: { email: 'jane@example.com' },
       });
       submitted: v.InferOutput<typeof Schema> | undefined = undefined;
+      readonly handleSubmit: SubmitEventHandler<typeof Schema> = (output) => {
+        this.submitted = output;
+      };
     }
 
     TestHost = TestHostComponent as Type<{
       form: FormStore<typeof Schema>;
       submitted: v.InferOutput<typeof Schema> | undefined;
     }>;
+
+    @Component({
+      selector: 'formisch-form-async-host',
+      standalone: true,
+      imports: [FormischForm],
+      template: `<form
+        [formischForm]="form"
+        [formischSubmit]="handleSubmit"
+      ></form>`,
+    })
+    class AsyncSubmitHostComponent {
+      readonly form = injectForm({
+        schema: Schema,
+        initialInput: { email: 'jane@example.com' },
+      });
+      submitted: v.InferOutput<typeof Schema> | undefined = undefined;
+      resolveSubmit: (() => void) | undefined = undefined;
+      readonly submitPromise = new Promise<void>((resolve) => {
+        this.resolveSubmit = resolve;
+      });
+      readonly handleSubmit: SubmitEventHandler<typeof Schema> = (output) => {
+        this.submitted = output;
+        return this.submitPromise;
+      };
+    }
+
+    AsyncSubmitHost = AsyncSubmitHostComponent as Type<{
+      form: FormStore<typeof Schema>;
+      submitted: v.InferOutput<typeof Schema> | undefined;
+      resolveSubmit: (() => void) | undefined;
+    }>;
+
+    @Component({
+      selector: 'formisch-form-reject-host',
+      standalone: true,
+      imports: [FormischForm],
+      template: `<form
+        [formischForm]="form"
+        [formischSubmit]="handleSubmit"
+      ></form>`,
+    })
+    class RejectSubmitHostComponent {
+      readonly form = injectForm({
+        schema: Schema,
+        initialInput: { email: 'jane@example.com' },
+      });
+      readonly handleSubmit: SubmitEventHandler<typeof Schema> = () =>
+        Promise.reject(new Error('Submit failed'));
+    }
+
+    RejectSubmitHost = RejectSubmitHostComponent as Type<{
+      form: FormStore<typeof Schema>;
+    }>;
+
+    @Component({
+      selector: 'formisch-form-swap-host',
+      standalone: true,
+      imports: [FormischForm],
+      template: `<form
+        [formischForm]="useFirstForm() ? firstForm : secondForm"
+        [formischSubmit]="handleSubmit"
+      ></form>`,
+    })
+    class SwapHostComponent {
+      readonly firstForm = injectForm({ schema: Schema });
+      readonly secondForm = injectForm({ schema: Schema });
+      readonly useFirstForm = signal(true);
+      readonly handleSubmit: SubmitEventHandler<typeof Schema> = () =>
+        undefined;
+    }
+
+    SwapHost = SwapHostComponent as Type<{
+      firstForm: FormStore<typeof Schema>;
+      secondForm: FormStore<typeof Schema>;
+      useFirstForm: WritableSignal<boolean>;
+    }>;
   });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [TestHost],
+      imports: [TestHost, AsyncSubmitHost, RejectSubmitHost, SwapHost],
       providers: [provideZonelessChangeDetection()],
     });
   });
@@ -70,7 +165,7 @@ describe('FormischForm', () => {
     expect(fixture.componentInstance.form[INTERNAL].element).toBe(form);
   });
 
-  it('emits the validated output when a valid form is submitted', async () => {
+  it('calls the submit handler with the validated output', async () => {
     const fixture = TestBed.createComponent(TestHost);
     fixture.detectChanges();
     const form = (fixture.nativeElement as HTMLElement).querySelector('form')!;
@@ -79,6 +174,59 @@ describe('FormischForm', () => {
     expect(fixture.componentInstance.submitted).toEqual({
       email: 'jane@example.com',
     });
+  });
+
+  it('keeps the form submitting while an async submit handler is pending', async () => {
+    const fixture = TestBed.createComponent(AsyncSubmitHost);
+    fixture.detectChanges();
+    const form = (fixture.nativeElement as HTMLElement).querySelector('form')!;
+    form.dispatchEvent(new SubmitEvent('submit', { cancelable: true }));
+
+    await vi.waitFor(() => {
+      expect(fixture.componentInstance.submitted).toEqual({
+        email: 'jane@example.com',
+      });
+    });
+    expect(fixture.componentInstance.form.isSubmitting()).toBe(true);
+
+    fixture.componentInstance.resolveSubmit?.();
+    await vi.waitFor(() => {
+      expect(fixture.componentInstance.form.isSubmitting()).toBe(false);
+    });
+  });
+
+  it('stores errors from a rejected submit handler', async () => {
+    const fixture = TestBed.createComponent(RejectSubmitHost);
+    fixture.detectChanges();
+    const form = (fixture.nativeElement as HTMLElement).querySelector('form')!;
+    form.dispatchEvent(new SubmitEvent('submit', { cancelable: true }));
+
+    await vi.waitFor(() => {
+      expect(fixture.componentInstance.form.errors()).toEqual([
+        'Submit failed',
+      ]);
+    });
+    expect(fixture.componentInstance.form.isSubmitting()).toBe(false);
+  });
+
+  it('re-registers the form element when the bound form changes', async () => {
+    const fixture = TestBed.createComponent(SwapHost);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const form = (fixture.nativeElement as HTMLElement).querySelector('form');
+    expect(fixture.componentInstance.firstForm[INTERNAL].element).toBe(form);
+    expect(
+      fixture.componentInstance.secondForm[INTERNAL].element
+    ).toBeUndefined();
+
+    fixture.componentInstance.useFirstForm.set(false);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(
+      fixture.componentInstance.firstForm[INTERNAL].element
+    ).toBeUndefined();
+    expect(fixture.componentInstance.secondForm[INTERNAL].element).toBe(form);
   });
 
   it('clears the registered form element on destroy', async () => {

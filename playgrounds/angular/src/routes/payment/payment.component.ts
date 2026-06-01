@@ -68,7 +68,7 @@ const PaymentSchema = v.intersect([
   template: `
     <form
       [formischForm]="form"
-      (formischSubmit)="handleSubmit($event)"
+      [formischSubmit]="handleSubmit"
       class="space-y-12 md:space-y-14 lg:space-y-16"
     >
       <app-form-header [form]="form" heading="Payment form" />
@@ -147,7 +147,9 @@ export class PaymentComponent {
     getInput(this.form, { path: ['type'] })
   );
 
-  handleSubmit(output: v.InferOutput<typeof PaymentSchema>): void {
+  readonly handleSubmit = (
+    output: v.InferOutput<typeof PaymentSchema>
+  ): void => {
     console.log(output);
-  }
+  };
 }

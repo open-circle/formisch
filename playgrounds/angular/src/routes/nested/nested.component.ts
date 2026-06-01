@@ -42,7 +42,7 @@ const NestedFormSchema = v.object({
   template: `
     <form
       [formischForm]="form"
-      (formischSubmit)="handleSubmit($event)"
+      [formischSubmit]="handleSubmit"
       class="space-y-12 md:space-y-14 lg:space-y-16"
     >
       <app-form-header [form]="form" heading="Nested form" />
@@ -195,9 +195,11 @@ export class NestedComponent {
     },
   });
 
-  handleSubmit(output: v.InferOutput<typeof NestedFormSchema>): void {
+  readonly handleSubmit = (
+    output: v.InferOutput<typeof NestedFormSchema>
+  ): void => {
     console.log(output);
-  }
+  };
 
   addItem(): void {
     insert(this.form, {

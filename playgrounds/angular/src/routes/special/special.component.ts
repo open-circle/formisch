@@ -46,7 +46,7 @@ const SpecialFormSchema = v.object({
   template: `
     <form
       [formischForm]="form"
-      (formischSubmit)="handleSubmit($event)"
+      [formischSubmit]="handleSubmit"
       class="space-y-12 md:space-y-14 lg:space-y-16"
     >
       <app-form-header [form]="form" heading="Special form" />
@@ -146,7 +146,9 @@ export class SpecialComponent {
     { label: 'Option 3', value: 'option_3' },
   ];
 
-  handleSubmit(output: v.InferOutput<typeof SpecialFormSchema>): void {
+  readonly handleSubmit = (
+    output: v.InferOutput<typeof SpecialFormSchema>
+  ): void => {
     console.log(output);
-  }
+  };
 }

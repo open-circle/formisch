@@ -7,6 +7,7 @@ export type {
   RequiredPath,
   FormSchema,
   Schema,
+  SubmitEventHandler,
   SubmitHandler,
   ValidArrayPath,
   ValidationMode,

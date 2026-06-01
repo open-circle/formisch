@@ -60,7 +60,7 @@ const TodosSchema = v.object({
   template: `
     <form
       [formischForm]="form"
-      (formischSubmit)="handleSubmit($event)"
+      [formischSubmit]="handleSubmit"
       class="space-y-12 md:space-y-14 lg:space-y-16"
     >
       <app-form-header [form]="form" heading="Todo form" />
@@ -170,9 +170,9 @@ export class TodosComponent {
     },
   });
 
-  handleSubmit(output: v.InferOutput<typeof TodosSchema>): void {
+  readonly handleSubmit = (output: v.InferOutput<typeof TodosSchema>): void => {
     console.log(output);
-  }
+  };
 
   handleInsert(): void {
     insert(this.form, {

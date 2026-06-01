@@ -1,17 +1,17 @@
 import {
-  afterNextRender,
-  DestroyRef,
   Directive,
   ElementRef,
+  effect,
   inject,
   input,
   type InputSignal,
-  output,
-  type OutputEmitterRef,
 } from '@angular/core';
-import { type FormSchema, INTERNAL } from '@formisch/core/angular';
+import {
+  type FormSchema,
+  INTERNAL,
+  type SubmitEventHandler,
+} from '@formisch/core/angular';
 import { handleSubmit } from '@formisch/methods/angular';
-import type * as v from 'valibot';
 import type { FormStore } from '../../types/index.ts';
 
 /**
@@ -20,7 +20,7 @@ import type { FormStore } from '../../types/index.ts';
  * disables native browser validation.
  *
  * ```html
- * <form [formischForm]="form" (formischSubmit)="onSubmit($event)">…</form>
+ * <form [formischForm]="form" [formischSubmit]="onSubmit">…</form>
  * ```
  */
 @Directive({
@@ -38,27 +38,27 @@ export class FormischForm<TSchema extends FormSchema = FormSchema> {
   readonly formischForm: InputSignal<FormStore<TSchema>> =
     input.required<FormStore<TSchema>>();
   /**
-   * Emits the validated form output when submission succeeds.
+   * The submit handler called when validation succeeds.
    */
-  readonly formischSubmit: OutputEmitterRef<v.InferOutput<TSchema>> =
-    output<v.InferOutput<TSchema>>();
+  readonly formischSubmit: InputSignal<SubmitEventHandler<TSchema>> =
+    input.required<SubmitEventHandler<TSchema>>();
 
   private readonly elementRef = inject<ElementRef<HTMLFormElement>>(ElementRef);
-  private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
-    afterNextRender(() => {
-      this.formischForm()[INTERNAL].element = this.elementRef.nativeElement;
-    });
-    this.destroyRef.onDestroy(() => {
-      this.formischForm()[INTERNAL].element = undefined;
+    effect((onCleanup) => {
+      const form = this.formischForm();
+      const element = this.elementRef.nativeElement;
+      form[INTERNAL].element = element;
+      onCleanup(() => {
+        if (form[INTERNAL].element === element) {
+          form[INTERNAL].element = undefined;
+        }
+      });
     });
   }
 
   protected handleFormSubmit(event: SubmitEvent): void {
-    event.preventDefault();
-    void handleSubmit(this.formischForm(), (output: v.InferOutput<TSchema>) => {
-      this.formischSubmit.emit(output);
-    })();
+    void handleSubmit(this.formischForm(), this.formischSubmit())(event);
   }
 }
