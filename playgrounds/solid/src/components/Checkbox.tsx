@@ -26,7 +26,7 @@ export function Checkbox(props: CheckboxProps) {
 
   return (
     <div class={clsx('px-8 lg:px-10', props.class)}>
-      <label class="flex space-x-4 font-medium select-none md:text-lg lg:text-xl">
+      <label class="flex select-none space-x-4 font-medium md:text-lg lg:text-xl">
         <input
           {...inputProps}
           class="mt-1 h-4 w-4 cursor-pointer lg:mt-1 lg:h-5 lg:w-5"

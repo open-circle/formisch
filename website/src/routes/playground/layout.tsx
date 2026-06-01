@@ -19,7 +19,7 @@ export default component$(() => {
   useContextProvider(FormStoreContext, formContext);
 
   return (
-    <main class="flex w-full max-w-(--breakpoint-2xl) flex-1 flex-col self-center lg:flex-row">
+    <main class="max-w-(--breakpoint-2xl) flex w-full flex-1 flex-col self-center lg:flex-row">
       <div class="flex flex-1 flex-col gap-12 py-10 md:gap-14 md:py-14 lg:gap-16 lg:py-24 xl:py-32">
         <Tabs items={['Login', 'Payment', 'Todos', 'Special', 'Nested']} />
         <Slot />
