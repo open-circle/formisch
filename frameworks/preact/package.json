@@ -58,7 +58,7 @@
     "typescript": "^5.8.3",
     "valibot": "^1.4.1",
     "vite": "^6.0.4",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.7"
   },
   "peerDependencies": {
     "@preact/signals": "^2.0.0",
