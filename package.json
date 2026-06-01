@@ -38,12 +38,14 @@
     "test-packages": "pnpm --filter './packages/*' --if-present test",
     "test-frameworks": "pnpm --filter './frameworks/*' --if-present test",
     "check-versions": "pnpm --filter formisch-scripts check-versions",
-    "create-releases": "pnpm --filter formisch-scripts create-releases"
+    "create-releases": "pnpm --filter formisch-scripts create-releases",
+    "scan": "cve-lite . --report"
   },
   "devDependencies": {
     "@babel/plugin-syntax-class-properties": "^7.12.13",
     "@babel/plugin-syntax-jsx": "^7.27.1",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "cve-lite-cli": "^1.17.3",
     "prettier": "^3.6.2",
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.6.14",

@@ -47,7 +47,7 @@
     "@formisch/methods": "workspace:*",
     "@testing-library/jest-dom": "^6.6.0",
     "@types/node": "^24.1.0",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/coverage-v8": "^4.1.7",
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^9.32.0",
@@ -57,7 +57,7 @@
     "typescript": "~5.8.3",
     "unplugin-vue": "^7.0.0",
     "valibot": "^1.4.1",
-    "vitest": "^3.2.4",
+    "vitest": "^4.1.7",
     "vue": "^3.5.18",
     "vue-tsc": "^3.0.4"
   },
