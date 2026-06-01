@@ -4,3 +4,12 @@ packages:
   - 'playgrounds/*'
   - 'scripts'
   - 'website'
+minimumReleaseAge: 20160  # minutes — 14 days
+minimumReleaseAgeExclude:
+  - valibot
+allowBuilds:
+  '@parcel/watcher': true
+  deasync: true
+  esbuild: true
+  sharp: true
+  vercel: true
