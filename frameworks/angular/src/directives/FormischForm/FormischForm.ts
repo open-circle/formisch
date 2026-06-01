@@ -1,5 +1,6 @@
 import {
   afterNextRender,
+  DestroyRef,
   Directive,
   ElementRef,
   inject,
@@ -43,10 +44,14 @@ export class FormischForm<TSchema extends FormSchema = FormSchema> {
     output<v.InferOutput<TSchema>>();
 
   private readonly elementRef = inject<ElementRef<HTMLFormElement>>(ElementRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
     afterNextRender(() => {
       this.formischForm()[INTERNAL].element = this.elementRef.nativeElement;
+    });
+    this.destroyRef.onDestroy(() => {
+      this.formischForm()[INTERNAL].element = undefined;
     });
   }
 

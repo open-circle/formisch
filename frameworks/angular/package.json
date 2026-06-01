@@ -62,7 +62,7 @@
   },
   "peerDependencies": {
     "@angular/common": ">=17.0.0",
-    "@angular/core": ">=17.1.0",
+    "@angular/core": ">=17.3.0",
     "typescript": ">=5",
     "valibot": "^1.4.1"
   },

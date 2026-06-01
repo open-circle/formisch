@@ -32,7 +32,7 @@ export interface FormischFieldContext<
  * `of` keyword so the context guard can infer the field's value type.
  *
  * ```html
- * <ng-container *formischField="['todos', i, 'label']; of form; let field">
+ * <ng-container *formischField="['todos', i, 'label'] of form; let field">
  *   <input [value]="field.input()" [formischControl]="field" />
  * </ng-container>
  * ```

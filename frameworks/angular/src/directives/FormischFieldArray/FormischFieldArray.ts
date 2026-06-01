@@ -32,7 +32,7 @@ export interface FormischFieldArrayContext<
  * via the `of` keyword so the context guard can infer the array type.
  *
  * ```html
- * <ng-container *formischFieldArray="['todos']; of form; let fieldArray">
+ * <ng-container *formischFieldArray="['todos'] of form; let fieldArray">
  *   &commat;for (item of fieldArray.items(); track item) { … }
  * </ng-container>
  * ```

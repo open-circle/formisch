@@ -80,4 +80,14 @@ describe('FormischForm', () => {
       email: 'jane@example.com',
     });
   });
+
+  it('clears the registered form element on destroy', async () => {
+    const fixture = TestBed.createComponent(TestHost);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const internalFormStore = fixture.componentInstance.form[INTERNAL];
+    expect(internalFormStore.element).toBeDefined();
+    fixture.destroy();
+    expect(internalFormStore.element).toBeUndefined();
+  });
 });

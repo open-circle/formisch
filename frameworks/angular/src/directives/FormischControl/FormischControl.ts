@@ -1,8 +1,7 @@
 import {
-  afterNextRender,
   computed,
-  DestroyRef,
   Directive,
+  effect,
   ElementRef,
   inject,
   input,
@@ -48,15 +47,16 @@ export class FormischControl {
   );
 
   private readonly elementRef = inject<ElementRef<FieldElement>>(ElementRef);
-  private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
-    afterNextRender(() => {
+    // Register the host element with the field, re-registering whenever the
+    // bound field changes and unregistering on cleanup/destroy.
+    effect((onCleanup) => {
       const cleanup = this.formischControl()[CONTROL].ref(
         this.elementRef.nativeElement
       );
       if (cleanup) {
-        this.destroyRef.onDestroy(cleanup);
+        onCleanup(cleanup);
       }
     });
   }
