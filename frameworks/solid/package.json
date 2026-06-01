@@ -57,6 +57,7 @@
     "@formisch/methods": "workspace:*",
     "@solidjs/testing-library": "^0.8.10",
     "@testing-library/jest-dom": "^6.6.0",
+    "@types/node": "24.0.13",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.31.0",
     "eslint-plugin-solid": "^0.14.5",
