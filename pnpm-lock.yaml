@@ -940,6 +940,9 @@ importers:
       '@formisch/qwik':
         specifier: workspace:*
         version: link:../frameworks/qwik
+      '@formkit/auto-animate':
+        specifier: ^0.9.0
+        version: 0.9.0
       clsx:
         specifier: ^2.1.1
         version: 2.1.1

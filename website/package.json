@@ -61,6 +61,7 @@
   },
   "dependencies": {
     "@formisch/qwik": "workspace:*",
+    "@formkit/auto-animate": "^0.9.0",
     "clsx": "^2.1.1",
     "valibot": "^1.4.1"
   },
