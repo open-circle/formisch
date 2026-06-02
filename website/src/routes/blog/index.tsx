@@ -91,7 +91,7 @@ export const usePosts = routeLoader$(async () => {
 export default component$(() => {
   const posts = usePosts();
   return (
-    <main class="flex w-full max-w-(--breakpoint-lg) flex-1 flex-col gap-12 self-center py-12 md:gap-14 md:py-14 lg:gap-16 lg:py-24 xl:py-32">
+    <main class="max-w-(--breakpoint-lg) flex w-full flex-1 flex-col gap-12 self-center py-12 md:gap-14 md:py-14 lg:gap-16 lg:py-24 xl:py-32">
       <div class="mdx">
         <h1>Blog</h1>
         <p>

@@ -17,6 +17,9 @@ backups
 .netlify
 .vercel
 
+# Security reports
+cve-report
+
 # Others
 logs
 *.log

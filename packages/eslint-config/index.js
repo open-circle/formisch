@@ -65,6 +65,7 @@ export const commonRules = {
 
   // Import
   'import/no-unresolved': 'off',
+  'import/named': 'off',
 
   // JSDoc
   'jsdoc/require-param-type': 'off',

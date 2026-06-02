@@ -25,7 +25,7 @@ export const PostList = component$<PostListProps>(({ posts }) => (
         <Link class="flex flex-col gap-8" href={post.href} prefetch={false}>
           <PostCover variant="blog" label={post.cover} />
           <div class="flex flex-col gap-5">
-            <h3 class="text-lg leading-normal font-medium text-slate-900 md:text-xl lg:text-2xl dark:text-slate-200">
+            <h3 class="text-lg font-medium leading-normal text-slate-900 md:text-xl lg:text-2xl dark:text-slate-200">
               {post.title}
             </h3>
             <PostMeta
