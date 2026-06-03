@@ -17,6 +17,17 @@ import { injectField } from '../../functions/index.ts';
 import type { FieldStore, FormStore } from '../../types/index.ts';
 
 /**
+ * Template context type for the FormischField content template.
+ * Provides type information for the `let-field` template variable.
+ */
+export interface FormischFieldContext<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
+  $implicit: FieldStore<TSchema, TFieldPath>;
+}
+
+/**
  * Headless field component that provides reactive field state via an Angular template.
  * Uses ContentChild TemplateRef pattern to pass the FieldStore as $implicit context.
  *
@@ -60,4 +71,14 @@ export class FormischField<
     TSchema,
     TFieldPath
   >(this.of, { path: this.path });
+
+  static ngTemplateContextGuard<
+    TSchema extends FormSchema,
+    TFieldPath extends RequiredPath,
+  >(
+    _dir: FormischField<TSchema, TFieldPath>,
+    ctx: unknown
+  ): ctx is FormischFieldContext<TSchema, TFieldPath> {
+    return true;
+  }
 }

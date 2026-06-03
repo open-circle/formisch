@@ -17,6 +17,17 @@ import { injectFieldArray } from '../../functions/index.ts';
 import type { FieldArrayStore, FormStore } from '../../types/index.ts';
 
 /**
+ * Template context type for the FormischFieldArray content template.
+ * Provides type information for the `let-fieldArray` template variable.
+ */
+export interface FormischFieldArrayContext<
+  TSchema extends FormSchema = FormSchema,
+  TFieldArrayPath extends RequiredPath = RequiredPath,
+> {
+  $implicit: FieldArrayStore<TSchema, TFieldArrayPath>;
+}
+
+/**
  * Headless field array component that provides reactive field array state via an Angular template.
  * Uses ContentChild TemplateRef pattern to pass the FieldArrayStore as $implicit context.
  *
@@ -63,4 +74,14 @@ export class FormischFieldArray<
     injectFieldArray<TSchema, TFieldArrayPath>(this.of, {
       path: this.path,
     });
+
+  static ngTemplateContextGuard<
+    TSchema extends FormSchema,
+    TFieldArrayPath extends RequiredPath,
+  >(
+    _dir: FormischFieldArray<TSchema, TFieldArrayPath>,
+    ctx: unknown
+  ): ctx is FormischFieldArrayContext<TSchema, TFieldArrayPath> {
+    return true;
+  }
 }
