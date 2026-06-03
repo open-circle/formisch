@@ -68,7 +68,7 @@ interface SelectOption {
   `,
 })
 export class SelectComponent {
-  readonly field = input.required<FieldStore<any, any>>();
+  readonly field = input.required<FieldStore>();
   readonly label = input<string>();
   readonly options = input.required<SelectOption[]>();
   readonly multiple = input<boolean>(false);

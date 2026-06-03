@@ -33,7 +33,7 @@ import { InputErrorsComponent } from './input-errors.component.ts';
   `,
 })
 export class CheckboxComponent {
-  readonly field = input.required<FieldStore<any, any>>();
+  readonly field = input.required<FieldStore>();
   readonly label = input<string>('');
   readonly value = input<string>();
   readonly required = input<boolean>(false);
