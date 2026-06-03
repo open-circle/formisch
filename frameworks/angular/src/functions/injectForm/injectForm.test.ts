@@ -1,4 +1,7 @@
-import { provideExperimentalZonelessChangeDetection } from '@angular/core';
+import {
+  Component,
+  provideExperimentalZonelessChangeDetection,
+} from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import * as v from 'valibot';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -52,5 +55,18 @@ describe('injectForm', () => {
   it('initializes errors to null', () => {
     const form = setup();
     expect(form.errors()).toBeNull();
+  });
+
+  it('triggers validation after initial render when validate is initial', async () => {
+    @Component({ standalone: true, template: '' })
+    class TestComponent {
+      readonly form = injectForm({ schema: Schema, validate: 'initial' });
+    }
+
+    const fixture = TestBed.createComponent(TestComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.form.isValid()).toBe(false);
   });
 });
