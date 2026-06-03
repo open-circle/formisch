@@ -9,6 +9,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { injectForm } from '../../functions/index.ts';
 import { loadDistComponent } from '../../vitest/loadDistComponent.ts';
 
+
 const Schema = v.object({ email: v.pipe(v.string(), v.email()) });
 
 let TestHost: Type<unknown>;
@@ -70,5 +71,45 @@ describe('FormischForm', () => {
     const { INTERNAL } = await import('@formisch/core/angular');
     const internalStore = formStore[INTERNAL];
     expect(internalStore.element).toBeInstanceOf(HTMLFormElement);
+  });
+});
+
+describe('FormischForm class forwarding', () => {
+  let TestHost: Type<unknown>;
+
+  beforeAll(async () => {
+    const FormischForm = await loadDistComponent('FormischForm');
+
+    @Component({
+      standalone: true,
+      imports: [FormischForm],
+      template: `
+        <formisch-form [of]="form" [submitFn]="handleSubmit" class="foo bar">
+          <button type="submit">Submit</button>
+        </formisch-form>
+      `,
+    })
+    class TestHostComponent {
+      form = injectForm({ schema: v.object({ email: v.string() }) });
+      handleSubmit = vi.fn();
+    }
+
+    TestHost = TestHostComponent;
+  });
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [TestHost],
+      providers: [provideExperimentalZonelessChangeDetection()],
+    });
+  });
+
+  it('moves classes from the host element to the inner form element', async () => {
+    const fixture = TestBed.createComponent(TestHost);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('form')?.className).toBe('foo bar');
+    expect(host.querySelector('formisch-form')?.getAttribute('class')).toBeNull();
   });
 });

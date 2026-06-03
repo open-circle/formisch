@@ -1,10 +1,12 @@
 import {
   afterNextRender,
+  afterRenderEffect,
   Component,
   ElementRef,
   inject,
   input,
   type InputSignal,
+  viewChild,
 } from '@angular/core';
 import {
   type FormSchema,
@@ -31,7 +33,7 @@ import type { FormStore } from '../../types/index.ts';
   // Render no box of its own so the inner `<form>` becomes the effective
   // element in the layout, matching the other framework wrappers.
   styles: ':host { display: contents; }',
-  template: `<form novalidate (submit)="handleFormSubmit($event)">
+  template: `<form #formEl novalidate (submit)="handleFormSubmit($event)">
     <ng-content />
   </form>`,
 })
@@ -42,21 +44,32 @@ export class FormischForm<TSchema extends FormSchema = FormSchema> {
     input.required<SubmitEventHandler<TSchema>>();
 
   private readonly hostEl = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly formEl = viewChild.required<ElementRef<HTMLFormElement>>('formEl');
 
   constructor() {
-    afterNextRender(() => {
-      const hostElement = this.hostEl.nativeElement;
-      const formElement = hostElement.querySelector<HTMLFormElement>('form');
-      if (formElement) {
-        this.of()[INTERNAL].element = formElement;
-        // Forward classes from the host to the actual `<form>` element so
-        // layout utilities (e.g. `space-y`) apply to the form's children
-        // instead of the host, which renders no box of its own.
-        if (hostElement.className) {
-          formElement.className = hostElement.className;
-          hostElement.removeAttribute('class');
+    const ofSignal = this.of;
+    const hostEl = this.hostEl;
+    const formEl = this.formEl;
+
+    // Register the inner form element with the store once after first render.
+    afterNextRender({
+      write: () => {
+        ofSignal()[INTERNAL].element = formEl().nativeElement;
+      },
+    });
+
+    // Forward classes from the host to the inner <form> after every render so
+    // layout utilities (e.g. Tailwind space-y-*) applied to <formisch-form>
+    // affect the form's children rather than the invisible host element.
+    afterRenderEffect({
+      earlyRead: () => hostEl.nativeElement.className,
+      write: (classNameSignal) => {
+        const className = classNameSignal();
+        if (className) {
+          formEl().nativeElement.className = className;
+          hostEl.nativeElement.removeAttribute('class');
         }
-      }
+      },
     });
   }
 
