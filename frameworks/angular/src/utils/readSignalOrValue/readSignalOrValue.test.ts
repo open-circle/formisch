@@ -11,6 +11,13 @@ describe('readSignalOrValue', () => {
     expect(readSignalOrValue(obj)).toBe(obj);
   });
 
+  test('should return a plain function as-is when TValue is a function type', () => {
+    // When TValue is itself a function, the old `typeof === 'function'` check would
+    // incorrectly invoke it. isSignal() correctly treats it as a plain value.
+    const fn = (): string => 'result';
+    expect(readSignalOrValue<typeof fn>(fn)).toBe(fn);
+  });
+
   test('should read the signal when a signal is passed', () => {
     expect(readSignalOrValue(signal(42))).toBe(42);
     const obj = { a: 1 };

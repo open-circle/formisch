@@ -1,4 +1,4 @@
-import type { Signal } from '@angular/core';
+import { isSignal } from '@angular/core';
 import type { SignalOrValue } from '../../types/index.ts';
 
 /**
@@ -10,8 +10,5 @@ import type { SignalOrValue } from '../../types/index.ts';
  */
 export function readSignalOrValue<TValue>(value: SignalOrValue<TValue>): TValue;
 export function readSignalOrValue(value: SignalOrValue<unknown>): unknown {
-  if (typeof value === 'function') {
-    return (value as Signal<unknown>)();
-  }
-  return value;
+  return isSignal(value) ? value() : value;
 }
