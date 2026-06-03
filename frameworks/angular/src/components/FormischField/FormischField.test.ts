@@ -23,7 +23,7 @@ describe('FormischField', () => {
       template: `
         <formisch-field [of]="form" [path]="['email']">
           <ng-template let-field>
-            <input [name]="field.props.name" data-testid="input" />
+            <input [name]="field.name" data-testid="input" />
             <span data-testid="errors">{{ field.errors() }}</span>
           </ng-template>
         </formisch-field>

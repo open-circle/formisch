@@ -40,16 +40,16 @@ const LoginSchema = v.object({
         <formisch-field [of]="form" [path]="['email']">
           <ng-template let-field>
             <app-text-input
-              [name]="field.props.name"
+              [name]="field.name"
               [value]="field.input()"
               [errors]="field.errors()"
               type="email"
               label="Email"
               placeholder="example@email.com"
               [required]="true"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>
@@ -57,16 +57,16 @@ const LoginSchema = v.object({
         <formisch-field [of]="form" [path]="['password']">
           <ng-template let-field>
             <app-text-input
-              [name]="field.props.name"
+              [name]="field.name"
               [value]="field.input()"
               [errors]="field.errors()"
               type="password"
               label="Password"
               placeholder="********"
               [required]="true"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>

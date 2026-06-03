@@ -77,16 +77,16 @@ const PaymentSchema = v.intersect([
         <formisch-field [of]="form" [path]="['owner']">
           <ng-template let-field>
             <app-text-input
-              [name]="field.props.name"
+              [name]="field.name"
               [value]="field.input()"
               [errors]="field.errors()"
               type="text"
               label="Owner"
               placeholder="John Doe"
               [required]="true"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>
@@ -94,16 +94,16 @@ const PaymentSchema = v.intersect([
         <formisch-field [of]="form" [path]="['type']">
           <ng-template let-field>
             <app-select
-              [name]="field.props.name"
+              [name]="field.name"
               [input]="field.input()"
               [options]="paymentTypes"
               [errors]="field.errors()"
               label="Type"
               placeholder="Card or PayPal?"
               [required]="true"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>
@@ -112,16 +112,16 @@ const PaymentSchema = v.intersect([
           <formisch-field [of]="form" [path]="['card', 'number']">
             <ng-template let-field>
               <app-text-input
-                [name]="field.props.name"
+                [name]="field.name"
                 [value]="field.input()"
                 [errors]="field.errors()"
                 type="text"
                 label="Number"
                 placeholder="1234 1234 1234 1234"
                 [required]="true"
-                (fieldFocus)="field.props.onFocus($event)"
-                (fieldChange)="field.props.onChange($event)"
-                (fieldBlur)="field.props.onBlur($event)"
+                (fieldFocus)="field.onFocus($event)"
+                (fieldChange)="field.onChange($event)"
+                (fieldBlur)="field.onBlur($event)"
               />
             </ng-template>
           </formisch-field>
@@ -129,16 +129,16 @@ const PaymentSchema = v.intersect([
           <formisch-field [of]="form" [path]="['card', 'expiration']">
             <ng-template let-field>
               <app-text-input
-                [name]="field.props.name"
+                [name]="field.name"
                 [value]="field.input()"
                 [errors]="field.errors()"
                 type="text"
                 label="Expiration"
                 placeholder="MM/YY"
                 [required]="true"
-                (fieldFocus)="field.props.onFocus($event)"
-                (fieldChange)="field.props.onChange($event)"
-                (fieldBlur)="field.props.onBlur($event)"
+                (fieldFocus)="field.onFocus($event)"
+                (fieldChange)="field.onChange($event)"
+                (fieldBlur)="field.onBlur($event)"
               />
             </ng-template>
           </formisch-field>
@@ -148,16 +148,16 @@ const PaymentSchema = v.intersect([
           <formisch-field [of]="form" [path]="['paypal', 'email']">
             <ng-template let-field>
               <app-text-input
-                [name]="field.props.name"
+                [name]="field.name"
                 [value]="field.input()"
                 [errors]="field.errors()"
                 type="email"
                 label="Email"
                 placeholder="example@email.com"
                 [required]="true"
-                (fieldFocus)="field.props.onFocus($event)"
-                (fieldChange)="field.props.onChange($event)"
-                (fieldBlur)="field.props.onBlur($event)"
+                (fieldFocus)="field.onFocus($event)"
+                (fieldChange)="field.onChange($event)"
+                (fieldBlur)="field.onBlur($event)"
               />
             </ng-template>
           </formisch-field>

@@ -63,13 +63,25 @@ describe('injectField', () => {
     expectTypeOf(field.isValid).toEqualTypeOf<Signal<boolean>>();
   });
 
-  test('should expose props with name and autofocus', () => {
+  test('should expose flat name, autofocus, and event handlers', () => {
     const schema = v.object({ email: v.pipe(v.string(), v.email()) });
     const form = injectForm({ schema });
     const field = injectField(form, { path: ['email'] });
 
-    expectTypeOf(field.props.name).toEqualTypeOf<string>();
-    expectTypeOf(field.props.autofocus).toEqualTypeOf<boolean>();
+    expectTypeOf(field.name).toEqualTypeOf<string>();
+    expectTypeOf(field.autofocus).toEqualTypeOf<boolean>();
+    expectTypeOf(field.onFocus).toEqualTypeOf<(event: FocusEvent) => void>();
+    expectTypeOf(field.onChange).toEqualTypeOf<(event: Event) => void>();
+    expectTypeOf(field.onBlur).toEqualTypeOf<(event: FocusEvent) => void>();
+  });
+
+  test('should expose registerElement returning a cleanup function', () => {
+    const schema = v.object({ email: v.pipe(v.string(), v.email()) });
+    const form = injectForm({ schema });
+    const field = injectField(form, { path: ['email'] });
+
+    expectTypeOf(field.registerElement).toBeFunction();
+    expectTypeOf(field.registerElement).returns.toEqualTypeOf<() => void>();
   });
 
   test('should reject invalid paths', () => {

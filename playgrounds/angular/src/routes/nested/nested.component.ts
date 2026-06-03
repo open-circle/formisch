@@ -67,15 +67,15 @@ const NestedFormSchema = v.object({
                     >
                       <ng-template let-field>
                         <app-text-input
-                          [name]="field.props.name"
+                          [name]="field.name"
                           [value]="field.input()"
                           [errors]="field.errors()"
                           type="text"
                           class="p-0!"
                           placeholder="Enter item"
-                          (fieldFocus)="field.props.onFocus($event)"
-                          (fieldChange)="field.props.onChange($event)"
-                          (fieldBlur)="field.props.onBlur($event)"
+                          (fieldFocus)="field.onFocus($event)"
+                          (fieldChange)="field.onChange($event)"
+                          (fieldBlur)="field.onBlur($event)"
                         />
                       </ng-template>
                     </formisch-field>
@@ -117,15 +117,15 @@ const NestedFormSchema = v.object({
                             >
                               <ng-template let-field>
                                 <app-text-input
-                                  [name]="field.props.name"
+                                  [name]="field.name"
                                   [value]="field.input()"
                                   [errors]="field.errors()"
                                   class="p-0!"
                                   type="text"
                                   placeholder="Enter option"
-                                  (fieldFocus)="field.props.onFocus($event)"
-                                  (fieldChange)="field.props.onChange($event)"
-                                  (fieldBlur)="field.props.onBlur($event)"
+                                  (fieldFocus)="field.onFocus($event)"
+                                  (fieldChange)="field.onChange($event)"
+                                  (fieldBlur)="field.onBlur($event)"
                                 />
                               </ng-template>
                             </formisch-field>

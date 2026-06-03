@@ -60,8 +60,8 @@ describe('injectField', () => {
     expect(field.input()).toBe('test@example.com');
   });
 
-  it('exposes a name prop as JSON-stringified path', () => {
+  it('exposes name as JSON-stringified path', () => {
     const { field } = setup();
-    expect(field.props.name).toBe('["email"]');
+    expect(field.name).toBe('["email"]');
   });
 });

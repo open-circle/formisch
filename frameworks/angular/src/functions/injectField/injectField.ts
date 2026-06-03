@@ -48,7 +48,7 @@ export interface InjectFieldConfig<
  * @param form The form store instance.
  * @param config The field configuration.
  *
- * @returns The field store with reactive Signal properties and element props.
+ * @returns The field store with reactive Signal properties.
  */
 export function injectField<
   TSchema extends FormSchema,
@@ -91,37 +91,38 @@ export function injectField(
       setFieldInput(internalFormStore(), path(), value);
       validateIfRequired(internalFormStore(), internalFieldStore(), 'input');
     },
-    props: {
-      get name() {
-        return internalFieldStore().name;
-      },
-      get autofocus() {
-        return !!internalFieldStore().errors.value;
-      },
-      ref(element) {
-        if (element) {
-          internalFieldStore().elements.push(element);
-        }
-      },
-      onFocus() {
-        setFieldBool(internalFieldStore(), 'isTouched', true);
-        validateIfRequired(internalFormStore(), internalFieldStore(), 'touch');
-      },
-      onChange(event) {
-        setFieldInput(
-          internalFormStore(),
-          path(),
-          getElementInput(
-            event.currentTarget as FieldElement,
-            internalFieldStore()
-          )
+    registerElement(element) {
+      internalFieldStore().elements.push(element);
+      return () => {
+        internalFieldStore().elements = internalFieldStore().elements.filter(
+          (el) => el !== element
         );
-        validateIfRequired(internalFormStore(), internalFieldStore(), 'input');
-        validateIfRequired(internalFormStore(), internalFieldStore(), 'change');
-      },
-      onBlur() {
-        validateIfRequired(internalFormStore(), internalFieldStore(), 'blur');
-      },
+      };
+    },
+    get name() {
+      return internalFieldStore().name;
+    },
+    get autofocus() {
+      return !!internalFieldStore().errors.value;
+    },
+    onFocus() {
+      setFieldBool(internalFieldStore(), 'isTouched', true);
+      validateIfRequired(internalFormStore(), internalFieldStore(), 'touch');
+    },
+    onChange(event) {
+      setFieldInput(
+        internalFormStore(),
+        path(),
+        getElementInput(
+          event.currentTarget as FieldElement,
+          internalFieldStore()
+        )
+      );
+      validateIfRequired(internalFormStore(), internalFieldStore(), 'input');
+      validateIfRequired(internalFormStore(), internalFieldStore(), 'change');
+    },
+    onBlur() {
+      validateIfRequired(internalFormStore(), internalFieldStore(), 'blur');
     },
   };
 }

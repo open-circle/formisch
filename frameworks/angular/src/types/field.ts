@@ -11,36 +11,6 @@ import type {
 import type * as v from 'valibot';
 
 /**
- * Field element props interface.
- */
-export interface FieldElementProps {
-  /**
-   * The name attribute of the field element.
-   */
-  readonly name: string;
-  /**
-   * Whether to autofocus the field element when there are errors.
-   */
-  readonly autofocus: boolean;
-  /**
-   * The ref callback to register the field element.
-   */
-  readonly ref: (element: FieldElement | null) => void;
-  /**
-   * The focus event handler of the field element.
-   */
-  readonly onFocus: (event: FocusEvent) => void;
-  /**
-   * The change event handler of the field element.
-   */
-  readonly onChange: (event: Event) => void;
-  /**
-   * The blur event handler of the field element.
-   */
-  readonly onBlur: (event: FocusEvent) => void;
-}
-
-/**
  * Field store interface.
  */
 export interface FieldStore<
@@ -80,9 +50,35 @@ export interface FieldStore<
     value: PartialValues<PathValue<v.InferInput<TSchema>, TFieldPath>>
   ) => void;
   /**
-   * The props to spread onto the field element for integration.
+   * Registers a DOM element with the field for focus management.
+   * Apply the `formischFieldElement` directive to a focusable element instead
+   * of calling this directly.
+   *
+   * @param element The field element to register.
+   *
+   * @returns A cleanup function that unregisters the element.
    */
-  readonly props: FieldElementProps;
+  readonly registerElement: (element: FieldElement) => () => void;
+  /**
+   * The name attribute value derived from the field path.
+   */
+  readonly name: string;
+  /**
+   * Whether the field element should be autofocused (true when the field has errors).
+   */
+  readonly autofocus: boolean;
+  /**
+   * Marks the field as touched and triggers touch-mode validation.
+   */
+  readonly onFocus: (event: FocusEvent) => void;
+  /**
+   * Updates the field value from a DOM event and triggers input and change validation.
+   */
+  readonly onChange: (event: Event) => void;
+  /**
+   * Triggers blur-mode validation.
+   */
+  readonly onBlur: (event: FocusEvent) => void;
 }
 
 /**

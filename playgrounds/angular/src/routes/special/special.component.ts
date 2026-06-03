@@ -55,14 +55,14 @@ const SpecialFormSchema = v.object({
         <formisch-field [of]="form" [path]="['number']">
           <ng-template let-field>
             <app-text-input
-              [name]="field.props.name"
+              [name]="field.name"
               [value]="field.input()"
               [errors]="field.errors()"
               type="number"
               label="Number"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>
@@ -70,13 +70,13 @@ const SpecialFormSchema = v.object({
         <formisch-field [of]="form" [path]="['range']">
           <ng-template let-field>
             <app-slider
-              [name]="field.props.name"
+              [name]="field.name"
               [input]="field.input()"
               [errors]="field.errors()"
               label="Range"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>
@@ -94,15 +94,15 @@ const SpecialFormSchema = v.object({
             <formisch-field [of]="form" [path]="['checkbox', 'array']">
               <ng-template let-field>
                 <app-checkbox
-                  [name]="field.props.name"
+                  [name]="field.name"
                   [label]="option.label"
                   [value]="option.value"
                   [input]="field.input().includes(option.value)"
                   [errors]="field.errors()"
                   class="p-0!"
-                  (fieldFocus)="field.props.onFocus($event)"
-                  (fieldChange)="field.props.onChange($event)"
-                  (fieldBlur)="field.props.onBlur($event)"
+                  (fieldFocus)="field.onFocus($event)"
+                  (fieldChange)="field.onChange($event)"
+                  (fieldBlur)="field.onBlur($event)"
                 />
               </ng-template>
             </formisch-field>
@@ -112,13 +112,13 @@ const SpecialFormSchema = v.object({
         <formisch-field [of]="form" [path]="['checkbox', 'boolean']">
           <ng-template let-field>
             <app-checkbox
-              [name]="field.props.name"
+              [name]="field.name"
               [input]="field.input()"
               [errors]="field.errors()"
               label="Checkbox boolean"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>
@@ -126,14 +126,14 @@ const SpecialFormSchema = v.object({
         <formisch-field [of]="form" [path]="['radio']">
           <ng-template let-field>
             <app-radio-group
-              [name]="field.props.name"
+              [name]="field.name"
               label="Radio group"
               [options]="radioOptions"
               [input]="field.input()"
               [errors]="field.errors()"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>
@@ -141,15 +141,15 @@ const SpecialFormSchema = v.object({
         <formisch-field [of]="form" [path]="['select', 'array']">
           <ng-template let-field>
             <app-select
-              [name]="field.props.name"
+              [name]="field.name"
               [input]="field.input()"
               [options]="selectOptions"
               [errors]="field.errors()"
               label="Select array"
               [multiple]="true"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>
@@ -157,14 +157,14 @@ const SpecialFormSchema = v.object({
         <formisch-field [of]="form" [path]="['select', 'string']">
           <ng-template let-field>
             <app-select
-              [name]="field.props.name"
+              [name]="field.name"
               [input]="field.input()"
               [options]="selectOptions"
               [errors]="field.errors()"
               label="Select string"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>
@@ -172,14 +172,14 @@ const SpecialFormSchema = v.object({
         <formisch-field [of]="form" [path]="['file', 'list']">
           <ng-template let-field>
             <app-file-input
-              [name]="field.props.name"
+              [name]="field.name"
               [input]="field.input()"
               [errors]="field.errors()"
               label="File list"
               [multiple]="true"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>
@@ -187,13 +187,13 @@ const SpecialFormSchema = v.object({
         <formisch-field [of]="form" [path]="['file', 'item']">
           <ng-template let-field>
             <app-file-input
-              [name]="field.props.name"
+              [name]="field.name"
               [input]="field.input()"
               [errors]="field.errors()"
               label="File item"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>

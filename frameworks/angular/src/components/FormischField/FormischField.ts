@@ -24,10 +24,7 @@ import type { FieldStore, FormStore } from '../../types/index.ts';
  * ```html
  * <formisch-field [of]="form" [path]="['email']">
  *   <ng-template let-field>
- *     <input [name]="field.props.name" [value]="field.input()"
- *            (focus)="field.props.onFocus($event)"
- *            (change)="field.props.onChange($event)"
- *            (blur)="field.props.onBlur($event)" />
+ *     <input [formischFieldElement]="field" [value]="field.input()" />
  *   </ng-template>
  * </formisch-field>
  * ```

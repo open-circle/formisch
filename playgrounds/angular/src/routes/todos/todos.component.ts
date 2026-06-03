@@ -69,16 +69,16 @@ const TodosSchema = v.object({
         <formisch-field [of]="form" [path]="['heading']">
           <ng-template let-field>
             <app-text-input
-              [name]="field.props.name"
+              [name]="field.name"
               [value]="field.input()"
               [errors]="field.errors()"
               type="text"
               label="Heading"
               placeholder="Shopping list"
               [required]="true"
-              (fieldFocus)="field.props.onFocus($event)"
-              (fieldChange)="field.props.onChange($event)"
-              (fieldBlur)="field.props.onBlur($event)"
+              (fieldFocus)="field.onFocus($event)"
+              (fieldChange)="field.onChange($event)"
+              (fieldBlur)="field.onBlur($event)"
             />
           </ng-template>
         </formisch-field>
@@ -105,16 +105,16 @@ const TodosSchema = v.object({
                       >
                         <ng-template let-field>
                           <app-text-input
-                            [name]="field.props.name"
+                            [name]="field.name"
                             [value]="field.input()"
                             [errors]="field.errors()"
                             type="text"
                             class="p-0!"
                             placeholder="Enter task"
                             [required]="true"
-                            (fieldFocus)="field.props.onFocus($event)"
-                            (fieldChange)="field.props.onChange($event)"
-                            (fieldBlur)="field.props.onBlur($event)"
+                            (fieldFocus)="field.onFocus($event)"
+                            (fieldChange)="field.onChange($event)"
+                            (fieldBlur)="field.onBlur($event)"
                           />
                         </ng-template>
                       </formisch-field>
@@ -126,15 +126,15 @@ const TodosSchema = v.object({
                       >
                         <ng-template let-field>
                           <app-text-input
-                            [name]="field.props.name"
+                            [name]="field.name"
                             [value]="field.input()"
                             [errors]="field.errors()"
                             type="date"
                             class="p-0!"
                             [required]="true"
-                            (fieldFocus)="field.props.onFocus($event)"
-                            (fieldChange)="field.props.onChange($event)"
-                            (fieldBlur)="field.props.onBlur($event)"
+                            (fieldFocus)="field.onFocus($event)"
+                            (fieldChange)="field.onChange($event)"
+                            (fieldBlur)="field.onBlur($event)"
                           />
                         </ng-template>
                       </formisch-field>
