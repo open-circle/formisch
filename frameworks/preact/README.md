@@ -9,6 +9,7 @@ Formisch is also available for [Qwik][formisch-qwik], [React][formisch-react], [
 - Small bundle size starting at 2.5 kB
 - Schema-based validation with Valibot
 - Type safety with autocompletion in editor
+- Open source and fully tested with 100 % coverage
 - It's fast – DOM updates are fine-grained
 - Minimal, readable and well thought out API
 - Supports all native HTML form fields
