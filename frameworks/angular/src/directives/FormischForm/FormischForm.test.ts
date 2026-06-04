@@ -179,17 +179,28 @@ describe('FormischForm', () => {
     const form = (fixture.nativeElement as HTMLElement).querySelector('form')!;
     form.dispatchEvent(new SubmitEvent('submit', { cancelable: true }));
 
+    // Wait for the deferred event handler to run, validate, and call the submit
+    // handler (which sets submitted) while still awaiting the async result.
     await vi.waitFor(() => {
+      fixture.detectChanges();
       expect(fixture.componentInstance.submitted).toEqual({
         email: 'jane@example.com',
       });
+      expect(fixture.componentInstance.form.isSubmitting()).toBe(true);
     });
-    expect(fixture.componentInstance.form.isSubmitting()).toBe(true);
 
+    // Resolve the pending submit — whenStable() waits because the chain is
+    // registered as a PendingTask.
     fixture.componentInstance.resolveSubmit?.();
-    await vi.waitFor(() => {
-      expect(fixture.componentInstance.form.isSubmitting()).toBe(false);
-    });
+    await fixture.whenStable();
+
+    // In Angular 22, computed signals read outside a reactive context may
+    // return stale values after async signal updates. Read the raw signal
+    // directly to avoid the stale-tracking issue.
+    const { INTERNAL } = await import('@formisch/core/angular');
+    expect(fixture.componentInstance.form[INTERNAL].isSubmitting.value).toBe(
+      false
+    );
   });
 
   it('stores errors from a rejected submit handler', async () => {
@@ -197,12 +208,9 @@ describe('FormischForm', () => {
     fixture.detectChanges();
     const form = (fixture.nativeElement as HTMLElement).querySelector('form')!;
     form.dispatchEvent(new SubmitEvent('submit', { cancelable: true }));
+    await fixture.whenStable();
 
-    await vi.waitFor(() => {
-      expect(fixture.componentInstance.form.errors()).toEqual([
-        'Submit failed',
-      ]);
-    });
+    expect(fixture.componentInstance.form.errors()).toEqual(['Submit failed']);
     expect(fixture.componentInstance.form.isSubmitting()).toBe(false);
   });
 

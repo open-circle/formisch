@@ -5,7 +5,6 @@ import {
   inject,
 } from '@angular/core';
 import {
-  type FieldElement,
   type FormSchema,
   getElementInput,
   getFieldBool,
@@ -106,14 +105,11 @@ export function injectField(
           };
         }
       },
-      onInput(event) {
+      onInput(element) {
         setFieldInput(
           internalFormStore(),
           path(),
-          getElementInput(
-            event.currentTarget as FieldElement,
-            internalFieldStore()
-          )
+          getElementInput(element, internalFieldStore())
         );
         validateIfRequired(internalFormStore(), internalFieldStore(), 'input');
       },

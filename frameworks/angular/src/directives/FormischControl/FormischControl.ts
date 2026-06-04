@@ -26,7 +26,7 @@ import type { FieldStore } from '../../types/index.ts';
   standalone: true,
   host: {
     '[attr.name]': 'fieldName()',
-    '(input)': 'control().onInput($event)',
+    '(input)': 'handleInput()',
     '(change)': 'control().onChange()',
     '(focus)': 'control().onFocus()',
     '(blur)': 'control().onBlur()',
@@ -59,5 +59,9 @@ export class FormischControl {
         onCleanup(cleanup);
       }
     });
+  }
+
+  protected handleInput(): void {
+    this.control().onInput(this.elementRef.nativeElement);
   }
 }

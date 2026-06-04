@@ -5,6 +5,7 @@ import {
   inject,
   input,
   type InputSignal,
+  PendingTasks,
 } from '@angular/core';
 import {
   type FormSchema,
@@ -44,6 +45,7 @@ export class FormischForm<TSchema extends FormSchema = FormSchema> {
     input.required<SubmitEventHandler<TSchema>>();
 
   private readonly elementRef = inject<ElementRef<HTMLFormElement>>(ElementRef);
+  private readonly pendingTasks = inject(PendingTasks);
 
   constructor() {
     effect((onCleanup) => {
@@ -59,6 +61,10 @@ export class FormischForm<TSchema extends FormSchema = FormSchema> {
   }
 
   protected handleFormSubmit(event: SubmitEvent): void {
-    void handleSubmit(this.formischForm(), this.formischSubmit())(event);
+    const cleanup = this.pendingTasks.add();
+    void handleSubmit(
+      this.formischForm(),
+      this.formischSubmit()
+    )(event).finally(cleanup);
   }
 }
