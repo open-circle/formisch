@@ -11,6 +11,10 @@ allowBuilds:
   esbuild: true
   sharp: true
   vercel: true
+  workerd: true
+minimumReleaseAgeExclude:
+  - miniflare@4.20260603.0
+  - wrangler@4.98.0
 overrides:
   # Security: pin vulnerable deps to patched versions (CVE Lite high findings).
   # Keyed by major so only the affected major line is moved to its fixed version.

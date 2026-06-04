@@ -6,9 +6,11 @@ public/guides/
 public/api/
 public/preact/
 public/qwik/
+public/react/
 public/solid/
 public/svelte/
 public/vue/
 public/core/
 public/methods/
 .vercel
+.wrangler

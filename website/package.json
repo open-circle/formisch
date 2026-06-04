@@ -13,11 +13,13 @@
   "scripts": {
     "build": "qwik build",
     "build.client": "vite build",
+    "build.cloudflare": "pnpm --filter @formisch/core --filter @formisch/methods --filter @formisch/qwik build && pnpm sitemap && pnpm llms && pnpm og && pnpm build",
     "build.preview": "vite build --ssr src/entry.preview.tsx",
     "build.server": "vite build -c adapters/static/vite.config.ts",
     "build.types": "tsc --incremental --noEmit",
     "contributors": "tsm ./scripts/contributors.ts",
-    "deploy": "vercel deploy",
+    "deploy.cloudflare": "wrangler deploy",
+    "deploy.vercel": "vercel deploy",
     "dev": "vite --mode ssr",
     "dev.debug": "node --inspect-brk ./node_modules/vite/bin/vite.js --mode ssr --force",
     "format": "prettier --write .",
@@ -57,7 +59,8 @@
     "vercel": "^32.0.0",
     "vite": "^5.4.20",
     "vite-imagetools": "^7.0.5",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "wrangler": "^4.98.0"
   },
   "dependencies": {
     "@formisch/qwik": "workspace:*",
