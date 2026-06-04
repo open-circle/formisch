@@ -9,12 +9,6 @@
 /og/*
   Cache-Control: public, max-age=86400, s-maxage=86400
 
-# Splats are not allowed mid-path, so each route depth needs its own rule
-/q-data.json
-  Cache-Control: public, max-age=60, stale-while-revalidate=604800
-/:a/q-data.json
-  Cache-Control: public, max-age=60, stale-while-revalidate=604800
-/:a/:b/q-data.json
-  Cache-Control: public, max-age=60, stale-while-revalidate=604800
-/:a/:b/:c/q-data.json
+# The splat greedily matches any path prefix at any depth, including none
+/*q-data.json
   Cache-Control: public, max-age=60, stale-while-revalidate=604800
