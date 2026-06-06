@@ -197,7 +197,6 @@ describe('FormischForm', () => {
     // In Angular 22, computed signals read outside a reactive context may
     // return stale values after async signal updates. Read the raw signal
     // directly to avoid the stale-tracking issue.
-    const { INTERNAL } = await import('@formisch/core/angular');
     expect(fixture.componentInstance.form[INTERNAL].isSubmitting.value).toBe(
       false
     );
