@@ -24,7 +24,7 @@ import { type FieldStore, FormischControl } from '@formisch/angular';
   `,
 })
 export class RadioComponent {
-  readonly field = input.required<FieldStore<any, any>>();
+  readonly field = input.required<FieldStore>();
   readonly label = input.required<string>();
   readonly value = input.required<string>();
 

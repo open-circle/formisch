@@ -35,7 +35,7 @@ import { InputLabelComponent } from './input-label.component.ts';
   `,
 })
 export class TextInputComponent {
-  readonly field = input.required<FieldStore<any, any>>();
+  readonly field = input.required<FieldStore>();
   readonly type = input<string>('text');
   readonly label = input<string>();
   readonly placeholder = input<string>();

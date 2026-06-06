@@ -71,7 +71,7 @@ describe('injectField', () => {
     const { field } = setup();
     const element = document.createElement('input');
     element.value = 'test@example.com';
-    field[CONTROL].onInput({ currentTarget: element } as unknown as Event);
+    field[CONTROL].onInput({ target: element } as unknown as Event);
     expect(field.input()).toBe('test@example.com');
   });
 

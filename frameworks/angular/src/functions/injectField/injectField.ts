@@ -110,10 +110,7 @@ export function injectField(
         setFieldInput(
           internalFormStore(),
           path(),
-          getElementInput(
-            event.currentTarget as FieldElement,
-            internalFieldStore()
-          )
+          getElementInput(event.target as FieldElement, internalFieldStore())
         );
         validateIfRequired(internalFormStore(), internalFieldStore(), 'input');
       },

@@ -48,7 +48,7 @@ interface RadioOption {
   `,
 })
 export class RadioGroupComponent {
-  readonly field = input.required<FieldStore<any, any>>();
+  readonly field = input.required<FieldStore>();
   readonly label = input<string>();
   readonly options = input.required<RadioOption[]>();
   readonly required = input<boolean>(false);

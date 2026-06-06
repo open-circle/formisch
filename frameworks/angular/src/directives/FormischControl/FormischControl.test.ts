@@ -27,11 +27,7 @@ describe('FormischControl', () => {
     @Component({
       standalone: true,
       imports: [FormischControl],
-      template: `<input
-        data-testid="input"
-        [value]="field.input() ?? ''"
-        [formischControl]="field"
-      />`,
+      template: `<input data-testid="input" [formischControl]="field" />`,
     })
     class TestHostComponent {
       readonly form = injectForm({ schema: Schema });
@@ -75,10 +71,11 @@ describe('FormischControl', () => {
     expect(internalFieldStore.elements).toContain(input);
   });
 
-  it('updates the field value on input', () => {
+  it('updates the field value on input', async () => {
     const { fixture, input } = render();
     input.value = 'test@example.com';
     input.dispatchEvent(new Event('input'));
+    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(fixture.componentInstance.field.input()).toBe('test@example.com');
   });
 });

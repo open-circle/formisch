@@ -1,11 +1,14 @@
+import { Location } from '@angular/common';
 import {
+  afterNextRender,
   Component,
   ElementRef,
-  HostListener,
   inject,
+  Injector,
   signal,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   NavigationEnd,
   Router,
@@ -13,6 +16,7 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
+import { filter } from 'rxjs';
 import { disableTransitions } from './utils/disable-transitions.ts';
 
 interface IndicatorStyle {
@@ -27,6 +31,9 @@ interface IndicatorStyle {
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  host: {
+    '(window:resize)': 'onResize()',
+  },
   template: `
     <div
       class="scrollbar-none flex scroll-px-8 overflow-x-auto scroll-smooth px-8"
@@ -75,20 +82,28 @@ export class AppComponent {
   ];
 
   private readonly navEl = viewChild<ElementRef<HTMLElement>>('navEl');
+  private readonly injector = inject(Injector);
+  private readonly location = inject(Location);
   protected readonly indicatorStyle = signal<IndicatorStyle | undefined>(
     undefined
   );
 
   constructor() {
     const router = inject(Router);
-    router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        setTimeout(() => this.updateIndicatorStyle());
-      }
-    });
+
+    router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        takeUntilDestroyed()
+      )
+      .subscribe(() => {
+        afterNextRender(
+          { read: () => this.updateIndicatorStyle() },
+          { injector: this.injector }
+        );
+      });
   }
 
-  @HostListener('window:resize')
   onResize(): void {
     disableTransitions();
     this.updateIndicatorStyle();
@@ -98,7 +113,7 @@ export class AppComponent {
     const nav = this.navEl()?.nativeElement;
     if (!nav) return;
     const activeEl = [...nav.children].find((el) =>
-      (el as HTMLAnchorElement).href?.endsWith(location.pathname)
+      (el as HTMLAnchorElement).href?.endsWith(this.location.path())
     ) as HTMLAnchorElement | undefined;
     this.indicatorStyle.set(
       activeEl

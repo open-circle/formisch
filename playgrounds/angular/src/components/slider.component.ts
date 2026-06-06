@@ -40,7 +40,7 @@ import { InputLabelComponent } from './input-label.component.ts';
   `,
 })
 export class SliderComponent {
-  readonly field = input.required<FieldStore<any, any>>();
+  readonly field = input.required<FieldStore>();
   readonly label = input<string>();
   readonly min = input<number>();
   readonly max = input<number>();

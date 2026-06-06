@@ -41,7 +41,7 @@ import { InputLabelComponent } from './input-label.component.ts';
   `,
 })
 export class FileInputComponent {
-  readonly field = input.required<FieldStore<any, any>>();
+  readonly field = input.required<FieldStore>();
   readonly label = input<string>();
   readonly accept = input<string>();
   readonly multiple = input<boolean>(false);
