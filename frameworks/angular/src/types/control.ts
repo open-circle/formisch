@@ -16,9 +16,9 @@ export interface FieldControl {
    */
   readonly ref: (element: FieldElement | null) => (() => void) | undefined;
   /**
-   * Updates the field input from the element's current value and validates.
+   * Updates the field input and validates on the `input` event.
    */
-  readonly onInput: (element: FieldElement) => void;
+  readonly onInput: (event: Event) => void;
   /**
    * Validates on the `change` event.
    */

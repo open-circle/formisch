@@ -1,10 +1,6 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import {
-  type FieldElement,
-  getFieldStore,
-  INTERNAL,
-} from '@formisch/core/angular';
+import { getFieldStore, INTERNAL } from '@formisch/core/angular';
 import * as v from 'valibot';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CONTROL } from '../../types/control.ts';
@@ -75,7 +71,7 @@ describe('injectField', () => {
     const { field } = setup();
     const element = document.createElement('input');
     element.value = 'test@example.com';
-    field[CONTROL].onInput(element as unknown as FieldElement);
+    field[CONTROL].onInput({ target: element } as unknown as Event);
     expect(field.input()).toBe('test@example.com');
   });
 
