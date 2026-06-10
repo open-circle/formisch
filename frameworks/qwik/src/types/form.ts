@@ -1,5 +1,5 @@
 import type { BaseFormStore, FormSchema } from '@formisch/core/qwik';
-import type { ReadonlySignal } from '@qwik.dev/core';
+import type { Signal } from '@qwik.dev/core';
 
 /**
  * Form store interface.
@@ -9,32 +9,32 @@ export interface FormStore<TSchema extends FormSchema = FormSchema>
   /**
    * Whether the form is currently submitting.
    */
-  readonly isSubmitting: ReadonlySignal<boolean>;
+  readonly isSubmitting: Readonly<Signal<boolean>>;
   /**
    * Whether the form has been submitted.
    */
-  readonly isSubmitted: ReadonlySignal<boolean>;
+  readonly isSubmitted: Readonly<Signal<boolean>>;
   /**
    * Whether the form is currently validating.
    */
-  readonly isValidating: ReadonlySignal<boolean>;
+  readonly isValidating: Readonly<Signal<boolean>>;
   /**
    * Whether any field in the form has been touched.
    */
-  readonly isTouched: ReadonlySignal<boolean>;
+  readonly isTouched: Readonly<Signal<boolean>>;
   /**
    * Whether any field in the form differs from its initial value.
    */
-  readonly isDirty: ReadonlySignal<boolean>;
+  readonly isDirty: Readonly<Signal<boolean>>;
   /**
    * Whether the form is valid according to the schema.
    */
-  readonly isValid: ReadonlySignal<boolean>;
+  readonly isValid: Readonly<Signal<boolean>>;
   /**
    * The current error messages of the form.
    *
    * Hint: This property only contains validation errors at the root level
    * of the form. To get all errors from all fields, use `getAllErrors`.
    */
-  readonly errors: ReadonlySignal<[string, ...string[]] | null>;
+  readonly errors: Readonly<Signal<[string, ...string[]] | null>>;
 }

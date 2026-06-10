@@ -1,10 +1,5 @@
 import type { FieldElementProps } from '@formisch/qwik';
-import {
-  component$,
-  ReadonlySignal,
-  useSignal,
-  useTask$,
-} from '@qwik.dev/core';
+import { component$, Signal, useSignal, useTask$ } from '@qwik.dev/core';
 import clsx from 'clsx';
 import { InputErrors } from './InputErrors';
 import { InputLabel } from './InputLabel';
@@ -15,8 +10,8 @@ interface TextInputProps extends FieldElementProps {
   label?: string;
   placeholder?: string;
   required?: boolean;
-  input: ReadonlySignal<string | number | undefined>;
-  errors: ReadonlySignal<[string, ...string[]] | null>;
+  input: Readonly<Signal<string | number | undefined>>;
+  errors: Readonly<Signal<[string, ...string[]] | null>>;
 }
 
 /**

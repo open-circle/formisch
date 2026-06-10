@@ -33,8 +33,8 @@
     "qwik": "qwik"
   },
   "devDependencies": {
-    "@qwik.dev/core": "2.0.0-beta.9",
-    "@qwik.dev/router": "2.0.0-beta.9",
+    "@qwik.dev/core": "https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99",
+    "@qwik.dev/router": "https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@7813a99",
     "@shikijs/rehype": "^3.13.0",
     "@tailwindcss/vite": "^4.1.13",
     "@types/eslint": "^8.56.12",
@@ -45,7 +45,7 @@
     "@vercel/og": "^0.6.5",
     "dotenv": "^16.4.7",
     "eslint": "^8.57.1",
-    "eslint-plugin-qwik": "2.0.0-beta.9",
+    "eslint-plugin-qwik": "2.0.0-beta.35",
     "gray-matter": "^4.0.3",
     "prettier": "^3.5.2",
     "rehype-external-links": "^3.0.0",
@@ -57,7 +57,7 @@
     "typescript": "^5.7.3",
     "undici": "^7.3.0",
     "vercel": "^32.0.0",
-    "vite": "^5.4.20",
+    "vite": "8.0.14",
     "vite-imagetools": "^7.0.5",
     "vite-tsconfig-paths": "^5.1.4",
     "wrangler": "^4.98.0"
