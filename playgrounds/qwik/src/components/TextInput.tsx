@@ -1,5 +1,5 @@
 import type { FieldElementProps } from '@formisch/qwik';
-import { component$, Signal, useSignal, useTask$ } from '@qwik.dev/core';
+import { component$, type Signal, useSignal, useTask$ } from '@qwik.dev/core';
 import clsx from 'clsx';
 import { InputErrors } from './InputErrors';
 import { InputLabel } from './InputLabel';
