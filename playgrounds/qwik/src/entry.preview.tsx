@@ -11,7 +11,6 @@
  *
  */
 import { createQwikRouter } from '@qwik.dev/router/middleware/node';
-// make sure qwikRouterConfig is imported before entry
 import render from './entry.ssr';
 
 /**

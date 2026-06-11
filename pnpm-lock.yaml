@@ -87,10 +87,14 @@ importers:
       '@preact/preset-vite':
         specifier: ^2.10.5
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 2.10.5(@babel/core@7.28.5)(preact@10.29.2)(rollup@4.59.0)(vite@6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
 =======
         version: 2.10.5(@babel/core@7.28.5)(preact@10.29.2)(rollup@4.52.5)(vite@6.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
 >>>>>>> 9742820 (chore: wip)
+=======
+        version: 2.10.5(@babel/core@7.28.5)(preact@10.29.2)(rollup@4.61.1)(vite@6.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       '@preact/signals':
         specifier: ^2.9.0
         version: 2.9.0(preact@10.29.2)
@@ -160,12 +164,17 @@ importers:
         version: link:../../packages/methods
       '@qwik.dev/core':
 <<<<<<< HEAD
+<<<<<<< HEAD
         specifier: 2.0.0-beta.5
         version: 2.0.0-beta.5(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
 =======
         specifier: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99
         version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
 >>>>>>> 9742820 (chore: wip)
+=======
+        specifier: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671
+        version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671(prettier@3.6.2)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       '@types/node':
         specifier: 24.0.13
         version: 24.0.13
@@ -173,8 +182,8 @@ importers:
         specifier: 9.31.0
         version: 9.31.0(jiti@2.6.1)
       eslint-plugin-qwik:
-        specifier: 2.0.0-beta.35
-        version: 2.0.0-beta.35(eslint@9.31.0(jiti@2.6.1))(typescript@5.8.3)
+        specifier: https://pkg.pr.new/QwikDev/qwik/eslint-plugin-qwik@1778671
+        version: https://pkg.pr.new/QwikDev/qwik/eslint-plugin-qwik@1778671(eslint@9.31.0(jiti@2.6.1))(typescript@5.8.3)
       globals:
         specifier: 16.3.0
         version: 16.3.0
@@ -192,6 +201,7 @@ importers:
         version: 1.4.1(typescript@5.8.3)
       vite:
 <<<<<<< HEAD
+<<<<<<< HEAD
         specifier: 7.3.2
         version: 7.3.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
       vite-tsconfig-paths:
@@ -204,6 +214,13 @@ importers:
         specifier: ^5.1.4
         version: 5.1.4(typescript@5.8.3)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
 >>>>>>> 9742820 (chore: wip)
+=======
+        specifier: 7.3.5
+        version: 7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite-tsconfig-paths:
+        specifier: ^5.1.4
+        version: 5.1.4(typescript@5.8.3)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   frameworks/react:
     dependencies:
@@ -348,10 +365,14 @@ importers:
       tsup-preset-solid:
         specifier: ^2.2.0
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 2.2.0(esbuild@0.27.7)(solid-js@1.9.9)(tsup@8.5.0(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.8.1))
 =======
         version: 2.2.0(esbuild@0.25.11)(solid-js@1.9.9)(tsup@8.5.0(jiti@2.6.1)(postcss@8.5.15)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.9.0))
 >>>>>>> 9742820 (chore: wip)
+=======
+        version: 2.2.0(esbuild@0.27.7)(solid-js@1.9.9)(tsup@8.5.0(jiti@2.6.1)(postcss@8.5.15)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -361,12 +382,16 @@ importers:
       vite-plugin-solid:
         specifier: ^2.11.6
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 2.11.10(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vite@6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
       vitest:
         specifier: 4.1.7
         version: 4.1.7(@edge-runtime/vm@3.1.7)(@types/node@24.0.13)(@vitest/coverage-v8@4.1.7)(jsdom@26.1.0)(vite@6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
 =======
         version: 2.11.10(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vite@8.0.14(@types/node@24.10.1)(esbuild@0.25.11)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+=======
+        version: 2.11.10(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vite@8.0.14(@types/node@24.10.1)(esbuild@0.27.7)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.10.1)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
@@ -550,12 +575,17 @@ importers:
         version: 2.9.0(preact@10.29.2)
       '@qwik.dev/core':
 <<<<<<< HEAD
+<<<<<<< HEAD
         specifier: 2.0.0-beta.5
         version: 2.0.0-beta.5(prettier@3.6.2)(vite@6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vitest@4.1.7)
 =======
         specifier: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99
         version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
 >>>>>>> 9742820 (chore: wip)
+=======
+        specifier: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671
+        version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671(prettier@3.6.2)(vite@8.0.14(@types/node@24.0.13)(esbuild@0.27.7)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       '@types/node':
         specifier: 24.0.13
         version: 24.0.13
@@ -719,12 +749,16 @@ importers:
       '@preact/preset-vite':
         specifier: ^2.10.5
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 2.10.5(@babel/core@7.28.5)(preact@10.29.2)(rollup@4.59.0)(vite@6.4.2(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.1.16(vite@6.4.2(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
 =======
         version: 2.10.5(@babel/core@7.28.5)(preact@10.29.2)(rollup@4.52.5)(vite@6.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+=======
+        version: 2.10.5(@babel/core@7.28.5)(preact@10.29.2)(rollup@4.61.1)(vite@6.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.1.16(vite@6.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
@@ -770,6 +804,7 @@ importers:
         version: link:../../frameworks/qwik
       '@qwik.dev/core':
 <<<<<<< HEAD
+<<<<<<< HEAD
         specifier: 2.0.0-beta.5
         version: 2.0.0-beta.5(prettier@3.6.2)(vite@6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vitest@4.1.7)
       '@qwik.dev/router':
@@ -781,13 +816,21 @@ importers:
 =======
         specifier: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99
         version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+=======
+        specifier: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671
+        version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671(prettier@3.6.2)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       '@qwik.dev/router':
-        specifier: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@7813a99
-        version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@7813a99(@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)))(rollup@4.52.5)(typescript@5.8.3)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+        specifier: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@1778671
+        version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@1778671(@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671(prettier@3.6.2)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)))(rollup@4.61.1)(typescript@5.8.3)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
       '@tailwindcss/vite':
         specifier: ^4.1.11
+<<<<<<< HEAD
         version: 4.1.16(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
 >>>>>>> 9742820 (chore: wip)
+=======
+        version: 4.1.16(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       '@types/node':
         specifier: 24.0.13
         version: 24.0.13
@@ -795,8 +838,8 @@ importers:
         specifier: 9.31.0
         version: 9.31.0(jiti@2.6.1)
       eslint-plugin-qwik:
-        specifier: 2.0.0-beta.35
-        version: 2.0.0-beta.35(eslint@9.31.0(jiti@2.6.1))(typescript@5.8.3)
+        specifier: https://pkg.pr.new/QwikDev/qwik/eslint-plugin-qwik@1778671
+        version: https://pkg.pr.new/QwikDev/qwik/eslint-plugin-qwik@1778671(eslint@9.31.0(jiti@2.6.1))(typescript@5.8.3)
       globals:
         specifier: 16.3.0
         version: 16.3.0
@@ -820,6 +863,7 @@ importers:
         version: 5.2.0(ts-node@10.9.1(@types/node@24.0.13)(typescript@5.8.3))(typescript@5.8.3)
       vite:
 <<<<<<< HEAD
+<<<<<<< HEAD
         specifier: 6.4.2
         version: 6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
       vite-tsconfig-paths:
@@ -832,6 +876,13 @@ importers:
         specifier: ^5.1.4
         version: 5.1.4(typescript@5.8.3)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
 >>>>>>> 9742820 (chore: wip)
+=======
+        specifier: 7.3.5
+        version: 7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite-tsconfig-paths:
+        specifier: ^5.1.4
+        version: 5.1.4(typescript@5.8.3)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   playgrounds/react:
     dependencies:
@@ -1179,17 +1230,21 @@ importers:
         version: 2.0.0-beta.9(patch_hash=e002def78f4681060d18bc24d686c24ee1d1b997c399a2cb1c03baf3b860e4c8)(rollup@4.59.0)(typescript@5.8.3)
 =======
         specifier: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99
-        version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+        version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
       '@qwik.dev/router':
         specifier: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@7813a99
+<<<<<<< HEAD
         version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@7813a99(@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)))(rollup@4.52.5)(typescript@5.8.3)(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
 >>>>>>> 9742820 (chore: wip)
+=======
+        version: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@7813a99(@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)))(rollup@4.61.1)(typescript@5.8.3)(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       '@shikijs/rehype':
         specifier: ^3.13.0
         version: 3.13.0
       '@tailwindcss/vite':
         specifier: ^4.1.13
-        version: 4.1.16(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+        version: 4.1.16(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
       '@types/eslint':
         specifier: ^8.56.12
         version: 8.56.12
@@ -1215,8 +1270,8 @@ importers:
         specifier: ^8.57.1
         version: 8.57.1
       eslint-plugin-qwik:
-        specifier: 2.0.0-beta.35
-        version: 2.0.0-beta.35(eslint@8.57.1)(typescript@5.8.3)
+        specifier: https://pkg.pr.new/QwikDev/qwik/eslint-plugin-qwik@1778671
+        version: https://pkg.pr.new/QwikDev/qwik/eslint-plugin-qwik@1778671(eslint@8.57.1)(typescript@5.8.3)
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
@@ -1256,10 +1311,11 @@ importers:
         version: 29.4.0(@types/node@22.18.12)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(ts-node@10.9.1(@types/node@22.18.12)(typescript@5.8.3))
 >>>>>>> 9742820 (chore: wip)
       vite:
-        specifier: 8.0.14
-        version: 8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+        specifier: 7.3.5
+        version: 7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
       vite-imagetools:
         specifier: ^7.0.5
+<<<<<<< HEAD
         version: 7.1.1(rollup@4.59.0)
       vite-tsconfig-paths:
         specifier: ^5.1.4
@@ -1271,6 +1327,12 @@ importers:
 =======
         version: 5.1.4(typescript@5.8.3)(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
 >>>>>>> 9742820 (chore: wip)
+=======
+        version: 7.1.1(rollup@4.61.1)
+      vite-tsconfig-paths:
+        specifier: ^5.1.4
+        version: 5.1.4(typescript@5.8.3)(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
 packages:
 
@@ -2083,11 +2145,25 @@ packages:
     cpu: [ppc64]
     os: [aix]
 
+<<<<<<< HEAD
   '@esbuild/aix-ppc64@0.27.3':
     resolution: {integrity: sha512-9fJMTNFTWZMh5qwrBItuziu834eOCUcEqymSH7pY+zoMVEZg3gcPuBNxH1EvfVYe9h0x/Ptw8KBzv7qxb7l8dg==}
     engines: {node: '>=18'}
     cpu: [ppc64]
     os: [aix]
+=======
+  '@esbuild/aix-ppc64@0.27.7':
+    resolution: {integrity: sha512-EKX3Qwmhz1eMdEJokhALr0YiD0lhQNwDqkPYyPhiSwKrh7/4KRjQc04sZ8db+5DVVnZ1LmbNDI1uAMPEUBnQPg==}
+    engines: {node: '>=18'}
+    cpu: [ppc64]
+    os: [aix]
+
+  '@esbuild/android-arm64@0.17.19':
+    resolution: {integrity: sha512-KBMWvEZooR7+kzY0BtbTQn0OAYY7CsiydT63pVEaPtVYF0hXbUaOyZog37DKxK7NF3XacBJOpYT4adIJh+avxA==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [android]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   '@esbuild/aix-ppc64@0.27.7':
     resolution: {integrity: sha512-EKX3Qwmhz1eMdEJokhALr0YiD0lhQNwDqkPYyPhiSwKrh7/4KRjQc04sZ8db+5DVVnZ1LmbNDI1uAMPEUBnQPg==}
@@ -2107,12 +2183,15 @@ packages:
     cpu: [arm64]
     os: [android]
 
+<<<<<<< HEAD
   '@esbuild/android-arm64@0.27.3':
     resolution: {integrity: sha512-YdghPYUmj/FX2SYKJ0OZxf+iaKgMsKHVPF1MAq/P8WirnSpCStzKJFjOjzsW0QQ7oIAiccHdcqjbHmJxRb/dmg==}
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [android]
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/android-arm64@0.27.7':
     resolution: {integrity: sha512-62dPZHpIXzvChfvfLJow3q5dDtiNMkwiRzPylSCfriLvZeq0a1bWChrGx/BbUbPwOrsWKMn8idSllklzBy+dgQ==}
     engines: {node: '>=18'}
@@ -2137,10 +2216,23 @@ packages:
     cpu: [arm]
     os: [android]
 
+<<<<<<< HEAD
   '@esbuild/android-arm@0.27.3':
     resolution: {integrity: sha512-i5D1hPY7GIQmXlXhs2w8AWHhenb00+GxjxRncS2ZM7YNVGNfaMxgzSGuO8o8SJzRc/oZwU2bcScvVERk03QhzA==}
     engines: {node: '>=18'}
     cpu: [arm]
+=======
+  '@esbuild/android-arm@0.27.7':
+    resolution: {integrity: sha512-jbPXvB4Yj2yBV7HUfE2KHe4GJX51QplCN1pGbYjvsyCZbQmies29EoJbkEc+vYuU5o45AfQn37vZlyXy4YJ8RQ==}
+    engines: {node: '>=18'}
+    cpu: [arm]
+    os: [android]
+
+  '@esbuild/android-x64@0.17.19':
+    resolution: {integrity: sha512-uUTTc4xGNDT7YSArp/zbtmbhO0uEEK9/ETW29Wk1thYUJBz3IVnvgEiEwEa9IeLyvnpKrWK64Utw2bgUmDveww==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [android]
 
   '@esbuild/android-arm@0.27.7':
@@ -2161,11 +2253,25 @@ packages:
     cpu: [x64]
     os: [android]
 
+<<<<<<< HEAD
   '@esbuild/android-x64@0.27.3':
     resolution: {integrity: sha512-IN/0BNTkHtk8lkOM8JWAYFg4ORxBkZQf9zXiEOfERX/CzxW3Vg1ewAhU7QSWQpVIzTW+b8Xy+lGzdYXV6UZObQ==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [android]
+=======
+  '@esbuild/android-x64@0.27.7':
+    resolution: {integrity: sha512-x5VpMODneVDb70PYV2VQOmIUUiBtY3D3mPBG8NxVk5CogneYhkR7MmM3yR/uMdITLrC1ml/NV1rj4bMJuy9MCg==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [android]
+
+  '@esbuild/darwin-arm64@0.17.19':
+    resolution: {integrity: sha512-80wEoCfF/hFKM6WE1FyBHc9SfUblloAWx6FJkFWTWiCoht9Mc0ARGEM47e67W9rI09YoUxJL68WHfDRYEAvOhg==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [darwin]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   '@esbuild/android-x64@0.27.7':
     resolution: {integrity: sha512-x5VpMODneVDb70PYV2VQOmIUUiBtY3D3mPBG8NxVk5CogneYhkR7MmM3yR/uMdITLrC1ml/NV1rj4bMJuy9MCg==}
@@ -2185,10 +2291,23 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
+<<<<<<< HEAD
   '@esbuild/darwin-arm64@0.27.3':
     resolution: {integrity: sha512-Re491k7ByTVRy0t3EKWajdLIr0gz2kKKfzafkth4Q8A5n1xTHrkqZgLLjFEHVD+AXdUGgQMq+Godfq45mGpCKg==}
     engines: {node: '>=18'}
     cpu: [arm64]
+=======
+  '@esbuild/darwin-arm64@0.27.7':
+    resolution: {integrity: sha512-5lckdqeuBPlKUwvoCXIgI2D9/ABmPq3Rdp7IfL70393YgaASt7tbju3Ac+ePVi3KDH6N2RqePfHnXkaDtY9fkw==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@esbuild/darwin-x64@0.17.19':
+    resolution: {integrity: sha512-IJM4JJsLhRYr9xdtLytPLSH9k/oxR3boaUIYiHkAawtwNOXKE8KoU8tMvryogdcT8AU+Bflmh81Xn6Q0vTZbQw==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [darwin]
 
   '@esbuild/darwin-arm64@0.27.7':
@@ -2209,11 +2328,25 @@ packages:
     cpu: [x64]
     os: [darwin]
 
+<<<<<<< HEAD
   '@esbuild/darwin-x64@0.27.3':
     resolution: {integrity: sha512-vHk/hA7/1AckjGzRqi6wbo+jaShzRowYip6rt6q7VYEDX4LEy1pZfDpdxCBnGtl+A5zq8iXDcyuxwtv3hNtHFg==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [darwin]
+=======
+  '@esbuild/darwin-x64@0.27.7':
+    resolution: {integrity: sha512-rYnXrKcXuT7Z+WL5K980jVFdvVKhCHhUwid+dDYQpH+qu+TefcomiMAJpIiC2EM3Rjtq0sO3StMV/+3w3MyyqQ==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@esbuild/freebsd-arm64@0.17.19':
+    resolution: {integrity: sha512-pBwbc7DufluUeGdjSU5Si+P3SoMF5DQ/F/UmTSb8HXO80ZEAJmrykPyzo1IfNbAoaqw48YRpv8shwd1NoI0jcQ==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [freebsd]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   '@esbuild/darwin-x64@0.27.7':
     resolution: {integrity: sha512-rYnXrKcXuT7Z+WL5K980jVFdvVKhCHhUwid+dDYQpH+qu+TefcomiMAJpIiC2EM3Rjtq0sO3StMV/+3w3MyyqQ==}
@@ -2233,10 +2366,23 @@ packages:
     cpu: [arm64]
     os: [freebsd]
 
+<<<<<<< HEAD
   '@esbuild/freebsd-arm64@0.27.3':
     resolution: {integrity: sha512-ipTYM2fjt3kQAYOvo6vcxJx3nBYAzPjgTCk7QEgZG8AUO3ydUhvelmhrbOheMnGOlaSFUoHXB6un+A7q4ygY9w==}
     engines: {node: '>=18'}
     cpu: [arm64]
+=======
+  '@esbuild/freebsd-arm64@0.27.7':
+    resolution: {integrity: sha512-B48PqeCsEgOtzME2GbNM2roU29AMTuOIN91dsMO30t+Ydis3z/3Ngoj5hhnsOSSwNzS+6JppqWsuhTp6E82l2w==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [freebsd]
+
+  '@esbuild/freebsd-x64@0.17.19':
+    resolution: {integrity: sha512-4lu+n8Wk0XlajEhbEffdy2xy53dpR06SlzvhGByyg36qJw6Kpfk7cp45DR/62aPH9mtJRmIyrXAS5UWBrJT6TQ==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [freebsd]
 
   '@esbuild/freebsd-arm64@0.27.7':
@@ -2257,11 +2403,25 @@ packages:
     cpu: [x64]
     os: [freebsd]
 
+<<<<<<< HEAD
   '@esbuild/freebsd-x64@0.27.3':
     resolution: {integrity: sha512-dDk0X87T7mI6U3K9VjWtHOXqwAMJBNN2r7bejDsc+j03SEjtD9HrOl8gVFByeM0aJksoUuUVU9TBaZa2rgj0oA==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [freebsd]
+=======
+  '@esbuild/freebsd-x64@0.27.7':
+    resolution: {integrity: sha512-jOBDK5XEjA4m5IJK3bpAQF9/Lelu/Z9ZcdhTRLf4cajlB+8VEhFFRjWgfy3M1O4rO2GQ/b2dLwCUGpiF/eATNQ==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@esbuild/linux-arm64@0.17.19':
+    resolution: {integrity: sha512-ct1Tg3WGwd3P+oZYqic+YZF4snNl2bsnMKRkb3ozHmnM0dGWuxcPTTntAF6bOP0Sp4x0PjSF+4uHQ1xvxfRKqg==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [linux]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   '@esbuild/freebsd-x64@0.27.7':
     resolution: {integrity: sha512-jOBDK5XEjA4m5IJK3bpAQF9/Lelu/Z9ZcdhTRLf4cajlB+8VEhFFRjWgfy3M1O4rO2GQ/b2dLwCUGpiF/eATNQ==}
@@ -2281,10 +2441,23 @@ packages:
     cpu: [arm64]
     os: [linux]
 
+<<<<<<< HEAD
   '@esbuild/linux-arm64@0.27.3':
     resolution: {integrity: sha512-sZOuFz/xWnZ4KH3YfFrKCf1WyPZHakVzTiqji3WDc0BCl2kBwiJLCXpzLzUBLgmp4veFZdvN5ChW4Eq/8Fc2Fg==}
     engines: {node: '>=18'}
     cpu: [arm64]
+=======
+  '@esbuild/linux-arm64@0.27.7':
+    resolution: {integrity: sha512-RZPHBoxXuNnPQO9rvjh5jdkRmVizktkT7TCDkDmQ0W2SwHInKCAV95GRuvdSvA7w4VMwfCjUiPwDi0ZO6Nfe9A==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@esbuild/linux-arm@0.17.19':
+    resolution: {integrity: sha512-cdmT3KxjlOQ/gZ2cjfrQOtmhG4HJs6hhvm3mWSRDPtZ/lP5oe8FWceS10JaSJC13GBd4eH/haHnqf7hhGNLerA==}
+    engines: {node: '>=12'}
+    cpu: [arm]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [linux]
 
   '@esbuild/linux-arm64@0.27.7':
@@ -2305,10 +2478,23 @@ packages:
     cpu: [arm]
     os: [linux]
 
+<<<<<<< HEAD
   '@esbuild/linux-arm@0.27.3':
     resolution: {integrity: sha512-s6nPv2QkSupJwLYyfS+gwdirm0ukyTFNl3KTgZEAiJDd+iHZcbTPPcWCcRYH+WlNbwChgH2QkE9NSlNrMT8Gfw==}
     engines: {node: '>=18'}
     cpu: [arm]
+=======
+  '@esbuild/linux-arm@0.27.7':
+    resolution: {integrity: sha512-RkT/YXYBTSULo3+af8Ib0ykH8u2MBh57o7q/DAs3lTJlyVQkgQvlrPTnjIzzRPQyavxtPtfg0EopvDyIt0j1rA==}
+    engines: {node: '>=18'}
+    cpu: [arm]
+    os: [linux]
+
+  '@esbuild/linux-ia32@0.17.19':
+    resolution: {integrity: sha512-w4IRhSy1VbsNxHRQpeGCHEmibqdTUx61Vc38APcsRbuVgK0OPEnQ0YD39Brymn96mOx48Y2laBQGqgZ0j9w6SQ==}
+    engines: {node: '>=12'}
+    cpu: [ia32]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [linux]
 
   '@esbuild/linux-arm@0.27.7':
@@ -2329,12 +2515,15 @@ packages:
     cpu: [ia32]
     os: [linux]
 
+<<<<<<< HEAD
   '@esbuild/linux-ia32@0.27.3':
     resolution: {integrity: sha512-yGlQYjdxtLdh0a3jHjuwOrxQjOZYD/C9PfdbgJJF3TIZWnm/tMd/RcNiLngiu4iwcBAOezdnSLAwQDPqTmtTYg==}
     engines: {node: '>=18'}
     cpu: [ia32]
     os: [linux]
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/linux-ia32@0.27.7':
     resolution: {integrity: sha512-GA48aKNkyQDbd3KtkplYWT102C5sn/EZTY4XROkxONgruHPU72l+gW+FfF8tf2cFjeHaRbWpOYa/uRBz/Xq1Pg==}
     engines: {node: '>=18'}
@@ -2359,10 +2548,23 @@ packages:
     cpu: [loong64]
     os: [linux]
 
+<<<<<<< HEAD
   '@esbuild/linux-loong64@0.27.3':
     resolution: {integrity: sha512-WO60Sn8ly3gtzhyjATDgieJNet/KqsDlX5nRC5Y3oTFcS1l0KWba+SEa9Ja1GfDqSF1z6hif/SkpQJbL63cgOA==}
     engines: {node: '>=18'}
     cpu: [loong64]
+=======
+  '@esbuild/linux-loong64@0.27.7':
+    resolution: {integrity: sha512-a4POruNM2oWsD4WKvBSEKGIiWQF8fZOAsycHOt6JBpZ+JN2n2JH9WAv56SOyu9X5IqAjqSIPTaJkqN8F7XOQ5Q==}
+    engines: {node: '>=18'}
+    cpu: [loong64]
+    os: [linux]
+
+  '@esbuild/linux-mips64el@0.17.19':
+    resolution: {integrity: sha512-LKJltc4LVdMKHsrFe4MGNPp0hqDFA1Wpt3jE1gEyM3nKUvOiO//9PheZZHfYRfYl6AwdTH4aTcXSqBerX0ml4A==}
+    engines: {node: '>=12'}
+    cpu: [mips64el]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [linux]
 
   '@esbuild/linux-loong64@0.27.7':
@@ -2383,10 +2585,23 @@ packages:
     cpu: [mips64el]
     os: [linux]
 
+<<<<<<< HEAD
   '@esbuild/linux-mips64el@0.27.3':
     resolution: {integrity: sha512-APsymYA6sGcZ4pD6k+UxbDjOFSvPWyZhjaiPyl/f79xKxwTnrn5QUnXR5prvetuaSMsb4jgeHewIDCIWljrSxw==}
     engines: {node: '>=18'}
     cpu: [mips64el]
+=======
+  '@esbuild/linux-mips64el@0.27.7':
+    resolution: {integrity: sha512-KabT5I6StirGfIz0FMgl1I+R1H73Gp0ofL9A3nG3i/cYFJzKHhouBV5VWK1CSgKvVaG4q1RNpCTR2LuTVB3fIw==}
+    engines: {node: '>=18'}
+    cpu: [mips64el]
+    os: [linux]
+
+  '@esbuild/linux-ppc64@0.17.19':
+    resolution: {integrity: sha512-/c/DGybs95WXNS8y3Ti/ytqETiW7EU44MEKuCAcpPto3YjQbyK3IQVKfF6nbghD7EcLUGl0NbiL5Rt5DMhn5tg==}
+    engines: {node: '>=12'}
+    cpu: [ppc64]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [linux]
 
   '@esbuild/linux-mips64el@0.27.7':
@@ -2407,10 +2622,23 @@ packages:
     cpu: [ppc64]
     os: [linux]
 
+<<<<<<< HEAD
   '@esbuild/linux-ppc64@0.27.3':
     resolution: {integrity: sha512-eizBnTeBefojtDb9nSh4vvVQ3V9Qf9Df01PfawPcRzJH4gFSgrObw+LveUyDoKU3kxi5+9RJTCWlj4FjYXVPEA==}
     engines: {node: '>=18'}
     cpu: [ppc64]
+=======
+  '@esbuild/linux-ppc64@0.27.7':
+    resolution: {integrity: sha512-gRsL4x6wsGHGRqhtI+ifpN/vpOFTQtnbsupUF5R5YTAg+y/lKelYR1hXbnBdzDjGbMYjVJLJTd2OFmMewAgwlQ==}
+    engines: {node: '>=18'}
+    cpu: [ppc64]
+    os: [linux]
+
+  '@esbuild/linux-riscv64@0.17.19':
+    resolution: {integrity: sha512-FC3nUAWhvFoutlhAkgHf8f5HwFWUL6bYdvLc/TTuxKlvLi3+pPzdZiFKSWz/PF30TB1K19SuCxDTI5KcqASJqA==}
+    engines: {node: '>=12'}
+    cpu: [riscv64]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [linux]
 
   '@esbuild/linux-ppc64@0.27.7':
@@ -2431,10 +2659,23 @@ packages:
     cpu: [riscv64]
     os: [linux]
 
+<<<<<<< HEAD
   '@esbuild/linux-riscv64@0.27.3':
     resolution: {integrity: sha512-3Emwh0r5wmfm3ssTWRQSyVhbOHvqegUDRd0WhmXKX2mkHJe1SFCMJhagUleMq+Uci34wLSipf8Lagt4LlpRFWQ==}
     engines: {node: '>=18'}
     cpu: [riscv64]
+=======
+  '@esbuild/linux-riscv64@0.27.7':
+    resolution: {integrity: sha512-hL25LbxO1QOngGzu2U5xeXtxXcW+/GvMN3ejANqXkxZ/opySAZMrc+9LY/WyjAan41unrR3YrmtTsUpwT66InQ==}
+    engines: {node: '>=18'}
+    cpu: [riscv64]
+    os: [linux]
+
+  '@esbuild/linux-s390x@0.17.19':
+    resolution: {integrity: sha512-IbFsFbxMWLuKEbH+7sTkKzL6NJmG2vRyy6K7JJo55w+8xDk7RElYn6xvXtDW8HCfoKBFK69f3pgBJSUSQPr+4Q==}
+    engines: {node: '>=12'}
+    cpu: [s390x]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [linux]
 
   '@esbuild/linux-riscv64@0.27.7':
@@ -2455,10 +2696,23 @@ packages:
     cpu: [s390x]
     os: [linux]
 
+<<<<<<< HEAD
   '@esbuild/linux-s390x@0.27.3':
     resolution: {integrity: sha512-pBHUx9LzXWBc7MFIEEL0yD/ZVtNgLytvx60gES28GcWMqil8ElCYR4kvbV2BDqsHOvVDRrOxGySBM9Fcv744hw==}
     engines: {node: '>=18'}
     cpu: [s390x]
+=======
+  '@esbuild/linux-s390x@0.27.7':
+    resolution: {integrity: sha512-2k8go8Ycu1Kb46vEelhu1vqEP+UeRVj2zY1pSuPdgvbd5ykAw82Lrro28vXUrRmzEsUV0NzCf54yARIK8r0fdw==}
+    engines: {node: '>=18'}
+    cpu: [s390x]
+    os: [linux]
+
+  '@esbuild/linux-x64@0.17.19':
+    resolution: {integrity: sha512-68ngA9lg2H6zkZcyp22tsVt38mlhWde8l3eJLWkyLrp4HwMUr3c1s/M2t7+kHIhvMjglIBrFpncX1SzMckomGw==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [linux]
 
   '@esbuild/linux-s390x@0.27.7':
@@ -2479,12 +2733,15 @@ packages:
     cpu: [x64]
     os: [linux]
 
+<<<<<<< HEAD
   '@esbuild/linux-x64@0.27.3':
     resolution: {integrity: sha512-Czi8yzXUWIQYAtL/2y6vogER8pvcsOsk5cpwL4Gk5nJqH5UZiVByIY8Eorm5R13gq+DQKYg0+JyQoytLQas4dA==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [linux]
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/linux-x64@0.27.7':
     resolution: {integrity: sha512-hzznmADPt+OmsYzw1EE33ccA+HPdIqiCRq7cQeL1Jlq2gb1+OyWBkMCrYGBJ+sxVzve2ZJEVeePbLM2iEIZSxA==}
     engines: {node: '>=18'}
@@ -2497,10 +2754,23 @@ packages:
     cpu: [arm64]
     os: [netbsd]
 
+<<<<<<< HEAD
   '@esbuild/netbsd-arm64@0.27.3':
     resolution: {integrity: sha512-sDpk0RgmTCR/5HguIZa9n9u+HVKf40fbEUt+iTzSnCaGvY9kFP0YKBWZtJaraonFnqef5SlJ8/TiPAxzyS+UoA==}
     engines: {node: '>=18'}
     cpu: [arm64]
+=======
+  '@esbuild/netbsd-arm64@0.27.7':
+    resolution: {integrity: sha512-b6pqtrQdigZBwZxAn1UpazEisvwaIDvdbMbmrly7cDTMFnw/+3lVxxCTGOrkPVnsYIosJJXAsILG9XcQS+Yu6w==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [netbsd]
+
+  '@esbuild/netbsd-x64@0.17.19':
+    resolution: {integrity: sha512-CwFq42rXCR8TYIjIfpXCbRX0rp1jo6cPIUPSaWwzbVI4aOfX96OXY8M6KNmtPcg7QjYeDmN+DD0Wp3LaBOLf4Q==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [netbsd]
 
   '@esbuild/netbsd-arm64@0.27.7':
@@ -2521,12 +2791,15 @@ packages:
     cpu: [x64]
     os: [netbsd]
 
+<<<<<<< HEAD
   '@esbuild/netbsd-x64@0.27.3':
     resolution: {integrity: sha512-P14lFKJl/DdaE00LItAukUdZO5iqNH7+PjoBm+fLQjtxfcfFE20Xf5CrLsmZdq5LFFZzb5JMZ9grUwvtVYzjiA==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [netbsd]
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/netbsd-x64@0.27.7':
     resolution: {integrity: sha512-OfatkLojr6U+WN5EDYuoQhtM+1xco+/6FSzJJnuWiUw5eVcicbyK3dq5EeV/QHT1uy6GoDhGbFpprUiHUYggrw==}
     engines: {node: '>=18'}
@@ -2539,10 +2812,23 @@ packages:
     cpu: [arm64]
     os: [openbsd]
 
+<<<<<<< HEAD
   '@esbuild/openbsd-arm64@0.27.3':
     resolution: {integrity: sha512-AIcMP77AvirGbRl/UZFTq5hjXK+2wC7qFRGoHSDrZ5v5b8DK/GYpXW3CPRL53NkvDqb9D+alBiC/dV0Fb7eJcw==}
     engines: {node: '>=18'}
     cpu: [arm64]
+=======
+  '@esbuild/openbsd-arm64@0.27.7':
+    resolution: {integrity: sha512-AFuojMQTxAz75Fo8idVcqoQWEHIXFRbOc1TrVcFSgCZtQfSdc1RXgB3tjOn/krRHENUB4j00bfGjyl2mJrU37A==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [openbsd]
+
+  '@esbuild/openbsd-x64@0.17.19':
+    resolution: {integrity: sha512-cnq5brJYrSZ2CF6c35eCmviIN3k3RczmHz8eYaVlNasVqsNY+JKohZU5MKmaOI+KkllCdzOKKdPs762VCPC20g==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [openbsd]
 
   '@esbuild/openbsd-arm64@0.27.7':
@@ -2563,12 +2849,15 @@ packages:
     cpu: [x64]
     os: [openbsd]
 
+<<<<<<< HEAD
   '@esbuild/openbsd-x64@0.27.3':
     resolution: {integrity: sha512-DnW2sRrBzA+YnE70LKqnM3P+z8vehfJWHXECbwBmH/CU51z6FiqTQTHFenPlHmo3a8UgpLyH3PT+87OViOh1AQ==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [openbsd]
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/openbsd-x64@0.27.7':
     resolution: {integrity: sha512-+A1NJmfM8WNDv5CLVQYJ5PshuRm/4cI6WMZRg1by1GwPIQPCTs1GLEUHwiiQGT5zDdyLiRM/l1G0Pv54gvtKIg==}
     engines: {node: '>=18'}
@@ -2581,11 +2870,25 @@ packages:
     cpu: [arm64]
     os: [openharmony]
 
+<<<<<<< HEAD
   '@esbuild/openharmony-arm64@0.27.3':
     resolution: {integrity: sha512-NinAEgr/etERPTsZJ7aEZQvvg/A6IsZG/LgZy+81wON2huV7SrK3e63dU0XhyZP4RKGyTm7aOgmQk0bGp0fy2g==}
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [openharmony]
+=======
+  '@esbuild/openharmony-arm64@0.27.7':
+    resolution: {integrity: sha512-+KrvYb/C8zA9CU/g0sR6w2RBw7IGc5J2BPnc3dYc5VJxHCSF1yNMxTV5LQ7GuKteQXZtspjFbiuW5/dOj7H4Yw==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@esbuild/sunos-x64@0.17.19':
+    resolution: {integrity: sha512-vCRT7yP3zX+bKWFeP/zdS6SqdWB8OIpaRq/mbXQxTGHnIxspRtigpkUcDMlSCOejlHowLqII7K2JKevwyRP2rg==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [sunos]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   '@esbuild/openharmony-arm64@0.27.7':
     resolution: {integrity: sha512-+KrvYb/C8zA9CU/g0sR6w2RBw7IGc5J2BPnc3dYc5VJxHCSF1yNMxTV5LQ7GuKteQXZtspjFbiuW5/dOj7H4Yw==}
@@ -2605,11 +2908,25 @@ packages:
     cpu: [x64]
     os: [sunos]
 
+<<<<<<< HEAD
   '@esbuild/sunos-x64@0.27.3':
     resolution: {integrity: sha512-PanZ+nEz+eWoBJ8/f8HKxTTD172SKwdXebZ0ndd953gt1HRBbhMsaNqjTyYLGLPdoWHy4zLU7bDVJztF5f3BHA==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [sunos]
+=======
+  '@esbuild/sunos-x64@0.27.7':
+    resolution: {integrity: sha512-ikktIhFBzQNt/QDyOL580ti9+5mL/YZeUPKU2ivGtGjdTYoqz6jObj6nOMfhASpS4GU4Q/Clh1QtxWAvcYKamA==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [sunos]
+
+  '@esbuild/win32-arm64@0.17.19':
+    resolution: {integrity: sha512-yYx+8jwowUstVdorcMdNlzklLYhPxjniHWFKgRqH7IFlUEa0Umu3KuYplf1HUZZ422e3NU9F4LGb+4O0Kdcaag==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [win32]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   '@esbuild/sunos-x64@0.27.7':
     resolution: {integrity: sha512-ikktIhFBzQNt/QDyOL580ti9+5mL/YZeUPKU2ivGtGjdTYoqz6jObj6nOMfhASpS4GU4Q/Clh1QtxWAvcYKamA==}
@@ -2629,10 +2946,23 @@ packages:
     cpu: [arm64]
     os: [win32]
 
+<<<<<<< HEAD
   '@esbuild/win32-arm64@0.27.3':
     resolution: {integrity: sha512-B2t59lWWYrbRDw/tjiWOuzSsFh1Y/E95ofKz7rIVYSQkUYBjfSgf6oeYPNWHToFRr2zx52JKApIcAS/D5TUBnA==}
     engines: {node: '>=18'}
     cpu: [arm64]
+=======
+  '@esbuild/win32-arm64@0.27.7':
+    resolution: {integrity: sha512-7yRhbHvPqSpRUV7Q20VuDwbjW5kIMwTHpptuUzV+AA46kiPze5Z7qgt6CLCK3pWFrHeNfDd1VKgyP4O+ng17CA==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@esbuild/win32-ia32@0.17.19':
+    resolution: {integrity: sha512-eggDKanJszUtCdlVs0RB+h35wNlb5v4TWEkq4vZcmVt5u/HiDZrTXe2bWFQUez3RgNHwx/x4sk5++4NSSicKkw==}
+    engines: {node: '>=12'}
+    cpu: [ia32]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [win32]
 
   '@esbuild/win32-arm64@0.27.7':
@@ -2653,10 +2983,23 @@ packages:
     cpu: [ia32]
     os: [win32]
 
+<<<<<<< HEAD
   '@esbuild/win32-ia32@0.27.3':
     resolution: {integrity: sha512-QLKSFeXNS8+tHW7tZpMtjlNb7HKau0QDpwm49u0vUp9y1WOF+PEzkU84y9GqYaAVW8aH8f3GcBck26jh54cX4Q==}
     engines: {node: '>=18'}
     cpu: [ia32]
+=======
+  '@esbuild/win32-ia32@0.27.7':
+    resolution: {integrity: sha512-SmwKXe6VHIyZYbBLJrhOoCJRB/Z1tckzmgTLfFYOfpMAx63BJEaL9ExI8x7v0oAO3Zh6D/Oi1gVxEYr5oUCFhw==}
+    engines: {node: '>=18'}
+    cpu: [ia32]
+    os: [win32]
+
+  '@esbuild/win32-x64@0.17.19':
+    resolution: {integrity: sha512-lAhycmKnVOuRYNtRtatQR1LPQf2oYCkRGkSFnseDAKPl8lu5SOsK/e1sXe5a0Pc5kHIHe6P2I/ilntNv2xf3cA==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     os: [win32]
 
   '@esbuild/win32-ia32@0.27.7':
@@ -2677,12 +3020,15 @@ packages:
     cpu: [x64]
     os: [win32]
 
+<<<<<<< HEAD
   '@esbuild/win32-x64@0.27.3':
     resolution: {integrity: sha512-4uJGhsxuptu3OcpVAzli+/gWusVGwZZHTlS63hh++ehExkVT8SgiEf7/uC/PclrPPkLhZqGgCTjd0VWLo6xMqA==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/win32-x64@0.27.7':
     resolution: {integrity: sha512-56hiAJPhwQ1R4i+21FVF7V8kSD5zZTdHcVuRFMW0hn753vVfQN8xlx4uOPT4xoGH0Z/oVATuR82AiqSTDIpaHg==}
     engines: {node: '>=18'}
@@ -3534,6 +3880,21 @@ packages:
   '@quansync/fs@0.1.5':
     resolution: {integrity: sha512-lNS9hL2aS2NZgNW7BBj+6EBl4rOf8l+tQ0eRY6JWCI8jI2kc53gSoqbjojU0OnAWhzoXiOjFyGsHcDGePB3lhA==}
 
+  '@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671':
+    resolution: {tarball: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671}
+    version: 2.0.0-beta.37
+    engines: {node: ^20.3.0 || >=21.0.0}
+    hasBin: true
+    peerDependencies:
+      prettier: '*'
+      vite: '>=6 <9'
+      vitest: '>=2 <4'
+    peerDependenciesMeta:
+      prettier:
+        optional: true
+      vitest:
+        optional: true
+
   '@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99':
     resolution: {tarball: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99}
     version: 2.0.0-beta.35
@@ -3555,6 +3916,7 @@ packages:
         optional: true
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   '@qwik.dev/core@2.0.0-beta.9':
     resolution: {integrity: sha512-MemsRTsLbqF17c/rfTWAojZTCpdKg6tWXs/xjpgeMcCzcmDwoqm3KrQ3GqgrBNu+7gMBPSWK0cb7hrd7q9uTQg==}
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
@@ -3569,11 +3931,26 @@ packages:
       vitest:
         optional: true
 =======
+=======
+  '@qwik.dev/optimizer@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/optimizer@1778671':
+    resolution: {tarball: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/optimizer@1778671}
+    version: 2.1.0-beta.5
+    engines: {node: ^20.3.0 || >=21.0.0}
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@qwik.dev/optimizer@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/optimizer@7813a99':
     resolution: {tarball: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/optimizer@7813a99}
     version: 2.1.0-beta.4
     engines: {node: ^20.3.0 || >=21.0.0}
 >>>>>>> 9742820 (chore: wip)
+
+  '@qwik.dev/router@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@1778671':
+    resolution: {tarball: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@1778671}
+    version: 2.0.0-beta.37
+    engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
+    peerDependencies:
+      '@qwik.dev/core': ^2.0.0-beta.37
+      vite: '>=6 <9'
 
   '@qwik.dev/router@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@7813a99':
     resolution: {tarball: https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@7813a99}
@@ -3944,6 +4321,7 @@ packages:
     cpu: [arm]
     os: [android]
 
+<<<<<<< HEAD
   '@rollup/rollup-android-arm64@4.59.0':
     resolution: {integrity: sha512-hZ+Zxj3SySm4A/DylsDKZAeVg0mvi++0PYVceVyX7hemkw7OreKdCvW2oQ3T1FMZvCaQXqOTHb8qmBShoqk69Q==}
     cpu: [arm64]
@@ -3971,34 +4349,134 @@ packages:
 
   '@rollup/rollup-linux-arm-gnueabihf@4.59.0':
     resolution: {integrity: sha512-t4ONHboXi/3E0rT6OZl1pKbl2Vgxf9vJfWgmUoCEVQVxhW6Cw/c8I6hbbu7DAvgp82RKiH7TpLwxnJeKv2pbsw==}
+=======
+  '@rollup/rollup-android-arm-eabi@4.61.1':
+    resolution: {integrity: sha512-JnBB8MdXj45cajvTuO5FmPlvFVJRQgvrz1uSEl3NwqFnReAPGwb8EanbGi4z2nRaqLzjJSv5/JmycoTKlRZxHA==}
+    cpu: [arm]
+    os: [android]
+
+  '@rollup/rollup-android-arm64@4.52.5':
+    resolution: {integrity: sha512-mQGfsIEFcu21mvqkEKKu2dYmtuSZOBMmAl5CFlPGLY94Vlcm+zWApK7F/eocsNzp8tKmbeBP8yXyAbx0XHsFNA==}
+    cpu: [arm64]
+    os: [android]
+
+  '@rollup/rollup-android-arm64@4.61.1':
+    resolution: {integrity: sha512-Jx2g7iSjw4AOT0HDPHM9RV3GNjRXwybWtSFZiZAYUTjUwjVrYIwq3kBf+LnhqJlzXFAqTAh2F7IGI+O568exPw==}
+    cpu: [arm64]
+    os: [android]
+
+  '@rollup/rollup-darwin-arm64@4.52.5':
+    resolution: {integrity: sha512-takF3CR71mCAGA+v794QUZ0b6ZSrgJkArC+gUiG6LB6TQty9T0Mqh3m2ImRBOxS2IeYBo4lKWIieSvnEk2OQWA==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@rollup/rollup-darwin-arm64@4.61.1':
+    resolution: {integrity: sha512-0F1L/Z3Eqv8mT2n3dCpeO8GcTvHvVqkP5/t6DMsn0KzhYVcg+s7Ncl5DS8qjKYEeio6Az0Gt6nyBORay5qIlCA==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@rollup/rollup-darwin-x64@4.52.5':
+    resolution: {integrity: sha512-W901Pla8Ya95WpxDn//VF9K9u2JbocwV/v75TE0YIHNTbhqUTv9w4VuQ9MaWlNOkkEfFwkdNhXgcLqPSmHy0fA==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@rollup/rollup-darwin-x64@4.61.1':
+    resolution: {integrity: sha512-qLttcH871ujY4YcVfUSShhOw+CsoTatYz8gRbHO7Bb92QH059/P0y5do1KMs41fY0BpD2x4AJH/gID0zFiqVKQ==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@rollup/rollup-freebsd-arm64@4.52.5':
+    resolution: {integrity: sha512-QofO7i7JycsYOWxe0GFqhLmF6l1TqBswJMvICnRUjqCx8b47MTo46W8AoeQwiokAx3zVryVnxtBMcGcnX12LvA==}
+    cpu: [arm64]
+    os: [freebsd]
+
+  '@rollup/rollup-freebsd-arm64@4.61.1':
+    resolution: {integrity: sha512-fUI4RapGE0Oh3mb8mgfvC1O2nU1RpDZUKnDQm3xB1Ipg7C2wTs5Kstz7G2uWK99a8S2yTMq8/P4uycwNa0nJyw==}
+    cpu: [arm64]
+    os: [freebsd]
+
+  '@rollup/rollup-freebsd-x64@4.52.5':
+    resolution: {integrity: sha512-jr21b/99ew8ujZubPo9skbrItHEIE50WdV86cdSoRkKtmWa+DDr6fu2c/xyRT0F/WazZpam6kk7IHBerSL7LDQ==}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@rollup/rollup-freebsd-x64@4.61.1':
+    resolution: {integrity: sha512-H5YrdvJaDtI/U9/emrD4b++xkvp3y/JvOe4rizHbxvkyMfRS/CiRYdji+Pl8D0brEaNFWUh1drQxgAGIl6Xudw==}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@rollup/rollup-linux-arm-gnueabihf@4.52.5':
+    resolution: {integrity: sha512-PsNAbcyv9CcecAUagQefwX8fQn9LQ4nZkpDboBOttmyffnInRy8R8dSg6hxxl2Re5QhHBf6FYIDhIj5v982ATQ==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     cpu: [arm]
     os: [linux]
     libc: [glibc]
 
+<<<<<<< HEAD
   '@rollup/rollup-linux-arm-musleabihf@4.59.0':
     resolution: {integrity: sha512-CikFT7aYPA2ufMD086cVORBYGHffBo4K8MQ4uPS/ZnY54GKj36i196u8U+aDVT2LX4eSMbyHtyOh7D7Zvk2VvA==}
+=======
+  '@rollup/rollup-linux-arm-gnueabihf@4.61.1':
+    resolution: {integrity: sha512-Q8CBCCQtDFrYtXoeUXSrnFXKOnyUhx6bz+SkL6A0E7V8kAiCJ5pamq1WtbfpVGhR5TSpXY6ak3avmDc5fHTyJA==}
+    cpu: [arm]
+    os: [linux]
+
+  '@rollup/rollup-linux-arm-musleabihf@4.52.5':
+    resolution: {integrity: sha512-Fw4tysRutyQc/wwkmcyoqFtJhh0u31K+Q6jYjeicsGJJ7bbEq8LwPWV/w0cnzOqR2m694/Af6hpFayLJZkG2VQ==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     cpu: [arm]
     os: [linux]
     libc: [musl]
 
+<<<<<<< HEAD
   '@rollup/rollup-linux-arm64-gnu@4.59.0':
     resolution: {integrity: sha512-jYgUGk5aLd1nUb1CtQ8E+t5JhLc9x5WdBKew9ZgAXg7DBk0ZHErLHdXM24rfX+bKrFe+Xp5YuJo54I5HFjGDAA==}
+=======
+  '@rollup/rollup-linux-arm-musleabihf@4.61.1':
+    resolution: {integrity: sha512-nwnhk1581l0FBVellGcVCAT0Oi06onEA3WB53sf01VO3I0UPBkMH9sXONYME2K0ovXcNayJfNtHfm6mpJElatQ==}
+    cpu: [arm]
+    os: [linux]
+
+  '@rollup/rollup-linux-arm64-gnu@4.52.5':
+    resolution: {integrity: sha512-a+3wVnAYdQClOTlyapKmyI6BLPAFYs0JM8HRpgYZQO02rMR09ZcV9LbQB+NL6sljzG38869YqThrRnfPMCDtZg==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
+<<<<<<< HEAD
   '@rollup/rollup-linux-arm64-musl@4.59.0':
     resolution: {integrity: sha512-peZRVEdnFWZ5Bh2KeumKG9ty7aCXzzEsHShOZEFiCQlDEepP1dpUl/SrUNXNg13UmZl+gzVDPsiCwnV1uI0RUA==}
+=======
+  '@rollup/rollup-linux-arm64-gnu@4.61.1':
+    resolution: {integrity: sha512-x5Xr49hwt3hdW75UOZm3395YwwzPyauktslv29KpWL/T+vVAzoT3azLcTWv0eMciBNrx+DYjH4paehHoLpPvpg==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@rollup/rollup-linux-arm64-musl@4.52.5':
+    resolution: {integrity: sha512-AvttBOMwO9Pcuuf7m9PkC1PUIKsfaAJ4AYhy944qeTJgQOqJYJ9oVl2nYgY7Rk0mkbsuOpCAYSs6wLYB2Xiw0Q==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
+<<<<<<< HEAD
   '@rollup/rollup-linux-loong64-gnu@4.59.0':
     resolution: {integrity: sha512-gbUSW/97f7+r4gHy3Jlup8zDG190AuodsWnNiXErp9mT90iCy9NKKU0Xwx5k8VlRAIV2uU9CsMnEFg/xXaOfXg==}
+=======
+  '@rollup/rollup-linux-arm64-musl@4.61.1':
+    resolution: {integrity: sha512-unMS3H73DpaoPyyEVPjGKleM/s0mkmsauTENpw4INQY8y4+IuLNjkueQ5QCtC0D3N38Y38yhAU8OoZ20S2Tm6w==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@rollup/rollup-linux-loong64-gnu@4.52.5':
+    resolution: {integrity: sha512-DkDk8pmXQV2wVrF6oq5tONK6UHLz/XcEVow4JTTerdeV1uqPeHxwcg7aFsfnSm9L+OO8WJsWotKM2JJPMWrQtA==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     cpu: [loong64]
     os: [linux]
     libc: [glibc]
 
+<<<<<<< HEAD
   '@rollup/rollup-linux-loong64-musl@4.59.0':
     resolution: {integrity: sha512-yTRONe79E+o0FWFijasoTjtzG9EBedFXJMl888NBEDCDV9I2wGbFFfJQQe63OijbFCUZqxpHz1GzpbtSFikJ4Q==}
     cpu: [loong64]
@@ -4007,10 +4485,25 @@ packages:
 
   '@rollup/rollup-linux-ppc64-gnu@4.59.0':
     resolution: {integrity: sha512-sw1o3tfyk12k3OEpRddF68a1unZ5VCN7zoTNtSn2KndUE+ea3m3ROOKRCZxEpmT9nsGnogpFP9x6mnLTCaoLkA==}
+=======
+  '@rollup/rollup-linux-loong64-gnu@4.61.1':
+    resolution: {integrity: sha512-zNZzGRnAhwjFEYmvphJRV5XaQGjs62cCmeYYHUT//NbvEnHauw+I85nGG+SiVg5ld4GX8D1IbKIX+ozITQnhMQ==}
+    cpu: [loong64]
+    os: [linux]
+
+  '@rollup/rollup-linux-loong64-musl@4.61.1':
+    resolution: {integrity: sha512-LdpWGL8X209B2SIvWjqlc8VZgM6PKfontSerGepuldQmHYrAOtnMCXeJkxXGbC+PPZVOuu5czJo7fNV6aeW8rQ==}
+    cpu: [loong64]
+    os: [linux]
+
+  '@rollup/rollup-linux-ppc64-gnu@4.52.5':
+    resolution: {integrity: sha512-W/b9ZN/U9+hPQVvlGwjzi+Wy4xdoH2I8EjaCkMvzpI7wJUs8sWJ03Rq96jRnHkSrcHTpQe8h5Tg3ZzUPGauvAw==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     cpu: [ppc64]
     os: [linux]
     libc: [glibc]
 
+<<<<<<< HEAD
   '@rollup/rollup-linux-ppc64-musl@4.59.0':
     resolution: {integrity: sha512-+2kLtQ4xT3AiIxkzFVFXfsmlZiG5FXYW7ZyIIvGA7Bdeuh9Z0aN4hVyXS/G1E9bTP/vqszNIN/pUKCk/BTHsKA==}
     cpu: [ppc64]
@@ -4019,34 +4512,89 @@ packages:
 
   '@rollup/rollup-linux-riscv64-gnu@4.59.0':
     resolution: {integrity: sha512-NDYMpsXYJJaj+I7UdwIuHHNxXZ/b/N2hR15NyH3m2qAtb/hHPA4g4SuuvrdxetTdndfj9b1WOmy73kcPRoERUg==}
+=======
+  '@rollup/rollup-linux-ppc64-gnu@4.61.1':
+    resolution: {integrity: sha512-EC5kTtNaNGOmbMGqar8dvJy6y/hg99GAwjfBz++pxZhQATXGcRjd6c5en5wcbru0vkRmiMGsQKdMJOOf6sza4g==}
+    cpu: [ppc64]
+    os: [linux]
+
+  '@rollup/rollup-linux-ppc64-musl@4.61.1':
+    resolution: {integrity: sha512-8hiwp6D4acEcNK78I4rP0/XtS1sknWIAMJBPdR4l6zUtyTm5KiTDr5bXmWt4foY7nAN7AThDHgkLIEZOWKbzWw==}
+    cpu: [ppc64]
+    os: [linux]
+
+  '@rollup/rollup-linux-riscv64-gnu@4.52.5':
+    resolution: {integrity: sha512-sjQLr9BW7R/ZiXnQiWPkErNfLMkkWIoCz7YMn27HldKsADEKa5WYdobaa1hmN6slu9oWQbB6/jFpJ+P2IkVrmw==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     cpu: [riscv64]
     os: [linux]
     libc: [glibc]
 
+<<<<<<< HEAD
   '@rollup/rollup-linux-riscv64-musl@4.59.0':
     resolution: {integrity: sha512-nLckB8WOqHIf1bhymk+oHxvM9D3tyPndZH8i8+35p/1YiVoVswPid2yLzgX7ZJP0KQvnkhM4H6QZ5m0LzbyIAg==}
+=======
+  '@rollup/rollup-linux-riscv64-gnu@4.61.1':
+    resolution: {integrity: sha512-10dh/h/BqA7DuMPWSxkR8uks18FRwnwOEqr5zOTEl+NOwP/OMzKX8OFR/Of9xxDA7D5qef1Nzar5WDD2kCCr1g==}
+    cpu: [riscv64]
+    os: [linux]
+
+  '@rollup/rollup-linux-riscv64-musl@4.52.5':
+    resolution: {integrity: sha512-hq3jU/kGyjXWTvAh2awn8oHroCbrPm8JqM7RUpKjalIRWWXE01CQOf/tUNWNHjmbMHg/hmNCwc/Pz3k1T/j/Lg==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     cpu: [riscv64]
     os: [linux]
     libc: [musl]
 
+<<<<<<< HEAD
   '@rollup/rollup-linux-s390x-gnu@4.59.0':
     resolution: {integrity: sha512-oF87Ie3uAIvORFBpwnCvUzdeYUqi2wY6jRFWJAy1qus/udHFYIkplYRW+wo+GRUP4sKzYdmE1Y3+rY5Gc4ZO+w==}
+=======
+  '@rollup/rollup-linux-riscv64-musl@4.61.1':
+    resolution: {integrity: sha512-YKJ5lg35DP17gcAOggnihe+APw9HLyj1Xn7gsmGumBJAUDa6NGXNixJzmkWLhcK9TOuuyQjdamzvJefkO7qHZQ==}
+    cpu: [riscv64]
+    os: [linux]
+
+  '@rollup/rollup-linux-s390x-gnu@4.52.5':
+    resolution: {integrity: sha512-gn8kHOrku8D4NGHMK1Y7NA7INQTRdVOntt1OCYypZPRt6skGbddska44K8iocdpxHTMMNui5oH4elPH4QOLrFQ==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     cpu: [s390x]
     os: [linux]
     libc: [glibc]
 
+<<<<<<< HEAD
   '@rollup/rollup-linux-x64-gnu@4.59.0':
     resolution: {integrity: sha512-3AHmtQq/ppNuUspKAlvA8HtLybkDflkMuLK4DPo77DfthRb71V84/c4MlWJXixZz4uruIH4uaa07IqoAkG64fg==}
+=======
+  '@rollup/rollup-linux-s390x-gnu@4.61.1':
+    resolution: {integrity: sha512-Mlil5G2Jj6a7B3LWGctg+XPL9vdXYuzCtNXfxOQ0nPjc2m6ueUktocPGH9bnAM0bNRKb/bAWTujUU7IJQdQA+g==}
+    cpu: [s390x]
+    os: [linux]
+
+  '@rollup/rollup-linux-x64-gnu@4.52.5':
+    resolution: {integrity: sha512-hXGLYpdhiNElzN770+H2nlx+jRog8TyynpTVzdlc6bndktjKWyZyiCsuDAlpd+j+W+WNqfcyAWz9HxxIGfZm1Q==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
+<<<<<<< HEAD
   '@rollup/rollup-linux-x64-musl@4.59.0':
     resolution: {integrity: sha512-2UdiwS/9cTAx7qIUZB/fWtToJwvt0Vbo0zmnYt7ED35KPg13Q0ym1g442THLC7VyI6JfYTP4PiSOWyoMdV2/xg==}
+=======
+  '@rollup/rollup-linux-x64-gnu@4.61.1':
+    resolution: {integrity: sha512-bVWIOIk6pV01p4CdUbPP7CJ/434z+OooYjDuFcR+44N35YvKUC66G8MGnvcWx5mWKW3g61J+t74l3Kj15Kwn2Q==}
+    cpu: [x64]
+    os: [linux]
+
+  '@rollup/rollup-linux-x64-musl@4.52.5':
+    resolution: {integrity: sha512-arCGIcuNKjBoKAXD+y7XomR9gY6Mw7HnFBv5Rw7wQRvwYLR7gBAgV7Mb2QTyjXfTveBNFAtPt46/36vV9STLNg==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
+<<<<<<< HEAD
   '@rollup/rollup-openbsd-x64@4.59.0':
     resolution: {integrity: sha512-M3bLRAVk6GOwFlPTIxVBSYKUaqfLrn8l0psKinkCFxl4lQvOSz8ZrKDz2gxcBwHFpci0B6rttydI4IpS4IS/jQ==}
     cpu: [x64]
@@ -4074,6 +4622,65 @@ packages:
 
   '@rollup/rollup-win32-x64-msvc@4.59.0':
     resolution: {integrity: sha512-2HRCml6OztYXyJXAvdDXPKcawukWY2GpR5/nxKp4iBgiO3wcoEGkAaqctIbZcNB6KlUQBIqt8VYkNSj2397EfA==}
+=======
+  '@rollup/rollup-linux-x64-musl@4.61.1':
+    resolution: {integrity: sha512-qy5pBvZbqNFheBz61R1rzsezjm0J7O2oNGoWtGoY89SZYLUfxAJTBAqDChqAIdB4rCiIbi9nF7yZ83GnNiLwSw==}
+    cpu: [x64]
+    os: [linux]
+
+  '@rollup/rollup-openbsd-x64@4.61.1':
+    resolution: {integrity: sha512-E83TXjI4zm0+5f2qO+UOudaCYIhYwpJ5jq6YCZNIZ+6CbfhKrkAGezeiASBL9ElxAxFsRS9ZhESv8mfnj6TKeg==}
+    cpu: [x64]
+    os: [openbsd]
+
+  '@rollup/rollup-openharmony-arm64@4.52.5':
+    resolution: {integrity: sha512-QoFqB6+/9Rly/RiPjaomPLmR/13cgkIGfA40LHly9zcH1S0bN2HVFYk3a1eAyHQyjs3ZJYlXvIGtcCs5tko9Cw==}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@rollup/rollup-openharmony-arm64@4.61.1':
+    resolution: {integrity: sha512-fbWnKqVkjrJN38vNe3ahkbk6iejS/3b0Nt7EEtPpE6RBacZcGXNKbzfHN3GUUlXOPghUg0j6XUGrtjX9z1sIvA==}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@rollup/rollup-win32-arm64-msvc@4.52.5':
+    resolution: {integrity: sha512-w0cDWVR6MlTstla1cIfOGyl8+qb93FlAVutcor14Gf5Md5ap5ySfQ7R9S/NjNaMLSFdUnKGEasmVnu3lCMqB7w==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@rollup/rollup-win32-arm64-msvc@4.61.1':
+    resolution: {integrity: sha512-ArMl38iVAbk0New1ogihQNY6iphLi4ZaRsa037gUzv5yeKPY8TD3Dmy4x2RNC1VztU/uqm+G+/RwFrSka3Oy2g==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@rollup/rollup-win32-ia32-msvc@4.52.5':
+    resolution: {integrity: sha512-Aufdpzp7DpOTULJCuvzqcItSGDH73pF3ko/f+ckJhxQyHtp67rHw3HMNxoIdDMUITJESNE6a8uh4Lo4SLouOUg==}
+    cpu: [ia32]
+    os: [win32]
+
+  '@rollup/rollup-win32-ia32-msvc@4.61.1':
+    resolution: {integrity: sha512-0mYtjHS9ucAbcATycCNK9IGBk/cCe/ma7EmSLGZdsxnOA8cjRIyU04wDpVAD9NiOfLUR9KTxdiO53uOkherqjQ==}
+    cpu: [ia32]
+    os: [win32]
+
+  '@rollup/rollup-win32-x64-gnu@4.52.5':
+    resolution: {integrity: sha512-UGBUGPFp1vkj6p8wCRraqNhqwX/4kNQPS57BCFc8wYh0g94iVIW33wJtQAx3G7vrjjNtRaxiMUylM0ktp/TRSQ==}
+    cpu: [x64]
+    os: [win32]
+
+  '@rollup/rollup-win32-x64-gnu@4.61.1':
+    resolution: {integrity: sha512-gK1iCEPfpoSG9wfBihXxvBMi8ZfcWffYkEsC/Eih+iFENTaewvNcrEQ69lIOWYO5pePHKLHHO7nq5AILGO/HQQ==}
+    cpu: [x64]
+    os: [win32]
+
+  '@rollup/rollup-win32-x64-msvc@4.52.5':
+    resolution: {integrity: sha512-TAcgQh2sSkykPRWLrdyy2AiceMckNf5loITqXxFI5VuQjS5tSuw3WlwdN8qv8vzjLAUTvYaH/mVjSFpbkFbpTg==}
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
+    cpu: [x64]
+    os: [win32]
+
+  '@rollup/rollup-win32-x64-msvc@4.61.1':
+    resolution: {integrity: sha512-X+zaP2x+j4RXGfbp/seSoRHWnPxzApilDszisZxbYH5C/jTxFhCtDNdPGZb9lJyYPs24wGxruPF7Y+sIXt9Gzw==}
     cpu: [x64]
     os: [win32]
 
@@ -4561,6 +5168,18 @@ packages:
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
+<<<<<<< HEAD
+=======
+  '@types/estree@1.0.9':
+    resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
+
+  '@types/glob@7.2.0':
+    resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
+
+  '@types/hast@2.3.10':
+    resolution: {integrity: sha512-McWspRw8xx8J9HurkVBfYj0xKoE25tOFlHGdx4MJ5xORQrMGZNqJhVQWaIbm6Oyla5kYOXtDiopzKRJzEOkwJw==}
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
 
@@ -6393,11 +7012,14 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+<<<<<<< HEAD
   esbuild@0.27.3:
     resolution: {integrity: sha512-8VwMnyGCONIs6cWue2IdpHxHnAjzxnw2Zr7MkVxB2vjmQ2ivqGFb4LEG3SMnv0Gb2F/G/2yA8zUaiL1gywDCCg==}
     engines: {node: '>=18'}
     hasBin: true
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   esbuild@0.27.7:
     resolution: {integrity: sha512-IxpibTjyVnmrIQo5aqNpCgoACA/dTKLTlhMHihVHhdkxKyPO1uBBthumT0rdHmcsk9uMonIWS0m4FljWzILh3w==}
     engines: {node: '>=18'}
@@ -6469,8 +7091,9 @@ packages:
     peerDependencies:
       eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
 
-  eslint-plugin-qwik@2.0.0-beta.35:
-    resolution: {integrity: sha512-kVmh3HXivvL8mhXyF9yQIooGL4cz23KBFAdbSb22kScutFj7YqLO4toW42V1OEsiVvlRD6ycJqvLivoz6o70aA==}
+  eslint-plugin-qwik@https://pkg.pr.new/QwikDev/qwik/eslint-plugin-qwik@1778671:
+    resolution: {tarball: https://pkg.pr.new/QwikDev/qwik/eslint-plugin-qwik@1778671}
+    version: 2.0.0-beta.37
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
@@ -9137,6 +9760,11 @@ packages:
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
+  rollup@4.61.1:
+    resolution: {integrity: sha512-I4KW6iuRpuu2uHBLraZ1wNZe0DP7lnRha+VJ9tNaYVaVgKhW0aI3h4RYnoRPeql0flHm/Co55b7snEDcOfOJrA==}
+    engines: {node: '>=18.0.0', npm: '>=8.0.0'}
+    hasBin: true
+
   rrweb-cssom@0.8.0:
     resolution: {integrity: sha512-guoltQEx+9aMf2gDZ0s62EcV8lsXR+0w8915TC3ITdn2YueuNjdAYh/levpU9nFaoChh9RUS5ZdQMrKfVEN9tw==}
 
@@ -10456,6 +11084,46 @@ packages:
   vite@7.2.6:
     resolution: {integrity: sha512-tI2l/nFHC5rLh7+5+o7QjKjSR04ivXDF4jcgV0f/bTQ+OJiITy5S6gaynVsEM+7RqzufMnVbIon6Sr5x1SDYaQ==}
 >>>>>>> 9742820 (chore: wip)
+    engines: {node: ^20.19.0 || >=22.12.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': ^20.19.0 || >=22.12.0
+      jiti: '>=1.21.0'
+      less: ^4.0.0
+      lightningcss: ^1.21.0
+      sass: ^1.70.0
+      sass-embedded: ^1.70.0
+      stylus: '>=0.54.8'
+      sugarss: ^5.0.0
+      terser: ^5.16.0
+      tsx: ^4.8.1
+      yaml: ^2.4.2
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      jiti:
+        optional: true
+      less:
+        optional: true
+      lightningcss:
+        optional: true
+      sass:
+        optional: true
+      sass-embedded:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+      tsx:
+        optional: true
+      yaml:
+        optional: true
+
+  vite@7.3.5:
+    resolution: {integrity: sha512-KuOaNhcnGFN2zIPGA7wRmzF+lJA1sea7rHq17aiJ++9lzY1WWG6Jpwqwe1KNbRVPIqHmr8GLYx7jbrQcN/7/ww==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -11838,7 +12506,14 @@ snapshots:
   '@esbuild/aix-ppc64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/aix-ppc64@0.27.3':
+=======
+  '@esbuild/aix-ppc64@0.27.7':
+    optional: true
+
+  '@esbuild/android-arm64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/aix-ppc64@0.27.7':
@@ -11850,9 +12525,12 @@ snapshots:
   '@esbuild/android-arm64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/android-arm64@0.27.3':
     optional: true
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/android-arm64@0.27.7':
     optional: true
 
@@ -11865,7 +12543,14 @@ snapshots:
   '@esbuild/android-arm@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/android-arm@0.27.3':
+=======
+  '@esbuild/android-arm@0.27.7':
+    optional: true
+
+  '@esbuild/android-x64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/android-arm@0.27.7':
@@ -11877,7 +12562,14 @@ snapshots:
   '@esbuild/android-x64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/android-x64@0.27.3':
+=======
+  '@esbuild/android-x64@0.27.7':
+    optional: true
+
+  '@esbuild/darwin-arm64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/android-x64@0.27.7':
@@ -11889,7 +12581,14 @@ snapshots:
   '@esbuild/darwin-arm64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/darwin-arm64@0.27.3':
+=======
+  '@esbuild/darwin-arm64@0.27.7':
+    optional: true
+
+  '@esbuild/darwin-x64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/darwin-arm64@0.27.7':
@@ -11901,7 +12600,14 @@ snapshots:
   '@esbuild/darwin-x64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/darwin-x64@0.27.3':
+=======
+  '@esbuild/darwin-x64@0.27.7':
+    optional: true
+
+  '@esbuild/freebsd-arm64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/darwin-x64@0.27.7':
@@ -11913,7 +12619,14 @@ snapshots:
   '@esbuild/freebsd-arm64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/freebsd-arm64@0.27.3':
+=======
+  '@esbuild/freebsd-arm64@0.27.7':
+    optional: true
+
+  '@esbuild/freebsd-x64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/freebsd-arm64@0.27.7':
@@ -11925,7 +12638,14 @@ snapshots:
   '@esbuild/freebsd-x64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/freebsd-x64@0.27.3':
+=======
+  '@esbuild/freebsd-x64@0.27.7':
+    optional: true
+
+  '@esbuild/linux-arm64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/freebsd-x64@0.27.7':
@@ -11937,7 +12657,14 @@ snapshots:
   '@esbuild/linux-arm64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/linux-arm64@0.27.3':
+=======
+  '@esbuild/linux-arm64@0.27.7':
+    optional: true
+
+  '@esbuild/linux-arm@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/linux-arm64@0.27.7':
@@ -11949,7 +12676,14 @@ snapshots:
   '@esbuild/linux-arm@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/linux-arm@0.27.3':
+=======
+  '@esbuild/linux-arm@0.27.7':
+    optional: true
+
+  '@esbuild/linux-ia32@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/linux-arm@0.27.7':
@@ -11961,9 +12695,12 @@ snapshots:
   '@esbuild/linux-ia32@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/linux-ia32@0.27.3':
     optional: true
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/linux-ia32@0.27.7':
     optional: true
 
@@ -11976,7 +12713,14 @@ snapshots:
   '@esbuild/linux-loong64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/linux-loong64@0.27.3':
+=======
+  '@esbuild/linux-loong64@0.27.7':
+    optional: true
+
+  '@esbuild/linux-mips64el@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/linux-loong64@0.27.7':
@@ -11988,7 +12732,14 @@ snapshots:
   '@esbuild/linux-mips64el@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/linux-mips64el@0.27.3':
+=======
+  '@esbuild/linux-mips64el@0.27.7':
+    optional: true
+
+  '@esbuild/linux-ppc64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/linux-mips64el@0.27.7':
@@ -12000,7 +12751,14 @@ snapshots:
   '@esbuild/linux-ppc64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/linux-ppc64@0.27.3':
+=======
+  '@esbuild/linux-ppc64@0.27.7':
+    optional: true
+
+  '@esbuild/linux-riscv64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/linux-ppc64@0.27.7':
@@ -12012,7 +12770,14 @@ snapshots:
   '@esbuild/linux-riscv64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/linux-riscv64@0.27.3':
+=======
+  '@esbuild/linux-riscv64@0.27.7':
+    optional: true
+
+  '@esbuild/linux-s390x@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/linux-riscv64@0.27.7':
@@ -12024,7 +12789,14 @@ snapshots:
   '@esbuild/linux-s390x@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/linux-s390x@0.27.3':
+=======
+  '@esbuild/linux-s390x@0.27.7':
+    optional: true
+
+  '@esbuild/linux-x64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/linux-s390x@0.27.7':
@@ -12036,16 +12808,26 @@ snapshots:
   '@esbuild/linux-x64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/linux-x64@0.27.3':
     optional: true
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/linux-x64@0.27.7':
     optional: true
 
   '@esbuild/netbsd-arm64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/netbsd-arm64@0.27.3':
+=======
+  '@esbuild/netbsd-arm64@0.27.7':
+    optional: true
+
+  '@esbuild/netbsd-x64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/netbsd-arm64@0.27.7':
@@ -12057,16 +12839,26 @@ snapshots:
   '@esbuild/netbsd-x64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/netbsd-x64@0.27.3':
     optional: true
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/netbsd-x64@0.27.7':
     optional: true
 
   '@esbuild/openbsd-arm64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/openbsd-arm64@0.27.3':
+=======
+  '@esbuild/openbsd-arm64@0.27.7':
+    optional: true
+
+  '@esbuild/openbsd-x64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/openbsd-arm64@0.27.7':
@@ -12078,16 +12870,26 @@ snapshots:
   '@esbuild/openbsd-x64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/openbsd-x64@0.27.3':
     optional: true
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/openbsd-x64@0.27.7':
     optional: true
 
   '@esbuild/openharmony-arm64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/openharmony-arm64@0.27.3':
+=======
+  '@esbuild/openharmony-arm64@0.27.7':
+    optional: true
+
+  '@esbuild/sunos-x64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/openharmony-arm64@0.27.7':
@@ -12099,7 +12901,14 @@ snapshots:
   '@esbuild/sunos-x64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/sunos-x64@0.27.3':
+=======
+  '@esbuild/sunos-x64@0.27.7':
+    optional: true
+
+  '@esbuild/win32-arm64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/sunos-x64@0.27.7':
@@ -12111,7 +12920,14 @@ snapshots:
   '@esbuild/win32-arm64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/win32-arm64@0.27.3':
+=======
+  '@esbuild/win32-arm64@0.27.7':
+    optional: true
+
+  '@esbuild/win32-ia32@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/win32-arm64@0.27.7':
@@ -12123,7 +12939,14 @@ snapshots:
   '@esbuild/win32-ia32@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/win32-ia32@0.27.3':
+=======
+  '@esbuild/win32-ia32@0.27.7':
+    optional: true
+
+  '@esbuild/win32-x64@0.17.19':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optional: true
 
   '@esbuild/win32-ia32@0.27.7':
@@ -12135,9 +12958,12 @@ snapshots:
   '@esbuild/win32-x64@0.25.11':
     optional: true
 
+<<<<<<< HEAD
   '@esbuild/win32-x64@0.27.3':
     optional: true
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
@@ -12859,10 +13685,14 @@ snapshots:
   '@poppinss/exception@1.2.2': {}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   '@preact/preset-vite@2.10.5(@babel/core@7.28.5)(preact@10.29.2)(rollup@4.59.0)(vite@6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))':
 =======
   '@preact/preset-vite@2.10.5(@babel/core@7.28.5)(preact@10.29.2)(rollup@4.52.5)(vite@6.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
 >>>>>>> 9742820 (chore: wip)
+=======
+  '@preact/preset-vite@2.10.5(@babel/core@7.28.5)(preact@10.29.2)(rollup@4.61.1)(vite@6.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-react-jsx': 7.27.1(@babel/core@7.28.5)
@@ -12872,8 +13702,12 @@ snapshots:
       '@rollup/pluginutils': 5.3.0(rollup@4.59.0)
 =======
       '@prefresh/vite': 2.4.11(preact@10.29.2)(vite@6.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+<<<<<<< HEAD
       '@rollup/pluginutils': 5.3.0(rollup@4.52.5)
 >>>>>>> 9742820 (chore: wip)
+=======
+      '@rollup/pluginutils': 5.3.0(rollup@4.61.1)
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       babel-plugin-transform-hook-names: 1.0.2(@babel/core@7.28.5)
       debug: 4.4.3
       magic-string: 0.30.21
@@ -12964,6 +13798,7 @@ snapshots:
       quansync: 0.2.11
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   '@qwik.dev/core@2.0.0-beta.5(prettier@3.6.2)(vite@6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vitest@4.1.7)':
     dependencies:
       csstype: 3.1.3
@@ -12980,11 +13815,15 @@ snapshots:
       vite: 7.3.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 =======
   '@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
+=======
+  '@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671(prettier@3.6.2)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     dependencies:
-      '@qwik.dev/optimizer': https://pkg.pr.new/QwikDev/qwik/@qwik.dev/optimizer@7813a99
+      '@qwik.dev/optimizer': https://pkg.pr.new/QwikDev/qwik/@qwik.dev/optimizer@1778671
       csstype: 3.2.3
       launch-editor: 2.14.0
       magic-string: 0.30.21
+<<<<<<< HEAD
       vite: 8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
 >>>>>>> 9742820 (chore: wip)
     optionalDependencies:
@@ -13009,19 +13848,52 @@ snapshots:
       launch-editor: 2.14.0
       magic-string: 0.30.21
       vite: 8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+=======
+      rollup: 4.61.1
+      vite: 7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optionalDependencies:
       prettier: 3.6.2
       vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
 
+  '@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671(prettier@3.6.2)(vite@8.0.14(@types/node@24.0.13)(esbuild@0.27.7)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
+    dependencies:
+      '@qwik.dev/optimizer': https://pkg.pr.new/QwikDev/qwik/@qwik.dev/optimizer@1778671
+      csstype: 3.2.3
+      launch-editor: 2.14.0
+      magic-string: 0.30.21
+      rollup: 4.61.1
+      vite: 8.0.14(@types/node@24.0.13)(esbuild@0.27.7)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+    optionalDependencies:
+      prettier: 3.6.2
+      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+
+  '@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
+    dependencies:
+      '@qwik.dev/optimizer': https://pkg.pr.new/QwikDev/qwik/@qwik.dev/optimizer@7813a99
+      csstype: 3.2.3
+      launch-editor: 2.14.0
+      magic-string: 0.30.21
+      vite: 7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+    optionalDependencies:
+      prettier: 3.6.2
+      vitest: 3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+
+  '@qwik.dev/optimizer@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/optimizer@1778671': {}
+
   '@qwik.dev/optimizer@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/optimizer@7813a99': {}
 
+<<<<<<< HEAD
   '@qwik.dev/router@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@7813a99(@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)))(rollup@4.52.5)(typescript@5.8.3)(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
 >>>>>>> 9742820 (chore: wip)
+=======
+  '@qwik.dev/router@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@1778671(@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671(prettier@3.6.2)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)))(rollup@4.61.1)(typescript@5.8.3)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     dependencies:
       '@azure/functions': 3.5.1
       '@mdx-js/mdx': 3.1.1
       '@netlify/edge-functions': 3.0.8
-      '@qwik.dev/core': https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+      '@qwik.dev/core': https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671(prettier@3.6.2)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
       '@types/mdx': 2.0.13
       estree-util-value-to-estree: 3.5.0
       github-slugger: 2.0.0
@@ -13049,8 +13921,8 @@ snapshots:
       unist-util-visit: 5.0.0
       valibot: 1.4.1(typescript@5.8.3)
       vfile: 6.0.3
-      vite: 8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
-      vite-imagetools: 10.0.0(rollup@4.52.5)(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+      vite: 7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite-imagetools: 10.0.0(rollup@4.61.1)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
       yaml: 2.9.0
       zod: 3.25.76
 >>>>>>> 9742820 (chore: wip)
@@ -13060,15 +13932,19 @@ snapshots:
       - typescript
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   '@qwik.dev/router@2.0.0-beta.9(patch_hash=e002def78f4681060d18bc24d686c24ee1d1b997c399a2cb1c03baf3b860e4c8)(rollup@4.59.0)(typescript@5.8.3)':
 =======
   '@qwik.dev/router@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@7813a99(@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)))(rollup@4.52.5)(typescript@5.8.3)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
 >>>>>>> 9742820 (chore: wip)
+=======
+  '@qwik.dev/router@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/router@7813a99(@qwik.dev/core@https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)))(rollup@4.61.1)(typescript@5.8.3)(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     dependencies:
       '@azure/functions': 3.5.1
       '@mdx-js/mdx': 3.1.1
       '@netlify/edge-functions': 3.0.8
-      '@qwik.dev/core': https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@24.0.13)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+      '@qwik.dev/core': https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@7813a99(prettier@3.6.2)(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))(vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
       '@types/mdx': 2.0.13
       estree-util-value-to-estree: 3.5.0
       github-slugger: 2.0.0
@@ -13095,8 +13971,8 @@ snapshots:
       unist-util-visit: 5.0.0
       valibot: 1.4.1(typescript@5.8.3)
       vfile: 6.0.3
-      vite: 8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
-      vite-imagetools: 10.0.0(rollup@4.52.5)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+      vite: 7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite-imagetools: 10.0.0(rollup@4.61.1)(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
       yaml: 2.9.0
       zod: 3.25.76
 >>>>>>> 9742820 (chore: wip)
@@ -13264,10 +14140,16 @@ snapshots:
 =======
   '@rolldown/pluginutils@1.0.1': {}
 
+<<<<<<< HEAD
   '@rollup/plugin-alias@5.1.1(rollup@4.52.5)':
 >>>>>>> 9742820 (chore: wip)
     optionalDependencies:
       rollup: 4.59.0
+=======
+  '@rollup/plugin-alias@5.1.1(rollup@4.61.1)':
+    optionalDependencies:
+      rollup: 4.61.1
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   '@rollup/plugin-babel@6.1.0(@babel/core@7.28.5)(@types/babel__core@7.20.5)(rollup@4.59.0)':
     dependencies:
@@ -13280,9 +14162,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+<<<<<<< HEAD
   '@rollup/plugin-commonjs@28.0.9(rollup@4.59.0)':
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.59.0)
+=======
+  '@rollup/plugin-commonjs@28.0.9(rollup@4.61.1)':
+    dependencies:
+      '@rollup/pluginutils': 5.3.0(rollup@4.61.1)
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       commondir: 1.0.1
       estree-walker: 2.0.2
       fdir: 6.5.0(picomatch@4.0.4)
@@ -13290,6 +14178,7 @@ snapshots:
       magic-string: 0.30.21
       picomatch: 4.0.4
     optionalDependencies:
+<<<<<<< HEAD
       rollup: 4.59.0
 
   '@rollup/plugin-inject@5.0.5(rollup@4.59.0)':
@@ -13305,6 +14194,23 @@ snapshots:
       '@rollup/pluginutils': 5.3.0(rollup@4.59.0)
     optionalDependencies:
       rollup: 4.59.0
+=======
+      rollup: 4.61.1
+
+  '@rollup/plugin-inject@5.0.5(rollup@4.61.1)':
+    dependencies:
+      '@rollup/pluginutils': 5.3.0(rollup@4.61.1)
+      estree-walker: 2.0.2
+      magic-string: 0.30.21
+    optionalDependencies:
+      rollup: 4.61.1
+
+  '@rollup/plugin-json@6.1.0(rollup@4.61.1)':
+    dependencies:
+      '@rollup/pluginutils': 5.3.0(rollup@4.61.1)
+    optionalDependencies:
+      rollup: 4.61.1
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   '@rollup/plugin-node-resolve@16.0.3(rollup@4.59.0)':
     dependencies:
@@ -13316,12 +14222,31 @@ snapshots:
     optionalDependencies:
       rollup: 4.59.0
 
+<<<<<<< HEAD
   '@rollup/plugin-replace@6.0.2(rollup@4.59.0)':
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.59.0)
       magic-string: 0.30.21
     optionalDependencies:
       rollup: 4.59.0
+=======
+  '@rollup/plugin-node-resolve@16.0.3(rollup@4.61.1)':
+    dependencies:
+      '@rollup/pluginutils': 5.3.0(rollup@4.61.1)
+      '@types/resolve': 1.20.2
+      deepmerge: 4.3.1
+      is-module: 1.0.0
+      resolve: 1.22.11
+    optionalDependencies:
+      rollup: 4.61.1
+
+  '@rollup/plugin-replace@6.0.2(rollup@4.61.1)':
+    dependencies:
+      '@rollup/pluginutils': 5.3.0(rollup@4.61.1)
+      magic-string: 0.30.21
+    optionalDependencies:
+      rollup: 4.61.1
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   '@rollup/plugin-terser@0.4.4(rollup@4.59.0)':
     dependencies:
@@ -13330,6 +14255,14 @@ snapshots:
       terser: 5.44.0
     optionalDependencies:
       rollup: 4.59.0
+
+  '@rollup/plugin-terser@0.4.4(rollup@4.61.1)':
+    dependencies:
+      serialize-javascript: 6.0.2
+      smob: 1.5.0
+      terser: 5.44.0
+    optionalDependencies:
+      rollup: 4.61.1
 
   '@rollup/pluginutils@4.2.1':
     dependencies:
@@ -13344,6 +14277,7 @@ snapshots:
     optionalDependencies:
       rollup: 4.59.0
 
+<<<<<<< HEAD
   '@rollup/rollup-android-arm-eabi@4.59.0':
     optional: true
 
@@ -13417,6 +14351,155 @@ snapshots:
     optional: true
 
   '@rollup/rollup-win32-x64-msvc@4.59.0':
+=======
+  '@rollup/pluginutils@5.3.0(rollup@4.61.1)':
+    dependencies:
+      '@types/estree': 1.0.8
+      estree-walker: 2.0.2
+      picomatch: 4.0.3
+    optionalDependencies:
+      rollup: 4.61.1
+
+  '@rollup/rollup-android-arm-eabi@4.52.5':
+    optional: true
+
+  '@rollup/rollup-android-arm-eabi@4.61.1':
+    optional: true
+
+  '@rollup/rollup-android-arm64@4.52.5':
+    optional: true
+
+  '@rollup/rollup-android-arm64@4.61.1':
+    optional: true
+
+  '@rollup/rollup-darwin-arm64@4.52.5':
+    optional: true
+
+  '@rollup/rollup-darwin-arm64@4.61.1':
+    optional: true
+
+  '@rollup/rollup-darwin-x64@4.52.5':
+    optional: true
+
+  '@rollup/rollup-darwin-x64@4.61.1':
+    optional: true
+
+  '@rollup/rollup-freebsd-arm64@4.52.5':
+    optional: true
+
+  '@rollup/rollup-freebsd-arm64@4.61.1':
+    optional: true
+
+  '@rollup/rollup-freebsd-x64@4.52.5':
+    optional: true
+
+  '@rollup/rollup-freebsd-x64@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-arm-gnueabihf@4.52.5':
+    optional: true
+
+  '@rollup/rollup-linux-arm-gnueabihf@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-arm-musleabihf@4.52.5':
+    optional: true
+
+  '@rollup/rollup-linux-arm-musleabihf@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-arm64-gnu@4.52.5':
+    optional: true
+
+  '@rollup/rollup-linux-arm64-gnu@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-arm64-musl@4.52.5':
+    optional: true
+
+  '@rollup/rollup-linux-arm64-musl@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-loong64-gnu@4.52.5':
+    optional: true
+
+  '@rollup/rollup-linux-loong64-gnu@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-loong64-musl@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-ppc64-gnu@4.52.5':
+    optional: true
+
+  '@rollup/rollup-linux-ppc64-gnu@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-ppc64-musl@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-riscv64-gnu@4.52.5':
+    optional: true
+
+  '@rollup/rollup-linux-riscv64-gnu@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-riscv64-musl@4.52.5':
+    optional: true
+
+  '@rollup/rollup-linux-riscv64-musl@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-s390x-gnu@4.52.5':
+    optional: true
+
+  '@rollup/rollup-linux-s390x-gnu@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-x64-gnu@4.52.5':
+    optional: true
+
+  '@rollup/rollup-linux-x64-gnu@4.61.1':
+    optional: true
+
+  '@rollup/rollup-linux-x64-musl@4.52.5':
+    optional: true
+
+  '@rollup/rollup-linux-x64-musl@4.61.1':
+    optional: true
+
+  '@rollup/rollup-openbsd-x64@4.61.1':
+    optional: true
+
+  '@rollup/rollup-openharmony-arm64@4.52.5':
+    optional: true
+
+  '@rollup/rollup-openharmony-arm64@4.61.1':
+    optional: true
+
+  '@rollup/rollup-win32-arm64-msvc@4.52.5':
+    optional: true
+
+  '@rollup/rollup-win32-arm64-msvc@4.61.1':
+    optional: true
+
+  '@rollup/rollup-win32-ia32-msvc@4.52.5':
+    optional: true
+
+  '@rollup/rollup-win32-ia32-msvc@4.61.1':
+    optional: true
+
+  '@rollup/rollup-win32-x64-gnu@4.52.5':
+    optional: true
+
+  '@rollup/rollup-win32-x64-gnu@4.61.1':
+    optional: true
+
+  '@rollup/rollup-win32-x64-msvc@4.52.5':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
+    optional: true
+
+  '@rollup/rollup-win32-x64-msvc@4.61.1':
     optional: true
 
   '@rtsao/scc@1.1.0': {}
@@ -13871,12 +14954,17 @@ snapshots:
 =======
       vite: 7.1.12(@types/node@24.9.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
 
+<<<<<<< HEAD
   '@tailwindcss/vite@4.1.16(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
 >>>>>>> 9742820 (chore: wip)
+=======
+  '@tailwindcss/vite@4.1.16(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     dependencies:
       '@tailwindcss/node': 4.1.16
       '@tailwindcss/oxide': 4.1.16
       tailwindcss: 4.1.16
+<<<<<<< HEAD
 <<<<<<< HEAD
       vite: 7.3.2(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
@@ -13886,16 +14974,25 @@ snapshots:
 
   '@tailwindcss/vite@4.1.16(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
 >>>>>>> 9742820 (chore: wip)
+=======
+      vite: 7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+
+  '@tailwindcss/vite@4.1.16(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     dependencies:
       '@tailwindcss/node': 4.1.16
       '@tailwindcss/oxide': 4.1.16
       tailwindcss: 4.1.16
+<<<<<<< HEAD
 <<<<<<< HEAD
       vite: 7.3.2(@types/node@24.9.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   '@tailwindcss/vite@4.1.17(vite@7.3.2(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))':
 =======
       vite: 8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+=======
+      vite: 7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   '@tailwindcss/vite@4.1.17(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))':
 >>>>>>> 9742820 (chore: wip)
@@ -14073,6 +15170,13 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
+<<<<<<< HEAD
+=======
+  '@types/acorn@4.0.6':
+    dependencies:
+      '@types/estree': 1.0.9
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@types/aria-query@5.0.4': {}
 
   '@types/babel__core@7.20.5':
@@ -14116,12 +15220,33 @@ snapshots:
       '@types/estree': 1.0.8
       '@types/json-schema': 7.0.15
 
+<<<<<<< HEAD
+=======
+  '@types/estree-jsx@0.0.1':
+    dependencies:
+      '@types/estree': 1.0.9
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@types/estree-jsx@1.0.5':
     dependencies:
       '@types/estree': 1.0.8
 
   '@types/estree@1.0.8': {}
 
+<<<<<<< HEAD
+=======
+  '@types/estree@1.0.9': {}
+
+  '@types/glob@7.2.0':
+    dependencies:
+      '@types/minimatch': 6.0.0
+      '@types/node': 24.10.1
+
+  '@types/hast@2.3.10':
+    dependencies:
+      '@types/unist': 2.0.11
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   '@types/hast@3.0.4':
     dependencies:
       '@types/unist': 3.0.3
@@ -14843,10 +15968,17 @@ snapshots:
       - encoding
       - supports-color
 
+<<<<<<< HEAD
   '@vercel/nft@0.30.3(rollup@4.59.0)':
     dependencies:
       '@mapbox/node-pre-gyp': 2.0.0
       '@rollup/pluginutils': 5.3.0(rollup@4.59.0)
+=======
+  '@vercel/nft@0.30.3(rollup@4.61.1)':
+    dependencies:
+      '@mapbox/node-pre-gyp': 2.0.0
+      '@rollup/pluginutils': 5.3.0(rollup@4.61.1)
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       acorn: 8.15.0
       acorn-import-attributes: 1.9.5(acorn@8.15.0)
       async-sema: 3.1.1
@@ -16629,6 +17761,15 @@ snapshots:
   esbuild-openbsd-64@0.15.18:
     optional: true
 
+<<<<<<< HEAD
+=======
+  esbuild-plugin-polyfill-node@0.2.0(esbuild@0.17.6):
+    dependencies:
+      '@jspm/core': 2.1.0
+      esbuild: 0.17.6
+      import-meta-resolve: 2.2.2
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   esbuild-plugin-solid@0.5.0(esbuild@0.27.7)(solid-js@1.9.9):
     dependencies:
       '@babel/core': 7.28.5
@@ -16766,6 +17907,7 @@ snapshots:
       '@esbuild/win32-ia32': 0.25.11
       '@esbuild/win32-x64': 0.25.11
 
+<<<<<<< HEAD
   esbuild@0.27.3:
     optionalDependencies:
       '@esbuild/aix-ppc64': 0.27.3
@@ -16795,6 +17937,8 @@ snapshots:
       '@esbuild/win32-ia32': 0.27.3
       '@esbuild/win32-x64': 0.27.3
 
+=======
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   esbuild@0.27.7:
     optionalDependencies:
       '@esbuild/aix-ppc64': 0.27.7
@@ -16922,7 +18066,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-qwik@2.0.0-beta.35(eslint@8.57.1)(typescript@5.8.3):
+  eslint-plugin-qwik@https://pkg.pr.new/QwikDev/qwik/eslint-plugin-qwik@1778671(eslint@8.57.1)(typescript@5.8.3):
     dependencies:
       '@typescript-eslint/utils': 8.60.0(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
@@ -16931,7 +18075,7 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-plugin-qwik@2.0.0-beta.35(eslint@9.31.0(jiti@2.6.1))(typescript@5.8.3):
+  eslint-plugin-qwik@https://pkg.pr.new/QwikDev/qwik/eslint-plugin-qwik@1778671(eslint@9.31.0(jiti@2.6.1))(typescript@5.8.3):
     dependencies:
       '@typescript-eslint/utils': 8.60.0(eslint@9.31.0(jiti@2.6.1))(typescript@5.8.3)
       eslint: 9.31.0(jiti@2.6.1)
@@ -17282,6 +18426,13 @@ snapshots:
 
   estraverse@5.3.0: {}
 
+<<<<<<< HEAD
+=======
+  estree-util-attach-comments@2.1.1:
+    dependencies:
+      '@types/estree': 1.0.9
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   estree-util-attach-comments@3.0.0:
     dependencies:
       '@types/estree': 1.0.8
@@ -17716,7 +18867,7 @@ snapshots:
 
   hast-util-to-estree@2.3.3:
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       '@types/estree-jsx': 1.0.5
       '@types/hast': 2.3.10
       '@types/unist': 2.0.11
@@ -18920,7 +20071,7 @@ snapshots:
 
   micromark-extension-mdx-expression@1.0.8:
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       micromark-factory-mdx-expression: 1.0.9
       micromark-factory-space: 1.1.0
       micromark-util-character: 1.2.0
@@ -18941,6 +20092,22 @@ snapshots:
       micromark-util-symbol: 2.0.1
       micromark-util-types: 2.0.2
 
+<<<<<<< HEAD
+=======
+  micromark-extension-mdx-jsx@1.0.5:
+    dependencies:
+      '@types/acorn': 4.0.6
+      '@types/estree': 1.0.9
+      estree-util-is-identifier-name: 2.1.0
+      micromark-factory-mdx-expression: 1.0.9
+      micromark-factory-space: 1.1.0
+      micromark-util-character: 1.2.0
+      micromark-util-symbol: 1.1.0
+      micromark-util-types: 1.1.0
+      uvu: 0.5.6
+      vfile-message: 3.1.4
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   micromark-extension-mdx-jsx@3.0.2:
     dependencies:
       '@types/estree': 1.0.8
@@ -18958,6 +20125,21 @@ snapshots:
     dependencies:
       micromark-util-types: 2.0.2
 
+<<<<<<< HEAD
+=======
+  micromark-extension-mdxjs-esm@1.0.5:
+    dependencies:
+      '@types/estree': 1.0.9
+      micromark-core-commonmark: 1.1.0
+      micromark-util-character: 1.2.0
+      micromark-util-events-to-acorn: 1.2.3
+      micromark-util-symbol: 1.1.0
+      micromark-util-types: 1.1.0
+      unist-util-position-from-estree: 1.1.2
+      uvu: 0.5.6
+      vfile-message: 3.1.4
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   micromark-extension-mdxjs-esm@3.0.0:
     dependencies:
       '@types/estree': 1.0.8
@@ -18994,6 +20176,20 @@ snapshots:
       micromark-util-symbol: 2.0.1
       micromark-util-types: 2.0.2
 
+<<<<<<< HEAD
+=======
+  micromark-factory-mdx-expression@1.0.9:
+    dependencies:
+      '@types/estree': 1.0.9
+      micromark-util-character: 1.2.0
+      micromark-util-events-to-acorn: 1.2.3
+      micromark-util-symbol: 1.1.0
+      micromark-util-types: 1.1.0
+      unist-util-position-from-estree: 1.1.2
+      uvu: 0.5.6
+      vfile-message: 3.1.4
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   micromark-factory-mdx-expression@2.0.3:
     dependencies:
       '@types/estree': 1.0.8
@@ -19058,6 +20254,20 @@ snapshots:
 
   micromark-util-encode@2.0.1: {}
 
+<<<<<<< HEAD
+=======
+  micromark-util-events-to-acorn@1.2.3:
+    dependencies:
+      '@types/acorn': 4.0.6
+      '@types/estree': 1.0.9
+      '@types/unist': 2.0.11
+      estree-util-visit: 1.2.1
+      micromark-util-symbol: 1.1.0
+      micromark-util-types: 1.1.0
+      uvu: 0.5.6
+      vfile-message: 3.1.4
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   micromark-util-events-to-acorn@2.0.3:
     dependencies:
       '@types/estree': 1.0.8
@@ -19240,6 +20450,7 @@ snapshots:
 >>>>>>> 9742820 (chore: wip)
     dependencies:
       '@cloudflare/kv-asset-handler': 0.4.0
+<<<<<<< HEAD
       '@rollup/plugin-alias': 5.1.1(rollup@4.59.0)
       '@rollup/plugin-commonjs': 28.0.9(rollup@4.59.0)
       '@rollup/plugin-inject': 5.0.5(rollup@4.59.0)
@@ -19248,6 +20459,16 @@ snapshots:
       '@rollup/plugin-replace': 6.0.2(rollup@4.59.0)
       '@rollup/plugin-terser': 0.4.4(rollup@4.59.0)
       '@vercel/nft': 0.30.3(rollup@4.59.0)
+=======
+      '@rollup/plugin-alias': 5.1.1(rollup@4.61.1)
+      '@rollup/plugin-commonjs': 28.0.9(rollup@4.61.1)
+      '@rollup/plugin-inject': 5.0.5(rollup@4.61.1)
+      '@rollup/plugin-json': 6.1.0(rollup@4.61.1)
+      '@rollup/plugin-node-resolve': 16.0.3(rollup@4.61.1)
+      '@rollup/plugin-replace': 6.0.2(rollup@4.61.1)
+      '@rollup/plugin-terser': 0.4.4(rollup@4.61.1)
+      '@vercel/nft': 0.30.3(rollup@4.61.1)
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       archiver: 7.0.1
       c12: 3.3.1(magicast@0.3.5)
       chokidar: 4.0.3
@@ -19290,12 +20511,17 @@ snapshots:
       pretty-bytes: 7.1.0
       radix3: 1.1.2
 <<<<<<< HEAD
+<<<<<<< HEAD
       rollup: 4.59.0
       rollup-plugin-visualizer: 6.0.5(rolldown@1.0.0-beta.52)(rollup@4.59.0)
 =======
       rollup: 4.52.5
       rollup-plugin-visualizer: 6.0.5(rolldown@1.0.2)(rollup@4.52.5)
 >>>>>>> 9742820 (chore: wip)
+=======
+      rollup: 4.61.1
+      rollup-plugin-visualizer: 6.0.5(rolldown@1.0.2)(rollup@4.61.1)
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       scule: 1.3.0
       semver: 7.5.2
       serve-placeholder: 2.0.2
@@ -19645,6 +20871,15 @@ snapshots:
 
   perfect-debounce@2.0.0: {}
 
+<<<<<<< HEAD
+=======
+  periscopic@3.1.0:
+    dependencies:
+      '@types/estree': 1.0.9
+      estree-walker: 3.0.3
+      is-reference: 3.0.3
+
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
   picocolors@1.0.0: {}
 
   picocolors@1.1.1: {}
@@ -20366,8 +21601,12 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.0.2
       '@rolldown/binding-win32-x64-msvc': 1.0.2
 
+<<<<<<< HEAD
   rollup-plugin-visualizer@6.0.5(rolldown@1.0.2)(rollup@4.52.5):
 >>>>>>> 9742820 (chore: wip)
+=======
+  rollup-plugin-visualizer@6.0.5(rolldown@1.0.2)(rollup@4.61.1):
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     dependencies:
       open: 8.4.2
       picomatch: 4.0.4
@@ -20379,8 +21618,12 @@ snapshots:
       rollup: 4.59.0
 =======
       rolldown: 1.0.2
+<<<<<<< HEAD
       rollup: 4.52.5
 >>>>>>> 9742820 (chore: wip)
+=======
+      rollup: 4.61.1
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
 
   rollup-preset-solid@3.0.0(@types/babel__core@7.20.5)(solid-js@1.9.9):
     dependencies:
@@ -20429,6 +21672,37 @@ snapshots:
       '@rollup/rollup-win32-ia32-msvc': 4.59.0
       '@rollup/rollup-win32-x64-gnu': 4.59.0
       '@rollup/rollup-win32-x64-msvc': 4.59.0
+      fsevents: 2.3.3
+
+  rollup@4.61.1:
+    dependencies:
+      '@types/estree': 1.0.9
+    optionalDependencies:
+      '@rollup/rollup-android-arm-eabi': 4.61.1
+      '@rollup/rollup-android-arm64': 4.61.1
+      '@rollup/rollup-darwin-arm64': 4.61.1
+      '@rollup/rollup-darwin-x64': 4.61.1
+      '@rollup/rollup-freebsd-arm64': 4.61.1
+      '@rollup/rollup-freebsd-x64': 4.61.1
+      '@rollup/rollup-linux-arm-gnueabihf': 4.61.1
+      '@rollup/rollup-linux-arm-musleabihf': 4.61.1
+      '@rollup/rollup-linux-arm64-gnu': 4.61.1
+      '@rollup/rollup-linux-arm64-musl': 4.61.1
+      '@rollup/rollup-linux-loong64-gnu': 4.61.1
+      '@rollup/rollup-linux-loong64-musl': 4.61.1
+      '@rollup/rollup-linux-ppc64-gnu': 4.61.1
+      '@rollup/rollup-linux-ppc64-musl': 4.61.1
+      '@rollup/rollup-linux-riscv64-gnu': 4.61.1
+      '@rollup/rollup-linux-riscv64-musl': 4.61.1
+      '@rollup/rollup-linux-s390x-gnu': 4.61.1
+      '@rollup/rollup-linux-x64-gnu': 4.61.1
+      '@rollup/rollup-linux-x64-musl': 4.61.1
+      '@rollup/rollup-openbsd-x64': 4.61.1
+      '@rollup/rollup-openharmony-arm64': 4.61.1
+      '@rollup/rollup-win32-arm64-msvc': 4.61.1
+      '@rollup/rollup-win32-ia32-msvc': 4.61.1
+      '@rollup/rollup-win32-x64-gnu': 4.61.1
+      '@rollup/rollup-win32-x64-msvc': 4.61.1
       fsevents: 2.3.3
 
   rrweb-cssom@0.8.0: {}
@@ -21464,14 +22738,18 @@ snapshots:
       esbuild: 0.15.18
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   tsup-preset-solid@2.2.0(esbuild@0.27.7)(solid-js@1.9.9)(tsup@8.5.0(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.8.1)):
     dependencies:
       esbuild-plugin-solid: 0.5.0(esbuild@0.27.7)(solid-js@1.9.9)
       tsup: 8.5.0(jiti@2.6.1)(postcss@8.5.6)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.8.1)
 =======
   tsup-preset-solid@2.2.0(esbuild@0.25.11)(solid-js@1.9.9)(tsup@8.5.0(jiti@2.6.1)(postcss@8.5.15)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.9.0)):
+=======
+  tsup-preset-solid@2.2.0(esbuild@0.27.7)(solid-js@1.9.9)(tsup@8.5.0(jiti@2.6.1)(postcss@8.5.15)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.9.0)):
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     dependencies:
-      esbuild-plugin-solid: 0.5.0(esbuild@0.25.11)(solid-js@1.9.9)
+      esbuild-plugin-solid: 0.5.0(esbuild@0.27.7)(solid-js@1.9.9)
       tsup: 8.5.0(jiti@2.6.1)(postcss@8.5.15)(tsx@4.20.6)(typescript@5.8.3)(yaml@2.9.0)
 >>>>>>> 9742820 (chore: wip)
     transitivePeerDependencies:
@@ -21746,7 +23024,7 @@ snapshots:
       pkg-types: 2.3.0
       scule: 1.3.0
       strip-literal: 3.1.0
-      tinyglobby: 0.2.15
+      tinyglobby: 0.2.16
       unplugin: 2.3.10
       unplugin-utils: 0.3.1
 
@@ -21798,10 +23076,14 @@ snapshots:
       debug: 4.4.3
       unplugin: 2.3.10
 <<<<<<< HEAD
+<<<<<<< HEAD
       vite: 7.3.2(@types/node@24.9.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 =======
       vite: 7.2.6(@types/node@24.9.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
 >>>>>>> 9742820 (chore: wip)
+=======
+      vite: 7.3.5(@types/node@24.9.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       vue: 3.5.22(typescript@5.8.3)
     transitivePeerDependencies:
       - '@types/node'
@@ -22075,28 +23357,34 @@ snapshots:
     dependencies:
       vite: 7.1.12(@types/node@24.9.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
 
-  vite-imagetools@10.0.0(rollup@4.52.5)(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
+  vite-imagetools@10.0.0(rollup@4.61.1)(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
     dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.52.5)
+      '@rollup/pluginutils': 5.3.0(rollup@4.61.1)
       imagetools-core: 9.1.0
       sharp: 0.34.4
-      vite: 8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
     transitivePeerDependencies:
       - rollup
 
-  vite-imagetools@10.0.0(rollup@4.52.5)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
+  vite-imagetools@10.0.0(rollup@4.61.1)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
     dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.52.5)
+      '@rollup/pluginutils': 5.3.0(rollup@4.61.1)
       imagetools-core: 9.1.0
       sharp: 0.34.4
-      vite: 8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
     transitivePeerDependencies:
       - rollup
 >>>>>>> 9742820 (chore: wip)
 
+<<<<<<< HEAD
   vite-imagetools@7.1.1(rollup@4.59.0):
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.59.0)
+=======
+  vite-imagetools@7.1.1(rollup@4.61.1):
+    dependencies:
+      '@rollup/pluginutils': 5.3.0(rollup@4.61.1)
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
       imagetools-core: 7.1.0
       sharp: 0.34.4
     transitivePeerDependencies:
@@ -22129,7 +23417,7 @@ snapshots:
       debug: 4.4.3
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 7.2.6(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -22151,7 +23439,7 @@ snapshots:
       debug: 4.4.3
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 7.2.6(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -22172,7 +23460,7 @@ snapshots:
       debug: 4.4.3
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 7.2.6(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -22193,7 +23481,7 @@ snapshots:
       debug: 4.4.3
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 7.2.6(@types/node@24.9.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@24.9.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -22254,10 +23542,14 @@ snapshots:
       - supports-color
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   vite-plugin-solid@2.11.10(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vite@6.4.2(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)):
 =======
   vite-plugin-solid@2.11.10(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vite@8.0.14(@types/node@24.10.1)(esbuild@0.25.11)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
 >>>>>>> 9742820 (chore: wip)
+=======
+  vite-plugin-solid@2.11.10(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vite@8.0.14(@types/node@24.10.1)(esbuild@0.27.7)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     dependencies:
       '@babel/core': 7.28.5
       '@types/babel__core': 7.20.5
@@ -22266,12 +23558,17 @@ snapshots:
       solid-js: 1.9.9
       solid-refresh: 0.6.3(solid-js@1.9.9)
 <<<<<<< HEAD
+<<<<<<< HEAD
       vite: 6.4.2(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
       vitefu: 1.1.1(vite@6.4.2(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
 =======
       vite: 8.0.14(@types/node@24.10.1)(esbuild@0.25.11)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
       vitefu: 1.1.1(vite@8.0.14(@types/node@24.10.1)(esbuild@0.25.11)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
 >>>>>>> 9742820 (chore: wip)
+=======
+      vite: 8.0.14(@types/node@24.10.1)(esbuild@0.27.7)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vitefu: 1.1.1(vite@8.0.14(@types/node@24.10.1)(esbuild@0.27.7)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0))
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optionalDependencies:
       '@testing-library/jest-dom': 6.9.1
     transitivePeerDependencies:
@@ -22354,32 +23651,40 @@ snapshots:
       vite: 6.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
 >>>>>>> 9742820 (chore: wip)
 
-  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
+  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
     dependencies:
       debug: 4.4.3
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@5.8.3)
     optionalDependencies:
-      vite: 8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)):
 =======
   vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
 >>>>>>> 9742820 (chore: wip)
+=======
+  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     dependencies:
       debug: 4.4.3
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@5.8.3)
     optionalDependencies:
 <<<<<<< HEAD
+<<<<<<< HEAD
       vite: 6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 =======
       vite: 8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
 >>>>>>> 9742820 (chore: wip)
+=======
+      vite: 7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -22406,8 +23711,12 @@ snapshots:
     dependencies:
       esbuild: 0.21.5
       postcss: 8.5.15
+<<<<<<< HEAD
       rollup: 4.52.5
 >>>>>>> 9742820 (chore: wip)
+=======
+      rollup: 4.61.1
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     optionalDependencies:
       '@types/node': 22.18.12
       fsevents: 2.3.3
@@ -22609,6 +23918,7 @@ snapshots:
       yaml: 2.9.0
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   vitefu@1.1.1(vite@6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)):
     optionalDependencies:
       vite: 6.4.2(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
@@ -22638,25 +23948,89 @@ snapshots:
       expect-type: 1.3.0
 =======
   vite@8.0.14(@types/node@22.18.12)(esbuild@0.17.6)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0):
+=======
+  vite@7.3.5(@types/node@22.18.12)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0):
+>>>>>>> 1902352 (fix: double render bug with pkg.pr.new)
     dependencies:
-      lightningcss: 1.32.0
+      esbuild: 0.27.7
+      fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
       postcss: 8.5.15
-      rolldown: 1.0.2
+      rollup: 4.61.1
       tinyglobby: 0.2.16
     optionalDependencies:
       '@types/node': 22.18.12
-      esbuild: 0.17.6
       fsevents: 2.3.3
       jiti: 2.6.1
       less: 4.4.2
+      lightningcss: 1.32.0
       sass: 1.93.2
       stylus: 0.62.0
       terser: 5.44.0
       tsx: 4.20.6
       yaml: 2.9.0
 
-  vite@8.0.14(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0):
+  vite@7.3.5(@types/node@24.0.13)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0):
+    dependencies:
+      esbuild: 0.27.7
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
+      postcss: 8.5.15
+      rollup: 4.61.1
+      tinyglobby: 0.2.16
+    optionalDependencies:
+      '@types/node': 24.0.13
+      fsevents: 2.3.3
+      jiti: 2.6.1
+      less: 4.4.2
+      lightningcss: 1.32.0
+      sass: 1.93.2
+      stylus: 0.62.0
+      terser: 5.44.0
+      tsx: 4.20.6
+      yaml: 2.9.0
+
+  vite@7.3.5(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0):
+    dependencies:
+      esbuild: 0.27.7
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
+      postcss: 8.5.15
+      rollup: 4.61.1
+      tinyglobby: 0.2.16
+    optionalDependencies:
+      '@types/node': 24.10.1
+      fsevents: 2.3.3
+      jiti: 2.6.1
+      less: 4.4.2
+      lightningcss: 1.32.0
+      sass: 1.93.2
+      stylus: 0.62.0
+      terser: 5.44.0
+      tsx: 4.20.6
+      yaml: 2.9.0
+
+  vite@7.3.5(@types/node@24.9.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0):
+    dependencies:
+      esbuild: 0.27.7
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
+      postcss: 8.5.15
+      rollup: 4.61.1
+      tinyglobby: 0.2.16
+    optionalDependencies:
+      '@types/node': 24.9.1
+      fsevents: 2.3.3
+      jiti: 2.6.1
+      less: 4.4.2
+      lightningcss: 1.32.0
+      sass: 1.93.2
+      stylus: 0.62.0
+      terser: 5.44.0
+      tsx: 4.20.6
+      yaml: 2.9.0
+
+  vite@8.0.14(@types/node@24.0.13)(esbuild@0.27.7)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -22665,6 +24039,7 @@ snapshots:
       tinyglobby: 0.2.16
     optionalDependencies:
       '@types/node': 24.0.13
+      esbuild: 0.27.7
       fsevents: 2.3.3
       jiti: 2.6.1
       less: 4.4.2
@@ -22674,7 +24049,7 @@ snapshots:
       tsx: 4.20.6
       yaml: 2.9.0
 
-  vite@8.0.14(@types/node@24.10.1)(esbuild@0.25.11)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0):
+  vite@8.0.14(@types/node@24.10.1)(esbuild@0.27.7)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -22683,7 +24058,7 @@ snapshots:
       tinyglobby: 0.2.16
     optionalDependencies:
       '@types/node': 24.10.1
-      esbuild: 0.25.11
+      esbuild: 0.27.7
       fsevents: 2.3.3
       jiti: 2.6.1
       less: 4.4.2
@@ -22701,9 +24076,9 @@ snapshots:
     optionalDependencies:
       vite: 7.1.12(@types/node@24.10.1)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
 
-  vitefu@1.1.1(vite@8.0.14(@types/node@24.10.1)(esbuild@0.25.11)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
+  vitefu@1.1.1(vite@8.0.14(@types/node@24.10.1)(esbuild@0.27.7)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)):
     optionalDependencies:
-      vite: 8.0.14(@types/node@24.10.1)(esbuild@0.25.11)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
+      vite: 8.0.14(@types/node@24.10.1)(esbuild@0.27.7)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0)
 
   vitest@3.2.4(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@26.1.0)(less@4.4.2)(lightningcss@1.32.0)(sass@1.93.2)(stylus@0.62.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.9.0):
     dependencies:
