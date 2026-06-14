@@ -21,17 +21,20 @@ describe('setInitialFieldInput', () => {
       const userStore = store.children.user;
       expect(userStore.kind).toBe('object');
       if (userStore.kind === 'object') {
+        expect(userStore.initialInput.value).toBe(true);
         expect(userStore.children.name.initialInput.value).toBe('John');
       }
     });
 
-    test('should set null input for nullish object', () => {
+    test('should set null initial input for nullish object', () => {
       const store = createTestStore(
         v.object({ user: v.nullish(v.object({ name: v.string() })) }),
         { initialInput: { user: { name: 'John' } } }
       );
       setInitialFieldInput(store.children.user, null);
-      expect(store.children.user.input.value).toBeNull();
+      expect(store.children.user.initialInput.value).toBeNull();
+      // Current input is not affected by setting the initial input
+      expect(store.children.user.input.value).toBe(true);
     });
   });
 
@@ -44,6 +47,7 @@ describe('setInitialFieldInput', () => {
       const itemsStore = store.children.items;
       expect(itemsStore.kind).toBe('array');
       if (itemsStore.kind === 'array') {
+        expect(itemsStore.initialInput.value).toBe(true);
         expect(itemsStore.initialItems.value).toHaveLength(2);
       }
     });
@@ -61,13 +65,15 @@ describe('setInitialFieldInput', () => {
       }
     });
 
-    test('should set null input for nullish array', () => {
+    test('should set null initial input for nullish array', () => {
       const store = createTestStore(
         v.object({ items: v.nullish(v.array(v.string())) }),
         { initialInput: { items: ['a'] } }
       );
       setInitialFieldInput(store.children.items, null);
-      expect(store.children.items.input.value).toBeNull();
+      expect(store.children.items.initialInput.value).toBeNull();
+      // Current input is not affected by setting the initial input
+      expect(store.children.items.input.value).toBe(true);
     });
 
     test('should set initial input on existing children', () => {

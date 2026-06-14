@@ -18,8 +18,8 @@ export function setInitialFieldInput(
   batch(() => {
     // If field store is array, handle array initial input
     if (internalFieldStore.kind === 'array') {
-      // Set array input
-      internalFieldStore.input.value =
+      // Set initial array input
+      internalFieldStore.initialInput.value =
         initialInput == null ? initialInput : true;
 
       // Normalize input to empty array if nullish
@@ -79,8 +79,8 @@ export function setInitialFieldInput(
 
       // Otherwise, if field store is object, handle object initial input
     } else if (internalFieldStore.kind === 'object') {
-      // Set object input
-      internalFieldStore.input.value =
+      // Set initial object input
+      internalFieldStore.initialInput.value =
         initialInput == null ? initialInput : true;
 
       // Set initial input for each object property
