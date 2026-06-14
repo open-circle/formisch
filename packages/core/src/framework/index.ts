@@ -10,6 +10,7 @@ export type Framework =
   | 'preact'
   | 'qwik'
   | 'react'
+  | 'react-native'
   | 'solid'
   | 'svelte'
   | 'vue';
