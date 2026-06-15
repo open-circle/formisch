@@ -1,6 +1,10 @@
 import { initializeFieldStore } from '../../field/initializeFieldStore/index.ts';
 import { batch, createId } from '../../framework/index.ts';
-import type { InternalFieldStore, PathKey } from '../../types/index.ts';
+import type {
+  FieldElement,
+  InternalFieldStore,
+  PathKey,
+} from '../../types/index.ts';
 
 /**
  * Resets the state of a field store (signal values) deeply nested. Sets
@@ -22,8 +26,14 @@ export function resetItemState(
 ): void {
   // Batch all state updates for optimal reactivity performance
   batch(() => {
-    // Clear elements array
-    internalFieldStore.elements = [];
+    // Clear elements array, keeping `initialElements` in sync while the store
+    // still owns it (not moved by a reorder) so a later `reset` restores the
+    // live element once the field remounts
+    const elements: FieldElement[] = [];
+    if (internalFieldStore.elements === internalFieldStore.initialElements) {
+      internalFieldStore.initialElements = elements;
+    }
+    internalFieldStore.elements = elements;
 
     // Clear errors
     internalFieldStore.errors.value = null;

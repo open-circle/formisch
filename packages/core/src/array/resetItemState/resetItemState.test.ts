@@ -191,6 +191,44 @@ describe('resetItemState', () => {
     });
   });
 
+  describe('elements', () => {
+    test('should keep initialElements in sync when the store owns its array', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'a' },
+      });
+      const field = store.children.name;
+      field.elements.push(document.createElement('input'));
+      // Precondition: the store owns its array (elements === initialElements)
+      expect(field.elements).toBe(field.initialElements);
+
+      resetItemState(field, 'b');
+
+      // Both stay the same (empty) array, so an element registered on remount
+      // is reflected in initialElements for a later reset
+      expect(field.elements).toBe(field.initialElements);
+      expect(field.elements).toHaveLength(0);
+      const element = document.createElement('input');
+      field.elements.push(element);
+      expect(field.initialElements).toContain(element);
+    });
+
+    test('should not touch initialElements when a reorder moved the elements', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'a' },
+      });
+      const field = store.children.name;
+      const home = field.initialElements;
+      // Simulate a reorder having moved elements (diverged from initialElements)
+      field.elements = [document.createElement('input')];
+      expect(field.elements).not.toBe(field.initialElements);
+
+      resetItemState(field, 'b');
+
+      // The reorder home baseline is preserved
+      expect(field.initialElements).toBe(home);
+    });
+  });
+
   describe('edge cases', () => {
     test('should initialize missing array children', () => {
       const store = createTestStore(v.object({ items: v.array(v.string()) }), {
