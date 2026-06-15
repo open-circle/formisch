@@ -59,6 +59,37 @@ describe('replace', () => {
     expect(store.children.items.isDirty.value).toBe(true);
   });
 
+  test('should initialize missing children of nested array item', () => {
+    const store = createTestStore(
+      v.object({ list: v.array(v.object({ tags: v.array(v.string()) })) }),
+      { initialInput: { list: [{ tags: ['a'] }] } }
+    );
+
+    replace(store, {
+      path: ['list'],
+      at: 0,
+      initialInput: { tags: ['x', 'y', 'z'] },
+    });
+
+    const listStore = store.children.list;
+    expect(listStore.kind).toBe('array');
+    if (listStore.kind === 'array') {
+      const itemStore = listStore.children[0];
+      expect(itemStore.kind).toBe('object');
+      if (itemStore.kind === 'object') {
+        const tagsStore = itemStore.children.tags;
+        expect(tagsStore.kind).toBe('array');
+        if (tagsStore.kind === 'array') {
+          expect(tagsStore.items.value).toHaveLength(3);
+          expect(tagsStore.children).toHaveLength(3);
+          expect(tagsStore.children[0].input.value).toBe('x');
+          expect(tagsStore.children[1].input.value).toBe('y');
+          expect(tagsStore.children[2].input.value).toBe('z');
+        }
+      }
+    }
+  });
+
   test('should replace with object item', () => {
     const store = createTestStore(
       v.object({ users: v.array(v.object({ name: v.string() })) }),

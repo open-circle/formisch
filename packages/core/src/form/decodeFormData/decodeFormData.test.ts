@@ -100,17 +100,32 @@ describe('decodeFormData', () => {
       });
     });
 
-    test('should resolve "null" and "undefined" booleans to false', () => {
-      // Boolean fields always resolve to true or false (checkbox semantics), so
-      // nullish branches of boolean decoding are overridden by default filling
+    test('should default absent and "undefined" booleans to false', () => {
+      // Unchecked checkboxes are absent from the form data, and the "undefined"
+      // string decodes to `undefined`; both are filled to `false`
       const schema = v.object({ a: v.boolean(), b: v.boolean() });
-      const formData = createFormData([
-        ['["a"]', 'null'],
-        ['["b"]', 'undefined'],
-      ]);
+      const formData = createFormData([['["b"]', 'undefined']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         a: false,
         b: false,
+      });
+    });
+
+    test('should preserve decoded null for nullable booleans', () => {
+      // A nullable boolean keeps its decoded `null` (from an empty string or
+      // the "null" string) instead of being coerced to `false` by default
+      // filling
+      const schema = v.object({
+        a: v.nullable(v.boolean()),
+        b: v.nullable(v.boolean()),
+      });
+      const formData = createFormData([
+        ['["a"]', ''],
+        ['["b"]', 'null'],
+      ]);
+      expect(decodeFormData(schema, formData)).toStrictEqual({
+        a: null,
+        b: null,
       });
     });
 
@@ -380,13 +395,23 @@ describe('decodeFormData', () => {
       });
     });
 
-    test('should not complete missing trailing tuple items', () => {
+    test('should complete missing trailing tuple items', () => {
       const schema = v.object({
         entry: v.tuple([v.number(), v.boolean()]),
       });
       const formData = createFormData([['["entry",0]', '5']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
-        entry: [5],
+        entry: [5, false],
+      });
+    });
+
+    test('should complete absent array at end of tuple', () => {
+      const schema = v.object({
+        entry: v.tuple([v.number(), v.array(v.string())]),
+      });
+      const formData = createFormData([['["entry",0]', '5']]);
+      expect(decodeFormData(schema, formData)).toStrictEqual({
+        entry: [5, []],
       });
     });
 

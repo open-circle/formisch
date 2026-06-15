@@ -41,6 +41,7 @@ overrides:
   'semver@7': '7.5.2'
   'serialize-javascript@6': '7.0.5'
   'seroval@1': '1.4.1'
+  'shell-quote@1': '1.8.4'
   'svgo@3': '3.3.3'
   'tar@4': '7.5.11'
   'tar@6': '7.5.11'

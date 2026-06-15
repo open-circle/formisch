@@ -151,8 +151,86 @@ describe('resetItemState', () => {
     });
   });
 
+  describe('keepStart', () => {
+    test('should keep start input as the dirty baseline for value fields', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'John' },
+      });
+
+      const nameStore = store.children.name;
+      nameStore.errors.value = ['Error'];
+
+      resetItemState(nameStore, 'Jane', true);
+
+      // Current input is updated and errors are cleared, but the start input is
+      // preserved so the field is still detected as dirty
+      expect(nameStore.input.value).toBe('Jane');
+      expect(nameStore.startInput.value).toBe('John');
+      expect(nameStore.errors.value).toBe(null);
+    });
+
+    test('should keep start items as the dirty baseline for array fields', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b'] },
+      });
+
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+
+      if (itemsStore.kind === 'array') {
+        const startItems = itemsStore.startItems.value;
+
+        resetItemState(itemsStore, ['x', 'y', 'z'], true);
+
+        // Current items grow to the new length while the start items are kept
+        expect(itemsStore.items.value.length).toBe(3);
+        expect(itemsStore.startItems.value).toBe(startItems);
+        expect(itemsStore.children[0].input.value).toBe('x');
+        expect(itemsStore.children[0].startInput.value).toBe('a');
+      }
+    });
+  });
+
+  describe('elements', () => {
+    test('should keep initialElements in sync when the store owns its array', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'a' },
+      });
+      const field = store.children.name;
+      field.elements.push(document.createElement('input'));
+      // Precondition: the store owns its array (elements === initialElements)
+      expect(field.elements).toBe(field.initialElements);
+
+      resetItemState(field, 'b');
+
+      // Both stay the same (empty) array, so an element registered on remount
+      // is reflected in initialElements for a later reset
+      expect(field.elements).toBe(field.initialElements);
+      expect(field.elements).toHaveLength(0);
+      const element = document.createElement('input');
+      field.elements.push(element);
+      expect(field.initialElements).toContain(element);
+    });
+
+    test('should not touch initialElements when a reorder moved the elements', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'a' },
+      });
+      const field = store.children.name;
+      const home = field.initialElements;
+      // Simulate a reorder having moved elements (diverged from initialElements)
+      field.elements = [document.createElement('input')];
+      expect(field.elements).not.toBe(field.initialElements);
+
+      resetItemState(field, 'b');
+
+      // The reorder home baseline is preserved
+      expect(field.initialElements).toBe(home);
+    });
+  });
+
   describe('edge cases', () => {
-    test('should skip missing array children gracefully', () => {
+    test('should initialize missing array children', () => {
       const store = createTestStore(v.object({ items: v.array(v.string()) }), {
         initialInput: { items: ['a'] },
       });
@@ -164,9 +242,35 @@ describe('resetItemState', () => {
         // Reset with more items than children exist
         resetItemState(itemsStore, ['x', 'y', 'z']);
 
-        // Should handle gracefully - only reset existing children
+        // Should initialize missing children so every item has a field store
         expect(itemsStore.items.value.length).toBe(3);
+        expect(itemsStore.children).toHaveLength(3);
         expect(itemsStore.children[0].input.value).toBe('x');
+        expect(itemsStore.children[1].input.value).toBe('y');
+        expect(itemsStore.children[2].input.value).toBe('z');
+        expect(itemsStore.children[2].name).toBe('["items",2]');
+      }
+    });
+
+    test('should not grow a tuple beyond its fixed children', () => {
+      const store = createTestStore(
+        v.object({ pair: v.tuple([v.string(), v.number()]) }),
+        { initialInput: { pair: ['a', 1] } }
+      );
+
+      const pairStore = store.children.pair;
+      expect(pairStore.kind).toBe('array');
+
+      if (pairStore.kind === 'array') {
+        // Reset with more items than the tuple defines (tuples have no
+        // `schema.item`, so the extra entry must not be initialized)
+        expect(() => resetItemState(pairStore, ['x', 2, 3])).not.toThrow();
+
+        // The tuple keeps its fixed length, ignoring the extra entry
+        expect(pairStore.items.value).toHaveLength(2);
+        expect(pairStore.children).toHaveLength(2);
+        expect(pairStore.children[0].input.value).toBe('x');
+        expect(pairStore.children[1].input.value).toBe(2);
       }
     });
   });

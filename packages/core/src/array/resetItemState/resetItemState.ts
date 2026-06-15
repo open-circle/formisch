@@ -1,5 +1,10 @@
+import { initializeFieldStore } from '../../field/initializeFieldStore/index.ts';
 import { batch, createId } from '../../framework/index.ts';
-import type { InternalFieldStore } from '../../types/index.ts';
+import type {
+  FieldElement,
+  InternalFieldStore,
+  PathKey,
+} from '../../types/index.ts';
 
 /**
  * Resets the state of a field store (signal values) deeply nested. Sets
@@ -9,16 +14,26 @@ import type { InternalFieldStore } from '../../types/index.ts';
  * form reset functionality.
  *
  * @param internalFieldStore The field store to reset.
- * @param initialInput The new input value (can be any type including array or object).
+ * @param input The new input value (can be any type including array or object).
+ * @param keepStart Whether to keep `startInput` and `startItems` as the dirty
+ * baseline instead of resetting them to the new input. Used when a field store
+ * is reused for an in-place edit so its dirty state is detected correctly.
  */
 export function resetItemState(
   internalFieldStore: InternalFieldStore,
-  initialInput: unknown
+  input: unknown,
+  keepStart = false
 ): void {
   // Batch all state updates for optimal reactivity performance
   batch(() => {
-    // Clear elements array
-    internalFieldStore.elements = [];
+    // Clear elements array, keeping `initialElements` in sync while the store
+    // still owns it (not moved by a reorder) so a later `reset` restores the
+    // live element once the field remounts
+    const elements: FieldElement[] = [];
+    if (internalFieldStore.elements === internalFieldStore.initialElements) {
+      internalFieldStore.initialElements = elements;
+    }
+    internalFieldStore.elements = elements;
 
     // Clear errors
     internalFieldStore.errors.value = null;
@@ -35,50 +50,87 @@ export function resetItemState(
       internalFieldStore.kind === 'object'
     ) {
       // For arrays and objects, input is null/undefined or true (not actual value)
-      const objectInput = initialInput == null ? initialInput : true;
+      const objectInput = input == null ? input : true;
 
-      // Set start input
-      internalFieldStore.startInput.value = objectInput;
+      // Set start input unless it is kept as the dirty baseline
+      if (!keepStart) {
+        internalFieldStore.startInput.value = objectInput;
+      }
 
       // Set current input
       internalFieldStore.input.value = objectInput;
 
       // If field store is array, handle array-specific reset
       if (internalFieldStore.kind === 'array') {
-        // If initial input is provided, create items with IDs
-        if (initialInput) {
-          // Create new items array with unique IDs for each item
-          // @ts-expect-error
-          const newItems = initialInput.map(createId);
+        // If input is provided, create items with IDs
+        if (input) {
+          // Dynamic arrays grow to the input length, while tuples keep their
+          // fixed number of children (their schema has no `item` to initialize
+          // additional ones)
+          const length =
+            internalFieldStore.schema.type === 'array'
+              ? (input as unknown[]).length
+              : internalFieldStore.children.length;
 
-          // Set start items
-          internalFieldStore.startItems.value = newItems;
+          // Create new items array with unique IDs for each item
+          const newItems = Array.from({ length }, createId);
+
+          // Set start items unless they are kept as the dirty baseline
+          if (!keepStart) {
+            internalFieldStore.startItems.value = newItems;
+          }
 
           // Set current items
           internalFieldStore.items.value = newItems;
 
+          // Parse path lazily, only when a missing child must be initialized
+          let path: PathKey[] | undefined;
+
           // Reset state for each array item
-          for (
-            let index = 0;
-            // @ts-expect-error
-            index < initialInput.length;
-            index++
-          ) {
+          for (let index = 0; index < length; index++) {
             // If child exists at this index, reset its state
             if (internalFieldStore.children[index]) {
               // Recursively reset child with corresponding input
               resetItemState(
                 internalFieldStore.children[index],
                 // @ts-expect-error
-                initialInput[index]
+                input[index],
+                keepStart
               );
+
+              // Otherwise, initialize a new child with the corresponding input
+            } else {
+              // Parse path only when needed
+              path ??= JSON.parse(internalFieldStore.name) as PathKey[];
+
+              // Create empty child object
+              // @ts-expect-error
+              internalFieldStore.children[index] = {};
+
+              // Add current index to path
+              path.push(index);
+
+              // Initialize field store for new child
+              initializeFieldStore(
+                internalFieldStore.children[index],
+                // @ts-expect-error
+                internalFieldStore.schema.item,
+                // @ts-expect-error
+                input[index],
+                path
+              );
+
+              // Remove index from path for next iteration
+              path.pop();
             }
           }
 
           // Otherwise, clear items arrays
         } else {
-          // Set start items to empty array
-          internalFieldStore.startItems.value = [];
+          // Set start items to empty array unless kept as the dirty baseline
+          if (!keepStart) {
+            internalFieldStore.startItems.value = [];
+          }
 
           // Set current items to empty array
           internalFieldStore.items.value = [];
@@ -92,18 +144,21 @@ export function resetItemState(
           resetItemState(
             internalFieldStore.children[key],
             // @ts-expect-error
-            initialInput?.[key]
+            input?.[key],
+            keepStart
           );
         }
       }
 
       // Otherwise, if field store is value, handle primitive type reset
     } else {
-      // Set start input
-      internalFieldStore.startInput.value = initialInput;
+      // Set start input unless it is kept as the dirty baseline
+      if (!keepStart) {
+        internalFieldStore.startInput.value = input;
+      }
 
       // Set current input
-      internalFieldStore.input.value = initialInput;
+      internalFieldStore.input.value = input;
     }
   });
 }

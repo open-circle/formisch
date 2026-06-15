@@ -298,6 +298,53 @@ describe('reset', () => {
       expect(store.children.name.input.value).toBe('John');
       expect(store.children.name.initialInput.value).toBe('John');
     });
+
+    test('should reset nullish object field to new initial input', () => {
+      const store = createTestStore(
+        v.object({ user: v.nullish(v.object({ name: v.string() })) })
+      );
+
+      reset(store, { path: ['user'], initialInput: { name: 'John' } });
+
+      expect(store.children.user.initialInput.value).toBe(true);
+      expect(store.children.user.input.value).toBe(true);
+      const userStore = store.children.user;
+      expect(userStore.kind).toBe('object');
+      if (userStore.kind === 'object') {
+        expect(userStore.children.name.initialInput.value).toBe('John');
+        expect(userStore.children.name.input.value).toBe('John');
+      }
+    });
+
+    test('should reset nullish object field to undefined initial input', () => {
+      const store = createTestStore(
+        v.object({ user: v.nullish(v.object({ name: v.string() })) }),
+        { initialInput: { user: { name: 'John' } } }
+      );
+
+      reset(store, { path: ['user'], initialInput: undefined });
+
+      expect(store.children.user.initialInput.value).toBeUndefined();
+      expect(store.children.user.input.value).toBeUndefined();
+    });
+
+    test('should reset nullish array field to new initial input', () => {
+      const store = createTestStore(
+        v.object({ items: v.nullish(v.array(v.string())) })
+      );
+
+      reset(store, { path: ['items'], initialInput: ['x', 'y'] });
+
+      expect(store.children.items.initialInput.value).toBe(true);
+      expect(store.children.items.input.value).toBe(true);
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+      if (itemsStore.kind === 'array') {
+        expect(itemsStore.items.value).toHaveLength(2);
+        expect(itemsStore.children[0].input.value).toBe('x');
+        expect(itemsStore.children[1].input.value).toBe('y');
+      }
+    });
   });
 
   describe('file input reset', () => {

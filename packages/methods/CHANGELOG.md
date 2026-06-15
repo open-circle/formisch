@@ -2,6 +2,15 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix `reset` method to apply a new `initialInput` to nullish array and object fields
+- Fix `insert` and `replace` methods to no longer crash when an item's initial input contains a nested array with more items than the existing field stores
+- Fix `setInput` method so growing an array after it was shrunk no longer resurfaces stale state from removed items and still detects changed values as dirty
+- Change field array methods to reject fixed-length tuple paths at the type level, since a tuple's fixed arity makes operations like `insert` and `remove` invalid
+- Fix `focus` method to focus the first element that can actually receive focus, skipping detached, disabled or hidden elements
+- Fix `validate` and `handleSubmit` methods to focus the first field with an error and a focusable element, and to reset the validating state if validation throws
+
 ## v0.8.0 (May 24, 2026)
 
 - Add `pickDirty` method to filter an externally-supplied value down to its dirty parts using the form's dirty mask (issue #21, pull request #98)

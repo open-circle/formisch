@@ -130,6 +130,9 @@ export function initializeFieldStore(
     internalFieldStore.name = JSON.stringify(path);
 
     // Initialize elements array
+    // Hint: `initialElements` and `elements` start as the same array so that
+    // `reset` can restore elements that array methods move between field stores
+    // (see `initialElements` in the `InternalBaseStore` interface).
     const initialElements: FieldElement[] = [];
     internalFieldStore.initialElements = initialElements;
     internalFieldStore.elements = initialElements;
