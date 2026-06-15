@@ -258,9 +258,11 @@ function fillDefaults(
   // Unwrap schema before reading its structure
   const unwrappedSchema = unwrapSchema(schema);
 
-  // If schema is boolean, default unchecked checkboxes to `false`
+  // If schema is boolean, default absent (unchecked checkbox) values to
+  // `false`. Only `undefined` is treated as absent so that a decoded `null`
+  // (e.g. from a nullable boolean) is preserved instead of coerced to `false`.
   if (unwrappedSchema.type === 'boolean') {
-    if (parent[key] !== true) {
+    if (parent[key] === undefined) {
       parent[key] = false;
     }
 
@@ -274,7 +276,7 @@ function fillDefaults(
       parent[key] = [];
     }
 
-    // Otherwise, if schema is tuple, complete present items
+    // Otherwise, if schema is tuple, complete items of present tuples
   } else if (
     unwrappedSchema.type === 'tuple' ||
     unwrappedSchema.type === 'loose_tuple' ||
@@ -282,9 +284,7 @@ function fillDefaults(
   ) {
     if (Array.isArray(parent[key])) {
       for (let index = 0; index < unwrappedSchema.items!.length; index++) {
-        if (index < parent[key].length) {
-          fillDefaults(unwrappedSchema.items![index], parent[key], index);
-        }
+        fillDefaults(unwrappedSchema.items![index], parent[key], index);
       }
     }
 
