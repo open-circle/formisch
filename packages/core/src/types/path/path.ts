@@ -219,7 +219,13 @@ type LazyArrayPath<
   // If path to check is empty, return possible array paths
   TPathToCheck extends readonly []
     ? TValue extends readonly unknown[]
-      ? TValidPath
+      ? // Only accept dynamic arrays; tuples have a fixed arity, so navigate
+        // into their indices instead of accepting the tuple as a field array
+        number extends TValue['length']
+        ? TValidPath
+        : IsNever<ExactKeysOfArrayPath<TValue>> extends false
+          ? readonly [...TValidPath, ExactKeysOfArrayPath<TValue>]
+          : never
       : readonly [...TValidPath, ExactKeysOfArrayPath<TValue>]
     : // If first key of path to check is valid, continue with next key
       TPathToCheck extends readonly [

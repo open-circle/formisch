@@ -609,6 +609,24 @@ describe('ValidArrayPath', () => {
       >
     >().toEqualTypeOf<['rows', number, 'tags']>();
   });
+
+  test('should reject a fixed tuple as a field array target', () => {
+    expectTypeOf<
+      ValidArrayPath<{ pair: [string, number] }, ['pair']>
+    >().toEqualTypeOf<never>();
+  });
+
+  test('should accept a dynamic array nested inside a tuple', () => {
+    expectTypeOf<
+      ValidArrayPath<{ pair: [string, string[]] }, ['pair', 1]>
+    >().toEqualTypeOf<['pair', 1]>();
+  });
+
+  test('should accept an array reached by indexing into a tuple of objects', () => {
+    expectTypeOf<
+      ValidArrayPath<{ t: [{ tags: string[] }, number] }, ['t', 0, 'tags']>
+    >().toEqualTypeOf<['t', 0, 'tags']>();
+  });
 });
 
 describe('DirtyPath', () => {
