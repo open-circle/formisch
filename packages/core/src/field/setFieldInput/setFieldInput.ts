@@ -28,32 +28,25 @@ function setNestedInput(
     const arrayInput = input ?? [];
     const items = internalFieldStore.items.value;
 
+    // Tuples have a fixed number of children, so ignore any extra input items
+    // instead of growing them (they have no `item` schema to initialize
+    // additional children, unlike dynamic arrays)
+    const length =
+      internalFieldStore.schema.type === 'array'
+        ? (arrayInput as unknown[]).length
+        : internalFieldStore.children.length;
+
     // If new array is shorter, truncate items
-    if (
-      // @ts-expect-error
-      arrayInput.length < items.length
-    ) {
-      internalFieldStore.items.value = items.slice(
-        0,
-        // @ts-expect-error
-        arrayInput.length
-      );
+    if (length < items.length) {
+      internalFieldStore.items.value = items.slice(0, length);
 
       // Otherwise, if new array is longer, extend items
-    } else if (
-      // @ts-expect-error
-      arrayInput.length > items.length
-    ) {
+    } else if (length > items.length) {
       // Parse path for child initialization
       const path = JSON.parse(internalFieldStore.name) as PathKey[];
 
       // Initialize or reset each newly visible child
-      for (
-        let index = items.length;
-        // @ts-expect-error
-        index < arrayInput.length;
-        index++
-      ) {
+      for (let index = items.length; index < length; index++) {
         // Reset the reused stale child but keep its start input as baseline
         // Hint: A child store from a previously longer array still holds stale
         // errors and nested values that must be cleared, but its `startInput`
@@ -101,12 +94,7 @@ function setNestedInput(
     }
 
     // Set input for each array item
-    for (
-      let index = 0;
-      // @ts-expect-error
-      index < arrayInput.length;
-      index++
-    ) {
+    for (let index = 0; index < length; index++) {
       // Recursively set nested input
       setNestedInput(
         internalFieldStore.children[index],

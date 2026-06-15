@@ -88,5 +88,23 @@ describe('setInitialFieldInput', () => {
         expect(itemsStore.children[1].initialInput.value).toBe('y');
       }
     });
+
+    test('should keep a tuple at its fixed length when given a longer input', () => {
+      const store = createTestStore(
+        v.object({ pair: v.tuple([v.string(), v.number()]) }),
+        { initialInput: { pair: ['a', 1] } }
+      );
+      const pairStore = store.children.pair;
+      expect(pairStore.kind).toBe('array');
+      if (pairStore.kind === 'array') {
+        // Tuples have no `item` schema, so the extra entry must be ignored
+        expect(() =>
+          setInitialFieldInput(pairStore, ['x', 2, 3])
+        ).not.toThrow();
+        expect(pairStore.initialItems.value).toHaveLength(2);
+        expect(pairStore.children[0].initialInput.value).toBe('x');
+        expect(pairStore.children[1].initialInput.value).toBe(2);
+      }
+    });
   });
 });
