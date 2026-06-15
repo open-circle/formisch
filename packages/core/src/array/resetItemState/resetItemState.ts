@@ -10,11 +10,11 @@ import type { InternalFieldStore, PathKey } from '../../types/index.ts';
  * form reset functionality.
  *
  * @param internalFieldStore The field store to reset.
- * @param initialInput The new input value (can be any type including array or object).
+ * @param input The new input value (can be any type including array or object).
  */
 export function resetItemState(
   internalFieldStore: InternalFieldStore,
-  initialInput: unknown
+  input: unknown
 ): void {
   // Batch all state updates for optimal reactivity performance
   batch(() => {
@@ -36,7 +36,7 @@ export function resetItemState(
       internalFieldStore.kind === 'object'
     ) {
       // For arrays and objects, input is null/undefined or true (not actual value)
-      const objectInput = initialInput == null ? initialInput : true;
+      const objectInput = input == null ? input : true;
 
       // Set start input
       internalFieldStore.startInput.value = objectInput;
@@ -46,11 +46,11 @@ export function resetItemState(
 
       // If field store is array, handle array-specific reset
       if (internalFieldStore.kind === 'array') {
-        // If initial input is provided, create items with IDs
-        if (initialInput) {
+        // If input is provided, create items with IDs
+        if (input) {
           // Create new items array with unique IDs for each item
           // @ts-expect-error
-          const newItems = initialInput.map(createId);
+          const newItems = input.map(createId);
 
           // Set start items
           internalFieldStore.startItems.value = newItems;
@@ -65,7 +65,7 @@ export function resetItemState(
           for (
             let index = 0;
             // @ts-expect-error
-            index < initialInput.length;
+            index < input.length;
             index++
           ) {
             // If child exists at this index, reset its state
@@ -74,7 +74,7 @@ export function resetItemState(
               resetItemState(
                 internalFieldStore.children[index],
                 // @ts-expect-error
-                initialInput[index]
+                input[index]
               );
 
               // Otherwise, initialize a new child with the corresponding input
@@ -95,7 +95,7 @@ export function resetItemState(
                 // @ts-expect-error
                 internalFieldStore.schema.item,
                 // @ts-expect-error
-                initialInput[index],
+                input[index],
                 path
               );
 
@@ -121,7 +121,7 @@ export function resetItemState(
           resetItemState(
             internalFieldStore.children[key],
             // @ts-expect-error
-            initialInput?.[key]
+            input?.[key]
           );
         }
       }
@@ -129,10 +129,10 @@ export function resetItemState(
       // Otherwise, if field store is value, handle primitive type reset
     } else {
       // Set start input
-      internalFieldStore.startInput.value = initialInput;
+      internalFieldStore.startInput.value = input;
 
       // Set current input
-      internalFieldStore.input.value = initialInput;
+      internalFieldStore.input.value = input;
     }
   });
 }
