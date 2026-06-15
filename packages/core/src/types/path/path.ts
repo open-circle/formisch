@@ -139,7 +139,10 @@ export type PathValue<TValue, TPath extends Path> = TPath extends readonly [
   : TValue;
 
 /**
- * Checks whether a value is an array or contains one anywhere in its shape.
+ * Checks whether a value is a dynamic array or contains one anywhere in its
+ * shape. A fixed-length tuple is not itself a dynamic array, but it counts when
+ * it contains one, so paths can still navigate through tuples to reach nested
+ * arrays.
  *
  * Hint: The inner conditionals (`TValue extends readonly unknown[]` and
  * `TValue extends Record<PropertyKey, unknown>`) distribute over union members,
@@ -154,7 +157,11 @@ type IsOrHasArray<TValue> = true extends (
   IsAny<TValue> extends true
     ? false
     : TValue extends readonly unknown[]
-      ? true
+      ? // A dynamic array counts directly; a tuple only if an element is or
+        // contains a dynamic array
+        number extends TValue['length']
+        ? true
+        : IsOrHasArray<TValue[number]>
       : TValue extends Record<PropertyKey, unknown>
         ? {
             [TKey in keyof TValue]: IsOrHasArray<TValue[TKey]>;

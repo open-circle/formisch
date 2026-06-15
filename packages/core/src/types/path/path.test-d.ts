@@ -627,6 +627,18 @@ describe('ValidArrayPath', () => {
       ValidArrayPath<{ t: [{ tags: string[] }, number] }, ['t', 0, 'tags']>
     >().toEqualTypeOf<['t', 0, 'tags']>();
   });
+
+  test('should not suggest a fixed tuple key for an invalid array path', () => {
+    expectTypeOf<
+      ValidArrayPath<{ pair: [string, number] }, ['missing']>
+    >().toEqualTypeOf<never>();
+  });
+
+  test('should suggest only dynamic-array keys for an invalid array path', () => {
+    expectTypeOf<
+      ValidArrayPath<{ pair: [string, number]; tags: string[] }, ['missing']>
+    >().toEqualTypeOf<readonly ['tags']>();
+  });
 });
 
 describe('DirtyPath', () => {
