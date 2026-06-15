@@ -54,9 +54,15 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
 
   useEffect(() => {
     return () => {
-      internalFieldStore.elements = internalFieldStore.elements.filter(
+      const elements = internalFieldStore.elements.filter(
         (element) => element.isConnected
       );
+      // Keep `initialElements` in sync unless a reorder has moved the elements,
+      // so resetting a remounted field restores its live element, not a stale one
+      if (internalFieldStore.elements === internalFieldStore.initialElements) {
+        internalFieldStore.initialElements = elements;
+      }
+      internalFieldStore.elements = elements;
     };
   }, [internalFieldStore]);
 
