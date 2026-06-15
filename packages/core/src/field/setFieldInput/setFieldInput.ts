@@ -54,14 +54,18 @@ function setNestedInput(
         index < arrayInput.length;
         index++
       ) {
-        // If a stale child store from a previously longer array is reused,
-        // reset its state so it does not keep stale errors, touched, dirty
-        // or nested values
+        // Reset the reused stale child but keep its start input as baseline
+        // Hint: A child store from a previously longer array still holds stale
+        // errors and nested values that must be cleared, but its `startInput`
+        // and `startItems` are the dirty baseline. Passing `keepStart`
+        // preserves them so editing a regrown index is detected as dirty, just
+        // like a direct edit on a never-shrunk array would be.
         if (internalFieldStore.children[index]) {
           resetItemState(
             internalFieldStore.children[index],
             // @ts-expect-error
-            arrayInput[index]
+            arrayInput[index],
+            true
           );
 
           // Otherwise, create and initialize a brand-new child

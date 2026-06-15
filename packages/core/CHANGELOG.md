@@ -8,7 +8,7 @@ All notable changes to the library will be documented in this file.
 - Fix `setFieldBool` to set the boolean property on object field stores themselves, not only on their children
 - Fix `setInitialFieldInput` to update the initial input instead of the current input of array and object field stores, so resetting nullish arrays and objects to a new initial input works
 - Fix `resetItemState` to initialize missing array children, so resetting an item whose nested array grew beyond its existing field stores no longer leaves items without a child store
-- Fix `setFieldInput` to reset reused child stores when an array grows after shrinking, so stale state from removed items no longer resurfaces
+- Fix `setFieldInput` to clear stale state from reused child stores when an array grows after shrinking, without losing their dirty baseline so a changed value is still detected as dirty
 - Fix `decodeFormData` to complete missing trailing tuple items, so unchecked checkboxes and absent arrays at the end of tuples are restored
 - Fix `decodeFormData` to preserve a decoded `null` for nullable booleans instead of coercing it to `false`
 - Fix `validateFormInput` to focus the first erroring field whose element can actually receive focus, so the focus is no longer consumed by a field without a focusable element (e.g. unmounted, disabled or hidden)

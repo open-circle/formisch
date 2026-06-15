@@ -11,10 +11,14 @@ import type { InternalFieldStore, PathKey } from '../../types/index.ts';
  *
  * @param internalFieldStore The field store to reset.
  * @param input The new input value (can be any type including array or object).
+ * @param keepStart Whether to keep `startInput` and `startItems` as the dirty
+ * baseline instead of resetting them to the new input. Used when a field store
+ * is reused for an in-place edit so its dirty state is detected correctly.
  */
 export function resetItemState(
   internalFieldStore: InternalFieldStore,
-  input: unknown
+  input: unknown,
+  keepStart = false
 ): void {
   // Batch all state updates for optimal reactivity performance
   batch(() => {
@@ -38,8 +42,10 @@ export function resetItemState(
       // For arrays and objects, input is null/undefined or true (not actual value)
       const objectInput = input == null ? input : true;
 
-      // Set start input
-      internalFieldStore.startInput.value = objectInput;
+      // Set start input unless it is kept as the dirty baseline
+      if (!keepStart) {
+        internalFieldStore.startInput.value = objectInput;
+      }
 
       // Set current input
       internalFieldStore.input.value = objectInput;
@@ -59,8 +65,10 @@ export function resetItemState(
           // Create new items array with unique IDs for each item
           const newItems = Array.from({ length }, createId);
 
-          // Set start items
-          internalFieldStore.startItems.value = newItems;
+          // Set start items unless they are kept as the dirty baseline
+          if (!keepStart) {
+            internalFieldStore.startItems.value = newItems;
+          }
 
           // Set current items
           internalFieldStore.items.value = newItems;
@@ -76,7 +84,8 @@ export function resetItemState(
               resetItemState(
                 internalFieldStore.children[index],
                 // @ts-expect-error
-                input[index]
+                input[index],
+                keepStart
               );
 
               // Otherwise, initialize a new child with the corresponding input
@@ -108,8 +117,10 @@ export function resetItemState(
 
           // Otherwise, clear items arrays
         } else {
-          // Set start items to empty array
-          internalFieldStore.startItems.value = [];
+          // Set start items to empty array unless kept as the dirty baseline
+          if (!keepStart) {
+            internalFieldStore.startItems.value = [];
+          }
 
           // Set current items to empty array
           internalFieldStore.items.value = [];
@@ -123,15 +134,18 @@ export function resetItemState(
           resetItemState(
             internalFieldStore.children[key],
             // @ts-expect-error
-            input?.[key]
+            input?.[key],
+            keepStart
           );
         }
       }
 
       // Otherwise, if field store is value, handle primitive type reset
     } else {
-      // Set start input
-      internalFieldStore.startInput.value = input;
+      // Set start input unless it is kept as the dirty baseline
+      if (!keepStart) {
+        internalFieldStore.startInput.value = input;
+      }
 
       // Set current input
       internalFieldStore.input.value = input;

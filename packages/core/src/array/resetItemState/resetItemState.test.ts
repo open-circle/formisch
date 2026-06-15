@@ -151,6 +151,46 @@ describe('resetItemState', () => {
     });
   });
 
+  describe('keepStart', () => {
+    test('should keep start input as the dirty baseline for value fields', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'John' },
+      });
+
+      const nameStore = store.children.name;
+      nameStore.errors.value = ['Error'];
+
+      resetItemState(nameStore, 'Jane', true);
+
+      // Current input is updated and errors are cleared, but the start input is
+      // preserved so the field is still detected as dirty
+      expect(nameStore.input.value).toBe('Jane');
+      expect(nameStore.startInput.value).toBe('John');
+      expect(nameStore.errors.value).toBe(null);
+    });
+
+    test('should keep start items as the dirty baseline for array fields', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b'] },
+      });
+
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+
+      if (itemsStore.kind === 'array') {
+        const startItems = itemsStore.startItems.value;
+
+        resetItemState(itemsStore, ['x', 'y', 'z'], true);
+
+        // Current items grow to the new length while the start items are kept
+        expect(itemsStore.items.value.length).toBe(3);
+        expect(itemsStore.startItems.value).toBe(startItems);
+        expect(itemsStore.children[0].input.value).toBe('x');
+        expect(itemsStore.children[0].startInput.value).toBe('a');
+      }
+    });
+  });
+
   describe('edge cases', () => {
     test('should initialize missing array children', () => {
       const store = createTestStore(v.object({ items: v.array(v.string()) }), {
