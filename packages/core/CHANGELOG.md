@@ -2,7 +2,7 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v0.8.0 (June 15, 2026)
 
 - Add `focusFieldElement` utility that focuses the first focusable element of a field store
 - Fix `setFieldBool` to set the boolean property on object field stores themselves, not only on their children

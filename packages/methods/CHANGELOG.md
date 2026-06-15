@@ -2,8 +2,9 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v0.9.0 (June 15, 2026)
 
+- Change `@formisch/core` to v0.8.0
 - Fix `reset` method to apply a new `initialInput` to nullish array and object fields
 - Fix `insert` and `replace` methods to no longer crash when an item's initial input contains a nested array with more items than the existing field stores
 - Fix `setInput` method so growing an array after it was shrunk no longer resurfaces stale state from removed items and still detects changed values as dirty
