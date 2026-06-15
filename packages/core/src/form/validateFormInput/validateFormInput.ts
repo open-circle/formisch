@@ -1,5 +1,9 @@
 import type * as v from 'valibot';
-import { getFieldInput, walkFieldStore } from '../../field/index.ts';
+import {
+  focusFieldElement,
+  getFieldInput,
+  walkFieldStore,
+} from '../../field/index.ts';
 import { batch, untrack } from '../../framework/index.ts';
 import type { InternalFormStore, Schema } from '../../types/index.ts';
 
@@ -108,10 +112,14 @@ export async function validateFormInput(
           const fieldErrors = nestedErrors?.[internalFieldStore.name] ?? null;
           internalFieldStore.errors.value = fieldErrors;
 
-          // Focus first field that has an error and a rendered element, so the
-          // focus is not consumed by an erroring field without an element
-          if (shouldFocus && fieldErrors && internalFieldStore.elements[0]) {
-            internalFieldStore.elements[0].focus();
+          // Focus the first erroring field whose element can actually receive
+          // focus, so the focus is not consumed by a field without a focusable
+          // element (e.g. unmounted or hidden)
+          if (
+            shouldFocus &&
+            fieldErrors &&
+            focusFieldElement(internalFieldStore)
+          ) {
             shouldFocus = false;
           }
         }
