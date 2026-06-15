@@ -86,7 +86,11 @@ describe('insert', () => {
     );
 
     // Insert at occupied index 0 - the reused child's nested tags array grows
-    insert(store, { path: ['list'], at: 0, initialInput: { tags: ['x', 'y'] } });
+    insert(store, {
+      path: ['list'],
+      at: 0,
+      initialInput: { tags: ['x', 'y'] },
+    });
 
     const listStore = store.children.list;
     expect(listStore.kind).toBe('array');
