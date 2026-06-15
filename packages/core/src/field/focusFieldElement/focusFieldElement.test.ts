@@ -70,4 +70,19 @@ describe('focusFieldElement', () => {
     expect(focusFieldElement(store.children.name)).toBe(true);
     expect(document.activeElement).toBe(focusable);
   });
+
+  test('should focus an element inside a shadow root and return true', () => {
+    const store = createTestStore(v.object({ name: v.string() }));
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const shadow = host.attachShadow({ mode: 'open' });
+    const input = document.createElement('input');
+    shadow.appendChild(input);
+    store.children.name.elements = [input];
+
+    // `document.activeElement` retargets to the host, so the focus must be
+    // read back from the element's own shadow root instead
+    expect(focusFieldElement(store.children.name)).toBe(true);
+    expect(shadow.activeElement).toBe(input);
+  });
 });
