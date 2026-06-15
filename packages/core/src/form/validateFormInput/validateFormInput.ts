@@ -27,99 +27,105 @@ export async function validateFormInput(
   internalFormStore: InternalFormStore,
   config?: ValidateFormInputConfig
 ): Promise<v.SafeParseResult<Schema>> {
-  // Update validation state
-  internalFormStore.validators++;
-  internalFormStore.isValidating.value = true;
+  try {
+    // Update validation state
+    internalFormStore.validators++;
+    internalFormStore.isValidating.value = true;
 
-  // Parse form input with Valibot schema
-  const result = await internalFormStore.parse(
-    untrack(() => getFieldInput(internalFormStore))
-  );
+    // Parse form input with Valibot schema
+    const result = await internalFormStore.parse(
+      untrack(() => getFieldInput(internalFormStore))
+    );
 
-  // Create variables for root and nested errors
-  let rootErrors: [string, ...string[]] | undefined;
-  let nestedErrors:
-    | Record<string, [string, ...string[]] | undefined>
-    | undefined;
+    // Create variables for root and nested errors
+    let rootErrors: [string, ...string[]] | undefined;
+    let nestedErrors:
+      | Record<string, [string, ...string[]] | undefined>
+      | undefined;
 
-  // Process validation issues into error variables
-  if (result.issues) {
-    // Initialize nested errors object
-    nestedErrors = {};
+    // Process validation issues into error variables
+    if (result.issues) {
+      // Initialize nested errors object
+      nestedErrors = {};
 
-    // Process each validation issue
-    for (const issue of result.issues) {
-      // If issue has path, assign to nested errors
-      if (issue.path) {
-        // Initialize path array
-        const path = [];
+      // Process each validation issue
+      for (const issue of result.issues) {
+        // If issue has path, assign to nested errors
+        if (issue.path) {
+          // Initialize path array
+          const path = [];
 
-        // Build path from issue path items
-        for (const pathItem of issue.path) {
-          const key = pathItem.key;
-          const keyType = typeof key;
-          const itemType = pathItem.type;
-          // Skip unsupported path types
-          if (
-            (keyType !== 'string' && keyType !== 'number') ||
-            itemType === 'map' ||
-            itemType === 'set'
-          ) {
-            break;
+          // Build path from issue path items
+          for (const pathItem of issue.path) {
+            const key = pathItem.key;
+            const keyType = typeof key;
+            const itemType = pathItem.type;
+            // Skip unsupported path types
+            if (
+              (keyType !== 'string' && keyType !== 'number') ||
+              itemType === 'map' ||
+              itemType === 'set'
+            ) {
+              break;
+            }
+
+            // Add key to path
+            path.push(key);
           }
 
-          // Add key to path
-          path.push(key);
-        }
+          // Convert path to name of field
+          const name = JSON.stringify(path);
 
-        // Convert path to name of field
-        const name = JSON.stringify(path);
+          // Append or initialize nested errors
+          const fieldErrors = nestedErrors[name];
+          if (fieldErrors) {
+            fieldErrors.push(issue.message);
+          } else {
+            nestedErrors[name] = [issue.message];
+          }
 
-        // Append or initialize nested errors
-        const fieldErrors = nestedErrors[name];
-        if (fieldErrors) {
-          fieldErrors.push(issue.message);
+          // Otherwise, assign to root errors
         } else {
-          nestedErrors[name] = [issue.message];
-        }
-
-        // Otherwise, assign to root errors
-      } else {
-        if (rootErrors) {
-          rootErrors.push(issue.message);
-        } else {
-          rootErrors = [issue.message];
+          if (rootErrors) {
+            rootErrors.push(issue.message);
+          } else {
+            rootErrors = [issue.message];
+          }
         }
       }
     }
-  }
 
-  // Create variable to decide if first error field should be focused
-  let shouldFocus = config?.shouldFocus ?? false;
+    // Create variable to decide if first error field should be focused
+    let shouldFocus = config?.shouldFocus ?? false;
 
-  // Batch all state updates for optimal reactivity performance
-  batch(() => {
-    // Set or reset errors on each field store
-    walkFieldStore(internalFormStore, (internalFieldStore) => {
-      if (internalFieldStore.name === '[]') {
-        internalFieldStore.errors.value = rootErrors ?? null;
-      } else {
-        const fieldErrors = nestedErrors?.[internalFieldStore.name] ?? null;
-        internalFieldStore.errors.value = fieldErrors;
+    // Batch all state updates for optimal reactivity performance
+    batch(() => {
+      // Set or reset errors on each field store
+      walkFieldStore(internalFormStore, (internalFieldStore) => {
+        if (internalFieldStore.name === '[]') {
+          internalFieldStore.errors.value = rootErrors ?? null;
+        } else {
+          const fieldErrors = nestedErrors?.[internalFieldStore.name] ?? null;
+          internalFieldStore.errors.value = fieldErrors;
 
-        // Focus first field with error if configured
-        if (shouldFocus && fieldErrors) {
-          internalFieldStore.elements[0]?.focus();
-          shouldFocus = false;
+          // Focus first field that has an error and a rendered element, so the
+          // focus is not consumed by an erroring field without an element
+          if (shouldFocus && fieldErrors && internalFieldStore.elements[0]) {
+            internalFieldStore.elements[0].focus();
+            shouldFocus = false;
+          }
         }
-      }
+      });
     });
 
-    // Update validation state of form
-    internalFormStore.validators--;
-    internalFormStore.isValidating.value = internalFormStore.validators > 0;
-  });
+    // Return validation result
+    return result;
 
-  // Return validation result
-  return result;
+    // Always reset validation state, even if parsing throws
+  } finally {
+    batch(() => {
+      internalFormStore.validators--;
+      internalFormStore.isValidating.value = internalFormStore.validators > 0;
+    });
+  }
 }

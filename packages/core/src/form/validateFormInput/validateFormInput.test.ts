@@ -300,6 +300,27 @@ describe('validateFormInput', () => {
       expect(mockFocus).not.toHaveBeenCalled();
     });
 
+    test('should focus next error field when the first has no element', async () => {
+      const schema = v.object({ name: v.string(), email: v.string() });
+      const store = createTestStore(schema, {
+        initialInput: { name: '', email: '' },
+        issues: [
+          validationIssue('Name is required', [objectPath('name')]),
+          validationIssue('Email is required', [objectPath('email')]),
+        ],
+      });
+
+      // The first erroring field (name) has no registered element, so focus
+      // must fall through to the second erroring field (email)
+      const emailInput = document.createElement('input');
+      const mockFocus = vi.spyOn(emailInput, 'focus');
+      store.children.email.elements = [emailInput];
+
+      await validateFormInput(store, { shouldFocus: true });
+
+      expect(mockFocus).toHaveBeenCalledOnce();
+    });
+
     test('should only focus first field with error', async () => {
       const schema = v.object({ name: v.string(), email: v.string() });
       const store = createTestStore(schema, {
@@ -356,6 +377,18 @@ describe('validateFormInput', () => {
       expect(store.validators).toBe(0);
       await validateFormInput(store);
       expect(store.validators).toBe(0);
+    });
+
+    test('should reset validation state when parse rejects', async () => {
+      const schema = v.object({ name: v.string() });
+      const parse = vi.fn().mockRejectedValue(new Error('Parse failed'));
+      const store = createFormStore({ schema }, parse);
+
+      await expect(validateFormInput(store)).rejects.toThrow('Parse failed');
+
+      // The validators counter and isValidating must not leak on error
+      expect(store.validators).toBe(0);
+      expect(store.isValidating.value).toBe(false);
     });
 
     test('should handle concurrent validations', async () => {
