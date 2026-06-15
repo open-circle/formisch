@@ -79,6 +79,45 @@ describe('insert', () => {
     }
   });
 
+  test('should initialize missing children when inserting item with longer nested array', () => {
+    const store = createTestStore(
+      v.object({ list: v.array(v.object({ tags: v.array(v.string()) })) }),
+      { initialInput: { list: [{ tags: ['a'] }] } }
+    );
+
+    // Insert at occupied index 0 - the reused child's nested tags array grows
+    insert(store, { path: ['list'], at: 0, initialInput: { tags: ['x', 'y'] } });
+
+    const listStore = store.children.list;
+    expect(listStore.kind).toBe('array');
+    if (listStore.kind === 'array') {
+      expect(listStore.items.value).toHaveLength(2);
+
+      const newItemStore = listStore.children[0];
+      expect(newItemStore.kind).toBe('object');
+      if (newItemStore.kind === 'object') {
+        const tagsStore = newItemStore.children.tags;
+        expect(tagsStore.kind).toBe('array');
+        if (tagsStore.kind === 'array') {
+          expect(tagsStore.items.value).toHaveLength(2);
+          expect(tagsStore.children).toHaveLength(2);
+          expect(tagsStore.children[0].input.value).toBe('x');
+          expect(tagsStore.children[1].input.value).toBe('y');
+        }
+      }
+
+      const shiftedItemStore = listStore.children[1];
+      expect(shiftedItemStore.kind).toBe('object');
+      if (shiftedItemStore.kind === 'object') {
+        const tagsStore = shiftedItemStore.children.tags;
+        expect(tagsStore.kind).toBe('array');
+        if (tagsStore.kind === 'array') {
+          expect(tagsStore.children[0].input.value).toBe('a');
+        }
+      }
+    }
+  });
+
   test('should mark array as dirty after insert', () => {
     const store = createTestStore(v.object({ items: v.array(v.string()) }), {
       initialInput: { items: ['a'] },
