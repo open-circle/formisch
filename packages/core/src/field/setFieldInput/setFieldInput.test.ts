@@ -141,6 +141,31 @@ describe('setFieldInput', () => {
     });
   });
 
+  describe('reusing child stores when growing', () => {
+    test('should reset stale child state when array grows after shrinking', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b', 'c'] },
+      });
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+      if (itemsStore.kind === 'array') {
+        // Give the third item some state, then shrink the array so its child
+        // store becomes a stale, invisible leftover
+        itemsStore.children[2].errors.value = ['Stale error'];
+        itemsStore.children[2].isDirty.value = true;
+        setFieldInput(store, ['items'], ['a']);
+
+        // Grow back so the stale child store is reused for a new item
+        setFieldInput(store, ['items'], ['a', 'x', 'y']);
+
+        // The reused child must carry the new value with clean state
+        expect(itemsStore.children[2].input.value).toBe('y');
+        expect(itemsStore.children[2].errors.value).toBeNull();
+        expect(itemsStore.children[2].isDirty.value).toBe(false);
+      }
+    });
+  });
+
   describe('dirty state for objects', () => {
     test('should mark object as dirty when input becomes null', () => {
       const store = createTestStore(

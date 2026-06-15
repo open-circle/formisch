@@ -1,3 +1,4 @@
+import { resetItemState } from '../../array/resetItemState/index.ts';
 import { batch, createId, untrack } from '../../framework/index.ts';
 import type {
   InternalFieldStore,
@@ -43,20 +44,28 @@ function setNestedInput(
       // @ts-expect-error
       arrayInput.length > items.length
     ) {
-      // If new items exceed children capacity, initialize new children
-      // @ts-expect-error
-      if (arrayInput.length > internalFieldStore.children.length) {
-        // TODO: Check if we can merge this for loop with the one below
-        // Parse path for child initialization
-        const path = JSON.parse(internalFieldStore.name) as PathKey[];
+      // Parse path for child initialization
+      const path = JSON.parse(internalFieldStore.name) as PathKey[];
 
-        // Initialize missing children
-        for (
-          let index = internalFieldStore.children.length;
-          // @ts-expect-error
-          index < arrayInput.length;
-          index++
-        ) {
+      // Initialize or reset each newly visible child
+      for (
+        let index = items.length;
+        // @ts-expect-error
+        index < arrayInput.length;
+        index++
+      ) {
+        // If a stale child store from a previously longer array is reused,
+        // reset its state so it does not keep stale errors, touched, dirty
+        // or nested values
+        if (internalFieldStore.children[index]) {
+          resetItemState(
+            internalFieldStore.children[index],
+            // @ts-expect-error
+            arrayInput[index]
+          );
+
+          // Otherwise, create and initialize a brand-new child
+        } else {
           // Create empty child object
           // @ts-expect-error
           internalFieldStore.children[index] = {};
