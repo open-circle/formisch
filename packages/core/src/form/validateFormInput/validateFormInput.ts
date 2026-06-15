@@ -31,11 +31,11 @@ export async function validateFormInput(
   internalFormStore: InternalFormStore,
   config?: ValidateFormInputConfig
 ): Promise<v.SafeParseResult<Schema>> {
-  try {
-    // Update validation state
-    internalFormStore.validators++;
-    internalFormStore.isValidating.value = true;
+  // Update validation state
+  internalFormStore.validators++;
+  internalFormStore.isValidating.value = true;
 
+  try {
     // Parse form input with Valibot schema
     const result = await internalFormStore.parse(
       untrack(() => getFieldInput(internalFormStore))
@@ -102,7 +102,8 @@ export async function validateFormInput(
     // Create variable to decide if first error field should be focused
     let shouldFocus = config?.shouldFocus ?? false;
 
-    // Batch all state updates for optimal reactivity performance
+    // Batch error, focus and validation state updates together so reactive
+    // subscribers observe a single consistent update
     batch(() => {
       // Set or reset errors on each field store
       walkFieldStore(internalFormStore, (internalFieldStore) => {
@@ -124,16 +125,22 @@ export async function validateFormInput(
           }
         }
       });
+
+      // Reset validation state of form
+      internalFormStore.validators--;
+      internalFormStore.isValidating.value = internalFormStore.validators > 0;
     });
 
     // Return validation result
     return result;
 
-    // Always reset validation state, even if parsing throws
-  } finally {
+    // If parsing throws, still reset validation state so form does not stay
+    // stuck in a validating state
+  } catch (error) {
     batch(() => {
       internalFormStore.validators--;
       internalFormStore.isValidating.value = internalFormStore.validators > 0;
     });
+    throw error;
   }
 }
