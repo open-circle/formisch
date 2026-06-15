@@ -85,11 +85,11 @@ function setNestedInput(
         }
       }
 
-      // Extend items array with new items
+      // Extend items array with new items, capped to the clamped length so a
+      // tuple never grows beyond its fixed number of children
       internalFieldStore.items.value = [
         ...items,
-        // @ts-expect-error
-        ...arrayInput.slice(items.length).map(createId),
+        ...Array.from({ length: length - items.length }, createId),
       ];
     }
 

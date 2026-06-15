@@ -125,6 +125,27 @@ describe('setFieldInput', () => {
         expect(getFieldInput(pairStore.children[1])).toBe(2);
       }
     });
+
+    test('should not grow a tuple beyond its children when items were cleared', () => {
+      const store = createTestStore(
+        v.object({ pair: v.tuple([v.string(), v.number()]) }),
+        { initialInput: { pair: ['a', 1] } }
+      );
+      const pairStore = store.children.pair;
+      expect(pairStore.kind).toBe('array');
+      if (pairStore.kind === 'array') {
+        // Simulate a previously cleared tuple (e.g. reset to `null`), then set
+        // a longer-than-fixed input
+        pairStore.items.value = [];
+        setFieldInput(store, ['pair'], ['x', 2, 3]);
+
+        // Items stay capped to the fixed child count, so reads do not throw
+        expect(pairStore.items.value).toHaveLength(2);
+        expect(() => getFieldInput(pairStore)).not.toThrow();
+        expect(getFieldInput(pairStore.children[0])).toBe('x');
+        expect(getFieldInput(pairStore.children[1])).toBe(2);
+      }
+    });
   });
 
   describe('dirty state for arrays', () => {
