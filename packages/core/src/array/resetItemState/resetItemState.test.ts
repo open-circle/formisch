@@ -173,5 +173,27 @@ describe('resetItemState', () => {
         expect(itemsStore.children[2].name).toBe('["items",2]');
       }
     });
+
+    test('should not grow a tuple beyond its fixed children', () => {
+      const store = createTestStore(
+        v.object({ pair: v.tuple([v.string(), v.number()]) }),
+        { initialInput: { pair: ['a', 1] } }
+      );
+
+      const pairStore = store.children.pair;
+      expect(pairStore.kind).toBe('array');
+
+      if (pairStore.kind === 'array') {
+        // Reset with more items than the tuple defines (tuples have no
+        // `schema.item`, so the extra entry must not be initialized)
+        expect(() => resetItemState(pairStore, ['x', 2, 3])).not.toThrow();
+
+        // The tuple keeps its fixed length, ignoring the extra entry
+        expect(pairStore.items.value).toHaveLength(2);
+        expect(pairStore.children).toHaveLength(2);
+        expect(pairStore.children[0].input.value).toBe('x');
+        expect(pairStore.children[1].input.value).toBe(2);
+      }
+    });
   });
 });

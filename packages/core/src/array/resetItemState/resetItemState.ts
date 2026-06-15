@@ -48,9 +48,16 @@ export function resetItemState(
       if (internalFieldStore.kind === 'array') {
         // If input is provided, create items with IDs
         if (input) {
+          // Dynamic arrays grow to the input length, while tuples keep their
+          // fixed number of children (their schema has no `item` to initialize
+          // additional ones)
+          const length =
+            internalFieldStore.schema.type === 'array'
+              ? (input as unknown[]).length
+              : internalFieldStore.children.length;
+
           // Create new items array with unique IDs for each item
-          // @ts-expect-error
-          const newItems = input.map(createId);
+          const newItems = Array.from({ length }, createId);
 
           // Set start items
           internalFieldStore.startItems.value = newItems;
@@ -62,12 +69,7 @@ export function resetItemState(
           let path: PathKey[] | undefined;
 
           // Reset state for each array item
-          for (
-            let index = 0;
-            // @ts-expect-error
-            index < input.length;
-            index++
-          ) {
+          for (let index = 0; index < length; index++) {
             // If child exists at this index, reset its state
             if (internalFieldStore.children[index]) {
               // Recursively reset child with corresponding input
