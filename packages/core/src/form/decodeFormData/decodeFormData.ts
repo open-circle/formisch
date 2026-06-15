@@ -258,9 +258,9 @@ function fillDefaults(
   // Unwrap schema before reading its structure
   const unwrappedSchema = unwrapSchema(schema);
 
-  // If schema is boolean, default absent (unchecked checkbox) values to
-  // `false`. Only `undefined` is treated as absent so that a decoded `null`
-  // (e.g. from a nullable boolean) is preserved instead of coerced to `false`.
+  // If schema is boolean, default absent (unchecked checkbox) values to `false`
+  // Hint: Only `undefined` is treated as absent so that a decoded `null` (e.g.
+  // from a nullable boolean) is preserved instead of being coerced to `false`.
   if (unwrappedSchema.type === 'boolean') {
     if (parent[key] === undefined) {
       parent[key] = false;
