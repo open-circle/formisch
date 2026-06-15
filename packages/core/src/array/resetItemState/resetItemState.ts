@@ -1,5 +1,6 @@
+import { initializeFieldStore } from '../../field/initializeFieldStore/index.ts';
 import { batch, createId } from '../../framework/index.ts';
-import type { InternalFieldStore } from '../../types/index.ts';
+import type { InternalFieldStore, PathKey } from '../../types/index.ts';
 
 /**
  * Resets the state of a field store (signal values) deeply nested. Sets
@@ -57,6 +58,9 @@ export function resetItemState(
           // Set current items
           internalFieldStore.items.value = newItems;
 
+          // Parse path lazily, only when a missing child must be initialized
+          let path: PathKey[] | undefined;
+
           // Reset state for each array item
           for (
             let index = 0;
@@ -72,6 +76,31 @@ export function resetItemState(
                 // @ts-expect-error
                 initialInput[index]
               );
+
+              // Otherwise, initialize a new child with the corresponding input
+            } else {
+              // Parse path only when needed
+              path ??= JSON.parse(internalFieldStore.name) as PathKey[];
+
+              // Create empty child object
+              // @ts-expect-error
+              internalFieldStore.children[index] = {};
+
+              // Add current index to path
+              path.push(index);
+
+              // Initialize field store for new child
+              initializeFieldStore(
+                internalFieldStore.children[index],
+                // @ts-expect-error
+                internalFieldStore.schema.item,
+                // @ts-expect-error
+                initialInput[index],
+                path
+              );
+
+              // Remove index from path for next iteration
+              path.pop();
             }
           }
 

@@ -152,7 +152,7 @@ describe('resetItemState', () => {
   });
 
   describe('edge cases', () => {
-    test('should skip missing array children gracefully', () => {
+    test('should initialize missing array children', () => {
       const store = createTestStore(v.object({ items: v.array(v.string()) }), {
         initialInput: { items: ['a'] },
       });
@@ -164,9 +164,13 @@ describe('resetItemState', () => {
         // Reset with more items than children exist
         resetItemState(itemsStore, ['x', 'y', 'z']);
 
-        // Should handle gracefully - only reset existing children
+        // Should initialize missing children so every item has a field store
         expect(itemsStore.items.value.length).toBe(3);
+        expect(itemsStore.children).toHaveLength(3);
         expect(itemsStore.children[0].input.value).toBe('x');
+        expect(itemsStore.children[1].input.value).toBe('y');
+        expect(itemsStore.children[2].input.value).toBe('z');
+        expect(itemsStore.children[2].name).toBe('["items",2]');
       }
     });
   });
