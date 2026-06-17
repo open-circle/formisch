@@ -1,3 +1,4 @@
+import { reset } from '@formisch/methods/react';
 import {
   act,
   fireEvent,
@@ -6,10 +7,11 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import type { ReactElement } from 'react';
+import { type ReactElement, useState } from 'react';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
 import { Form } from '../../components/Form/index.ts';
+import type { FormStore } from '../../types/index.ts';
 import { useForm } from '../useForm/index.ts';
 import { useField } from './useField.ts';
 
@@ -257,6 +259,70 @@ describe('useField', () => {
 
       await waitFor(() => {
         expect(document.activeElement).toBe(input);
+      });
+    });
+
+    test('should focus a remounted field after reset instead of a stale element', async () => {
+      const schema = v.object({
+        email: v.pipe(v.string(), v.nonEmpty('Required')),
+      });
+
+      // The field lives in its own component so unmounting it runs the
+      // adapter cleanup (which reassigns `elements`), the way a real
+      // conditionally rendered field does
+      function EmailField({
+        form,
+      }: {
+        form: FormStore<typeof schema>;
+      }): ReactElement {
+        const field = useField(form, { path: ['email'] });
+        return (
+          <input
+            data-testid="input"
+            {...field.props}
+            value={field.input ?? ''}
+          />
+        );
+      }
+
+      function Test(): ReactElement {
+        const form = useForm({ schema, initialInput: { email: '' } });
+        const [show, setShow] = useState(true);
+        return (
+          <Form of={form} onSubmit={vi.fn()} aria-label="Test">
+            {show && <EmailField form={form} />}
+            <button type="button" onClick={() => setShow((value) => !value)}>
+              toggle
+            </button>
+            <button type="button" onClick={() => reset(form)}>
+              reset
+            </button>
+            <button type="submit">Submit</button>
+          </Form>
+        );
+      }
+
+      render(<Test />);
+
+      // Unmount then remount the field so the adapter cleanup reassigns
+      // `elements` and a stale `initialElements` would diverge
+      act(() => {
+        fireEvent.click(screen.getByText('toggle'));
+      });
+      expect(screen.queryByTestId('input')).toBeNull();
+      act(() => {
+        fireEvent.click(screen.getByText('toggle'));
+      });
+
+      // Reset the form, then submit so validation focuses the first error field
+      act(() => {
+        fireEvent.click(screen.getByText('reset'));
+      });
+      fireEvent.submit(screen.getByRole('form', { name: 'Test' }));
+
+      // Focus must land on the live remounted input, not a detached baseline
+      await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByTestId('input'));
       });
     });
 
