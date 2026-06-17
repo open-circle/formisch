@@ -50,5 +50,3 @@ overrides:
   'undici@7': '7.24.0'
   'vite@6': '6.4.2'
   'vite@7': '7.3.2'
-patchedDependencies:
-  '@qwik.dev/router@2.0.0-beta.9': patches/@qwik.dev__router@2.0.0-beta.9.patch

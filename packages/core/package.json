@@ -75,7 +75,7 @@
     "@angular/core": "^21.0.0",
     "@formisch/eslint-config": "workspace:*",
     "@preact/signals": "^2.9.0",
-    "@qwik.dev/core": "https://pkg.pr.new/QwikDev/qwik/@qwik.dev/core@1778671",
+    "@qwik.dev/core": "2.0.0-beta.37",
     "@types/node": "24.0.13",
     "@types/react": "^19.2.5",
     "@vitest/coverage-v8": "^4.1.7",
