@@ -2,6 +2,21 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.8.0 (June 15, 2026)
+
+- Add `focusFieldElement` utility that focuses the first focusable element of a field store
+- Fix `setFieldBool` to set the boolean property on object field stores themselves, not only on their children
+- Fix `setInitialFieldInput` to update the initial input instead of the current input of array and object field stores, so resetting nullish arrays and objects to a new initial input works
+- Fix `resetItemState` to initialize missing array children, so resetting an item whose nested array grew beyond its existing field stores no longer leaves items without a child store
+- Fix `resetItemState`, `setFieldInput` and `setInitialFieldInput` to keep tuple field stores at their fixed length instead of growing them for a longer input, which previously threw
+- Fix `resetItemState` to keep `initialElements` in sync with `elements` while a field owns its element array, so a later reset restores the field's live element after a replaced or remounted field re-registers
+- Change `ValidArrayPath` to reject fixed-length tuples, so field array methods only accept dynamic array paths
+- Fix `setFieldInput` to clear stale state from reused child stores when an array grows after shrinking, without losing their dirty baseline so a changed value is still detected as dirty
+- Fix `decodeFormData` to complete missing trailing tuple items, so unchecked checkboxes and absent arrays at the end of tuples are restored
+- Fix `decodeFormData` to preserve a decoded `null` for nullable booleans instead of coercing it to `false`
+- Fix `validateFormInput` to focus the first erroring field whose element can actually receive focus, so the focus is no longer consumed by a field without a focusable element (e.g. unmounted, disabled or hidden)
+- Fix `validateFormInput` to always reset the validating state, even if schema parsing throws
+
 ## v0.7.0 (May 24, 2026)
 
 - Add `FormSchema` type that constrains a form's root schema to object schemas (sync or async) and combinators (`intersect`, `union`, `variant`)

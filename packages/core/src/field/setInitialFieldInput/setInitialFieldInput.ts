@@ -18,26 +18,30 @@ export function setInitialFieldInput(
   batch(() => {
     // If field store is array, handle array initial input
     if (internalFieldStore.kind === 'array') {
-      // Set array input
-      internalFieldStore.input.value =
+      // Set initial array input
+      internalFieldStore.initialInput.value =
         initialInput == null ? initialInput : true;
 
       // Normalize input to empty array if nullish
       const initialArrayInput = initialInput ?? [];
 
+      // Tuples have a fixed number of children, so ignore any extra input items
+      // instead of growing them (they have no `item` schema to initialize
+      // additional children, unlike dynamic arrays)
+      const length =
+        internalFieldStore.schema.type === 'array'
+          ? (initialArrayInput as unknown[]).length
+          : internalFieldStore.children.length;
+
       // If initial input exceeds children capacity, initialize new children
-      if (
-        // @ts-expect-error
-        initialArrayInput.length > internalFieldStore.children.length
-      ) {
+      if (length > internalFieldStore.children.length) {
         // Parse path for child initialization
         const path = JSON.parse(internalFieldStore.name) as PathKey[];
 
         // Initialize missing children
         for (
           let index = internalFieldStore.children.length;
-          // @ts-expect-error
-          index < initialArrayInput.length;
+          index < length;
           index++
         ) {
           // Create empty child object
@@ -63,9 +67,7 @@ export function setInitialFieldInput(
       }
 
       // Set initial items with unique IDs
-      internalFieldStore.initialItems.value =
-        // @ts-expect-error
-        initialArrayInput.map(createId);
+      internalFieldStore.initialItems.value = Array.from({ length }, createId);
 
       // Set initial input for each array item
       for (let index = 0; index < internalFieldStore.children.length; index++) {
@@ -79,8 +81,8 @@ export function setInitialFieldInput(
 
       // Otherwise, if field store is object, handle object initial input
     } else if (internalFieldStore.kind === 'object') {
-      // Set object input
-      internalFieldStore.input.value =
+      // Set initial object input
+      internalFieldStore.initialInput.value =
         initialInput == null ? initialInput : true;
 
       // Set initial input for each object property

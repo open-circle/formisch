@@ -122,6 +122,10 @@ export function reset(
       // Reset state of fields by walking field store
       walkFieldStore(internalFieldStore, (internalFieldStore) => {
         // Reset elements to initial elements
+        // Hint: `copyItemState` and `swapItemState` move elements between field
+        // stores during array methods, so this restores each field's original
+        // element. Without it, focus and file reset target the wrong element
+        // after a reorder followed by a reset.
         internalFieldStore.elements = internalFieldStore.initialElements;
 
         // Reset errors if it is not to be kept

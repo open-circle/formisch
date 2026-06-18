@@ -27,6 +27,13 @@ export interface InternalBaseStore {
   schema: Schema;
   /**
    * The initial elements of the field.
+   *
+   * Hint: This may look unused, but do not remove it. `copyItemState` and
+   * `swapItemState` move the `elements` reference between field stores when
+   * array items are inserted, moved, removed or swapped, and `reset` restores
+   * each field's original element via `elements = initialElements`. Without it,
+   * focus and file reset target the wrong element after a reorder followed by a
+   * reset.
    */
   initialElements: FieldElement[];
   /**
