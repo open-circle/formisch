@@ -113,6 +113,10 @@ export function initializeFieldStore(
     schema.type === 'variant'
   ) {
     // Initialize field store for each schema option
+    // Hint: Options share a single field store per key, so per-branch metadata
+    // (`schema`, `kind`, `isNullish`) is approximated last-write-wins. A key
+    // that differs across branches (e.g. nullish in one, required in another)
+    // is therefore not fully represented. See #95 for the long-term fix.
     for (const schemaOption of schema.options) {
       initializeFieldStore(
         internalFieldStore,
