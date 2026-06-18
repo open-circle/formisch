@@ -98,8 +98,9 @@ export function resetItemState(
 
           // Reset state for each array item
           for (let index = 0; index < length; index++) {
-            // A tuple reset without input resets its children to undefined
-            const itemInput = input && (input as unknown[])[index];
+            // A tuple reset without input (or with nullish input) resets each
+            // child to undefined, mirroring `initializeFieldStore`
+            const itemInput = (input as unknown[] | null | undefined)?.[index];
 
             // If child exists at this index, reset its state
             if (internalFieldStore.children[index]) {

@@ -316,6 +316,12 @@ describe('resetItemState', () => {
         expect(pairStore.children).toHaveLength(2);
         expect(pairStore.children[0].input.value).toBeUndefined();
         expect(pairStore.children[1].input.value).toBeUndefined();
+
+        // An explicit null input normalizes to undefined children too, so it
+        // stays consistent with the initial state
+        resetItemState(pairStore, null);
+        expect(pairStore.children[0].input.value).toBeUndefined();
+        expect(pairStore.children[1].input.value).toBeUndefined();
       }
     });
   });
