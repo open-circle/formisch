@@ -16,6 +16,7 @@ describe('resetItemState', () => {
       // Modify state
       nameStore.input.value = 'modified';
       nameStore.isTouched.value = true;
+      nameStore.isEdited.value = true;
       nameStore.isDirty.value = true;
       nameStore.errors.value = ['Error'];
       nameStore.elements = [document.createElement('input')];
@@ -25,6 +26,7 @@ describe('resetItemState', () => {
       expect(nameStore.input.value).toBe('reset-value');
       expect(nameStore.startInput.value).toBe('reset-value');
       expect(nameStore.isTouched.value).toBe(false);
+      expect(nameStore.isEdited.value).toBe(false);
       expect(nameStore.isDirty.value).toBe(false);
       expect(nameStore.errors.value).toBe(null);
       expect(nameStore.elements).toEqual([]);

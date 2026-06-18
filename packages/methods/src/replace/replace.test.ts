@@ -59,6 +59,16 @@ describe('replace', () => {
     expect(store.children.items.isDirty.value).toBe(true);
   });
 
+  test('should mark array as edited after replace', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: ['a', 'b'] },
+    });
+
+    replace(store, { path: ['items'], at: 0, initialInput: 'x' });
+
+    expect(store.children.items.isEdited.value).toBe(true);
+  });
+
   test('should initialize missing children of nested array item', () => {
     const store = createTestStore(
       v.object({ list: v.array(v.object({ tags: v.array(v.string()) })) }),

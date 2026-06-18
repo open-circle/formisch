@@ -19,8 +19,9 @@ function setNestedInput(
   internalFieldStore: InternalFieldStore,
   input: unknown
 ): void {
-  // Mark field as touched
+  // Mark field as touched and edited
   internalFieldStore.isTouched.value = true;
+  internalFieldStore.isEdited.value = true;
 
   // If field store is array, handle array input
   if (internalFieldStore.kind === 'array') {

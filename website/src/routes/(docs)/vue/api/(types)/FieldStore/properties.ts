@@ -103,6 +103,10 @@ export const properties: Record<string, PropertyProps> = {
           value: 'boolean',
         },
         {
+          key: 'isEdited',
+          value: 'boolean',
+        },
+        {
           key: 'isDirty',
           value: 'boolean',
         },
@@ -196,6 +200,9 @@ export const properties: Record<string, PropertyProps> = {
     },
   },
   isTouched: {
+    type: 'boolean',
+  },
+  isEdited: {
     type: 'boolean',
   },
   isDirty: {

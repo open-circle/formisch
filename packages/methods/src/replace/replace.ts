@@ -78,8 +78,9 @@ export function replace<
         config.initialInput
       );
 
-      // Mark field array as touched and dirty
+      // Mark field array as touched, edited and dirty
       internalArrayStore.isTouched.value = true;
+      internalArrayStore.isEdited.value = true;
       internalArrayStore.isDirty.value = true;
 
       // Validate if required

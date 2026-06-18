@@ -12,7 +12,7 @@ import type { InternalFieldStore } from '../../types/index.ts';
 // @__NO_SIDE_EFFECTS__
 export function getFieldBool(
   internalFieldStore: InternalFieldStore,
-  type: 'errors' | 'isTouched' | 'isDirty'
+  type: 'errors' | 'isTouched' | 'isEdited' | 'isDirty'
 ): boolean {
   // If current field has property set to true, return true
   if (internalFieldStore[type].value) {

@@ -18,6 +18,7 @@ describe('copyItemState', () => {
       // Modify source state
       sourceStore.input.value = 'modified';
       sourceStore.isTouched.value = true;
+      sourceStore.isEdited.value = true;
       sourceStore.isDirty.value = true;
       sourceStore.errors.value = ['Error'];
 
@@ -26,6 +27,7 @@ describe('copyItemState', () => {
       expect(targetStore.input.value).toBe('modified');
       expect(targetStore.startInput.value).toBe('hello');
       expect(targetStore.isTouched.value).toBe(true);
+      expect(targetStore.isEdited.value).toBe(true);
       expect(targetStore.isDirty.value).toBe(true);
       expect(targetStore.errors.value).toEqual(['Error']);
     });

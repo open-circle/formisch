@@ -2,6 +2,11 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Add `keepEdited` config option to the `reset` method to keep the edited state of fields
+- Change `insert`, `move`, `remove`, `replace` and `swap` methods to set the edited state of the field array
+
 ## v0.9.0 (June 15, 2026)
 
 - Change `@formisch/core` to v0.8.0

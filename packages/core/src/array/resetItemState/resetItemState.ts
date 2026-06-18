@@ -8,10 +8,10 @@ import type {
 
 /**
  * Resets the state of a field store (signal values) deeply nested. Sets
- * `elements` to empty array, `errors` to `null`, `isTouched` and `isDirty` to
- * `false`, and `startInput`, `input`, `startItems`, and `items` to the new
- * input value. Keeps the `initialInput` and `initialItems` state unchanged for
- * form reset functionality.
+ * `elements` to empty array, `errors` to `null`, `isTouched`, `isEdited` and
+ * `isDirty` to `false`, and `startInput`, `input`, `startItems`, and `items` to
+ * the new input value. Keeps the `initialInput` and `initialItems` state
+ * unchanged for form reset functionality.
  *
  * @param internalFieldStore The field store to reset.
  * @param input The new input value (can be any type including array or object).
@@ -40,6 +40,9 @@ export function resetItemState(
 
     // Reset touched to false
     internalFieldStore.isTouched.value = false;
+
+    // Reset edited to false
+    internalFieldStore.isEdited.value = false;
 
     // Reset dirty to false
     internalFieldStore.isDirty.value = false;

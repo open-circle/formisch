@@ -140,6 +140,7 @@ export function initializeFieldStore(
     // Initialize common signals
     internalFieldStore.errors = createSignal(null);
     internalFieldStore.isTouched = createSignal(false);
+    internalFieldStore.isEdited = createSignal(false);
     internalFieldStore.isDirty = createSignal(false);
 
     // If schema is array or tuple, initialize as array field
