@@ -78,7 +78,7 @@ export default function App() {
   });
 
   return (
-    <Form of={loginForm}>
+    <Form of={loginForm} onSubmit={(output) => console.log(output)}>
       <Field of={loginForm} path={['email']}>
         {(field) => (
           <div>
@@ -104,8 +104,9 @@ When your schema contains asynchronous checks, validation does not resolve insta
 ```tsx
 import { createForm, Form } from '@formisch/solid';
 import * as v from 'valibot';
+import { isUsernameAvailable } from '~/api';
 
-const SignUpSchema = v.object({
+const SignUpSchema = v.objectAsync({
   username: v.pipeAsync(
     v.string(),
     v.nonEmpty(),
@@ -120,7 +121,7 @@ export default function App() {
   });
 
   return (
-    <Form of={signUpForm}>
+    <Form of={signUpForm} onSubmit={(output) => console.log(output)}>
       {/* fields */}
       <button type="submit" disabled={signUpForm.isValidating}>
         {signUpForm.isValidating ? 'Checking...' : 'Sign up'}

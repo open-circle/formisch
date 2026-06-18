@@ -79,7 +79,7 @@ const loginForm = useForm({
 </script>
 
 <template>
-  <Form :of="loginForm">
+  <Form :of="loginForm" @submit="(output) => console.log(output)">
     <Field :of="loginForm" :path="['email']" v-slot="field">
       <input v-model="field.input" v-bind="field.props" type="email" />
       <div v-if="(field.isEdited || loginForm.isSubmitted) && field.errors">
@@ -101,8 +101,9 @@ When your schema contains asynchronous checks, validation does not resolve insta
 <script setup lang="ts">
 import { Form, useForm } from '@formisch/vue';
 import * as v from 'valibot';
+import { isUsernameAvailable } from '~/api';
 
-const SignUpSchema = v.object({
+const SignUpSchema = v.objectAsync({
   username: v.pipeAsync(
     v.string(),
     v.nonEmpty(),
@@ -117,7 +118,7 @@ const signUpForm = useForm({
 </script>
 
 <template>
-  <Form :of="signUpForm">
+  <Form :of="signUpForm" @submit="(output) => console.log(output)">
     <!-- fields -->
     <button type="submit" :disabled="signUpForm.isValidating">
       {{ signUpForm.isValidating ? 'Checking...' : 'Sign up' }}
