@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Add `isEdited` property to the field, field array and form stores
+
 ## v0.12.0 (June 15, 2026)
 
 - Change `@formisch/core` to v0.8.0
