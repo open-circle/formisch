@@ -69,15 +69,18 @@ export function resetItemState(
 
       // If field store is array, handle array-specific reset
       if (internalFieldStore.kind === 'array') {
-        // If input is provided, create items with IDs
-        if (input) {
+        // Tuples have a fixed number of children that the schema cannot
+        // recreate (no `item`), so they keep them even when the input is
+        // nullish, just like `initializeFieldStore`
+        const isTuple = internalFieldStore.schema.type !== 'array';
+
+        // If input is provided or store is a tuple, (re)create items with IDs
+        if (input || isTuple) {
           // Dynamic arrays grow to the input length, while tuples keep their
-          // fixed number of children (their schema has no `item` to initialize
-          // additional ones)
-          const length =
-            internalFieldStore.schema.type === 'array'
-              ? (input as unknown[]).length
-              : internalFieldStore.children.length;
+          // fixed number of children
+          const length = isTuple
+            ? internalFieldStore.children.length
+            : (input as unknown[]).length;
 
           // Create new items array with unique IDs for each item
           const newItems = Array.from({ length }, createId);
@@ -95,13 +98,15 @@ export function resetItemState(
 
           // Reset state for each array item
           for (let index = 0; index < length; index++) {
+            // A tuple reset without input resets its children to undefined
+            const itemInput = input && (input as unknown[])[index];
+
             // If child exists at this index, reset its state
             if (internalFieldStore.children[index]) {
               // Recursively reset child with corresponding input
               resetItemState(
                 internalFieldStore.children[index],
-                // @ts-expect-error
-                input[index],
+                itemInput,
                 keepStart
               );
 
@@ -122,8 +127,7 @@ export function resetItemState(
                 internalFieldStore.children[index],
                 // @ts-expect-error
                 internalFieldStore.schema.item,
-                // @ts-expect-error
-                input[index],
+                itemInput,
                 path
               );
 

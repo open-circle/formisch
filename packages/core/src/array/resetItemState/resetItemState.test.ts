@@ -295,5 +295,28 @@ describe('resetItemState', () => {
         expect(pairStore.children[1].input.value).toBe(2);
       }
     });
+
+    test('should keep a non-nullish tuple at its fixed length when input is nullish', () => {
+      const store = createTestStore(
+        v.object({ pair: v.tuple([v.string(), v.number()]) }),
+        { initialInput: { pair: ['a', 1] } }
+      );
+
+      const pairStore = store.children.pair;
+      expect(pairStore.kind).toBe('array');
+
+      if (pairStore.kind === 'array') {
+        // Reset without input, e.g. replacing an item that omits the tuple key
+        resetItemState(pairStore, undefined);
+
+        // The tuple stays present with its fixed children reset to undefined,
+        // instead of collapsing to an empty array
+        expect(pairStore.input.value).toBe(true);
+        expect(pairStore.items.value).toHaveLength(2);
+        expect(pairStore.children).toHaveLength(2);
+        expect(pairStore.children[0].input.value).toBeUndefined();
+        expect(pairStore.children[1].input.value).toBeUndefined();
+      }
+    });
   });
 });

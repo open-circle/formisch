@@ -180,4 +180,21 @@ describe('replace', () => {
       a: [{ type: 'array', string: undefined, array: [] }],
     });
   });
+
+  test('should keep a nested tuple at its fixed length when its key is omitted', () => {
+    const store = createTestStore(
+      v.object({
+        a: v.array(v.object({ pair: v.tuple([v.string(), v.number()]) })),
+      }),
+      { initialInput: { a: [{ pair: ['x', 1] }] } }
+    );
+
+    replace(store, { path: ['a'], at: 0, initialInput: {} });
+
+    // An omitted non-nullish tuple keeps its fixed positions (reset to
+    // `undefined`) instead of collapsing to an empty array
+    expect(getFieldInput(store)).toStrictEqual({
+      a: [{ pair: [undefined, undefined] }],
+    });
+  });
 });
