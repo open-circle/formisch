@@ -222,6 +222,9 @@ export function initializeFieldStore(
           }
         }
 
+        // Store whether array is nullish so resetting can stay consistent
+        internalFieldStore.isNullish = nullish;
+
         // Set array input (nullish or true)
         const arrayInput =
           nullish && initialInput == null ? initialInput : true;
@@ -278,6 +281,9 @@ export function initializeFieldStore(
           // Remove key from path for next iteration
           path.pop();
         }
+
+        // Store whether object is nullish so resetting can stay consistent
+        internalFieldStore.isNullish = nullish;
 
         // Set object input (nullish or true)
         const objectInput =

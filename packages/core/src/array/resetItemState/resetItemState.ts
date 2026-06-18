@@ -52,8 +52,12 @@ export function resetItemState(
       internalFieldStore.kind === 'array' ||
       internalFieldStore.kind === 'object'
     ) {
-      // For arrays and objects, input is null/undefined or true (not actual value)
-      const objectInput = input == null ? input : true;
+      // For arrays and objects, input is null/undefined or true (not actual
+      // value). Mirror `initializeFieldStore` so a missing input on a
+      // non-nullish array or object becomes a present empty container (`true`)
+      // instead of `undefined`, keeping reset consistent with the initial state.
+      const objectInput =
+        internalFieldStore.isNullish && input == null ? input : true;
 
       // Set start input unless it is kept as the dirty baseline
       if (!keepStart) {

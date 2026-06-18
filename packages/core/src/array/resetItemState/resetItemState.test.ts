@@ -118,7 +118,7 @@ describe('resetItemState', () => {
       }
     });
 
-    test('should reset array to empty when input is null', () => {
+    test('should reset non-nullish array to present empty when input is nullish', () => {
       const store = createTestStore(v.object({ items: v.array(v.string()) }), {
         initialInput: { items: ['a', 'b'] },
       });
@@ -131,6 +131,26 @@ describe('resetItemState', () => {
 
         expect(itemsStore.items.value).toEqual([]);
         expect(itemsStore.startItems.value).toEqual([]);
+        // A non-nullish array stays a present empty array (`true`) instead of
+        // becoming `null`, matching how `initializeFieldStore` represents it
+        expect(itemsStore.input.value).toBe(true);
+      }
+    });
+
+    test('should reset nullish array to null when input is null', () => {
+      const store = createTestStore(
+        v.object({ items: v.nullish(v.array(v.string())) }),
+        { initialInput: { items: ['a', 'b'] } }
+      );
+
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+
+      if (itemsStore.kind === 'array') {
+        resetItemState(itemsStore, null);
+
+        expect(itemsStore.items.value).toEqual([]);
+        // A nullish array preserves the explicit nullish value
         expect(itemsStore.input.value).toBe(null);
       }
     });
