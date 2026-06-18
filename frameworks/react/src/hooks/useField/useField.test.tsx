@@ -28,6 +28,7 @@ describe('useField', () => {
       expect(field.input).toBe(undefined);
       expect(field.errors).toBe(null);
       expect(field.isTouched).toBe(false);
+      expect(field.isEdited).toBe(false);
       expect(field.isDirty).toBe(false);
       expect(field.isValid).toBe(true);
       expect(field.props.name).toBe('["name"]');
@@ -104,6 +105,111 @@ describe('useField', () => {
         expect(result.current.errors).toEqual(['Invalid email']);
         expect(result.current.isValid).toBe(false);
       });
+    });
+  });
+
+  describe('edited state', () => {
+    test('should not set isEdited on focus but should set isTouched', async () => {
+      function Test(): ReactElement {
+        const form = useForm({
+          schema: v.object({ name: v.string() }),
+          initialInput: { name: '' },
+        });
+        const field = useField(form, { path: ['name'] });
+        return (
+          <div>
+            <input data-testid="input" {...field.props} />
+            <span data-testid="touched">{String(field.isTouched)}</span>
+            <span data-testid="edited">{String(field.isEdited)}</span>
+          </div>
+        );
+      }
+
+      render(<Test />);
+
+      const touched = screen.getByTestId('touched');
+      const edited = screen.getByTestId('edited');
+
+      fireEvent.focus(screen.getByTestId('input'));
+
+      // Focusing marks the field as touched, but not as edited
+      await waitFor(() => {
+        expect(touched).toHaveTextContent('true');
+      });
+      expect(edited).toHaveTextContent('false');
+    });
+
+    test('should set isEdited on input', async () => {
+      function Test(): ReactElement {
+        const form = useForm({
+          schema: v.object({ name: v.string() }),
+          initialInput: { name: '' },
+        });
+        const field = useField(form, { path: ['name'] });
+        return (
+          <div>
+            <input
+              data-testid="input"
+              {...field.props}
+              value={field.input ?? ''}
+            />
+            <span data-testid="edited">{String(field.isEdited)}</span>
+          </div>
+        );
+      }
+
+      render(<Test />);
+
+      const edited = screen.getByTestId('edited');
+      expect(edited).toHaveTextContent('false');
+
+      fireEvent.change(screen.getByTestId('input'), {
+        target: { value: 'changed' },
+      });
+
+      await waitFor(() => {
+        expect(edited).toHaveTextContent('true');
+      });
+    });
+
+    test('should keep isEdited after reverting the value to its initial value', async () => {
+      function Test(): ReactElement {
+        const form = useForm({
+          schema: v.object({ name: v.string() }),
+          initialInput: { name: 'initial' },
+        });
+        const field = useField(form, { path: ['name'] });
+        return (
+          <div>
+            <input
+              data-testid="input"
+              {...field.props}
+              value={field.input ?? ''}
+            />
+            <span data-testid="edited">{String(field.isEdited)}</span>
+            <span data-testid="dirty">{String(field.isDirty)}</span>
+          </div>
+        );
+      }
+
+      render(<Test />);
+
+      const input = screen.getByTestId('input') as HTMLInputElement;
+      const edited = screen.getByTestId('edited');
+      const dirty = screen.getByTestId('dirty');
+
+      fireEvent.change(input, { target: { value: 'changed' } });
+      await waitFor(() => {
+        expect(edited).toHaveTextContent('true');
+        expect(dirty).toHaveTextContent('true');
+      });
+
+      // Reverting to the initial value clears isDirty but keeps isEdited
+      fireEvent.change(input, { target: { value: 'initial' } });
+      await waitFor(() => {
+        expect(dirty).toHaveTextContent('false');
+      });
+      expect(edited).toHaveTextContent('true');
     });
   });
 

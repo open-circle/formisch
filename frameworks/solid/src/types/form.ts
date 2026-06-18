@@ -22,6 +22,10 @@ export interface FormStore<TSchema extends FormSchema = FormSchema>
    */
   readonly isTouched: boolean;
   /**
+   * Whether any field in the form has been edited.
+   */
+  readonly isEdited: boolean;
+  /**
    * Whether any field in the form differs from its initial value.
    */
   readonly isDirty: boolean;

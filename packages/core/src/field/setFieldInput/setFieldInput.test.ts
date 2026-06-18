@@ -19,6 +19,24 @@ describe('setFieldInput', () => {
       expect(store.children.name.isTouched.value).toBe(true);
     });
 
+    test('should mark field as edited', () => {
+      const store = createTestStore(v.object({ name: v.string() }));
+      setFieldInput(store, ['name'], 'John');
+      expect(store.children.name.isEdited.value).toBe(true);
+    });
+
+    test('should keep field edited after reverting to initial value', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'John' },
+      });
+      setFieldInput(store, ['name'], 'Jane');
+      setFieldInput(store, ['name'], 'John');
+      // Unlike `isDirty`, `isEdited` stays `true` even after the value is
+      // changed back to its initial value
+      expect(store.children.name.isDirty.value).toBe(false);
+      expect(store.children.name.isEdited.value).toBe(true);
+    });
+
     test('should mark field as dirty when value changes', () => {
       const store = createTestStore(v.object({ name: v.string() }), {
         initialInput: { name: 'John' },

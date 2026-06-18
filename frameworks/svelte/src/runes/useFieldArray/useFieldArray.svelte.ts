@@ -56,6 +56,7 @@ export function useFieldArray(
   );
 
   const isTouched = $derived(getFieldBool(internalFieldStore, 'isTouched'));
+  const isEdited = $derived(getFieldBool(internalFieldStore, 'isEdited'));
   const isDirty = $derived(getFieldBool(internalFieldStore, 'isDirty'));
   const isValid = $derived(!getFieldBool(internalFieldStore, 'errors'));
 
@@ -71,6 +72,9 @@ export function useFieldArray(
     },
     get isTouched() {
       return isTouched;
+    },
+    get isEdited() {
+      return isEdited;
     },
     get isDirty() {
       return isDirty;

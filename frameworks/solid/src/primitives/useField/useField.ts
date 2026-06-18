@@ -60,6 +60,9 @@ export function useField(
   const getIsTouched = createMemo(() =>
     getFieldBool(getInternalFieldStore(), 'isTouched')
   );
+  const getIsEdited = createMemo(() =>
+    getFieldBool(getInternalFieldStore(), 'isEdited')
+  );
   const getIsDirty = createMemo(() =>
     getFieldBool(getInternalFieldStore(), 'isDirty')
   );
@@ -79,6 +82,9 @@ export function useField(
     },
     get isTouched() {
       return getIsTouched();
+    },
+    get isEdited() {
+      return getIsEdited();
     },
     get isDirty() {
       return getIsDirty();

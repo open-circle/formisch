@@ -20,6 +20,7 @@ describe('useField', () => {
       expect(field.input).toBe(undefined);
       expect(field.errors).toBe(null);
       expect(field.isTouched).toBe(false);
+      expect(field.isEdited).toBe(false);
       expect(field.isDirty).toBe(false);
       expect(field.isValid).toBe(true);
       expect(field.props.name).toBe('["name"]');
@@ -201,6 +202,122 @@ describe('useField', () => {
 
       await vi.waitFor(() => {
         expect(valid.text()).toBe('false');
+      });
+    });
+  });
+
+  describe('edited state', () => {
+    test('should not set isEdited on focus but should set isTouched', async () => {
+      const Test = defineComponent({
+        setup() {
+          const form = useForm({
+            schema: v.object({ name: v.string() }),
+            initialInput: { name: 'initial' },
+          });
+          const field = useField(form, { path: ['name'] });
+          return () =>
+            h('div', [
+              h('input', {
+                'data-testid': 'input',
+                ...field.props,
+                value: field.input ?? '',
+              }),
+              h('span', { 'data-testid': 'touched' }, String(field.isTouched)),
+              h('span', { 'data-testid': 'edited' }, String(field.isEdited)),
+            ]);
+        },
+      });
+
+      const wrapper = mount(Test);
+      const touched = wrapper.get('[data-testid="touched"]');
+      const edited = wrapper.get('[data-testid="edited"]');
+      expect(touched.text()).toBe('false');
+      expect(edited.text()).toBe('false');
+
+      await wrapper.get('[data-testid="input"]').trigger('focus');
+
+      await vi.waitFor(() => {
+        expect(touched.text()).toBe('true');
+        expect(edited.text()).toBe('false');
+      });
+    });
+
+    test('should set isEdited on input', async () => {
+      const Test = defineComponent({
+        setup() {
+          const form = useForm({
+            schema: v.object({ name: v.string() }),
+            initialInput: { name: 'initial' },
+          });
+          const field = useField(form, { path: ['name'] });
+          return () =>
+            h('div', [
+              h('input', {
+                'data-testid': 'input',
+                ...field.props,
+                value: field.input ?? '',
+                onInput: (e: Event) => {
+                  field.input = (e.target as HTMLInputElement).value;
+                },
+              }),
+              h('span', { 'data-testid': 'edited' }, String(field.isEdited)),
+            ]);
+        },
+      });
+
+      const wrapper = mount(Test);
+      const input = wrapper.get<HTMLInputElement>('[data-testid="input"]');
+      const edited = wrapper.get('[data-testid="edited"]');
+      expect(edited.text()).toBe('false');
+
+      await input.setValue('changed');
+
+      await vi.waitFor(() => {
+        expect(edited.text()).toBe('true');
+      });
+    });
+
+    test('should keep isEdited after reverting the value to its initial value', async () => {
+      const Test = defineComponent({
+        setup() {
+          const form = useForm({
+            schema: v.object({ name: v.string() }),
+            initialInput: { name: 'initial' },
+          });
+          const field = useField(form, { path: ['name'] });
+          return () =>
+            h('div', [
+              h('input', {
+                'data-testid': 'input',
+                ...field.props,
+                value: field.input ?? '',
+                onInput: (e: Event) => {
+                  field.input = (e.target as HTMLInputElement).value;
+                },
+              }),
+              h('span', { 'data-testid': 'edited' }, String(field.isEdited)),
+              h('span', { 'data-testid': 'dirty' }, String(field.isDirty)),
+            ]);
+        },
+      });
+
+      const wrapper = mount(Test);
+      const input = wrapper.get<HTMLInputElement>('[data-testid="input"]');
+      const edited = wrapper.get('[data-testid="edited"]');
+      const dirty = wrapper.get('[data-testid="dirty"]');
+
+      await input.setValue('changed');
+
+      await vi.waitFor(() => {
+        expect(edited.text()).toBe('true');
+        expect(dirty.text()).toBe('true');
+      });
+
+      await input.setValue('initial');
+
+      await vi.waitFor(() => {
+        expect(dirty.text()).toBe('false');
+        expect(edited.text()).toBe('true');
       });
     });
   });

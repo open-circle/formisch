@@ -16,6 +16,7 @@ describe('initializeFieldStore', () => {
       expect(field.startInput.value).toBe('John');
       expect(field.errors.value).toBeNull();
       expect(field.isTouched.value).toBe(false);
+      expect(field.isEdited.value).toBe(false);
       expect(field.isDirty.value).toBe(false);
     });
 

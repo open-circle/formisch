@@ -26,6 +26,15 @@ describe('reset', () => {
       expect(store.children.name.isTouched.value).toBe(false);
     });
 
+    test('should reset field edited state', () => {
+      const store = createTestStore(v.object({ name: v.string() }));
+      store.children.name.isEdited.value = true;
+
+      reset(store);
+
+      expect(store.children.name.isEdited.value).toBe(false);
+    });
+
     test('should reset field errors', () => {
       const store = createTestStore(v.object({ name: v.string() }));
       store.children.name.errors.value = ['Error'];
@@ -150,6 +159,17 @@ describe('reset', () => {
       reset(store, { keepTouched: true });
 
       expect(store.children.name.isTouched.value).toBe(true);
+    });
+  });
+
+  describe('form reset with keepEdited', () => {
+    test('should keep edited state', () => {
+      const store = createTestStore(v.object({ name: v.string() }));
+      store.children.name.isEdited.value = true;
+
+      reset(store, { keepEdited: true });
+
+      expect(store.children.name.isEdited.value).toBe(true);
     });
   });
 

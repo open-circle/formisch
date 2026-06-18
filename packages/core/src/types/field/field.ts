@@ -49,6 +49,15 @@ export interface InternalBaseStore {
    */
   isTouched: Signal<boolean>;
   /**
+   * The edited state of the field.
+   *
+   * Hint: Unlike `isTouched`, which is also set when a field is focused, this
+   * is only set when the field's value is changed. Unlike `isDirty`, it stays
+   * `true` even if the value is changed back to its initial value. It is only
+   * reset when the field is reset.
+   */
+  isEdited: Signal<boolean>;
+  /**
    * The dirty state of the field.
    */
   isDirty: Signal<boolean>;

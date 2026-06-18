@@ -78,6 +78,9 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
       get isTouched() {
         return getFieldBool(internalFieldStore, 'isTouched');
       },
+      get isEdited() {
+        return getFieldBool(internalFieldStore, 'isEdited');
+      },
       get isDirty() {
         return getFieldBool(internalFieldStore, 'isDirty');
       },

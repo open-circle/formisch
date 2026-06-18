@@ -85,6 +85,9 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
     isTouched: createComputed$(() =>
       getFieldBool(internalFieldStore.value, 'isTouched')
     ),
+    isEdited: createComputed$(() =>
+      getFieldBool(internalFieldStore.value, 'isEdited')
+    ),
     isDirty: createComputed$(() =>
       getFieldBool(internalFieldStore.value, 'isDirty')
     ),

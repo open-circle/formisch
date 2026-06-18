@@ -61,6 +61,16 @@ describe('swap', () => {
     expect(store.children.items.isTouched.value).toBe(true);
   });
 
+  test('should mark array as edited after swap', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: ['a', 'b'] },
+    });
+
+    swap(store, { path: ['items'], at: 0, and: 1 });
+
+    expect(store.children.items.isEdited.value).toBe(true);
+  });
+
   test('should mark array as dirty after swap', () => {
     const store = createTestStore(v.object({ items: v.array(v.string()) }), {
       initialInput: { items: ['a', 'b'] },

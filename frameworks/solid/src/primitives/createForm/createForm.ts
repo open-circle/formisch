@@ -31,6 +31,9 @@ export function createForm(config: FormConfig): FormStore {
   const getIsTouched = createMemo(() =>
     getFieldBool(internalFormStore, 'isTouched')
   );
+  const getIsEdited = createMemo(() =>
+    getFieldBool(internalFormStore, 'isEdited')
+  );
   const getIsDirty = createMemo(() =>
     getFieldBool(internalFormStore, 'isDirty')
   );
@@ -51,6 +54,9 @@ export function createForm(config: FormConfig): FormStore {
     },
     get isTouched() {
       return getIsTouched();
+    },
+    get isEdited() {
+      return getIsEdited();
     },
     get isDirty() {
       return getIsDirty();

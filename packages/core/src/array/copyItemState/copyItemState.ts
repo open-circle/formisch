@@ -5,8 +5,9 @@ import type { InternalFieldStore, PathKey } from '../../types/index.ts';
 /**
  * Copies the deeply nested state (signal values) from one field store to
  * another. This includes the `elements`, `errors`, `startInput`, `input`,
- * `isTouched`, `isDirty`, and for arrays `startItems` and `items` properties.
- * Recursively walks through the field stores and copies all signal values.
+ * `isTouched`, `isEdited`, `isDirty`, and for arrays `startItems` and `items`
+ * properties. Recursively walks through the field stores and copies all signal
+ * values.
  *
  * @param fromInternalFieldStore The source field store to copy from.
  * @param toInternalFieldStore The destination field store to copy to.
@@ -35,6 +36,10 @@ export function copyItemState(
       // Copy touched state
       toInternalFieldStore.isTouched.value =
         fromInternalFieldStore.isTouched.value;
+
+      // Copy edited state
+      toInternalFieldStore.isEdited.value =
+        fromInternalFieldStore.isEdited.value;
 
       // Copy dirty state
       toInternalFieldStore.isDirty.value = fromInternalFieldStore.isDirty.value;

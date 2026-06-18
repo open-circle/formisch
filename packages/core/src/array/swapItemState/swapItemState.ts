@@ -5,8 +5,8 @@ import type { InternalFieldStore, PathKey } from '../../types/index.ts';
 /**
  * Swaps the deeply nested state (signal values) between two field stores. This
  * includes the `elements`, `errors`, `startInput`, `input`, `isTouched`,
- * `isDirty`, and for arrays `startItems` and `items` properties. Recursively
- * walks through the field stores and swaps all signal values.
+ * `isEdited`, `isDirty`, and for arrays `startItems` and `items` properties.
+ * Recursively walks through the field stores and swaps all signal values.
  *
  * @param firstInternalFieldStore The first field store to swap.
  * @param secondInternalFieldStore The second field store to swap.
@@ -47,6 +47,12 @@ export function swapItemState(
       firstInternalFieldStore.isTouched.value =
         secondInternalFieldStore.isTouched.value;
       secondInternalFieldStore.isTouched.value = tempIsTouched;
+
+      // Swap edited state
+      const tempIsEdited = firstInternalFieldStore.isEdited.value;
+      firstInternalFieldStore.isEdited.value =
+        secondInternalFieldStore.isEdited.value;
+      secondInternalFieldStore.isEdited.value = tempIsEdited;
 
       // Swap dirty state
       const tempIsDirty = firstInternalFieldStore.isDirty.value;
