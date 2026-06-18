@@ -5,6 +5,7 @@ All notable changes to the library will be documented in this file.
 ## vX.X.X (Month DD, YYYY)
 
 - Add `isEdited` field state that is set when a field's value changes, is not set on focus, and stays set after reverting to the initial value
+- Fix `resetItemState` to keep a non-nullish array, object or tuple consistent with its initial state instead of `undefined` when its input is omitted (issue #139)
 
 ## v0.8.0 (June 15, 2026)
 

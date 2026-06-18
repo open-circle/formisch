@@ -1,3 +1,4 @@
+import { getFieldInput } from '@formisch/core';
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
 import { createTestStore } from '../vitest/index.ts';
@@ -131,5 +132,69 @@ describe('replace', () => {
     if (itemsStore.kind === 'array') {
       expect(itemsStore.children).toHaveLength(3);
     }
+  });
+
+  test('should keep nested array present and empty when its key is omitted', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ nested: v.array(v.string()) })) }),
+      { initialInput: { items: [{ nested: ['a'] }] } }
+    );
+
+    replace(store, { path: ['items'], at: 0, initialInput: {} });
+
+    // The omitted nested array must stay a present empty array, consistent with
+    // how a fresh form initialized without the key behaves (not `undefined`)
+    expect(getFieldInput(store)).toStrictEqual({ items: [{ nested: [] }] });
+  });
+
+  test('should fully switch variant items including nested arrays (#139)', () => {
+    const store = createTestStore(
+      v.object({
+        a: v.array(
+          v.variant('type', [
+            v.object({ type: v.literal('string'), string: v.string() }),
+            v.object({ type: v.literal('array'), array: v.array(v.string()) }),
+          ])
+        ),
+      }),
+      { initialInput: { a: [{ type: 'string', string: 'foo' }] } }
+    );
+
+    // Switch to the "array" variant with a full value
+    replace(store, {
+      path: ['a'],
+      at: 0,
+      initialInput: { type: 'array', array: ['foo', 'bar'] },
+    });
+    expect(getFieldInput(store)).toStrictEqual({
+      a: [{ type: 'array', string: undefined, array: ['foo', 'bar'] }],
+    });
+
+    // Switch to the "array" variant but omit the array key -> stays `[]`
+    replace(store, {
+      path: ['a'],
+      at: 0,
+      initialInput: { type: 'array' },
+    });
+    expect(getFieldInput(store)).toStrictEqual({
+      a: [{ type: 'array', string: undefined, array: [] }],
+    });
+  });
+
+  test('should keep a nested tuple at its fixed length when its key is omitted', () => {
+    const store = createTestStore(
+      v.object({
+        a: v.array(v.object({ pair: v.tuple([v.string(), v.number()]) })),
+      }),
+      { initialInput: { a: [{ pair: ['x', 1] }] } }
+    );
+
+    replace(store, { path: ['a'], at: 0, initialInput: {} });
+
+    // An omitted non-nullish tuple keeps its fixed positions (reset to
+    // `undefined`) instead of collapsing to an empty array
+    expect(getFieldInput(store)).toStrictEqual({
+      a: [{ pair: [undefined, undefined] }],
+    });
   });
 });

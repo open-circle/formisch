@@ -118,7 +118,7 @@ describe('resetItemState', () => {
       }
     });
 
-    test('should reset array to empty when input is null', () => {
+    test('should reset non-nullish array to present empty when input is nullish', () => {
       const store = createTestStore(v.object({ items: v.array(v.string()) }), {
         initialInput: { items: ['a', 'b'] },
       });
@@ -131,6 +131,26 @@ describe('resetItemState', () => {
 
         expect(itemsStore.items.value).toEqual([]);
         expect(itemsStore.startItems.value).toEqual([]);
+        // A non-nullish array stays a present empty array (`true`) instead of
+        // becoming `null`, matching how `initializeFieldStore` represents it
+        expect(itemsStore.input.value).toBe(true);
+      }
+    });
+
+    test('should reset nullish array to null when input is null', () => {
+      const store = createTestStore(
+        v.object({ items: v.nullish(v.array(v.string())) }),
+        { initialInput: { items: ['a', 'b'] } }
+      );
+
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+
+      if (itemsStore.kind === 'array') {
+        resetItemState(itemsStore, null);
+
+        expect(itemsStore.items.value).toEqual([]);
+        // A nullish array preserves the explicit nullish value
         expect(itemsStore.input.value).toBe(null);
       }
     });
@@ -273,6 +293,35 @@ describe('resetItemState', () => {
         expect(pairStore.children).toHaveLength(2);
         expect(pairStore.children[0].input.value).toBe('x');
         expect(pairStore.children[1].input.value).toBe(2);
+      }
+    });
+
+    test('should keep a non-nullish tuple at its fixed length when input is nullish', () => {
+      const store = createTestStore(
+        v.object({ pair: v.tuple([v.string(), v.number()]) }),
+        { initialInput: { pair: ['a', 1] } }
+      );
+
+      const pairStore = store.children.pair;
+      expect(pairStore.kind).toBe('array');
+
+      if (pairStore.kind === 'array') {
+        // Reset without input, e.g. replacing an item that omits the tuple key
+        resetItemState(pairStore, undefined);
+
+        // The tuple stays present with its fixed children reset to undefined,
+        // instead of collapsing to an empty array
+        expect(pairStore.input.value).toBe(true);
+        expect(pairStore.items.value).toHaveLength(2);
+        expect(pairStore.children).toHaveLength(2);
+        expect(pairStore.children[0].input.value).toBeUndefined();
+        expect(pairStore.children[1].input.value).toBeUndefined();
+
+        // An explicit null input normalizes to undefined children too, so it
+        // stays consistent with the initial state
+        resetItemState(pairStore, null);
+        expect(pairStore.children[0].input.value).toBeUndefined();
+        expect(pairStore.children[1].input.value).toBeUndefined();
       }
     });
   });

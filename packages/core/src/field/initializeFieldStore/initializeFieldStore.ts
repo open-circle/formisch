@@ -113,6 +113,10 @@ export function initializeFieldStore(
     schema.type === 'variant'
   ) {
     // Initialize field store for each schema option
+    // Hint: Options share a single field store per key, so per-branch metadata
+    // (`schema`, `kind`, `isNullish`) is approximated last-write-wins. A key
+    // that differs across branches (e.g. nullish in one, required in another)
+    // is therefore not fully represented. See #95 for the long-term fix.
     for (const schemaOption of schema.options) {
       initializeFieldStore(
         internalFieldStore,
@@ -222,6 +226,9 @@ export function initializeFieldStore(
           }
         }
 
+        // Store whether array is nullish so resetting can stay consistent
+        internalFieldStore.isNullish = nullish;
+
         // Set array input (nullish or true)
         const arrayInput =
           nullish && initialInput == null ? initialInput : true;
@@ -278,6 +285,9 @@ export function initializeFieldStore(
           // Remove key from path for next iteration
           path.pop();
         }
+
+        // Store whether object is nullish so resetting can stay consistent
+        internalFieldStore.isNullish = nullish;
 
         // Set object input (nullish or true)
         const objectInput =
