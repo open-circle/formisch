@@ -110,7 +110,7 @@ importers:
         version: 10.29.2
       tsdown:
         specifier: ^0.16.8
-        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3)
+        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3)(vue-tsc@3.1.8(typescript@5.9.3))
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
@@ -231,7 +231,7 @@ importers:
         version: 19.2.7(react@19.2.7)
       tsdown:
         specifier: ^0.16.8
-        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3)
+        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3)(vue-tsc@3.1.8(typescript@5.9.3))
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
@@ -285,7 +285,7 @@ importers:
         version: 1.9.13
       tsdown:
         specifier: ^0.16.8
-        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3)
+        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3)(vue-tsc@3.1.8(typescript@5.9.3))
       tsup:
         specifier: ^8.5.0
         version: 8.5.1(jiti@2.7.0)(postcss@8.5.15)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)
@@ -414,7 +414,7 @@ importers:
         version: 26.1.0
       tsdown:
         specifier: ^0.16.8
-        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.8.3)(vue-tsc@3.3.5(typescript@5.8.3))
+        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.8.3)(vue-tsc@3.1.8(typescript@5.8.3))
       typescript:
         specifier: ~5.8.3
         version: 5.8.3
@@ -431,8 +431,8 @@ importers:
         specifier: ^3.5.18
         version: 3.5.38(typescript@5.8.3)
       vue-tsc:
-        specifier: ^3.0.4
-        version: 3.3.5(typescript@5.8.3)
+        specifier: ~3.1.0
+        version: 3.1.8(typescript@5.8.3)
 
   packages/core:
     devDependencies:
@@ -471,7 +471,7 @@ importers:
         version: 1.0.0-beta.26
       rolldown-plugin-dts:
         specifier: ^0.13.13
-        version: 0.13.14(rolldown@1.0.0-beta.26)(typescript@5.9.3)
+        version: 0.13.14(rolldown@1.0.0-beta.26)(typescript@5.9.3)(vue-tsc@3.1.8(typescript@5.9.3))
       solid-js:
         specifier: ^1.9.7
         version: 1.9.13
@@ -480,7 +480,7 @@ importers:
         version: 5.56.3(@typescript-eslint/types@8.61.1)
       tsdown:
         specifier: ^0.16.8
-        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3)
+        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3)(vue-tsc@3.1.8(typescript@5.9.3))
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
@@ -547,10 +547,10 @@ importers:
         version: 1.0.0-beta.26
       rolldown-plugin-dts:
         specifier: ^0.13.13
-        version: 0.13.14(rolldown@1.0.0-beta.26)(typescript@5.9.3)
+        version: 0.13.14(rolldown@1.0.0-beta.26)(typescript@5.9.3)(vue-tsc@3.1.8(typescript@5.9.3))
       tsdown:
         specifier: ^0.16.8
-        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3)
+        version: 0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3)(vue-tsc@3.1.8(typescript@5.9.3))
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
@@ -4445,11 +4445,20 @@ packages:
   '@vitest/utils@4.1.9':
     resolution: {integrity: sha512-A51o8ymO5PpqlWNnBP9ZHPXDIpuMtTLlGSjN7la4US+LJzoUMyhwjA5QXlm39JexgwHKW4Xjs8Z2d3dLCXOeuA==}
 
+  '@volar/language-core@2.4.26':
+    resolution: {integrity: sha512-hH0SMitMxnB43OZpyF1IFPS9bgb2I3bpCh76m2WEK7BE0A0EzpYsRp0CCH2xNKshr7kacU5TQBLYn4zj7CG60A==}
+
   '@volar/language-core@2.4.28':
     resolution: {integrity: sha512-w4qhIJ8ZSitgLAkVay6AbcnC7gP3glYM3fYwKV3srj8m494E3xtrCv6E+bWviiK/8hs6e6t1ij1s2Endql7vzQ==}
 
+  '@volar/source-map@2.4.26':
+    resolution: {integrity: sha512-JJw0Tt/kSFsIRmgTQF4JSt81AUSI1aEye5Zl65EeZ8H35JHnTvFGmpDOBn5iOxd48fyGE+ZvZBp5FcgAy/1Qhw==}
+
   '@volar/source-map@2.4.28':
     resolution: {integrity: sha512-yX2BDBqJkRXfKw8my8VarTyjv48QwxdJtvRgUpNE5erCsgEUdI2DsLbpa+rOQVAJYshY99szEcRDmyHbF10ggQ==}
+
+  '@volar/typescript@2.4.26':
+    resolution: {integrity: sha512-N87ecLD48Sp6zV9zID/5yuS1+5foj0DfuYGdQ6KHj/IbKvyKv1zNX6VCmnKYwtmHadEO6mFc2EKISiu3RDPAvA==}
 
   '@volar/typescript@2.4.28':
     resolution: {integrity: sha512-Ja6yvWrbis2QtN4ClAKreeUZPVYMARDYZl9LMEv1iQ1QdepB6wn0jTRxA9MftYmYa4DQ4k/DaSZpFPUfxl8giw==}
@@ -4503,6 +4512,14 @@ packages:
       eslint: ^9.10.0 || ^10.0.0
       eslint-plugin-vue: ^9.28.0 || ^10.0.0
       typescript: '>=4.8.4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@vue/language-core@3.1.8':
+    resolution: {integrity: sha512-PfwAW7BLopqaJbneChNL6cUOTL3GL+0l8paYP5shhgY5toBNidWnMXWM+qDwL7MC9+zDtzCF2enT8r6VPu64iw==}
+    peerDependencies:
+      typescript: '*'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -9783,6 +9800,12 @@ packages:
     peerDependencies:
       vue: ^3.5.0
 
+  vue-tsc@3.1.8:
+    resolution: {integrity: sha512-deKgwx6exIHeZwF601P1ktZKNF0bepaSN4jBU3AsbldPx9gylUc1JDxYppl82yxgkAgaz0Y0LCLOi+cXe9HMYA==}
+    hasBin: true
+    peerDependencies:
+      typescript: '>=5.0.0'
+
   vue-tsc@3.3.5:
     resolution: {integrity: sha512-Rzh/G2MmNlMSAMTiQEjDrsb4dgB/jbtEM47rVN2NtidF1dfb/q4w4QvpQBtW5+y3y5H27Hjh7deVwk+YB02fNg==}
     hasBin: true
@@ -13647,11 +13670,23 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
+  '@volar/language-core@2.4.26':
+    dependencies:
+      '@volar/source-map': 2.4.26
+
   '@volar/language-core@2.4.28':
     dependencies:
       '@volar/source-map': 2.4.28
 
+  '@volar/source-map@2.4.26': {}
+
   '@volar/source-map@2.4.28': {}
+
+  '@volar/typescript@2.4.26':
+    dependencies:
+      '@volar/language-core': 2.4.26
+      path-browserify: 1.0.1
+      vscode-uri: 3.1.0
 
   '@volar/typescript@2.4.28':
     dependencies:
@@ -13747,6 +13782,31 @@ snapshots:
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
+
+  '@vue/language-core@3.1.8(typescript@5.8.3)':
+    dependencies:
+      '@volar/language-core': 2.4.26
+      '@vue/compiler-dom': 3.5.38
+      '@vue/shared': 3.5.38
+      alien-signals: 3.2.1
+      muggle-string: 0.4.1
+      path-browserify: 1.0.1
+      picomatch: 4.0.4
+    optionalDependencies:
+      typescript: 5.8.3
+
+  '@vue/language-core@3.1.8(typescript@5.9.3)':
+    dependencies:
+      '@volar/language-core': 2.4.26
+      '@vue/compiler-dom': 3.5.38
+      '@vue/shared': 3.5.38
+      alien-signals: 3.2.1
+      muggle-string: 0.4.1
+      path-browserify: 1.0.1
+      picomatch: 4.0.4
+    optionalDependencies:
+      typescript: 5.9.3
+    optional: true
 
   '@vue/language-core@3.3.5':
     dependencies:
@@ -18311,7 +18371,7 @@ snapshots:
       - oxc-resolver
       - supports-color
 
-  rolldown-plugin-dts@0.13.14(rolldown@1.0.0-beta.26)(typescript@5.9.3):
+  rolldown-plugin-dts@0.13.14(rolldown@1.0.0-beta.26)(typescript@5.9.3)(vue-tsc@3.1.8(typescript@5.9.3)):
     dependencies:
       '@babel/generator': 7.29.7
       '@babel/parser': 7.29.7
@@ -18324,11 +18384,12 @@ snapshots:
       rolldown: 1.0.0-beta.26
     optionalDependencies:
       typescript: 5.9.3
+      vue-tsc: 3.1.8(typescript@5.9.3)
     transitivePeerDependencies:
       - oxc-resolver
       - supports-color
 
-  rolldown-plugin-dts@0.18.4(rolldown@1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1))(typescript@5.8.3)(vue-tsc@3.3.5(typescript@5.8.3)):
+  rolldown-plugin-dts@0.18.4(rolldown@1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1))(typescript@5.8.3)(vue-tsc@3.1.8(typescript@5.8.3)):
     dependencies:
       '@babel/generator': 7.29.7
       '@babel/parser': 7.29.7
@@ -18342,11 +18403,11 @@ snapshots:
       rolldown: 1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
     optionalDependencies:
       typescript: 5.8.3
-      vue-tsc: 3.3.5(typescript@5.8.3)
+      vue-tsc: 3.1.8(typescript@5.8.3)
     transitivePeerDependencies:
       - oxc-resolver
 
-  rolldown-plugin-dts@0.18.4(rolldown@1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1))(typescript@5.9.3):
+  rolldown-plugin-dts@0.18.4(rolldown@1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1))(typescript@5.9.3)(vue-tsc@3.1.8(typescript@5.9.3)):
     dependencies:
       '@babel/generator': 7.29.7
       '@babel/parser': 7.29.7
@@ -18360,6 +18421,7 @@ snapshots:
       rolldown: 1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
     optionalDependencies:
       typescript: 5.9.3
+      vue-tsc: 3.1.8(typescript@5.9.3)
     transitivePeerDependencies:
       - oxc-resolver
 
@@ -19409,7 +19471,7 @@ snapshots:
       - supports-color
       - vue-tsc
 
-  tsdown@0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.8.3)(vue-tsc@3.3.5(typescript@5.8.3)):
+  tsdown@0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.8.3)(vue-tsc@3.1.8(typescript@5.8.3)):
     dependencies:
       ansis: 4.3.1
       cac: 6.7.14
@@ -19419,7 +19481,7 @@ snapshots:
       hookable: 5.5.3
       obug: 2.1.3
       rolldown: 1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
-      rolldown-plugin-dts: 0.18.4(rolldown@1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1))(typescript@5.8.3)(vue-tsc@3.3.5(typescript@5.8.3))
+      rolldown-plugin-dts: 0.18.4(rolldown@1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1))(typescript@5.8.3)(vue-tsc@3.1.8(typescript@5.8.3))
       semver: 7.5.2
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
@@ -19438,7 +19500,7 @@ snapshots:
       - synckit
       - vue-tsc
 
-  tsdown@0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3):
+  tsdown@0.16.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(publint@0.3.21)(typescript@5.9.3)(vue-tsc@3.1.8(typescript@5.9.3)):
     dependencies:
       ansis: 4.3.1
       cac: 6.7.14
@@ -19448,7 +19510,7 @@ snapshots:
       hookable: 5.5.3
       obug: 2.1.3
       rolldown: 1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
-      rolldown-plugin-dts: 0.18.4(rolldown@1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1))(typescript@5.9.3)
+      rolldown-plugin-dts: 0.18.4(rolldown@1.0.0-beta.52(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1))(typescript@5.9.3)(vue-tsc@3.1.8(typescript@5.9.3))
       semver: 7.5.2
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
@@ -20416,6 +20478,19 @@ snapshots:
     dependencies:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.38(typescript@5.8.3)
+
+  vue-tsc@3.1.8(typescript@5.8.3):
+    dependencies:
+      '@volar/typescript': 2.4.26
+      '@vue/language-core': 3.1.8(typescript@5.8.3)
+      typescript: 5.8.3
+
+  vue-tsc@3.1.8(typescript@5.9.3):
+    dependencies:
+      '@volar/typescript': 2.4.26
+      '@vue/language-core': 3.1.8(typescript@5.9.3)
+      typescript: 5.9.3
+    optional: true
 
   vue-tsc@3.3.5(typescript@5.8.3):
     dependencies:
