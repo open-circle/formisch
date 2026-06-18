@@ -1,0 +1,137 @@
+---
+title: Validation
+description: >-
+  Learn how validation works in Formisch. This guide covers the validate and
+  revalidate config, how to show errors only at the right time using field
+  state like isEdited, and the isValidating state for async validation.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Validation
+
+Formisch validates your form against your Valibot schema — the same one that defines its types. This guide explains how validation runs under the hood, how the `validate` and `revalidate` config control its timing, how to display errors only when they are helpful, and how to react to asynchronous validation with `isValidating`.
+
+## How validation works
+
+Whenever validation is triggered, Formisch parses the **entire form** against your schema in a single pass. It then distributes the resulting issues to the individual fields: every field with an issue receives its error messages, and every field without one is cleared. A field is valid when it has no errors.
+
+> Validation always runs against the whole schema, even when a single field triggers it. This keeps cross-field rules (like a `password` and `confirmPassword` that must match) correct without any extra wiring. The result is still stored per field, so each `<input />` only re-renders when its own errors change.
+
+Because Formisch parses with Valibot's asynchronous API, schemas with async checks (for example, a server-side uniqueness check) work out of the box. While such a check is in flight, the form's `isValidating` state is `true` (see <Link href="#validating-state">below</Link>).
+
+## When validation runs
+
+Two config options control the timing of validation:
+
+- `validate`: when a field is validated for the **first** time. Defaults to `'submit'`.
+- `revalidate`: when a field is validated **again**, once it already has an error or the form has been submitted. Defaults to `'input'`.
+
+Both accept the following modes:
+
+- `'initial'`: immediately, when the form is created (only valid for `validate`, not `revalidate`).
+- `'touch'`: when the field is first focused.
+- `'input'`: on every keystroke.
+- `'change'`: on the field's change event.
+- `'blur'`: when the field loses focus.
+- `'submit'`: only when the form is submitted.
+
+```tsx
+const loginForm = useForm({
+  schema: LoginSchema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+The split between `validate` and `revalidate` is what makes good defaults possible. With the default `validate: 'submit'` and `revalidate: 'input'`, a field stays quiet until the user submits, and only then does it start correcting itself live as the user fixes it. The configuration above (`validate: 'blur'`) is a gentler variant: a field is first checked when the user leaves it, then re-checked on every keystroke once it has an error.
+
+## Showing errors at the right time
+
+`validate` and `revalidate` control **when validation runs** — but not **when errors are shown**. After a validation pass, every invalid field has its `errors` populated, and it is up to you to decide which ones to render.
+
+Showing every error the moment it appears can overwhelm the user, while showing them only after submit forces them to scroll back and fix fields they have already filled out. A balanced approach is to reveal a field's error once the user has actually changed it, and to reveal all remaining errors after the first submit attempt.
+
+Each field exposes several state flags to drive this decision:
+
+- `isTouched`: the field has been focused or changed.
+- `isEdited`: the field's value has been changed (but not merely focused), and stays `true` even if the value is changed back to its initial value.
+- `isDirty`: the field's current value differs from its initial value.
+
+The form additionally exposes `isSubmitted`, which becomes `true` after the first submit attempt. Combining `isEdited` with `isSubmitted` gives the balanced behavior described above:
+
+```tsx
+import { Field, Form, useForm } from '@formisch/preact';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function App() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+    validate: 'input',
+  });
+
+  return (
+    <Form of={loginForm} onSubmit={(output) => console.log(output)}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input.value} type="email" />
+            {(field.isEdited.value || loginForm.isSubmitted.value) &&
+              field.errors.value && <div>{field.errors.value[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit">Login</button>
+    </Form>
+  );
+}
+```
+
+`isEdited` is the right flag for this. `isTouched` would reveal the error as soon as the user tabs through a field without changing it, and `isDirty` would hide the error again if the user clears an invalid value back to its initial state. `isEdited` avoids both: it turns on only after a real change and stays on. Pair it with `validate: 'input'` (or `'change'`) so the error appears as soon as the field becomes invalid, and with `isSubmitted` so that the errors of all fields — including the ones the user never touched — become visible after a submit attempt.
+
+## Validating state
+
+When your schema contains asynchronous checks, validation does not resolve instantly. The form's `isValidating` state is `true` while any validation is in flight, which you can use to show a loading indicator or to disable the submit button until validation settles.
+
+```tsx
+import { Form, useForm } from '@formisch/preact';
+import * as v from 'valibot';
+import { isUsernameAvailable } from '~/api';
+
+const SignUpSchema = v.objectAsync({
+  username: v.pipeAsync(
+    v.string(),
+    v.nonEmpty(),
+    v.checkAsync(isUsernameAvailable, 'Username is already taken.')
+  ),
+});
+
+export default function App() {
+  const signUpForm = useForm({
+    schema: SignUpSchema,
+    validate: 'blur',
+  });
+
+  return (
+    <Form of={signUpForm} onSubmit={(output) => console.log(output)}>
+      {/* fields */}
+      <button type="submit" disabled={signUpForm.isValidating}>
+        {signUpForm.isValidating.value ? 'Checking...' : 'Sign up'}
+      </button>
+    </Form>
+  );
+}
+```
+
+`isValidating` and `isSubmitting` overlap but are not the same. `isValidating` is `true` whenever validation runs — triggered by a field event or as part of a submit. `isSubmitting` is `true` for the entire submission, which covers both validating the form and running your submit handler. So during a submit both are `true` while the form validates, and once validation passes only `isSubmitting` stays `true` while your handler runs.
+
+## Further reading
+
+To process your form's values once they pass validation, see the <Link href="/preact/guides/handle-submission/">handle submission</Link> guide. For working with the fields a user has changed, see the <Link href="/preact/guides/dirty-fields/">dirty fields</Link> guide.
