@@ -132,6 +132,16 @@ describe('insert', () => {
     expect(store.children.items.isDirty.value).toBe(true);
   });
 
+  test('should mark array as edited after insert', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: ['a'] },
+    });
+
+    insert(store, { path: ['items'], initialInput: 'b' });
+
+    expect(store.children.items.isEdited.value).toBe(true);
+  });
+
   test('should insert object item', () => {
     const store = createTestStore(
       v.object({ users: v.array(v.object({ name: v.string() })) }),

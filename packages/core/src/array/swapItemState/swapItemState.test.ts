@@ -17,6 +17,7 @@ describe('swapItemState', () => {
       firstStore.isTouched.value = true;
       firstStore.errors.value = ['First error'];
       secondStore.isDirty.value = true;
+      secondStore.isEdited.value = true;
 
       swapItemState(firstStore, secondStore);
 
@@ -24,6 +25,8 @@ describe('swapItemState', () => {
       expect(secondStore.input.value).toBe('hello');
       expect(firstStore.isTouched.value).toBe(false);
       expect(secondStore.isTouched.value).toBe(true);
+      expect(firstStore.isEdited.value).toBe(true);
+      expect(secondStore.isEdited.value).toBe(false);
       expect(firstStore.isDirty.value).toBe(true);
       expect(secondStore.isDirty.value).toBe(false);
       expect(firstStore.errors.value).toBe(null);

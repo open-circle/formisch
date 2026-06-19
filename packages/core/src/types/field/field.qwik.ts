@@ -43,6 +43,15 @@ export interface InternalBaseStore {
    */
   isTouched: Signal<boolean>;
   /**
+   * The edited state of the field.
+   *
+   * Hint: Unlike `isTouched`, which is also set when a field is focused, this
+   * is only set when the field's value is changed. Unlike `isDirty`, it stays
+   * `true` even if the value is changed back to its initial value. It is only
+   * reset when the field is reset.
+   */
+  isEdited: Signal<boolean>;
+  /**
    * The dirty state of the field.
    */
   isDirty: Signal<boolean>;
@@ -56,6 +65,14 @@ export interface InternalArrayStore extends InternalBaseStore {
    * The kind of field store.
    */
   kind: 'array';
+  /**
+   * Whether the array schema is wrapped in a nullish schema.
+   *
+   * Hint: This indicates whether a missing input should be represented as the
+   * nullish value (`null`/`undefined`) or as a present but empty array
+   * (`true`). It keeps resetting consistent with the initial state.
+   */
+  isNullish: boolean;
   /**
    * The children of the array field.
    */
@@ -111,6 +128,14 @@ export interface InternalObjectStore extends InternalBaseStore {
    * The kind of field store.
    */
   kind: 'object';
+  /**
+   * Whether the object schema is wrapped in a nullish schema.
+   *
+   * Hint: This indicates whether a missing input should be represented as the
+   * nullish value (`null`/`undefined`) or as a present but empty object
+   * (`true`). It keeps resetting consistent with the initial state.
+   */
+  isNullish: boolean;
   /**
    * The children of the object field.
    */

@@ -21,6 +21,7 @@ describe('useField', () => {
       expect(field.input).toBe(undefined);
       expect(field.errors).toBe(null);
       expect(field.isTouched).toBe(false);
+      expect(field.isEdited).toBe(false);
       expect(field.isDirty).toBe(false);
       expect(field.isValid).toBe(true);
       expect(field.props.name).toBe('["name"]');
@@ -190,6 +191,87 @@ describe('useField', () => {
 
       await waitFor(() => {
         expect(valid).toHaveTextContent('false');
+      });
+    });
+  });
+
+  describe('edited state', () => {
+    test('focus does not set isEdited but sets isTouched', async () => {
+      render(FieldHost, {
+        props: {
+          config: {
+            schema: v.object({ name: v.string() }),
+            initialInput: { name: 'initial' },
+          },
+          path: ['name'],
+        },
+      });
+
+      const touched = screen.getByTestId('touched');
+      const edited = screen.getByTestId('edited');
+      expect(touched).toHaveTextContent('false');
+      expect(edited).toHaveTextContent('false');
+
+      await fireEvent.focus(screen.getByTestId('input'));
+
+      await waitFor(() => {
+        expect(touched).toHaveTextContent('true');
+        expect(edited).toHaveTextContent('false');
+      });
+    });
+
+    test('input sets isEdited', async () => {
+      render(FieldHost, {
+        props: {
+          config: {
+            schema: v.object({ name: v.string() }),
+            initialInput: { name: 'initial' },
+          },
+          path: ['name'],
+        },
+      });
+
+      const input = screen.getByTestId('input') as HTMLInputElement;
+      const edited = screen.getByTestId('edited');
+      expect(edited).toHaveTextContent('false');
+
+      await fireEvent.input(input, { target: { value: 'changed' } });
+      flushSync();
+
+      await waitFor(() => {
+        expect(edited).toHaveTextContent('true');
+      });
+    });
+
+    test('reverting to initial keeps isEdited', async () => {
+      render(FieldHost, {
+        props: {
+          config: {
+            schema: v.object({ name: v.string() }),
+            initialInput: { name: 'initial' },
+          },
+          path: ['name'],
+        },
+      });
+
+      const input = screen.getByTestId('input') as HTMLInputElement;
+      const edited = screen.getByTestId('edited');
+      const dirty = screen.getByTestId('dirty');
+
+      await fireEvent.input(input, { target: { value: 'changed' } });
+      flushSync();
+
+      await waitFor(() => {
+        expect(edited).toHaveTextContent('true');
+        expect(dirty).toHaveTextContent('true');
+      });
+
+      await fireEvent.input(input, { target: { value: 'initial' } });
+      flushSync();
+
+      await waitFor(() => {
+        expect(dirty).toHaveTextContent('false');
+        expect(edited).toHaveTextContent('true');
       });
     });
   });

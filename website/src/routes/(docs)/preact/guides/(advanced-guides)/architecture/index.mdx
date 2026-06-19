@@ -66,7 +66,7 @@ interface Signal<T> {
 }
 ```
 
-Reads track, writes notify. There is no central store object that gets diffed and no equality check on the consumer side. Each field carries its own signals for `errors`, `isTouched`, `isDirty`, plus an `input` signal for value fields and a `children` collection for arrays and objects. When you call `setInput(form, { path: ['email'], input: 'a@b.c' })`, only the `input` signal of that one field is written, so only the components that read that one signal (typically a single `<input />`) re-render.
+Reads track, writes notify. There is no central store object that gets diffed and no equality check on the consumer side. Each field carries its own signals for `errors`, `isTouched`, `isEdited`, `isDirty`, plus an `input` signal for value fields and a `children` collection for arrays and objects. When you call `setInput(form, { path: ['email'], input: 'a@b.c' })`, only the `input` signal of that one field is written, so only the components that read that one signal (typically a single `<input />`) re-render.
 
 This is the source of the fine-grained reactivity. The shape of the store is pre-allocated at form creation, matching the shape of your Valibot schema, so methods never have to look up paths in a generic object. They walk a typed tree of stores and update individual signals.
 
@@ -117,9 +117,9 @@ The interesting work happens inside `createFormStore`. It calls [`initializeFiel
 - Wrapper schemas such as `v.optional`, `v.nullable`, `v.nonNullable` and `v.lazy` are unwrapped and recursed into.
 - `v.union`, `v.variant` and `v.intersect` initialize every option into the same store, which is what lets you address discriminated fields with a single field path.
 
-At every level, the same three signals are created: `errors`, `isTouched` and `isDirty`. Once the field tree is built, three more signals are added to the form root: `isSubmitting`, `isSubmitted` and `isValidating`.
+At every level, the same four signals are created: `errors`, `isTouched`, `isEdited` and `isDirty`. Once the field tree is built, three more signals are added to the form root: `isSubmitting`, `isSubmitted` and `isValidating`.
 
-The form object the wrapper returns sits on top of that internal store. Form-level signals are exposed directly, while derived state like `isTouched`, `isDirty` and `isValid` is wrapped in `computed` so it recomputes lazily as the underlying field signals change.
+The form object the wrapper returns sits on top of that internal store. Form-level signals are exposed directly, while derived state like `isTouched`, `isEdited`, `isDirty` and `isValid` is wrapped in `computed` so it recomputes lazily as the underlying field signals change.
 
 The internal store is tucked away behind the [`INTERNAL`](https://github.com/open-circle/formisch/blob/main/packages/core/src/values.ts) symbol. Methods like `setInput(form, …)` reach in via `form[INTERNAL]` to mutate signals, while your code only sees the public form store. This separation is what keeps the public API small and stable even as the internal shape evolves.
 

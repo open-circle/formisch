@@ -18,6 +18,7 @@
 
 ## Advanced guides
 
+- [Validation](/react/guides/validation/)
 - [Special inputs](/react/guides/special-inputs/)
 - [Controlled fields](/react/guides/controlled-fields/)
 - [Nested fields](/react/guides/nested-fields/)

@@ -8,10 +8,10 @@ import type {
 
 /**
  * Resets the state of a field store (signal values) deeply nested. Sets
- * `elements` to empty array, `errors` to `null`, `isTouched` and `isDirty` to
- * `false`, and `startInput`, `input`, `startItems`, and `items` to the new
- * input value. Keeps the `initialInput` and `initialItems` state unchanged for
- * form reset functionality.
+ * `elements` to empty array, `errors` to `null`, `isTouched`, `isEdited` and
+ * `isDirty` to `false`, and `startInput`, `input`, `startItems`, and `items` to
+ * the new input value. Keeps the `initialInput` and `initialItems` state
+ * unchanged for form reset functionality.
  *
  * @param internalFieldStore The field store to reset.
  * @param input The new input value (can be any type including array or object).
@@ -41,6 +41,9 @@ export function resetItemState(
     // Reset touched to false
     internalFieldStore.isTouched.value = false;
 
+    // Reset edited to false
+    internalFieldStore.isEdited.value = false;
+
     // Reset dirty to false
     internalFieldStore.isDirty.value = false;
 
@@ -49,8 +52,12 @@ export function resetItemState(
       internalFieldStore.kind === 'array' ||
       internalFieldStore.kind === 'object'
     ) {
-      // For arrays and objects, input is null/undefined or true (not actual value)
-      const objectInput = input == null ? input : true;
+      // For arrays and objects, input is null/undefined or true (not actual
+      // value). Mirror `initializeFieldStore` so a missing input on a
+      // non-nullish array or object becomes a present empty container (`true`)
+      // instead of `undefined`, keeping reset consistent with the initial state.
+      const objectInput =
+        internalFieldStore.isNullish && input == null ? input : true;
 
       // Set start input unless it is kept as the dirty baseline
       if (!keepStart) {
@@ -62,15 +69,18 @@ export function resetItemState(
 
       // If field store is array, handle array-specific reset
       if (internalFieldStore.kind === 'array') {
-        // If input is provided, create items with IDs
-        if (input) {
+        // Tuples have a fixed number of children that the schema cannot
+        // recreate (no `item`), so they keep them even when the input is
+        // nullish, just like `initializeFieldStore`
+        const isTuple = internalFieldStore.schema.type !== 'array';
+
+        // If input is provided or store is a tuple, (re)create items with IDs
+        if (input || isTuple) {
           // Dynamic arrays grow to the input length, while tuples keep their
-          // fixed number of children (their schema has no `item` to initialize
-          // additional ones)
-          const length =
-            internalFieldStore.schema.type === 'array'
-              ? (input as unknown[]).length
-              : internalFieldStore.children.length;
+          // fixed number of children
+          const length = isTuple
+            ? internalFieldStore.children.length
+            : (input as unknown[]).length;
 
           // Create new items array with unique IDs for each item
           const newItems = Array.from({ length }, createId);
@@ -88,13 +98,16 @@ export function resetItemState(
 
           // Reset state for each array item
           for (let index = 0; index < length; index++) {
+            // A tuple reset without input (or with nullish input) resets each
+            // child to undefined, mirroring `initializeFieldStore`
+            const itemInput = (input as unknown[] | null | undefined)?.[index];
+
             // If child exists at this index, reset its state
             if (internalFieldStore.children[index]) {
               // Recursively reset child with corresponding input
               resetItemState(
                 internalFieldStore.children[index],
-                // @ts-expect-error
-                input[index],
+                itemInput,
                 keepStart
               );
 
@@ -115,8 +128,7 @@ export function resetItemState(
                 internalFieldStore.children[index],
                 // @ts-expect-error
                 internalFieldStore.schema.item,
-                // @ts-expect-error
-                input[index],
+                itemInput,
                 path
               );
 

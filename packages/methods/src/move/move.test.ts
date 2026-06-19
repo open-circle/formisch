@@ -62,6 +62,16 @@ describe('move', () => {
     expect(store.children.items.isTouched.value).toBe(true);
   });
 
+  test('should mark array as edited after move', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: ['a', 'b'] },
+    });
+
+    move(store, { path: ['items'], from: 0, to: 1 });
+
+    expect(store.children.items.isEdited.value).toBe(true);
+  });
+
   test('should mark array as dirty after move', () => {
     const store = createTestStore(v.object({ items: v.array(v.string()) }), {
       initialInput: { items: ['a', 'b'] },

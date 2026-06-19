@@ -35,6 +35,7 @@ export function useForm(config: FormConfig): FormStore {
       isSubmitted: internalFormStore.isSubmitted,
       isValidating: internalFormStore.isValidating,
       isTouched: computed(() => getFieldBool(internalFormStore, 'isTouched')),
+      isEdited: computed(() => getFieldBool(internalFormStore, 'isEdited')),
       isDirty: computed(() => getFieldBool(internalFormStore, 'isDirty')),
       isValid: computed(() => !getFieldBool(internalFormStore, 'errors')),
       errors: internalFormStore.errors,

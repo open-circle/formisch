@@ -37,6 +37,7 @@ export function useForm(config: FormConfig): FormStore {
   const isTouched = computed(() =>
     getFieldBool(internalFormStore, 'isTouched')
   );
+  const isEdited = computed(() => getFieldBool(internalFormStore, 'isEdited'));
   const isDirty = computed(() => getFieldBool(internalFormStore, 'isDirty'));
   const isValid = computed(() => !getFieldBool(internalFormStore, 'errors'));
 
@@ -53,6 +54,9 @@ export function useForm(config: FormConfig): FormStore {
     },
     get isTouched() {
       return isTouched.value;
+    },
+    get isEdited() {
+      return isEdited.value;
     },
     get isDirty() {
       return isDirty.value;

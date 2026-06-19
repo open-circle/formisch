@@ -40,6 +40,7 @@
 <Form of={form} {onsubmit} aria-label="Test">
   <input data-testid="input" {...field.props} value={field.input ?? ''} />
   <span data-testid="touched">{String(field.isTouched)}</span>
+  <span data-testid="edited">{String(field.isEdited)}</span>
   <span data-testid="dirty">{String(field.isDirty)}</span>
   <span data-testid="valid">{String(field.isValid)}</span>
   {#if field.errors}

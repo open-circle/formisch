@@ -131,8 +131,9 @@ export function insert<
       // Mark array input as present in children
       internalArrayStore.input.value = true;
 
-      // Mark field array as touched and dirty
+      // Mark field array as touched, edited and dirty
       internalArrayStore.isTouched.value = true;
+      internalArrayStore.isEdited.value = true;
       internalArrayStore.isDirty.value = true;
 
       // Validate if required
