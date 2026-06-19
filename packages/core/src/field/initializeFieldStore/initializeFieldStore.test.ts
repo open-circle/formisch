@@ -11,6 +11,7 @@ describe('initializeFieldStore', () => {
       const field = store.children.name;
       expect(field.kind).toBe('value');
       expect(field.name).toBe('["name"]');
+      expect(field.path).toStrictEqual(['name']);
       expect(field.input.value).toBe('John');
       expect(field.initialInput.value).toBe('John');
       expect(field.startInput.value).toBe('John');
@@ -31,8 +32,48 @@ describe('initializeFieldStore', () => {
       const store = createTestStore(v.object({ a: v.string(), b: v.number() }));
       expect(store.kind).toBe('object');
       expect(store.name).toBe('[]');
+      expect(store.path).toStrictEqual([]);
       expect(store.children).toHaveProperty('a');
       expect(store.children).toHaveProperty('b');
+    });
+
+    test('should set the path for deeply nested fields', () => {
+      const store = createTestStore(
+        v.object({
+          groups: v.array(
+            v.object({ tags: v.array(v.object({ label: v.string() })) })
+          ),
+        }),
+        { initialInput: { groups: [{ tags: [{ label: 'a' }] }] } }
+      );
+
+      expect(store.path).toStrictEqual([]);
+      const groupsStore = store.children.groups;
+      expect(groupsStore.kind).toBe('array');
+      if (groupsStore.kind === 'array') {
+        expect(groupsStore.path).toStrictEqual(['groups']);
+        const groupStore = groupsStore.children[0];
+        expect(groupStore.path).toStrictEqual(['groups', 0]);
+        if (groupStore.kind === 'object') {
+          const tagsStore = groupStore.children.tags;
+          expect(tagsStore.path).toStrictEqual(['groups', 0, 'tags']);
+          if (tagsStore.kind === 'array' && tagsStore.children[0].kind === 'object') {
+            expect(tagsStore.children[0].path).toStrictEqual([
+              'groups',
+              0,
+              'tags',
+              0,
+            ]);
+            expect(tagsStore.children[0].children.label.path).toStrictEqual([
+              'groups',
+              0,
+              'tags',
+              0,
+              'label',
+            ]);
+          }
+        }
+      }
     });
 
     test('should initialize nested object', () => {

@@ -1,0 +1,30 @@
+---
+title: GetFieldDeepErrorsConfig
+description: Configuration interface for retrieving the errors of a specific field.
+source: /packages/methods/src/getDeepErrors/getDeepErrors.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# GetFieldDeepErrorsConfig
+
+Configuration interface for retrieving the errors of a specific field. Used by the `getDeepErrors` method when a specific field path is provided.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Definition
+
+- `GetFieldDeepErrorsConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'getDeepErrors', href: '../getDeepErrors/' }]} />

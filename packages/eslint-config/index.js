@@ -79,6 +79,9 @@ export const commonRules = {
   '@typescript-eslint/no-non-null-assertion': 'off',
   '@typescript-eslint/prefer-function-type': 'off',
   '@typescript-eslint/no-inferrable-types': 'off',
+  // Allow `void` in union return types, e.g. the optional-return callback of
+  // `walkFieldStore` (`(store) => boolean | void`)
+  '@typescript-eslint/no-invalid-void-type': 'off',
 };
 
 /**

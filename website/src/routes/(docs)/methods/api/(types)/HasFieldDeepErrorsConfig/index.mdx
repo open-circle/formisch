@@ -1,0 +1,30 @@
+---
+title: HasFieldDeepErrorsConfig
+description: Configuration interface for checking the errors of a specific field.
+source: /packages/methods/src/hasDeepErrors/hasDeepErrors.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# HasFieldDeepErrorsConfig
+
+Configuration interface for checking the errors of a specific field. Used by the `hasDeepErrors` method when a specific field path is provided.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Definition
+
+- `HasFieldDeepErrorsConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'hasDeepErrors', href: '../hasDeepErrors/' }]} />

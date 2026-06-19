@@ -3,7 +3,7 @@ import { createId, createSignal, framework } from '../../framework/index.ts';
 import type {
   FieldElement,
   InternalFieldStore,
-  PathKey,
+  Path,
 } from '../../types/index.ts';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -54,7 +54,7 @@ export function initializeFieldStore(
   internalFieldStore: Partial<InternalFieldStore>,
   schema: FieldSchema,
   initialInput: unknown,
-  path: PathKey[],
+  path: Path,
   nullish = false
 ): void {
   // If schema is unsupported, throw error
@@ -132,6 +132,9 @@ export function initializeFieldStore(
     // Set basic properties
     internalFieldStore.schema = schema;
     internalFieldStore.name = JSON.stringify(path);
+    // Hint: Each field store receives its own freshly built path array (see the
+    // `[...path, key]` calls below), so it can be stored directly.
+    internalFieldStore.path = path;
 
     // Initialize elements array
     // Hint: `initialElements` and `elements` start as the same array so that
@@ -184,20 +187,14 @@ export function initializeFieldStore(
               // @ts-expect-error
               internalFieldStore.children[index] = {};
 
-              // Add current index to path
-              path.push(index);
-
               // Initialize field store for child
               initializeFieldStore(
                 internalFieldStore.children[index],
                 schema.item as FieldSchema,
                 // @ts-expect-error
                 initialInput[index],
-                path
+                [...path, index]
               );
-
-              // Remove index from path for next iteration
-              path.pop();
             }
           }
 
@@ -209,20 +206,14 @@ export function initializeFieldStore(
             // @ts-expect-error
             internalFieldStore.children[index] = {};
 
-            // Add current index to path
-            path.push(index);
-
             // Initialize field store for child
             initializeFieldStore(
               internalFieldStore.children[index],
               schema.items[index] as FieldSchema,
               // @ts-expect-error
               initialInput?.[index],
-              path
+              [...path, index]
             );
-
-            // Remove index from path for next iteration
-            path.pop();
           }
         }
 
@@ -270,20 +261,14 @@ export function initializeFieldStore(
           // @ts-expect-error
           internalFieldStore.children[key] ??= {};
 
-          // Add current key to path
-          path.push(key);
-
           // Initialize field store for child
           initializeFieldStore(
             internalFieldStore.children[key],
             schema.entries[key] as FieldSchema,
             // @ts-expect-error
             initialInput?.[key],
-            path
+            [...path, key]
           );
-
-          // Remove key from path for next iteration
-          path.pop();
         }
 
         // Store whether object is nullish so resetting can stay consistent

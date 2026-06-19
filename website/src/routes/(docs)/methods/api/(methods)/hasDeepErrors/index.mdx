@@ -1,0 +1,54 @@
+---
+title: hasDeepErrors
+description: Checks whether a specific field or the entire form contains any errors.
+source: /packages/methods/src/hasDeepErrors/hasDeepErrors.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# hasDeepErrors
+
+Checks whether a specific field or the entire form contains any errors by walking through the field store and all its descendants. The walk stops as soon as the first error is found, making this more efficient than collecting all errors. This is useful for error indicators in multi-tab or multi-section forms.
+
+```ts
+const hasErrors = hasDeepErrors<TSchema>(form);
+const hasErrors = hasDeepErrors<TSchema, TFieldPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+The `form` parameter is the form store to check for errors. The optional `config` parameter scopes the check to a specific field's subtree via a `path` (when omitted, the entire form is checked). The walk stops at the first error found.
+
+## Returns
+
+- `result` <Property {...properties.result} />
+
+## Related
+
+### Primitives
+
+<ApiList items={[{ text: 'createForm', href: '/solid/api/createForm/' }]} />
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'getErrors', href: '../getErrors/' },
+    { text: 'getDeepErrors', href: '../getDeepErrors/' },
+    { text: 'getDeepErrorEntries', href: '../getDeepErrorEntries/' },
+    { text: 'validate', href: '../validate/' },
+  ]}
+/>

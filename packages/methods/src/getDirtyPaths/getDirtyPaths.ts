@@ -6,7 +6,6 @@ import {
   getFieldStore,
   INTERNAL,
   type InternalFieldStore,
-  type PathKey,
   type RequiredPath,
   type ValidPath,
 } from '@formisch/core';
@@ -77,16 +76,11 @@ export function getDirtyPaths(
     | GetFormDirtyPathsConfig
     | GetFieldDirtyPathsConfig<FormSchema, RequiredPath>
 ): RequiredPath[] {
-  // Get field store of form or specified field
-  const internalFieldStore = config?.path
-    ? getFieldStore(form[INTERNAL], config.path)
-    : form[INTERNAL];
-
-  // Collect paths of dirty fields via a single recursive walk
+  // Collect paths of dirty fields via a single recursive walk, reading each
+  // field's own path instead of reconstructing it during the walk
   const paths: RequiredPath[] = [];
   collectDirtyPaths(
-    internalFieldStore,
-    config?.path ? [...config.path] : [],
+    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
     paths
   );
 
@@ -97,7 +91,6 @@ export function getDirtyPaths(
 // @__NO_SIDE_EFFECTS__
 function collectDirtyPaths(
   internalFieldStore: InternalFieldStore,
-  currentPath: PathKey[],
   paths: RequiredPath[]
 ): void {
   // If field store is object with non-nullish input, recurse into children
@@ -107,9 +100,7 @@ function collectDirtyPaths(
     // every dirty subtree twice.
     const lengthBefore = paths.length;
     for (const key in internalFieldStore.children) {
-      currentPath.push(key);
-      collectDirtyPaths(internalFieldStore.children[key], currentPath, paths);
-      currentPath.pop();
+      collectDirtyPaths(internalFieldStore.children[key], paths);
     }
 
     // If no descendant emitted a path but the object itself flipped dirty
@@ -118,23 +109,26 @@ function collectDirtyPaths(
     if (
       paths.length === lengthBefore &&
       internalFieldStore.isDirty.value &&
-      currentPath.length > 0
+      internalFieldStore.path.length > 0
     ) {
-      paths.push([...currentPath] as unknown as RequiredPath);
+      paths.push([...internalFieldStore.path] as unknown as RequiredPath);
     }
 
     // Otherwise, if field store is a value, emit its path if dirty
   } else if (internalFieldStore.kind === 'value') {
-    if (internalFieldStore.isDirty.value && currentPath.length > 0) {
-      paths.push([...currentPath] as unknown as RequiredPath);
+    if (
+      internalFieldStore.isDirty.value &&
+      internalFieldStore.path.length > 0
+    ) {
+      paths.push([...internalFieldStore.path] as unknown as RequiredPath);
     }
 
     // Otherwise, field is atomic (array or cleared object) — emit its path
     // if any dirty content exists
   } else if (
     getFieldBool(internalFieldStore, 'isDirty') &&
-    currentPath.length > 0
+    internalFieldStore.path.length > 0
   ) {
-    paths.push([...currentPath] as unknown as RequiredPath);
+    paths.push([...internalFieldStore.path] as unknown as RequiredPath);
   }
 }

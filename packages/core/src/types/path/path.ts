@@ -300,3 +300,41 @@ export type DirtyPath<
             >;
       }[ExactKeysOf<TValue>]
     : never;
+
+/**
+ * Recursive helper for `FieldPath` that prepends `TKey` to each deeper field
+ * path, or falls through to `never` when the child is a leaf value.
+ */
+type DeepFieldPath<TChild, TKey extends PathKey, TDepth extends 0[]> =
+  TChild extends readonly unknown[] | Record<PropertyKey, unknown>
+    ? readonly [TKey, ...FieldPath<TChild, [...TDepth, 0]>]
+    : never;
+
+/**
+ * Returns the union of all `RequiredPath`s that address a field within the
+ * given input type. Object and array fields contribute their own path and the
+ * paths of their descendants; unlike `DirtyPath`, arrays are recursed into so
+ * that fields at any depth, including array items, can be addressed. Leaf
+ * values contribute only their own path (emitted by their parent).
+ *
+ * Narrowing is exact for the first 5 levels of nesting; deeper paths fall
+ * back to `RequiredPath` to keep the result a complete superset of any path
+ * the runtime can address. `TDepth` is a tuple-length counter capped at 5 to
+ * bound TypeScript instantiation cost.
+ */
+export type FieldPath<
+  TValue,
+  TDepth extends 0[] = [],
+> = TDepth['length'] extends 5
+  ? RequiredPath
+  : TValue extends readonly unknown[] | Record<PropertyKey, unknown>
+    ? {
+        [TKey in ExactKeysOf<TValue>]:
+          | readonly [TKey]
+          | DeepFieldPath<
+              NonNullable<PropertiesOf<TValue>[TKey]>,
+              TKey,
+              TDepth
+            >;
+      }[ExactKeysOf<TValue>]
+    : never;

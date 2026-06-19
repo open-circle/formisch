@@ -107,7 +107,7 @@ export async function validateFormInput(
     batch(() => {
       // Set or reset errors on each field store
       walkFieldStore(internalFormStore, (internalFieldStore) => {
-        if (internalFieldStore.name === '[]') {
+        if (internalFieldStore.path.length === 0) {
           internalFieldStore.errors.value = rootErrors ?? null;
         } else {
           const fieldErrors = nestedErrors?.[internalFieldStore.name] ?? null;

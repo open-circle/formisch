@@ -6,7 +6,6 @@ import {
   INTERNAL,
   type InternalArrayStore,
   type InternalFormStore,
-  type PathKey,
   type ValidationMode,
 } from '@formisch/core';
 import type * as v from 'valibot';
@@ -167,8 +166,6 @@ export function initializeChildSlot(
   index: number
 ): void {
   if (!arrayStore.children[index]) {
-    const path = JSON.parse(arrayStore.name) as PathKey[];
-    path.push(index);
     // @ts-expect-error - Creating empty object to be initialized
     arrayStore.children[index] = {};
     initializeFieldStore(
@@ -176,7 +173,7 @@ export function initializeChildSlot(
       // @ts-expect-error - Accessing schema item
       arrayStore.schema.item,
       undefined,
-      path
+      [...arrayStore.path, index]
     );
   }
 }

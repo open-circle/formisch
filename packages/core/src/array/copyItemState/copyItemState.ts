@@ -1,6 +1,6 @@
 import { initializeFieldStore } from '../../field/initializeFieldStore/index.ts';
 import { batch, untrack } from '../../framework/index.ts';
-import type { InternalFieldStore, PathKey } from '../../types/index.ts';
+import type { InternalFieldStore } from '../../types/index.ts';
 
 /**
  * Copies the deeply nested state (signal values) from one field store to
@@ -59,22 +59,13 @@ export function copyItemState(
         // Copy current items
         toInternalFieldStore.items.value = fromItems;
 
-        // Initialize path variable for lazy parsing
-        let path: PathKey[] | undefined;
-
         // Copy state for each array item
         for (let index = 0; index < fromItems.length; index++) {
           // If destination child doesn't exist, initialize it
           if (!toInternalFieldStore.children[index]) {
-            // Parse path only when needed
-            path ??= JSON.parse(toInternalFieldStore.name) as PathKey[];
-
             // Create empty child object
             // @ts-expect-error
             toInternalFieldStore.children[index] = {};
-
-            // Add current index to path
-            path.push(index);
 
             // Initialize field store for new child
             initializeFieldStore(
@@ -82,11 +73,8 @@ export function copyItemState(
               // @ts-expect-error
               toInternalFieldStore.schema.item,
               undefined,
-              path
+              [...toInternalFieldStore.path, index]
             );
-
-            // Remove index from path for next iteration
-            path.pop();
           }
 
           // Recursively copy child state

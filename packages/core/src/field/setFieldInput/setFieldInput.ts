@@ -4,7 +4,6 @@ import type {
   InternalFieldStore,
   InternalFormStore,
   Path,
-  PathKey,
 } from '../../types/index.ts';
 import { initializeFieldStore } from '../initializeFieldStore/index.ts';
 
@@ -43,9 +42,6 @@ function setNestedInput(
 
       // Otherwise, if new array is longer, extend items
     } else if (length > items.length) {
-      // Parse path for child initialization
-      const path = JSON.parse(internalFieldStore.name) as PathKey[];
-
       // Initialize or reset each newly visible child
       for (let index = items.length; index < length; index++) {
         // Reset the reused stale child but keep its start input as baseline
@@ -68,9 +64,6 @@ function setNestedInput(
           // @ts-expect-error
           internalFieldStore.children[index] = {};
 
-          // Add current index to path
-          path.push(index);
-
           // Initialize field store for new child
           initializeFieldStore(
             internalFieldStore.children[index],
@@ -78,11 +71,8 @@ function setNestedInput(
             internalFieldStore.schema.item,
             // @ts-expect-error
             arrayInput[index],
-            path
+            [...internalFieldStore.path, index]
           );
-
-          // Remove index from path for next iteration
-          path.pop();
         }
       }
 

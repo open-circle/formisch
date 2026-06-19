@@ -1,5 +1,5 @@
 import { batch, createId } from '../../framework/index.ts';
-import type { InternalFieldStore, PathKey } from '../../types/index.ts';
+import type { InternalFieldStore } from '../../types/index.ts';
 import { initializeFieldStore } from '../initializeFieldStore/index.ts';
 
 /**
@@ -35,9 +35,6 @@ export function setInitialFieldInput(
 
       // If initial input exceeds children capacity, initialize new children
       if (length > internalFieldStore.children.length) {
-        // Parse path for child initialization
-        const path = JSON.parse(internalFieldStore.name) as PathKey[];
-
         // Initialize missing children
         for (
           let index = internalFieldStore.children.length;
@@ -48,9 +45,6 @@ export function setInitialFieldInput(
           // @ts-expect-error
           internalFieldStore.children[index] = {};
 
-          // Add current index to path
-          path.push(index);
-
           // Initialize field store for new child
           initializeFieldStore(
             internalFieldStore.children[index],
@@ -58,11 +52,8 @@ export function setInitialFieldInput(
             internalFieldStore.schema.item,
             // @ts-expect-error
             initialArrayInput[index],
-            path
+            [...internalFieldStore.path, index]
           );
-
-          // Remove index from path for next iteration
-          path.pop();
         }
       }
 
