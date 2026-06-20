@@ -18,7 +18,9 @@ export interface DeepErrorEntry<TValue = unknown> {
   /**
    * The path to the field with errors, or an empty path for form-level errors.
    */
-  readonly path: unknown extends TValue ? Path : readonly [] | FieldPath<TValue>;
+  readonly path: unknown extends TValue
+    ? Path
+    : readonly [] | FieldPath<TValue>;
   /**
    * The error messages of the field.
    */

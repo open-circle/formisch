@@ -57,7 +57,10 @@ describe('initializeFieldStore', () => {
         if (groupStore.kind === 'object') {
           const tagsStore = groupStore.children.tags;
           expect(tagsStore.path).toStrictEqual(['groups', 0, 'tags']);
-          if (tagsStore.kind === 'array' && tagsStore.children[0].kind === 'object') {
+          if (
+            tagsStore.kind === 'array' &&
+            tagsStore.children[0].kind === 'object'
+          ) {
             expect(tagsStore.children[0].path).toStrictEqual([
               'groups',
               0,

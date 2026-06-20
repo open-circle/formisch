@@ -2,7 +2,10 @@ import type { Path } from '@formisch/core';
 import * as v from 'valibot';
 import { describe, expectTypeOf, test } from 'vitest';
 import { createTestStore } from '../vitest/index.ts';
-import { type DeepErrorEntry, getDeepErrorEntries } from './getDeepErrorEntries.ts';
+import {
+  type DeepErrorEntry,
+  getDeepErrorEntries,
+} from './getDeepErrorEntries.ts';
 
 describe('getDeepErrorEntries', () => {
   const store = createTestStore(
