@@ -1,0 +1,53 @@
+---
+title: isEdited
+description: Checks whether a specific field or the entire form is edited.
+source: /packages/methods/src/isEdited/isEdited.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# isEdited
+
+Checks whether a specific field or the entire form is edited by walking through the field store and all its descendants. A field is edited once its value has been changed by the user.
+
+```ts
+const edited = isEdited<TSchema>(form);
+const edited = isEdited<TSchema, TFieldPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+The `form` parameter is the form store to check for being edited. The optional `config` parameter scopes the check to a specific field's subtree via a `path` (when omitted, the entire form is checked). The function walks through the field store and all its descendants and returns `true` as soon as it finds an edited field.
+
+## Returns
+
+- `result` <Property {...properties.result} />
+
+## Related
+
+### Primitives
+
+<ApiList items={[{ text: 'createForm', href: '/solid/api/createForm/' }]} />
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'isDirty', href: '../isDirty/' },
+    { text: 'isTouched', href: '../isTouched/' },
+    { text: 'isValid', href: '../isValid/' },
+  ]}
+/>

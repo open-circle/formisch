@@ -56,7 +56,7 @@ Every form starts with the `createForm` function. It initializes your form's sto
 </Form>
 ```
 
-In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include `focus`, `getDeepErrorEntries`, `getDeepErrors`, `getDirtyInput`, `getDirtyPaths`, `getErrors`, `getInput`, `handleSubmit`, `insert`, `move`, `pickDirty`, `remove`, `replace`, `reset`, `setErrors`, `setInput`, `submit`, `swap` and `validate`. These methods allow you to control the form programmatically.
+In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include `focus`, `getDeepErrorEntries`, `getDeepErrors`, `getDirtyInput`, `getDirtyPaths`, `getErrors`, `getInput`, `handleSubmit`, `insert`, `isDirty`, `isEdited`, `isTouched`, `isValid`, `move`, `pickDirty`, `remove`, `replace`, `reset`, `setErrors`, `setInput`, `submit`, `swap` and `validate`. These methods allow you to control the form programmatically.
 
 ## Comparison
 

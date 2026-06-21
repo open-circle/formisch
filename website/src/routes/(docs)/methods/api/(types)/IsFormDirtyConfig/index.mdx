@@ -1,0 +1,25 @@
+---
+title: IsFormDirtyConfig
+description: Configuration interface for checking whether the entire form is dirty.
+source: /packages/methods/src/isDirty/isDirty.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# IsFormDirtyConfig
+
+Configuration interface for checking whether the entire form is dirty. Used by the `isDirty` method when no specific field path is provided.
+
+## Definition
+
+- `IsFormDirtyConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'isDirty', href: '../isDirty/' }]} />

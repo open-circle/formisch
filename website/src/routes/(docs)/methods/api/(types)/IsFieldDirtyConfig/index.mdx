@@ -1,0 +1,30 @@
+---
+title: IsFieldDirtyConfig
+description: Configuration interface for checking whether a specific field is dirty.
+source: /packages/methods/src/isDirty/isDirty.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# IsFieldDirtyConfig
+
+Configuration interface for checking whether a specific field is dirty. Used by the `isDirty` method when a specific field path is provided.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Definition
+
+- `IsFieldDirtyConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'isDirty', href: '../isDirty/' }]} />

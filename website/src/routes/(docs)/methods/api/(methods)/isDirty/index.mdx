@@ -1,0 +1,56 @@
+---
+title: isDirty
+description: Checks whether a specific field or the entire form is dirty.
+source: /packages/methods/src/isDirty/isDirty.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# isDirty
+
+Checks whether a specific field or the entire form is dirty by walking through the field store and all its descendants. A field is dirty when its input differs from its initial value.
+
+```ts
+const dirty = isDirty<TSchema>(form);
+const dirty = isDirty<TSchema, TFieldPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+The `form` parameter is the form store to check for dirtiness. The optional `config` parameter scopes the check to a specific field's subtree via a `path` (when omitted, the entire form is checked). The function walks through the field store and all its descendants and returns `true` as soon as it finds a dirty field.
+
+## Returns
+
+- `result` <Property {...properties.result} />
+
+## Related
+
+### Primitives
+
+<ApiList items={[{ text: 'createForm', href: '/solid/api/createForm/' }]} />
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'getDirtyInput', href: '../getDirtyInput/' },
+    { text: 'getDirtyPaths', href: '../getDirtyPaths/' },
+    { text: 'pickDirty', href: '../pickDirty/' },
+    { text: 'isTouched', href: '../isTouched/' },
+    { text: 'isEdited', href: '../isEdited/' },
+    { text: 'isValid', href: '../isValid/' },
+  ]}
+/>
