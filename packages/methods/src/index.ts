@@ -6,7 +6,6 @@ export * from './getDirtyPaths/index.ts';
 export * from './getErrors/index.ts';
 export * from './getInput/index.ts';
 export * from './handleSubmit/index.ts';
-export * from './hasDeepErrors/index.ts';
 export * from './insert/index.ts';
 export * from './move/index.ts';
 export * from './pickDirty/index.ts';

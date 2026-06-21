@@ -98,8 +98,7 @@ export function getDeepErrorEntries(
   walkFieldStore(
     config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
     (internalFieldStore) => {
-      // Emit an entry if the field has errors; form-level errors are emitted
-      // with an empty path, mirroring `getDeepErrors` and `hasDeepErrors`
+      // Emit an entry if field has errors; form-level errors are emitted
       const errors = internalFieldStore.errors.value;
       if (errors) {
         entries.push({
