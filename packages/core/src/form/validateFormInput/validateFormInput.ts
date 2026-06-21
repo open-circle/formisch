@@ -105,25 +105,29 @@ export async function validateFormInput(
     // Batch error, focus and validation state updates together so reactive
     // subscribers observe a single consistent update
     batch(() => {
-      // Set or reset errors on each field store
-      walkFieldStore(internalFormStore, (internalFieldStore) => {
-        if (internalFieldStore.path.length === 0) {
-          internalFieldStore.errors.value = rootErrors ?? null;
-        } else {
-          const fieldErrors = nestedErrors?.[internalFieldStore.name] ?? null;
-          internalFieldStore.errors.value = fieldErrors;
+      // Untracked to avoid subscribing a surrounding reactive scope to the
+      // form structure.
+      untrack(() => {
+        // Set or reset errors on each field store.
+        walkFieldStore(internalFormStore, (internalFieldStore) => {
+          if (internalFieldStore.path.length === 0) {
+            internalFieldStore.errors.value = rootErrors ?? null;
+          } else {
+            const fieldErrors = nestedErrors?.[internalFieldStore.name] ?? null;
+            internalFieldStore.errors.value = fieldErrors;
 
-          // Focus the first erroring field whose element can actually receive
-          // focus, so the focus is not consumed by a field without a focusable
-          // element (e.g. unmounted or hidden)
-          if (
-            shouldFocus &&
-            fieldErrors &&
-            focusFieldElement(internalFieldStore)
-          ) {
-            shouldFocus = false;
+            // Focus the first erroring field whose element can actually receive
+            // focus, so the focus is not consumed by a field without a focusable
+            // element (e.g. unmounted or hidden)
+            if (
+              shouldFocus &&
+              fieldErrors &&
+              focusFieldElement(internalFieldStore)
+            ) {
+              shouldFocus = false;
+            }
           }
-        }
+        });
       });
 
       // Reset validation state of form

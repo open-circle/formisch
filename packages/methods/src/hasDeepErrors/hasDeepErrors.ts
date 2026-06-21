@@ -1,11 +1,11 @@
 import {
   type BaseFormStore,
   type FormSchema,
+  getFieldBool,
   getFieldStore,
   INTERNAL,
   type RequiredPath,
   type ValidPath,
-  walkFieldStore,
 } from '@formisch/core';
 import type * as v from 'valibot';
 
@@ -76,17 +76,9 @@ export function hasDeepErrors(
     | HasFormDeepErrorsConfig
     | HasFieldDeepErrorsConfig<FormSchema, RequiredPath>
 ): boolean {
-  return walkFieldStore(
+  // Walks the field store and stops as soon as the first error is found
+  return getFieldBool(
     config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
-    (internalFieldStore) => {
-      // Subscribe to items so reactive computations re-run when array items
-      // are added or removed (walkFieldStore reads items via untrack internally)
-      if (internalFieldStore.kind === 'array') {
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        internalFieldStore.items.value;
-      }
-      // Stop walking as soon as the first error is found
-      return internalFieldStore.errors.value !== null;
-    }
+    'errors'
   );
 }

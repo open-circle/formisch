@@ -1,10 +1,13 @@
-import { untrack } from '../../framework/index.ts';
 import type { InternalFieldStore } from '../../types/index.ts';
 
 /**
  * Walks through the field store and all nested children, calling the callback
  * for each field store in depth-first order. The callback may return `true` to
  * stop the walk early, in which case `walkFieldStore` returns `true` as well.
+ *
+ * The walk reads array `items` reactively, so a reactive caller subscribes to
+ * structural changes naturally. Imperative callers that must not subscribe
+ * (e.g. when invoked inside an effect) should wrap the call in `untrack`.
  *
  * @param internalFieldStore The field store to walk.
  * @param callback The callback to invoke for each field store. Return `true` to stop the walk early.
@@ -25,7 +28,7 @@ export function walkFieldStore(
     // Walk each array item
     for (
       let index = 0;
-      index < untrack(() => internalFieldStore.items.value).length;
+      index < internalFieldStore.items.value.length;
       index++
     ) {
       // Recursively walk child and stop early if requested
