@@ -1,0 +1,27 @@
+---
+title: GetFormDeepErrorEntriesConfig
+description: Configuration interface for retrieving the error entries of the entire form.
+source: /packages/methods/src/getDeepErrorEntries/getDeepErrorEntries.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# GetFormDeepErrorEntriesConfig
+
+Configuration interface for retrieving the error entries of the entire form. Used by the `getDeepErrorEntries` method when no specific field path is provided.
+
+## Definition
+
+- `GetFormDeepErrorEntriesConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList
+  items={[{ text: 'getDeepErrorEntries', href: '../getDeepErrorEntries/' }]}
+/>

@@ -1,6 +1,6 @@
 import { initializeFieldStore } from '../../field/initializeFieldStore/index.ts';
 import { batch, untrack } from '../../framework/index.ts';
-import type { InternalFieldStore, PathKey } from '../../types/index.ts';
+import type { InternalFieldStore } from '../../types/index.ts';
 
 /**
  * Swaps the deeply nested state (signal values) between two field stores. This
@@ -82,23 +82,13 @@ export function swapItemState(
         // Calculate maximum length to ensure all children are swapped
         const maxLength = Math.max(firstItems.length, secondItems.length);
 
-        // Initialize path variables for lazy parsing
-        let firstPath: PathKey[] | undefined;
-        let secondPath: PathKey[] | undefined;
-
         // Swap state for each array item
         for (let index = 0; index < maxLength; index++) {
           // If first store child doesn't exist, initialize it
           if (!firstInternalFieldStore.children[index]) {
-            // Parse path only when needed
-            firstPath ??= JSON.parse(firstInternalFieldStore.name) as PathKey[];
-
             // Create empty child object
             // @ts-expect-error
             firstInternalFieldStore.children[index] = {};
-
-            // Add current index to path
-            firstPath.push(index);
 
             // Initialize field store for new child
             initializeFieldStore(
@@ -106,26 +96,15 @@ export function swapItemState(
               // @ts-expect-error
               firstInternalFieldStore.schema.item,
               undefined,
-              firstPath
+              [...firstInternalFieldStore.path, index]
             );
-
-            // Remove index from path for next iteration
-            firstPath.pop();
           }
 
           // If second store child doesn't exist, initialize it
           if (!secondInternalFieldStore.children[index]) {
-            // Parse path only when needed
-            secondPath ??= JSON.parse(
-              secondInternalFieldStore.name
-            ) as PathKey[];
-
             // Create empty child object
             // @ts-expect-error
             secondInternalFieldStore.children[index] = {};
-
-            // Add current index to path
-            secondPath.push(index);
 
             // Initialize field store for new child
             initializeFieldStore(
@@ -133,11 +112,8 @@ export function swapItemState(
               // @ts-expect-error
               secondInternalFieldStore.schema.item,
               undefined,
-              secondPath
+              [...secondInternalFieldStore.path, index]
             );
-
-            // Remove index from path for next iteration
-            secondPath.pop();
           }
 
           // Recursively swap children

@@ -41,7 +41,7 @@ const handleInput = (event: Event) => {
 
 <template>
   <div :class="['px-8 lg:px-10', props.class]">
-    <label class="flex space-x-4 font-medium select-none md:text-lg lg:text-xl">
+    <label class="flex select-none space-x-4 font-medium md:text-lg lg:text-xl">
       <input
         v-bind="props.props"
         :id="props.props.name"

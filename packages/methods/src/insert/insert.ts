@@ -9,7 +9,6 @@ import {
   INTERNAL,
   type InternalArrayStore,
   type InternalFieldStore,
-  type PathKey,
   type PathValue,
   type RequiredPath,
   resetItemState,
@@ -91,16 +90,14 @@ export function insert<
       // Move all child stores after the insertion point one index up
       for (let index = items.length; index > insertIndex; index--) {
         if (!internalArrayStore.children[index]) {
-          const path = JSON.parse(internalArrayStore.name) as PathKey[];
           // @ts-expect-error
           internalArrayStore.children[index] = {};
-          path.push(index);
           initializeFieldStore(
             internalArrayStore.children[index],
             // @ts-expect-error
             internalArrayStore.schema.item,
             undefined,
-            path
+            [...internalArrayStore.path, index]
           );
         }
         copyItemState(
@@ -110,16 +107,14 @@ export function insert<
       }
 
       if (!internalArrayStore.children[insertIndex]) {
-        const path = JSON.parse(internalArrayStore.name) as PathKey[];
         // @ts-expect-error
         internalArrayStore.children[insertIndex] = {};
-        path.push(insertIndex);
         initializeFieldStore(
           internalArrayStore.children[insertIndex],
           // @ts-expect-error
           internalArrayStore.schema.item,
           config.initialInput,
-          path
+          [...internalArrayStore.path, insertIndex]
         );
       } else {
         resetItemState(

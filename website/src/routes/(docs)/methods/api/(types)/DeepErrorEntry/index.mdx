@@ -1,0 +1,32 @@
+---
+title: DeepErrorEntry
+description: Entry pairing the path to a field with its error messages.
+source: /packages/methods/src/getDeepErrorEntries/getDeepErrorEntries.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# DeepErrorEntry
+
+Entry that pairs the `path` to a field with its error messages. Returned by the `getDeepErrorEntries` method. Form-level errors are included with an empty path.
+
+## Generics
+
+- `TValue` <Property {...properties.TValue} />
+
+## Definition
+
+- `DeepErrorEntry`
+  - `path` <Property {...properties.path} />
+  - `errors` <Property {...properties.errors} />
+
+## Related
+
+### Methods
+
+<ApiList
+  items={[{ text: 'getDeepErrorEntries', href: '../getDeepErrorEntries/' }]}
+/>

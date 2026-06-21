@@ -6,6 +6,8 @@ All notable changes to the library will be documented in this file.
 
 - Change `@formisch/core` to vX.X.X
 - Add `keepEdited` config option to the `reset` method to keep the edited state of fields
+- Rename `getAllErrors` method to `getDeepErrors` and add an optional `path` config to scope error collection to a specific field's subtree (issue #135)
+- Add `getDeepErrorEntries` method to retrieve the errors of a form or specific field as a list of path and message entries (issue #135)
 - Change `insert`, `move`, `remove`, `replace` and `swap` methods to set the edited state of the field array
 - Fix `replace` and `insert` to keep a non-nullish array, object or tuple consistent with the initial form state instead of `undefined` when its key is omitted (issue #139)
 

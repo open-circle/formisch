@@ -53,7 +53,7 @@ Framework-agnostic form logic. Builds to framework-specific outputs via `tsdown.
 
 Form manipulation utilities. Each method in its own directory (`src/{method-name}/`).
 
-**Available methods:** focus, getAllErrors, getErrors, getInput, handleSubmit, insert, move, remove, replace, reset, setErrors, setInput, submit, swap, validate
+**Available methods:** focus, getDeepErrorEntries, getDeepErrors, getDirtyInput, getDirtyPaths, getErrors, getInput, handleSubmit, insert, move, pickDirty, remove, replace, reset, setErrors, setInput, submit, swap, validate
 
 ## Framework Packages
 

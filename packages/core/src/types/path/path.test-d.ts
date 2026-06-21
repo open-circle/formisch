@@ -4,6 +4,7 @@ import type {
   ExactKeysOf,
   ExactKeysOfArrayPath,
   ExactRequired,
+  FieldPath,
   Path,
   PathKey,
   PathValue,
@@ -731,6 +732,83 @@ describe('DirtyPath', () => {
   test('should be a subtype of RequiredPath', () => {
     expectTypeOf<
       DirtyPath<{ name: string; user: { email: string } }>
+    >().toMatchTypeOf<RequiredPath>();
+  });
+});
+
+describe('FieldPath', () => {
+  test('should return the keys of a flat object as single-segment paths', () => {
+    expectTypeOf<FieldPath<{ name: string; age: number }>>().toEqualTypeOf<
+      readonly ['name'] | readonly ['age']
+    >();
+  });
+
+  test('should include both the parent path and nested paths for object children', () => {
+    expectTypeOf<
+      FieldPath<{ user: { email: string; name: string } }>
+    >().toEqualTypeOf<
+      readonly ['user'] | readonly ['user', 'email'] | readonly ['user', 'name']
+    >();
+  });
+
+  test('should recurse into arrays via a numeric index segment', () => {
+    expectTypeOf<FieldPath<{ items: string[] }>>().toEqualTypeOf<
+      readonly ['items'] | readonly ['items', number]
+    >();
+  });
+
+  test('should recurse into the fields of array items', () => {
+    expectTypeOf<FieldPath<{ users: { name: string }[] }>>().toEqualTypeOf<
+      | readonly ['users']
+      | readonly ['users', number]
+      | readonly ['users', number, 'name']
+    >();
+  });
+
+  test('should recurse into tuples via their literal index segments', () => {
+    expectTypeOf<FieldPath<{ coords: [number, number] }>>().toEqualTypeOf<
+      readonly ['coords'] | readonly ['coords', 0] | readonly ['coords', 1]
+    >();
+  });
+
+  test('should enumerate paths for array and tuple roots', () => {
+    expectTypeOf<FieldPath<string[]>>().toEqualTypeOf<readonly [number]>();
+    expectTypeOf<FieldPath<[number, string]>>().toEqualTypeOf<
+      readonly [0] | readonly [1]
+    >();
+  });
+
+  test('should return `never` for leaf roots', () => {
+    expectTypeOf<FieldPath<string>>().toBeNever();
+    expectTypeOf<FieldPath<number>>().toBeNever();
+  });
+
+  test('should narrow paths up to the configured depth', () => {
+    expectTypeOf<
+      FieldPath<{ a: { b: { c: { d: { e: string } } } } }>
+    >().toEqualTypeOf<
+      | readonly ['a']
+      | readonly ['a', 'b']
+      | readonly ['a', 'b', 'c']
+      | readonly ['a', 'b', 'c', 'd']
+      | readonly ['a', 'b', 'c', 'd', 'e']
+    >();
+  });
+
+  test('should fall back to RequiredPath for paths deeper than the depth limit', () => {
+    type Result = FieldPath<{
+      a: { b: { c: { d: { e: { f: string } } } } };
+    }>;
+    // The path `['a', 'b', 'c', 'd', 'e', 'f']` is past depth 5, so the last
+    // segments collapse to `PathKey, ...Path` (RequiredPath catch-all).
+    expectTypeOf<
+      readonly ['a', 'b', 'c', 'd', 'e', PathKey, ...Path]
+    >().toMatchTypeOf<Result>();
+  });
+
+  test('should be a subtype of RequiredPath', () => {
+    expectTypeOf<
+      FieldPath<{ tags: string[]; user: { email: string } }>
     >().toMatchTypeOf<RequiredPath>();
   });
 });

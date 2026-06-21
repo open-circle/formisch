@@ -15,7 +15,8 @@
 ## Methods
 
 - [focus](/methods/api/focus/)
-- [getAllErrors](/methods/api/getAllErrors/)
+- [getDeepErrorEntries](/methods/api/getDeepErrorEntries/)
+- [getDeepErrors](/methods/api/getDeepErrors/)
 - [getDirtyInput](/methods/api/getDirtyInput/)
 - [getDirtyPaths](/methods/api/getDirtyPaths/)
 - [getErrors](/methods/api/getErrors/)
@@ -35,6 +36,7 @@
 
 ## Types
 
+- [DeepErrorEntry](/methods/api/DeepErrorEntry/)
 - [DeepPartial](/core/api/DeepPartial/)
 - [FieldArrayStore](/preact/api/FieldArrayStore/)
 - [FieldElement](/core/api/FieldElement/)
@@ -44,10 +46,14 @@
 - [FormConfig](/preact/api/FormConfig/)
 - [FormSchema](/core/api/FormSchema/)
 - [FormStore](/preact/api/FormStore/)
+- [GetFieldDeepErrorEntriesConfig](/methods/api/GetFieldDeepErrorEntriesConfig/)
+- [GetFieldDeepErrorsConfig](/methods/api/GetFieldDeepErrorsConfig/)
 - [GetFieldDirtyInputConfig](/methods/api/GetFieldDirtyInputConfig/)
 - [GetFieldDirtyPathsConfig](/methods/api/GetFieldDirtyPathsConfig/)
 - [GetFieldErrorsConfig](/methods/api/GetFieldErrorsConfig/)
 - [GetFieldInputConfig](/methods/api/GetFieldInputConfig/)
+- [GetFormDeepErrorEntriesConfig](/methods/api/GetFormDeepErrorEntriesConfig/)
+- [GetFormDeepErrorsConfig](/methods/api/GetFormDeepErrorsConfig/)
 - [GetFormDirtyInputConfig](/methods/api/GetFormDirtyInputConfig/)
 - [GetFormDirtyPathsConfig](/methods/api/GetFormDirtyPathsConfig/)
 - [GetFormErrorsConfig](/methods/api/GetFormErrorsConfig/)

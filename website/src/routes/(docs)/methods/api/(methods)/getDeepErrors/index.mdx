@@ -1,0 +1,54 @@
+---
+title: getDeepErrors
+description: Retrieves all error messages of a specific field or the entire form.
+source: /packages/methods/src/getDeepErrors/getDeepErrors.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# getDeepErrors
+
+Retrieves all error messages of a specific field or the entire form by walking through the field store and all its descendants. This is useful for displaying a summary of all validation errors within a section or the whole form.
+
+```ts
+const errors = getDeepErrors<TSchema>(form);
+const errors = getDeepErrors<TSchema, TFieldPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+The `form` parameter is the form store to retrieve errors from. The optional `config` parameter scopes the collection to a specific field's subtree via a `path` (when omitted, the entire form is walked). The function walks through the field store and all its descendants to collect every validation error message.
+
+## Returns
+
+- `result` <Property {...properties.result} />
+
+## Related
+
+### Primitives
+
+<ApiList items={[{ text: 'createForm', href: '/solid/api/createForm/' }]} />
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'getErrors', href: '../getErrors/' },
+    { text: 'getDeepErrorEntries', href: '../getDeepErrorEntries/' },
+    { text: 'validate', href: '../validate/' },
+    { text: 'setErrors', href: '../setErrors/' },
+  ]}
+/>
