@@ -2,7 +2,7 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v0.9.0 (June 21, 2026)
 
 - Add `isEdited` field state that is set when a field's value changes, is not set on focus, and stays set after reverting to the initial value
 - Add `path` property to internal field stores so the path no longer needs to be reconstructed from the stringified `name`

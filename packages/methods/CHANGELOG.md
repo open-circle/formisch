@@ -2,9 +2,9 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v0.10.0 (June 21, 2026)
 
-- Change `@formisch/core` to vX.X.X
+- Change `@formisch/core` to v0.9.0
 - Add `keepEdited` config option to the `reset` method to keep the edited state of fields
 - Rename `getAllErrors` method to `getDeepErrors` and add an optional `path` config to scope error collection to a specific field's subtree (issue #135)
 - Add `getDeepErrorEntries` method to retrieve the errors of a form or specific field as a list of path and message entries (issue #135)
