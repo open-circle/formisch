@@ -1,0 +1,54 @@
+---
+title: isTouched
+description: Checks whether a specific field or the entire form is touched.
+source: /packages/methods/src/isTouched/isTouched.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# isTouched
+
+Checks whether a specific field or the entire form is touched by walking through the field store and all its descendants. A field is touched once it has received and lost focus.
+
+```ts
+const touched = isTouched<TSchema>(form);
+const touched = isTouched<TSchema, TFieldPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+The `form` parameter is the form store to check for being touched. The optional `config` parameter scopes the check to a specific field's subtree via a `path` (when omitted, the entire form is checked). The function walks through the field store and all its descendants and returns `true` as soon as it finds a touched field.
+
+## Returns
+
+- `result` <Property {...properties.result} />
+
+## Related
+
+### Primitives
+
+<ApiList items={[{ text: 'createForm', href: '/solid/api/createForm/' }]} />
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'isDirty', href: '../isDirty/' },
+    { text: 'isEdited', href: '../isEdited/' },
+    { text: 'isValid', href: '../isValid/' },
+    { text: 'focus', href: '../focus/' },
+  ]}
+/>

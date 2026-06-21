@@ -1,0 +1,30 @@
+---
+title: IsFieldValidConfig
+description: Configuration interface for checking whether a specific field is valid.
+source: /packages/methods/src/isValid/isValid.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# IsFieldValidConfig
+
+Configuration interface for checking whether a specific field is valid. Used by the `isValid` method when a specific field path is provided.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Definition
+
+- `IsFieldValidConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'isValid', href: '../isValid/' }]} />
