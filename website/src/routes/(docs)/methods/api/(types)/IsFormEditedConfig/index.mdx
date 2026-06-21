@@ -1,0 +1,25 @@
+---
+title: IsFormEditedConfig
+description: Configuration interface for checking whether the entire form is edited.
+source: /packages/methods/src/isEdited/isEdited.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# IsFormEditedConfig
+
+Configuration interface for checking whether the entire form is edited. Used by the `isEdited` method when no specific field path is provided.
+
+## Definition
+
+- `IsFormEditedConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'isEdited', href: '../isEdited/' }]} />

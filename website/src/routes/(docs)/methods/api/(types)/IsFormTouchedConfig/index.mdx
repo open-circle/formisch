@@ -1,0 +1,25 @@
+---
+title: IsFormTouchedConfig
+description: Configuration interface for checking whether the entire form is touched.
+source: /packages/methods/src/isTouched/isTouched.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# IsFormTouchedConfig
+
+Configuration interface for checking whether the entire form is touched. Used by the `isTouched` method when no specific field path is provided.
+
+## Definition
+
+- `IsFormTouchedConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'isTouched', href: '../isTouched/' }]} />
