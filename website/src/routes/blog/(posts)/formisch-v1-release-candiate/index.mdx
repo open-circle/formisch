@@ -1,0 +1,120 @@
+---
+cover: Formisch v1 RC
+title: 'Formisch v1 RC is now available'
+description: >-
+  Formisch, the schema-first, headless, and fully type-safe form library, is now
+  a Release Candidate. One Valibot schema drives both validation and your types,
+  and the client-side API is feature-complete. Here is how it got here, and how
+  you can help us finalize v1.
+published: 2026-06-23
+authors:
+  - fabian-hiller
+  - flySewa
+---
+
+import { Link } from '~/components';
+
+Formisch is officially in the Release Candidate (RC) phase! 🎉
+
+This means the core API and the overall design are now stable. Barring a critical issue, there will be no breaking changes before the 1.0 release, so if you held off on trying Formisch to avoid churn, now is a good time. We have spent recent months hardening the library against complex edge cases to improve reliability and runtime performance, and your feedback on the current API is the most valuable thing we can get before v1 locks in.
+
+## So, what actually is Formisch?
+
+Formisch is a schema-first, headless, fully type-safe library for managing form state. You describe your form once with a [Valibot](https://valibot.dev/) schema, and that single schema drives both runtime validation and your TypeScript types. There is no second type definition to keep in sync and no resolver to configure.
+
+```tsx
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email('Please enter a valid email.')),
+  password: v.pipe(v.string(), v.minLength(8, 'Your password is too short.')),
+});
+```
+
+From there you build your UI on top of the schema. Formisch is headless, so you keep full control over your markup and styling. Every field gives you its value, its errors, and the props to wire up your input:
+
+```tsx
+import { Field, Form, useForm } from '@formisch/react';
+
+export default function LoginForm() {
+  const loginForm = useForm({ schema: LoginSchema });
+
+  return (
+    <Form
+      of={loginForm}
+      onSubmit={(values) => {
+        // `values` is fully typed: { email: string; password: string }
+        console.log(values);
+      }}
+    >
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="email" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="password" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit">Login</button>
+    </Form>
+  );
+}
+```
+
+You can run this exact example on the <Link href="/playground/login/">playground</Link> in your browser, no install required.
+
+The `path` is fully typed against your schema, so if you rename a field, TypeScript flags every place that no longer matches. Because state lives in fine-grained signals, only the fields that actually change re-render, and thanks to the modular design the bundle size starts at around 2.5 kB.
+
+Formisch runs on React, Vue, Solid, Qwik, Svelte, and Preact from a single core, but there is no adapter tax: at build time it swaps in your framework's own reactivity, so you get real React updates, real Solid signals, and native performance with no extra layer in your bundle.
+
+For a deeper look at the design decisions behind Formisch, read our <Link href="/blog/one-core-six-frameworks/">architecture post</Link>. We explain how the runtime works and why there is no abstraction layer.
+
+Curious how it compares to popular form libraries? Our comparison guides break down the differences in API design and mental models for <Link href="/react/guides/comparison/">React</Link>, <Link href="/solid/guides/comparison/">Solid</Link>, <Link href="/svelte/guides/comparison/">Svelte</Link>, and <Link href="/vue/guides/comparison/">Vue</Link>.
+
+## How we got here
+
+Formisch did not start as Formisch. It started years ago with a frustration I think every web developer knows: you build a form that should be simple, and it grows into hundreds of lines of repetitive, fragile code.
+
+My first real answer to that was [Modular Forms](https://modularforms.dev/), which I started in 2022. It was built around one idea: you should only ever ship the form code you actually use. Instead of one giant hook that does everything, the functionality is split into small, tree-shakeable pieces. It started on SolidJS, later came to Qwik and other frameworks, and it taught me what a great forms experience feels like.
+
+The second piece came a year later, in 2023: [Valibot](https://valibot.dev/), the schema library I built next. Valibot made it possible to describe the shape of your data once and get both runtime validation and static TypeScript types from a single source. That turned out to be the missing foundation. If one schema can drive validation and types, it can drive an entire form.
+
+Formisch is where those two threads meet. It is basically the rewrite of Modular Forms I had wanted to do for a long time, rebuilt around a schema-first, framework-agnostic core. For a while I wasn't sure it was even technically possible, or worth the enormous amount of work it would take. I built the first version of the core by hand, before coding agents were any help, in late nights after my actual day job.
+
+Honestly, what kept it alive was a promise. In late 2024 I told [Shai Reznik](https://github.com/shairez) from the Qwik team that I was going to build this, and then I kept telling him, month after month, how it was going. That accountability, and his constant encouragement, is probably the single biggest reason Formisch exists today. The name came out of one of those early chats too. _Formisch_ is a little German pseudo-word: "form" plus the German "-isch" suffix that turns a noun into a describing word.
+
+It did not come easily. My first architecture was a dead end. I tried to map the form's signal-based store onto a tree structure and ran straight into more edge cases than I could handle. I had to throw it away, go back to research, and start over. It took weeks to crack the part I am most proud of: efficient, per-field signals that work natively across every supported framework. When that finally clicked, Formisch became real.
+
+The vision behind all of this is bigger than any single library. I want Formisch to be a framework-agnostic platform for forms, basically _like Vite, but for forms_, so that form logic is something you build once and reuse everywhere instead of rebuilding it for every framework and every layer. The <Link href="/blog/one-core-six-frameworks/">architecture post</Link> goes deep on how that one-core-six-frameworks design actually works.
+
+## What's new in the Release Candidate
+
+Getting to RC was less about adding features and more about hardening the ones already there, now backed by a test suite with 100% coverage:
+
+- **Hardened nested fields, field arrays, and tuples.** Lots of edge cases around inserting, moving, replacing, resetting, and resizing nested structures, the parts of a form that are easiest to get subtly wrong.
+- **More correct state and focus handling.** Dirty, touched, and the new edited state now behave predictably across resets and field-array operations, and a failed submit focuses the first field that can actually receive focus.
+- **New convenience helpers.** Methods like <Link href="/methods/api/isValid/">`isValid`</Link>, <Link href="/methods/api/isDirty/">`isDirty`</Link>, and <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>, plus an <Link href="/core/api/EmptyInput/">`emptyInput`</Link> config that gives required fields a sensible starting value so an empty field shows your own validation message.
+
+If something behaves unexpectedly in your forms, that feedback is the most valuable thing you can give us before v1 locks in.
+
+## Give it a try
+
+Install it for your framework. Here is the React package as an example. Every other framework works the same way, just swap in `@formisch/solid`, `@formisch/vue`, `@formisch/svelte`, `@formisch/preact`, or `@formisch/qwik`:
+
+```bash
+npm install @formisch/react valibot
+```
+
+Take a look at the <Link href="/playground/login/">playground</Link>, which runs in your browser with no install, or open a [StackBlitz example](https://stackblitz.com/edit/formisch-playground-react) to get a feel for it. If you find any bugs or something does not work the way you expect, [open an issue](https://github.com/open-circle/formisch/issues) or find us on [Discord](https://discord.gg/tkMjQACf2P). That feedback is exactly what helps us get v1 right.
+
+If Formisch is useful to you, a [GitHub star](https://github.com/open-circle/formisch) helps others discover the project and signals that this direction is valuable. 🙏
+
+A huge thank you to all our early testers and code contributors who helped us refine the API to this point, and to Shai Reznik and the Qwik community for the encouragement along the way. We really appreciate your support.
