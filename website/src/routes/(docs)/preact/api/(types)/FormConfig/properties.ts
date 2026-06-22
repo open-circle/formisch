@@ -49,6 +49,21 @@ export const properties: Record<string, PropertyProps> = {
           },
         },
         {
+          key: 'emptyInput',
+          optional: true,
+          value: {
+            type: 'union',
+            options: [
+              {
+                type: 'custom',
+                name: 'EmptyInput',
+                href: '/core/api/EmptyInput/',
+              },
+              'undefined',
+            ],
+          },
+        },
+        {
           key: 'validate',
           optional: true,
           value: {
@@ -108,6 +123,19 @@ export const properties: Record<string, PropertyProps> = {
               ],
             },
           ],
+        },
+        'undefined',
+      ],
+    },
+  },
+  emptyInput: {
+    type: {
+      type: 'union',
+      options: [
+        {
+          type: 'custom',
+          name: 'EmptyInput',
+          href: '/core/api/EmptyInput/',
         },
         'undefined',
       ],

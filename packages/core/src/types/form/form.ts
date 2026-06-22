@@ -17,6 +17,35 @@ export type ValidationMode =
   | 'submit';
 
 /**
+ * Empty input interface.
+ *
+ * Defines the value a required field of a given type starts at when no initial
+ * input is provided. Optional and nullable fields are not affected, as they
+ * accept `undefined`. Only required fields whose input is `undefined` fall back
+ * to these values.
+ */
+export interface EmptyInput {
+  /**
+   * The empty input of a string field. Defaults to an empty string so that an
+   * untouched field matches the DOM and validates with its own message instead
+   * of a type mismatch. Set to `undefined` to opt out.
+   */
+  readonly string?: string | undefined;
+  /**
+   * The empty input of a number field. Defaults to `undefined`.
+   */
+  readonly number?: number | undefined;
+  /**
+   * The empty input of a boolean field. Defaults to `undefined`.
+   */
+  readonly boolean?: boolean | undefined;
+  /**
+   * The empty input of a date field. Defaults to `undefined`.
+   */
+  readonly date?: Date | undefined;
+}
+
+/**
  * Form config interface.
  */
 export interface FormConfig<TSchema extends FormSchema = FormSchema> {
@@ -28,6 +57,11 @@ export interface FormConfig<TSchema extends FormSchema = FormSchema> {
    * The initial input of the form.
    */
   readonly initialInput?: DeepPartial<v.InferInput<TSchema>> | undefined;
+  /**
+   * The empty input of the form, keyed by field type. Merged on top of the
+   * defaults, so `{ string: '' }` stays in effect unless overridden.
+   */
+  readonly emptyInput?: EmptyInput | undefined;
   /**
    * The validation mode of the form.
    */
@@ -52,6 +86,10 @@ export interface InternalFormStore<TSchema extends FormSchema = FormSchema>
    * The number of active validators.
    */
   validators: number;
+  /**
+   * The resolved empty input of the form, keyed by field type.
+   */
+  emptyInput: EmptyInput;
   /**
    * The validation mode of the form.
    */

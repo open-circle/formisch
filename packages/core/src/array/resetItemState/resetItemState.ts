@@ -1,6 +1,11 @@
 import { initializeFieldStore } from '../../field/initializeFieldStore/index.ts';
 import { batch, createId } from '../../framework/index.ts';
-import type { FieldElement, InternalFieldStore } from '../../types/index.ts';
+import type {
+  EmptyInput,
+  FieldElement,
+  InternalFieldStore,
+  InternalFormStore,
+} from '../../types/index.ts';
 
 /**
  * Resets the state of a field store (signal values) deeply nested. Sets
@@ -9,6 +14,7 @@ import type { FieldElement, InternalFieldStore } from '../../types/index.ts';
  * the new input value. Keeps the `initialInput` and `initialItems` state
  * unchanged for form reset functionality.
  *
+ * @param internalFormStore The form store providing the empty input config.
  * @param internalFieldStore The field store to reset.
  * @param input The new input value (can be any type including array or object).
  * @param keepStart Whether to keep `startInput` and `startItems` as the dirty
@@ -16,6 +22,7 @@ import type { FieldElement, InternalFieldStore } from '../../types/index.ts';
  * is reused for an in-place edit so its dirty state is detected correctly.
  */
 export function resetItemState(
+  internalFormStore: InternalFormStore,
   internalFieldStore: InternalFieldStore,
   input: unknown,
   keepStart = false
@@ -99,6 +106,7 @@ export function resetItemState(
             if (internalFieldStore.children[index]) {
               // Recursively reset child with corresponding input
               resetItemState(
+                internalFormStore,
                 internalFieldStore.children[index],
                 itemInput,
                 keepStart
@@ -112,6 +120,7 @@ export function resetItemState(
 
               // Initialize field store for new child
               initializeFieldStore(
+                internalFormStore,
                 internalFieldStore.children[index],
                 // @ts-expect-error
                 internalFieldStore.schema.item,
@@ -138,6 +147,7 @@ export function resetItemState(
         for (const key in internalFieldStore.children) {
           // Recursively reset child with corresponding input
           resetItemState(
+            internalFormStore,
             internalFieldStore.children[key],
             // @ts-expect-error
             input?.[key],
@@ -148,13 +158,23 @@ export function resetItemState(
 
       // Otherwise, if field store is value, handle primitive type reset
     } else {
+      // Fall back to the empty input for this field's type when no input is
+      // provided so the reset value stays consistent with the initial input.
+      // Optional and nullable fields stay `undefined` as they accept it.
+      const valueInput =
+        input === undefined && !internalFieldStore.isNullish
+          ? internalFormStore.emptyInput[
+              internalFieldStore.schema.type as keyof EmptyInput
+            ]
+          : input;
+
       // Set start input unless it is kept as the dirty baseline
       if (!keepStart) {
-        internalFieldStore.startInput.value = input;
+        internalFieldStore.startInput.value = valueInput;
       }
 
       // Set current input
-      internalFieldStore.input.value = input;
+      internalFieldStore.input.value = valueInput;
     }
   });
 }

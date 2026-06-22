@@ -1,8 +1,10 @@
 import * as v from 'valibot';
 import { createId, createSignal, framework } from '../../framework/index.ts';
 import type {
+  EmptyInput,
   FieldElement,
   InternalFieldStore,
+  InternalFormStore,
   Path,
 } from '../../types/index.ts';
 
@@ -12,6 +14,8 @@ export type FieldSchema =
       v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
       v.ErrorMessage<v.ArrayIssue> | undefined
     >
+  | v.BooleanSchema<any>
+  | v.DateSchema<any>
   | v.ExactOptionalSchema<any, any>
   | v.IntersectSchema<any, any>
   | v.LazySchema<any>
@@ -22,6 +26,7 @@ export type FieldSchema =
   | v.NonOptionalSchema<any, any>
   | v.NullableSchema<any, any>
   | v.NullishSchema<any, any>
+  | v.NumberSchema<any>
   | v.ObjectSchema<v.ObjectEntries, v.ErrorMessage<v.ObjectIssue> | undefined>
   | v.ObjectWithRestSchema<
       v.ObjectEntries,
@@ -33,6 +38,7 @@ export type FieldSchema =
   | v.RecordSchema<any, any, any>
   | v.StrictObjectSchema<any, any>
   | v.StrictTupleSchema<any, any>
+  | v.StringSchema<any>
   | v.TupleSchema<v.TupleItems, v.ErrorMessage<v.TupleIssue> | undefined>
   | v.TupleWithRestSchema<any, any, any>
   | v.UndefinedableSchema<any, any>
@@ -44,6 +50,7 @@ export type FieldSchema =
  * array, object, and value schemas, setting up all necessary signals and
  * children. Supports wrapped schemas and schema options.
  *
+ * @param internalFormStore The form store providing the empty input config.
  * @param internalFieldStore The partial field store to initialize.
  * @param schema The Valibot schema defining the field structure.
  * @param initialInput The initial input value.
@@ -51,6 +58,7 @@ export type FieldSchema =
  * @param nullish Whether the schema is wrapped in a nullish schema.
  */
 export function initializeFieldStore(
+  internalFormStore: InternalFormStore,
   internalFieldStore: Partial<InternalFieldStore>,
   schema: FieldSchema,
   initialInput: unknown,
@@ -70,6 +78,7 @@ export function initializeFieldStore(
     // Otherwise, if schema is lazy, unwrap and initialize
   } else if (schema.type === 'lazy') {
     initializeFieldStore(
+      internalFormStore,
       internalFieldStore,
       schema.getter(undefined),
       initialInput,
@@ -86,6 +95,7 @@ export function initializeFieldStore(
     schema.type === 'undefinedable'
   ) {
     initializeFieldStore(
+      internalFormStore,
       internalFieldStore,
       schema.wrapped,
       initialInput === undefined ? v.getDefault(schema) : initialInput,
@@ -100,6 +110,7 @@ export function initializeFieldStore(
     schema.type === 'non_optional'
   ) {
     initializeFieldStore(
+      internalFormStore,
       internalFieldStore,
       schema.wrapped,
       initialInput,
@@ -119,6 +130,7 @@ export function initializeFieldStore(
     // is therefore not fully represented. See #95 for the long-term fix.
     for (const schemaOption of schema.options) {
       initializeFieldStore(
+        internalFormStore,
         internalFieldStore,
         schemaOption,
         initialInput,
@@ -135,6 +147,9 @@ export function initializeFieldStore(
     // Hint: Each field store receives its own freshly built path array (see the
     // `[...path, key]` calls below), so it can be stored directly.
     internalFieldStore.path = path;
+
+    // Store whether property is nullish so resetting can stay consistent
+    internalFieldStore.isNullish = nullish;
 
     // Initialize elements array
     // Hint: `initialElements` and `elements` start as the same array so that
@@ -189,6 +204,7 @@ export function initializeFieldStore(
 
               // Initialize field store for child
               initializeFieldStore(
+                internalFormStore,
                 internalFieldStore.children[index],
                 schema.item as FieldSchema,
                 // @ts-expect-error
@@ -208,6 +224,7 @@ export function initializeFieldStore(
 
             // Initialize field store for child
             initializeFieldStore(
+              internalFormStore,
               internalFieldStore.children[index],
               schema.items[index] as FieldSchema,
               // @ts-expect-error
@@ -216,9 +233,6 @@ export function initializeFieldStore(
             );
           }
         }
-
-        // Store whether array is nullish so resetting can stay consistent
-        internalFieldStore.isNullish = nullish;
 
         // Set array input (nullish or true)
         const arrayInput =
@@ -263,6 +277,7 @@ export function initializeFieldStore(
 
           // Initialize field store for child
           initializeFieldStore(
+            internalFormStore,
             internalFieldStore.children[key],
             schema.entries[key] as FieldSchema,
             // @ts-expect-error
@@ -270,9 +285,6 @@ export function initializeFieldStore(
             [...path, key]
           );
         }
-
-        // Store whether object is nullish so resetting can stay consistent
-        internalFieldStore.isNullish = nullish;
 
         // Set object input (nullish or true)
         const objectInput =
@@ -296,14 +308,19 @@ export function initializeFieldStore(
 
       // Initialize value-specific properties
       if (internalFieldStore.kind === 'value') {
-        // Set initial input
-        internalFieldStore.initialInput = createSignal(initialInput);
+        // Resolve the empty input for this field's type from the configured map
+        // (e.g. `''` for a string), so an untouched empty field matches the DOM
+        // and validates with its own message instead of a type mismatch.
+        // Optional and nullable fields stay `undefined` as they accept it.
+        const valueInput =
+          initialInput === undefined && !nullish
+            ? internalFormStore.emptyInput[schema.type as keyof EmptyInput]
+            : initialInput;
 
-        // Set start input
-        internalFieldStore.startInput = createSignal(initialInput);
-
-        // Set current input
-        internalFieldStore.input = createSignal(initialInput);
+        // Set initial, start and current input
+        internalFieldStore.initialInput = createSignal(valueInput);
+        internalFieldStore.startInput = createSignal(valueInput);
+        internalFieldStore.input = createSignal(valueInput);
       }
     }
   }

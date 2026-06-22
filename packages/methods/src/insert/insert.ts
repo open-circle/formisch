@@ -93,6 +93,7 @@ export function insert<
           // @ts-expect-error
           internalArrayStore.children[index] = {};
           initializeFieldStore(
+            internalFormStore,
             internalArrayStore.children[index],
             // @ts-expect-error
             internalArrayStore.schema.item,
@@ -101,6 +102,7 @@ export function insert<
           );
         }
         copyItemState(
+          internalFormStore,
           internalArrayStore.children[index - 1],
           internalArrayStore.children[index]
         );
@@ -110,6 +112,7 @@ export function insert<
         // @ts-expect-error
         internalArrayStore.children[insertIndex] = {};
         initializeFieldStore(
+          internalFormStore,
           internalArrayStore.children[insertIndex],
           // @ts-expect-error
           internalArrayStore.schema.item,
@@ -118,6 +121,7 @@ export function insert<
         );
       } else {
         resetItemState(
+          internalFormStore,
           internalArrayStore.children[insertIndex],
           config.initialInput
         );

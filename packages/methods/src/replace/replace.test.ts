@@ -167,7 +167,7 @@ describe('replace', () => {
       initialInput: { type: 'array', array: ['foo', 'bar'] },
     });
     expect(getFieldInput(store)).toStrictEqual({
-      a: [{ type: 'array', string: undefined, array: ['foo', 'bar'] }],
+      a: [{ type: 'array', string: '', array: ['foo', 'bar'] }],
     });
 
     // Switch to the "array" variant but omit the array key -> stays `[]`
@@ -177,7 +177,7 @@ describe('replace', () => {
       initialInput: { type: 'array' },
     });
     expect(getFieldInput(store)).toStrictEqual({
-      a: [{ type: 'array', string: undefined, array: [] }],
+      a: [{ type: 'array', string: '', array: [] }],
     });
   });
 
@@ -191,10 +191,30 @@ describe('replace', () => {
 
     replace(store, { path: ['a'], at: 0, initialInput: {} });
 
-    // An omitted non-nullish tuple keeps its fixed positions (reset to
-    // `undefined`) instead of collapsing to an empty array
+    // An omitted non-nullish tuple keeps its fixed positions (reset to their
+    // empty input: an empty string for the string, undefined for the number)
+    // instead of collapsing to an empty array
     expect(getFieldInput(store)).toStrictEqual({
-      a: [{ pair: [undefined, undefined] }],
+      a: [{ pair: ['', undefined] }],
+    });
+  });
+
+  test('should reset an omitted required field to its empty input but keep an optional field undefined', () => {
+    const store = createTestStore(
+      v.object({
+        a: v.array(
+          v.object({ name: v.string(), nickname: v.optional(v.string()) })
+        ),
+      }),
+      { initialInput: { a: [{ name: 'x', nickname: 'y' }] } }
+    );
+
+    replace(store, { path: ['a'], at: 0, initialInput: { name: 'z' } });
+
+    // The required string falls back to its empty input, while the optional
+    // string stays undefined as it accepts it
+    expect(getFieldInput(store)).toStrictEqual({
+      a: [{ name: 'z', nickname: undefined }],
     });
   });
 });

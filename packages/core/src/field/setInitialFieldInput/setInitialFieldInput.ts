@@ -1,5 +1,9 @@
 import { batch, createId } from '../../framework/index.ts';
-import type { InternalFieldStore } from '../../types/index.ts';
+import type {
+  EmptyInput,
+  InternalFieldStore,
+  InternalFormStore,
+} from '../../types/index.ts';
 import { initializeFieldStore } from '../initializeFieldStore/index.ts';
 
 /**
@@ -7,10 +11,12 @@ import { initializeFieldStore } from '../initializeFieldStore/index.ts';
  * For arrays, initializes missing children if needed. Updates `initialInput`
  * and `initialItems` properties.
  *
+ * @param internalFormStore The form store providing the empty input config.
  * @param internalFieldStore The field store to update.
  * @param initialInput The initial input value.
  */
 export function setInitialFieldInput(
+  internalFormStore: InternalFormStore,
   internalFieldStore: InternalFieldStore,
   initialInput: unknown
 ): void {
@@ -47,6 +53,7 @@ export function setInitialFieldInput(
 
           // Initialize field store for new child
           initializeFieldStore(
+            internalFormStore,
             internalFieldStore.children[index],
             // @ts-expect-error
             internalFieldStore.schema.item,
@@ -64,6 +71,7 @@ export function setInitialFieldInput(
       for (let index = 0; index < internalFieldStore.children.length; index++) {
         // Recursively set initial input for child
         setInitialFieldInput(
+          internalFormStore,
           internalFieldStore.children[index],
           // @ts-expect-error
           initialArrayInput[index]
@@ -80,6 +88,7 @@ export function setInitialFieldInput(
       for (const key in internalFieldStore.children) {
         // Recursively set initial input for child
         setInitialFieldInput(
+          internalFormStore,
           internalFieldStore.children[key],
           // @ts-expect-error
           initialInput?.[key]
@@ -88,8 +97,15 @@ export function setInitialFieldInput(
 
       // Otherwise, handle value field initial input
     } else {
-      // Set initial input
-      internalFieldStore.initialInput.value = initialInput;
+      // Fall back to the empty input for this field's type when no input is
+      // provided so the initial input stays consistent with form
+      // initialization. Optional and nullable fields stay `undefined`.
+      internalFieldStore.initialInput.value =
+        initialInput === undefined && !internalFieldStore.isNullish
+          ? internalFormStore.emptyInput[
+              internalFieldStore.schema.type as keyof EmptyInput
+            ]
+          : initialInput;
     }
   });
 }

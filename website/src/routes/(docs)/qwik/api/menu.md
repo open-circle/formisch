@@ -42,6 +42,7 @@
 
 - [DeepErrorEntry](/methods/api/DeepErrorEntry/)
 - [DeepPartial](/core/api/DeepPartial/)
+- [EmptyInput](/core/api/EmptyInput/)
 - [FieldArrayStore](/qwik/api/FieldArrayStore/)
 - [FieldElement](/core/api/FieldElement/)
 - [FieldElementProps](/qwik/api/FieldElementProps/)

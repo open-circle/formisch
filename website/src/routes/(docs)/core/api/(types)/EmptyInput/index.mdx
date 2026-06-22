@@ -1,0 +1,36 @@
+---
+title: EmptyInput
+description: Type definition that specifies the empty input a required field starts at, keyed by field type.
+source: /packages/core/src/types/form/form.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# EmptyInput
+
+Empty input interface that defines the value a required field of a given type starts at when no initial input is provided. Optional and nullable fields are not affected, as they accept `undefined`.
+
+## Definition
+
+- `EmptyInput`
+  - `string` <Property {...properties.string} />
+  - `number` <Property {...properties.number} />
+  - `boolean` <Property {...properties.boolean} />
+  - `date` <Property {...properties.date} />
+
+### Explanation
+
+Only required fields whose input is `undefined` fall back to these values. The `string` property defaults to an empty string so that an untouched field matches the DOM and validates with its own message instead of a type mismatch. The other properties default to `undefined`.
+
+## Related
+
+### Primitives
+
+<ApiList items={[{ text: 'useForm', href: '/react/api/useForm/' }]} />
+
+### Types
+
+<ApiList items={[{ text: 'FormConfig', href: '/react/api/FormConfig/' }]} />

@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Add `emptyInput` form config to define the value a required field of a given type starts at when no initial input is provided, defaulting to `{ string: '' }` so an untouched string field matches the DOM and validates with its own message instead of a type mismatch (issue #53)
+
 ## v0.9.0 (June 21, 2026)
 
 - Add `isEdited` field state that is set when a field's value changes, is not set on focus, and stays set after reverting to the initial value

@@ -7,7 +7,7 @@ describe('setInitialFieldInput', () => {
   describe('value fields', () => {
     test('should set initial input', () => {
       const store = createTestStore(v.object({ name: v.string() }));
-      setInitialFieldInput(store.children.name, 'John');
+      setInitialFieldInput(store, store.children.name, 'John');
       expect(store.children.name.initialInput.value).toBe('John');
     });
   });
@@ -17,7 +17,7 @@ describe('setInitialFieldInput', () => {
       const store = createTestStore(
         v.object({ user: v.object({ name: v.string() }) })
       );
-      setInitialFieldInput(store.children.user, { name: 'John' });
+      setInitialFieldInput(store, store.children.user, { name: 'John' });
       const userStore = store.children.user;
       expect(userStore.kind).toBe('object');
       if (userStore.kind === 'object') {
@@ -31,7 +31,7 @@ describe('setInitialFieldInput', () => {
         v.object({ user: v.nullish(v.object({ name: v.string() })) }),
         { initialInput: { user: { name: 'John' } } }
       );
-      setInitialFieldInput(store.children.user, null);
+      setInitialFieldInput(store, store.children.user, null);
       expect(store.children.user.initialInput.value).toBeNull();
       // Current input is not affected by setting the initial input
       expect(store.children.user.input.value).toBe(true);
@@ -43,7 +43,7 @@ describe('setInitialFieldInput', () => {
       const store = createTestStore(v.object({ items: v.array(v.string()) }), {
         initialInput: { items: ['a'] },
       });
-      setInitialFieldInput(store.children.items, ['x', 'y']);
+      setInitialFieldInput(store, store.children.items, ['x', 'y']);
       const itemsStore = store.children.items;
       expect(itemsStore.kind).toBe('array');
       if (itemsStore.kind === 'array') {
@@ -56,7 +56,7 @@ describe('setInitialFieldInput', () => {
       const store = createTestStore(v.object({ items: v.array(v.string()) }), {
         initialInput: { items: ['a'] },
       });
-      setInitialFieldInput(store.children.items, ['x', 'y', 'z']);
+      setInitialFieldInput(store, store.children.items, ['x', 'y', 'z']);
       const itemsStore = store.children.items;
       expect(itemsStore.kind).toBe('array');
       if (itemsStore.kind === 'array') {
@@ -70,7 +70,7 @@ describe('setInitialFieldInput', () => {
         v.object({ items: v.nullish(v.array(v.string())) }),
         { initialInput: { items: ['a'] } }
       );
-      setInitialFieldInput(store.children.items, null);
+      setInitialFieldInput(store, store.children.items, null);
       expect(store.children.items.initialInput.value).toBeNull();
       // Current input is not affected by setting the initial input
       expect(store.children.items.input.value).toBe(true);
@@ -81,7 +81,7 @@ describe('setInitialFieldInput', () => {
         initialInput: { items: ['a', 'b'] },
       });
       const itemsStore = store.children.items;
-      setInitialFieldInput(itemsStore, ['x', 'y']);
+      setInitialFieldInput(store, itemsStore, ['x', 'y']);
       expect(itemsStore.kind).toBe('array');
       if (itemsStore.kind === 'array') {
         expect(itemsStore.children[0].initialInput.value).toBe('x');
@@ -99,7 +99,7 @@ describe('setInitialFieldInput', () => {
       if (pairStore.kind === 'array') {
         // Tuples have no `item` schema, so the extra entry must be ignored
         expect(() =>
-          setInitialFieldInput(pairStore, ['x', 2, 3])
+          setInitialFieldInput(store, pairStore, ['x', 2, 3])
         ).not.toThrow();
         expect(pairStore.initialItems.value).toHaveLength(2);
         expect(pairStore.children[0].initialInput.value).toBe('x');

@@ -120,7 +120,11 @@ export function reset(
 
       // If initial input is provided, set it
       if (config && 'initialInput' in config) {
-        setInitialFieldInput(internalFieldStore, config.initialInput);
+        setInitialFieldInput(
+          internalFormStore,
+          internalFieldStore,
+          config.initialInput
+        );
       }
 
       // Reset state of fields by walking field store

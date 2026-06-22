@@ -22,9 +22,10 @@ Form config interface that defines the configuration options for creating a form
 - `FormConfig`
   - `schema` <Property {...properties.schema} />
   - `initialInput` <Property {...properties.initialInput} />
+  - `emptyInput` <Property {...properties.emptyInput} />
   - `validate` <Property {...properties.validate} />
   - `revalidate` <Property {...properties.revalidate} />
 
 ### Explanation
 
-The `FormConfig` object is passed to <Link href="../useForm/">`useForm`</Link> with a required `schema` property and optional properties for `initialInput`, `validate`, and `revalidate` to control form behavior and validation timing.
+The `FormConfig` object is passed to <Link href="../useForm/">`useForm`</Link> with a required `schema` property and optional properties for `initialInput`, `emptyInput`, `validate`, and `revalidate` to control form behavior and validation timing.

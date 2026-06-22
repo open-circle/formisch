@@ -20,10 +20,118 @@ describe('initializeFieldStore', () => {
       expect(field.isEdited.value).toBe(false);
       expect(field.isDirty.value).toBe(false);
     });
+  });
 
-    test('should initialize with undefined input', () => {
+  describe('empty input config', () => {
+    test('should default required string to empty string', () => {
       const store = createTestStore(v.object({ name: v.string() }));
+      expect(store.children.name.input.value).toBe('');
+      expect(store.children.name.initialInput.value).toBe('');
+      expect(store.children.name.startInput.value).toBe('');
+    });
+
+    test('should default required piped string to empty string', () => {
+      const store = createTestStore(
+        v.object({ name: v.pipe(v.string(), v.nonEmpty()) })
+      );
+      expect(store.children.name.input.value).toBe('');
+    });
+
+    test('should not default required non-string to empty string', () => {
+      const store = createTestStore(v.object({ age: v.number() }));
+      expect(store.children.age.input.value).toBeUndefined();
+    });
+
+    test('should keep optional string as undefined', () => {
+      const store = createTestStore(v.object({ name: v.optional(v.string()) }));
       expect(store.children.name.input.value).toBeUndefined();
+    });
+
+    test('should keep nullable string as undefined', () => {
+      const store = createTestStore(v.object({ name: v.nullable(v.string()) }));
+      expect(store.children.name.input.value).toBeUndefined();
+    });
+
+    test('should use explicit initial input over empty string default', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'John' },
+      });
+      expect(store.children.name.input.value).toBe('John');
+    });
+
+    test('should default nested required string to empty string', () => {
+      const store = createTestStore(
+        v.object({ user: v.object({ name: v.string() }) })
+      );
+      const userStore = store.children.user;
+      expect(userStore.kind).toBe('object');
+      if (userStore.kind === 'object') {
+        expect(userStore.children.name.input.value).toBe('');
+      }
+    });
+
+    test('should default number and boolean to undefined', () => {
+      const store = createTestStore(
+        v.object({ age: v.number(), active: v.boolean() })
+      );
+      expect(store.children.age.input.value).toBeUndefined();
+      expect(store.children.active.input.value).toBeUndefined();
+    });
+
+    test('should apply configured empty input per type', () => {
+      const date = new Date('2020-01-01');
+      const store = createTestStore(
+        v.object({
+          name: v.string(),
+          age: v.number(),
+          active: v.boolean(),
+          birthday: v.date(),
+        }),
+        { emptyInput: { number: 0, boolean: false, date } }
+      );
+      expect(store.children.name.input.value).toBe('');
+      expect(store.children.age.input.value).toBe(0);
+      expect(store.children.active.input.value).toBe(false);
+      expect(store.children.birthday.input.value).toBe(date);
+    });
+
+    test('should opt out of the empty string default', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        emptyInput: { string: undefined },
+      });
+      expect(store.children.name.input.value).toBeUndefined();
+    });
+
+    test('should apply configured empty input to nested and array children', () => {
+      const store = createTestStore(
+        v.object({
+          user: v.object({ age: v.number() }),
+          scores: v.array(v.number()),
+        }),
+        { initialInput: { scores: [undefined] }, emptyInput: { number: 0 } }
+      );
+      const userStore = store.children.user;
+      expect(userStore.kind).toBe('object');
+      if (userStore.kind === 'object') {
+        expect(userStore.children.age.input.value).toBe(0);
+      }
+      const scoresStore = store.children.scores;
+      expect(scoresStore.kind).toBe('array');
+      if (scoresStore.kind === 'array') {
+        expect(scoresStore.children[0].input.value).toBe(0);
+      }
+    });
+
+    test('should store whether a value field is nullish for resetting', () => {
+      const store = createTestStore(
+        v.object({ name: v.string(), nickname: v.optional(v.string()) })
+      );
+      const nameStore = store.children.name;
+      const nicknameStore = store.children.nickname;
+      if (nameStore.kind === 'value' && nicknameStore.kind === 'value') {
+        expect(nameStore.isNullish).toBe(false);
+        expect(nicknameStore.isNullish).toBe(true);
+      }
     });
   });
 
