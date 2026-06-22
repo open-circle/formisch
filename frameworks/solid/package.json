@@ -10,11 +10,20 @@
     "url": "https://github.com/open-circle/formisch"
   },
   "keywords": [
+    "solid",
     "solidjs",
+    "solid-form",
     "form",
-    "typescript",
+    "forms",
+    "form-validation",
+    "validation",
     "schema",
-    "validation"
+    "typescript",
+    "type-safe",
+    "signals",
+    "bundle-size",
+    "modular",
+    "valibot"
   ],
   "type": "module",
   "main": "./dist/index.js",

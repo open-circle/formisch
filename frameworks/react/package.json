@@ -11,10 +11,18 @@
   },
   "keywords": [
     "react",
+    "react-form",
     "form",
-    "typescript",
+    "forms",
+    "form-validation",
+    "validation",
     "schema",
-    "validation"
+    "typescript",
+    "type-safe",
+    "signals",
+    "bundle-size",
+    "modular",
+    "valibot"
   ],
   "type": "module",
   "main": "./dist/index.js",
