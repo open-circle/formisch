@@ -24,6 +24,7 @@ export const DEFAULT_EMPTY_INPUT: EmptyInput = { string: '' };
  *
  * @returns The internal form store.
  */
+// @__NO_SIDE_EFFECTS__
 export function createFormStore(
   config: FormConfig,
   parse: (input: unknown) => Promise<v.SafeParseResult<FormSchema>>
