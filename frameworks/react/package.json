@@ -1,7 +1,7 @@
 {
   "name": "@formisch/react",
   "description": "The lightweight, schema-first, and fully type-safe form library for React",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",

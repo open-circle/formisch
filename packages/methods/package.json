@@ -1,7 +1,7 @@
 {
   "name": "@formisch/methods",
   "description": "The lightweight, schema-first, and fully type-safe form library for React, Solid, Vue, Svelte and more",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",

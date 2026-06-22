@@ -2,6 +2,11 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.11.0 (June 22, 2026)
+
+- Change `@formisch/core` to v0.10.0
+- Change `insert`, `replace` and `reset` methods to initialize required fields without an input using the form's `emptyInput` config
+
 ## v0.10.0 (June 21, 2026)
 
 - Change `@formisch/core` to v0.9.0

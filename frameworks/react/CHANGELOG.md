@@ -2,6 +2,12 @@
 
 All notable changes to the library will be documented in this file.
 
+## v0.8.0 (June 22, 2026)
+
+- Change `@formisch/core` to v0.10.0
+- Change `@formisch/methods` to v0.11.0
+- Add `emptyInput` config to define the value a required field of a given type starts at when no initial input is provided
+
 ## v0.7.0 (June 21, 2026)
 
 - Change `@formisch/core` to v0.9.0

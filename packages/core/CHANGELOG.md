@@ -2,7 +2,7 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v0.10.0 (June 22, 2026)
 
 - Add `emptyInput` form config to define the value a required field of a given type starts at when no initial input is provided, defaulting to `{ string: '' }` so an untouched string field matches the DOM and validates with its own message instead of a type mismatch (issue #53)
 - Change `FormSchema` to structurally accept any schema with an object output, so generic object schemas (e.g. `v.GenericSchema<{ email: string }>`) can again be used to type a partial `FormStore` for reusable field components (issue #147)
