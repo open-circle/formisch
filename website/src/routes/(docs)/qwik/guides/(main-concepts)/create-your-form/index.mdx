@@ -43,6 +43,7 @@ The <Link href="/qwik/api/useForm$/">`useForm$`</Link> hook accepts a configurat
 
 - `schema`: Your Valibot schema that defines the form
 - `initialInput`: Initial values for your form fields (optional)
+- `emptyInput`: The empty value each field type starts at when a required field has no initial input (optional, defaults to `{ string: '' }`)
 - `validate`: When validation first occurs (optional, defaults to `'submit'`)
 - `revalidate`: When revalidation occurs after initial validation (optional, defaults to `'input'`)
 
@@ -61,7 +62,26 @@ Formisch tracks two inputs for every field: the **initial input** (baseline for 
 
 `isDirty` becomes `true` when a field's current input differs from its initial input. Use <Link href="/methods/api/setInput/">`setInput`</Link> to update the current input (client state), and use <Link href="/methods/api/reset/">`reset`</Link> to update the initial input (baseline) when your server data changes or is refreshed.
 
-### Multiple forms
+### Empty input
+
+By default, a required string field starts as an empty string (`''`) instead of `undefined`, matching an empty text input. This way an empty field shows the validation message you defined for it (for example from `v.nonEmpty()`) without you setting an `initialInput` for every field.
+
+You can configure the empty value per field type, or opt out by setting a type to `undefined`:
+
+```tsx
+const loginForm = useForm$(() => ({
+  schema: LoginSchema,
+  emptyInput: {
+    string: '', // the default
+    number: 0, // required numbers start at 0 instead of undefined
+    boolean: false, // checkboxes start unchecked
+  },
+}));
+```
+
+Optional and nullable fields are never affected and keep starting as `undefined`, since they accept it. The supported types are `string`, `number`, `boolean` and `date`, and the default is `{ string: '' }`.
+
+## Multiple forms
 
 When a page contains multiple forms, you can create separate form stores for each one:
 
@@ -93,6 +113,8 @@ export default component$(() => {
   );
 });
 ```
+
+If you need a multi-step form (wizard), see the [multi-step form discussion](https://github.com/open-circle/formisch/discussions/108) for patterns and approaches.
 
 ## Next steps
 
