@@ -109,12 +109,16 @@ export function initializeFieldStore(
     schema.type === 'non_nullish' ||
     schema.type === 'non_optional'
   ) {
+    // Forward the nullish flag so an outer optional or nullable wrapper still
+    // keeps the field at `undefined`/`null` instead of its empty input (e.g.
+    // `v.optional(v.nonOptional(v.string()))`)
     initializeFieldStore(
       internalFormStore,
       internalFieldStore,
       schema.wrapped,
       initialInput,
-      path
+      path,
+      nullish
     );
 
     // Otherwise, if schema has options, initialize for each option

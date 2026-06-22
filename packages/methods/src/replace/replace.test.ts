@@ -209,12 +209,12 @@ describe('replace', () => {
       { initialInput: { a: [{ name: 'x', nickname: 'y' }] } }
     );
 
-    replace(store, { path: ['a'], at: 0, initialInput: { name: 'z' } });
+    replace(store, { path: ['a'], at: 0, initialInput: {} });
 
-    // The required string falls back to its empty input, while the optional
-    // string stays undefined as it accepts it
+    // The omitted required string falls back to its empty input, while the
+    // omitted optional string stays undefined as it accepts it
     expect(getFieldInput(store)).toStrictEqual({
-      a: [{ name: 'z', nickname: undefined }],
+      a: [{ name: '', nickname: undefined }],
     });
   });
 });

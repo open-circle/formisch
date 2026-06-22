@@ -52,6 +52,20 @@ describe('initializeFieldStore', () => {
       expect(store.children.name.input.value).toBeUndefined();
     });
 
+    test('should keep a non-optional inside an optional as undefined', () => {
+      const store = createTestStore(
+        v.object({ name: v.optional(v.nonOptional(v.string())) })
+      );
+      expect(store.children.name.input.value).toBeUndefined();
+    });
+
+    test('should keep a non-nullish inside a nullish as undefined', () => {
+      const store = createTestStore(
+        v.object({ name: v.nullish(v.nonNullish(v.string())) })
+      );
+      expect(store.children.name.input.value).toBeUndefined();
+    });
+
     test('should use explicit initial input over empty string default', () => {
       const store = createTestStore(v.object({ name: v.string() }), {
         initialInput: { name: 'John' },
