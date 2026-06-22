@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 import { describe, expectTypeOf, test } from 'vitest';
-import type { FieldStore } from '../../types/index.ts';
+import type { FieldStore, FormStore } from '../../types/index.ts';
 import { useForm } from '../useForm/index.ts';
 import { useField } from './useField.ts';
 
@@ -38,6 +38,24 @@ describe('useField', () => {
     expectTypeOf(useField(form, { path: ['tags', 0] }).input).toEqualTypeOf<
       string | undefined
     >();
+  });
+
+  test('should accept a partial FormStore typed with a generic object schema (#147)', () => {
+    // Reusable field logic (e.g. a custom hook) types its `FormStore`
+    // parameter with a generic object schema so it accepts any form whose
+    // input includes the required field. This must type-check against
+    // `useField`.
+    function useEmailField(
+      form: FormStore<v.GenericSchema<{ email: string }>>
+    ) {
+      return useField(form, { path: ['email'] });
+    }
+
+    const form = useForm({
+      schema: v.object({ email: v.string(), name: v.string() }),
+    });
+
+    expectTypeOf(useEmailField(form).input).toEqualTypeOf<string | undefined>();
   });
 
   test('should reject invalid paths', () => {
