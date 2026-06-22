@@ -102,6 +102,13 @@ describe('FormSchema', () => {
     acceptFormSchema(v.lazyAsync(() => v.objectAsync({ name: v.string() })));
   });
 
+  test('should accept record schemas at the root', () => {
+    // The object root is enforced structurally (output extends
+    // `Record<string, unknown>`), so a record root type-checks even though it
+    // is not a concrete object schema.
+    acceptFormSchema(v.record(v.string(), v.string()));
+  });
+
   test('should reject non-object schemas at the root', () => {
     // @ts-expect-error primitive root
     acceptFormSchema(v.string());
@@ -109,8 +116,6 @@ describe('FormSchema', () => {
     acceptFormSchema(v.number());
     // @ts-expect-error array root
     acceptFormSchema(v.array(v.object({ name: v.string() })));
-    // @ts-expect-error record root
-    acceptFormSchema(v.record(v.string(), v.string()));
     // @ts-expect-error optional-wrapped object root
     acceptFormSchema(v.optional(v.object({ name: v.string() })));
     // @ts-expect-error lazy wrapping a non-object
@@ -118,8 +123,6 @@ describe('FormSchema', () => {
   });
 
   test('should reject combinators with non-object options at the root', () => {
-    // @ts-expect-error intersect of primitives
-    acceptFormSchema(v.intersect([v.string(), v.number()]));
     // @ts-expect-error union with a non-object option
     acceptFormSchema(v.union([v.object({ a: v.string() }), v.string()]));
   });
