@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Change `FormSchema` to structurally accept any schema with an object output, so generic object schemas (e.g. `v.GenericSchema<{ email: string }>`) can again be used to type a partial `FormStore` for reusable field components (issue #147)
+
 ## v0.9.0 (June 21, 2026)
 
 - Add `isEdited` field state that is set when a field's value changes, is not set on focus, and stays set after reverting to the initial value
