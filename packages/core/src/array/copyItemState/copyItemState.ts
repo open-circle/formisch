@@ -1,6 +1,9 @@
 import { initializeFieldStore } from '../../field/initializeFieldStore/index.ts';
 import { batch, untrack } from '../../framework/index.ts';
-import type { InternalFieldStore } from '../../types/index.ts';
+import type {
+  InternalFieldStore,
+  InternalFormStore,
+} from '../../types/index.ts';
 
 /**
  * Copies the deeply nested state (signal values) from one field store to
@@ -9,10 +12,12 @@ import type { InternalFieldStore } from '../../types/index.ts';
  * properties. Recursively walks through the field stores and copies all signal
  * values.
  *
+ * @param internalFormStore The form store providing the empty input config.
  * @param fromInternalFieldStore The source field store to copy from.
  * @param toInternalFieldStore The destination field store to copy to.
  */
 export function copyItemState(
+  internalFormStore: InternalFormStore,
   fromInternalFieldStore: InternalFieldStore,
   toInternalFieldStore: InternalFieldStore
 ): void {
@@ -69,6 +74,7 @@ export function copyItemState(
 
             // Initialize field store for new child
             initializeFieldStore(
+              internalFormStore,
               toInternalFieldStore.children[index],
               // @ts-expect-error
               toInternalFieldStore.schema.item,
@@ -79,6 +85,7 @@ export function copyItemState(
 
           // Recursively copy child state
           copyItemState(
+            internalFormStore,
             fromInternalFieldStore.children[index],
             toInternalFieldStore.children[index]
           );
@@ -93,6 +100,7 @@ export function copyItemState(
         for (const key in fromInternalFieldStore.children) {
           // Recursively copy child state
           copyItemState(
+            internalFormStore,
             fromInternalFieldStore.children[key],
             toInternalFieldStore.children[key]
           );

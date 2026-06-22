@@ -31,6 +31,15 @@ export interface InternalBaseStore {
    */
   schema: Schema;
   /**
+   * Whether the schema is wrapped in a nullish schema.
+   *
+   * Hint: This indicates whether a missing input should be represented as the
+   * nullish value (`null`/`undefined`) instead of a present empty fallback
+   * (`true` for arrays and objects, or the empty input for values). It keeps
+   * resetting consistent with the initial state.
+   */
+  isNullish: boolean;
+  /**
    * The initial elements of the field.
    *
    * Hint: This may look unused, but do not remove it. `copyItemState` and
@@ -76,14 +85,7 @@ export interface InternalArrayStore extends InternalBaseStore {
    * The kind of field store.
    */
   kind: 'array';
-  /**
-   * Whether the array schema is wrapped in a nullish schema.
-   *
-   * Hint: This indicates whether a missing input should be represented as the
-   * nullish value (`null`/`undefined`) or as a present but empty array
-   * (`true`). It keeps resetting consistent with the initial state.
-   */
-  isNullish: boolean;
+
   /**
    * The children of the array field.
    */
@@ -139,14 +141,6 @@ export interface InternalObjectStore extends InternalBaseStore {
    * The kind of field store.
    */
   kind: 'object';
-  /**
-   * Whether the object schema is wrapped in a nullish schema.
-   *
-   * Hint: This indicates whether a missing input should be represented as the
-   * nullish value (`null`/`undefined`) or as a present but empty object
-   * (`true`). It keeps resetting consistent with the initial state.
-   */
-  isNullish: boolean;
   /**
    * The children of the object field.
    */

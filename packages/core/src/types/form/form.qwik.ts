@@ -6,6 +6,7 @@ import type { FormSchema } from '../schema/index.ts';
 import type { Signal } from '../signal/index.ts';
 import type { DeepPartial } from '../utils/index.ts';
 import type {
+  EmptyInput,
   SubmitEventHandler,
   SubmitHandler,
   ValidationMode,
@@ -23,6 +24,11 @@ export interface FormConfig<TSchema extends FormSchema = FormSchema> {
    * The initial input of the form.
    */
   readonly initialInput?: DeepPartial<v.InferInput<TSchema>> | undefined;
+  /**
+   * The empty input of the form, keyed by field type. Merged on top of the
+   * defaults, so `{ string: '' }` stays in effect unless overridden.
+   */
+  readonly emptyInput?: EmptyInput | undefined;
   /**
    * The validation mode of the form.
    */
@@ -47,6 +53,10 @@ export interface InternalFormStore<TSchema extends FormSchema = FormSchema>
    * The number of active validators.
    */
   validators: number;
+  /**
+   * The resolved empty input of the form, keyed by field type.
+   */
+  emptyInput: EmptyInput;
   /**
    * The validation mode of the form.
    */
@@ -86,4 +96,4 @@ export interface BaseFormStore<TSchema extends FormSchema = FormSchema> {
   readonly [INTERNAL]: InternalFormStore<TSchema>;
 }
 
-export type { ValidationMode, SubmitHandler, SubmitEventHandler };
+export type { EmptyInput, ValidationMode, SubmitHandler, SubmitEventHandler };

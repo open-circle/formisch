@@ -1,6 +1,9 @@
 import { initializeFieldStore } from '../../field/initializeFieldStore/index.ts';
 import { batch, untrack } from '../../framework/index.ts';
-import type { InternalFieldStore } from '../../types/index.ts';
+import type {
+  InternalFieldStore,
+  InternalFormStore,
+} from '../../types/index.ts';
 
 /**
  * Swaps the deeply nested state (signal values) between two field stores. This
@@ -8,10 +11,12 @@ import type { InternalFieldStore } from '../../types/index.ts';
  * `isEdited`, `isDirty`, and for arrays `startItems` and `items` properties.
  * Recursively walks through the field stores and swaps all signal values.
  *
+ * @param internalFormStore The form store providing the empty input config.
  * @param firstInternalFieldStore The first field store to swap.
  * @param secondInternalFieldStore The second field store to swap.
  */
 export function swapItemState(
+  internalFormStore: InternalFormStore,
   firstInternalFieldStore: InternalFieldStore,
   secondInternalFieldStore: InternalFieldStore
 ): void {
@@ -92,6 +97,7 @@ export function swapItemState(
 
             // Initialize field store for new child
             initializeFieldStore(
+              internalFormStore,
               firstInternalFieldStore.children[index],
               // @ts-expect-error
               firstInternalFieldStore.schema.item,
@@ -108,6 +114,7 @@ export function swapItemState(
 
             // Initialize field store for new child
             initializeFieldStore(
+              internalFormStore,
               secondInternalFieldStore.children[index],
               // @ts-expect-error
               secondInternalFieldStore.schema.item,
@@ -118,6 +125,7 @@ export function swapItemState(
 
           // Recursively swap children
           swapItemState(
+            internalFormStore,
             firstInternalFieldStore.children[index],
             secondInternalFieldStore.children[index]
           );
@@ -132,6 +140,7 @@ export function swapItemState(
         for (const key in firstInternalFieldStore.children) {
           // Recursively swap children
           swapItemState(
+            internalFormStore,
             firstInternalFieldStore.children[key],
             secondInternalFieldStore.children[key]
           );

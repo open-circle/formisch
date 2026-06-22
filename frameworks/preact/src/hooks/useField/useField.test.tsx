@@ -23,7 +23,7 @@ describe('useField', () => {
 
       const field = result.current;
       expect(field.path.value).toEqual(['name']);
-      expect(field.input.value).toBe(undefined);
+      expect(field.input.value).toBe('');
       expect(field.errors.value).toBe(null);
       expect(field.isTouched.value).toBe(false);
       expect(field.isDirty.value).toBe(false);

@@ -11,10 +11,12 @@ import { initializeFieldStore } from '../initializeFieldStore/index.ts';
  * Sets the input for a nested field store and all its children, updating
  * touched and dirty states accordingly. Handles dynamic array resizing.
  *
+ * @param internalFormStore The form store providing the empty input config.
  * @param internalFieldStore The field store to update.
  * @param input The new input value.
  */
 function setNestedInput(
+  internalFormStore: InternalFormStore,
   internalFieldStore: InternalFieldStore,
   input: unknown
 ): void {
@@ -52,6 +54,7 @@ function setNestedInput(
         // like a direct edit on a never-shrunk array would be.
         if (internalFieldStore.children[index]) {
           resetItemState(
+            internalFormStore,
             internalFieldStore.children[index],
             // @ts-expect-error
             arrayInput[index],
@@ -66,6 +69,7 @@ function setNestedInput(
 
           // Initialize field store for new child
           initializeFieldStore(
+            internalFormStore,
             internalFieldStore.children[index],
             // @ts-expect-error
             internalFieldStore.schema.item,
@@ -88,6 +92,7 @@ function setNestedInput(
     for (let index = 0; index < length; index++) {
       // Recursively set nested input
       setNestedInput(
+        internalFormStore,
         internalFieldStore.children[index],
         // @ts-expect-error
         arrayInput[index]
@@ -109,6 +114,7 @@ function setNestedInput(
     for (const key in internalFieldStore.children) {
       // Recursively set nested input
       setNestedInput(
+        internalFormStore,
         internalFieldStore.children[key],
         // @ts-expect-error
         input?.[key]
@@ -173,7 +179,7 @@ export function setFieldInput(
       }
 
       // Set nested input on target field
-      setNestedInput(internalFieldStore, input);
+      setNestedInput(internalFormStore, internalFieldStore, input);
     });
   });
 }

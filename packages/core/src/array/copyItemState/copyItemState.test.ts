@@ -22,7 +22,7 @@ describe('copyItemState', () => {
       sourceStore.isDirty.value = true;
       sourceStore.errors.value = ['Error'];
 
-      copyItemState(sourceStore, targetStore);
+      copyItemState(store, sourceStore, targetStore);
 
       expect(targetStore.input.value).toBe('modified');
       expect(targetStore.startInput.value).toBe('hello');
@@ -43,7 +43,7 @@ describe('copyItemState', () => {
       const mockElement = document.createElement('input');
       sourceStore.elements = [mockElement];
 
-      copyItemState(sourceStore, targetStore);
+      copyItemState(store, sourceStore, targetStore);
 
       expect(targetStore.elements).toEqual([mockElement]);
     });
@@ -75,7 +75,7 @@ describe('copyItemState', () => {
         sourceStore.children.name.isTouched.value = true;
         sourceStore.children.age.input.value = 25;
 
-        copyItemState(sourceStore, targetStore);
+        copyItemState(store, sourceStore, targetStore);
 
         expect(targetStore.children.name.input.value).toBe('Jane');
         expect(targetStore.children.name.isTouched.value).toBe(true);
@@ -109,7 +109,7 @@ describe('copyItemState', () => {
         sourceStore.children[0].input.value = 'modified-a';
         sourceStore.isTouched.value = true;
 
-        copyItemState(sourceStore, targetStore);
+        copyItemState(store, sourceStore, targetStore);
 
         expect(targetStore.items.value).toEqual(sourceStore.items.value);
         expect(targetStore.startItems.value).toEqual(
@@ -143,7 +143,7 @@ describe('copyItemState', () => {
       if (sourceStore.kind === 'array' && targetStore.kind === 'array') {
         expect(targetStore.children.length).toBe(1);
 
-        copyItemState(sourceStore, targetStore);
+        copyItemState(store, sourceStore, targetStore);
 
         expect(targetStore.children.length).toBe(3);
         expect(targetStore.children[2].input.value).toBe('c');
@@ -163,7 +163,7 @@ describe('copyItemState', () => {
       targetStore.errors.value = ['Old error'];
       sourceStore.errors.value = null;
 
-      copyItemState(sourceStore, targetStore);
+      copyItemState(store, sourceStore, targetStore);
 
       expect(targetStore.errors.value).toBe(null);
     });

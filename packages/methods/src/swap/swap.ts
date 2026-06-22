@@ -75,6 +75,7 @@ export function swap<
 
       // Swap child stores directly
       swapItemState(
+        internalFormStore,
         internalArrayStore.children[config.at],
         internalArrayStore.children[config.and]
       );

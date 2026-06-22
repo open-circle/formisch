@@ -19,7 +19,7 @@ describe('swapItemState', () => {
       secondStore.isDirty.value = true;
       secondStore.isEdited.value = true;
 
-      swapItemState(firstStore, secondStore);
+      swapItemState(store, firstStore, secondStore);
 
       expect(firstStore.input.value).toBe('world');
       expect(secondStore.input.value).toBe('hello');
@@ -46,7 +46,7 @@ describe('swapItemState', () => {
       firstStore.elements = [input1];
       secondStore.elements = [input2];
 
-      swapItemState(firstStore, secondStore);
+      swapItemState(store, firstStore, secondStore);
 
       expect(firstStore.elements).toEqual([input2]);
       expect(secondStore.elements).toEqual([input1]);
@@ -77,7 +77,7 @@ describe('swapItemState', () => {
       if (firstStore.kind === 'object' && secondStore.kind === 'object') {
         firstStore.children.name.isTouched.value = true;
 
-        swapItemState(firstStore, secondStore);
+        swapItemState(store, firstStore, secondStore);
 
         expect(firstStore.children.name.input.value).toBe('Jane');
         expect(secondStore.children.name.input.value).toBe('John');
@@ -112,7 +112,7 @@ describe('swapItemState', () => {
         const firstItems = firstStore.items.value;
         const secondItems = secondStore.items.value;
 
-        swapItemState(firstStore, secondStore);
+        swapItemState(store, firstStore, secondStore);
 
         expect(firstStore.items.value).toEqual(secondItems);
         expect(secondStore.items.value).toEqual(firstItems);
@@ -145,7 +145,7 @@ describe('swapItemState', () => {
         expect(firstStore.children.length).toBe(1);
         expect(secondStore.children.length).toBe(3);
 
-        swapItemState(firstStore, secondStore);
+        swapItemState(store, firstStore, secondStore);
 
         // Both should now have 3 children (max of both)
         expect(firstStore.children.length).toBe(3);
@@ -177,7 +177,7 @@ describe('swapItemState', () => {
         expect(firstStore.children.length).toBe(3);
         expect(secondStore.children.length).toBe(1);
 
-        swapItemState(firstStore, secondStore);
+        swapItemState(store, firstStore, secondStore);
 
         // Both should now have 3 children (max of both)
         expect(firstStore.children.length).toBe(3);
@@ -198,7 +198,7 @@ describe('swapItemState', () => {
       const firstStore = store.children.first;
       const secondStore = store.children.second;
 
-      swapItemState(firstStore, secondStore);
+      swapItemState(store, firstStore, secondStore);
 
       expect(firstStore.startInput.value).toBe('start-second');
       expect(secondStore.startInput.value).toBe('start-first');
@@ -232,7 +232,7 @@ describe('swapItemState', () => {
         if (child0.kind === 'object' && child1.kind === 'object') {
           child0.children.name.isTouched.value = true;
 
-          swapItemState(child0, child1);
+          swapItemState(store, child0, child1);
 
           expect(child0.children.name.input.value).toBe('Bob');
           expect(child0.children.score.input.value).toBe(50);
@@ -258,7 +258,7 @@ describe('swapItemState', () => {
 
         child0.isTouched.value = true;
 
-        swapItemState(child0, child2);
+        swapItemState(store, child0, child2);
 
         expect(child0.input.value).toBe('third');
         expect(child2.input.value).toBe('first');
