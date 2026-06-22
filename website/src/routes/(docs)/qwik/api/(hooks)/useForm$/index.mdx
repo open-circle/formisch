@@ -27,7 +27,7 @@ const form = useForm$<TSchema>(configFn);
 
 ### Explanation
 
-`useForm$` creates a reactive form store that manages form state using the provided Valibot schema. The `configFn` callback must return a <Link href="../FormConfig/">`FormConfig`</Link> object. Validation runs when a field is blurred or the form is submitted by default, but this can be customized with the `validate` and `revalidate` options.
+`useForm$` creates a reactive form store that manages form state using the provided Valibot schema. The `configFn` callback must return a <Link href="../FormConfig/">`FormConfig`</Link> object. By default, validation runs when the form is submitted and then revalidates on every input, but this can be customized with the `validate` and `revalidate` options.
 
 ## Returns
 

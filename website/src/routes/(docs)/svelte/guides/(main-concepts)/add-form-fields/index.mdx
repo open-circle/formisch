@@ -101,7 +101,7 @@ For very complex forms where you create individual components for each form fiel
     form: FormStore<v.GenericSchema<{ email: string }>>;
   };
 
-  let { form } = $props<EmailInputProps>();
+  let { form }: EmailInputProps = $props();
 
   const field = useField(form, { path: ['email'] });
 </script>

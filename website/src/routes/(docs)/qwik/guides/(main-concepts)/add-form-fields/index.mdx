@@ -2,7 +2,7 @@
 title: Add form fields
 description: >-
   Learn how to add fields to your form using the Field component or useField
-  primitive. Both are headless and provide access to field state for building
+  hook. Both are headless and provide access to field state for building
   your form UI.
 contributors:
   - fabian-hiller
@@ -12,7 +12,7 @@ import { Link } from '~/components';
 
 # Add form fields
 
-To add a field to your form, you can use the <Link href="/qwik/api/Field/">`Field`</Link> component or the <Link href="/qwik/api/useField/">`useField$`</Link> hook. Both are headless and provide access to field state for building your form UI.
+To add a field to your form, you can use the <Link href="/qwik/api/Field/">`Field`</Link> component or the <Link href="/qwik/api/useField/">`useField`</Link> hook. Both are headless and provide access to field state for building your form UI.
 
 ## Field component
 
@@ -98,12 +98,12 @@ For nested fields, the path reflects the structure of your schema:
 
 The API design of the <Link href="/qwik/api/Field/">`Field`</Link> component results in a fully type-safe form. For example, if you change your schema, TypeScript will immediately alert you if the path is invalid. The field state is also fully typed based on your schema, giving you autocompletion for properties like `field.input`.
 
-## useField$ hook
+## useField hook
 
-For very complex forms where you create individual components for each form field, Formisch provides the <Link href="/qwik/api/useField/">`useField$`</Link> hook. It allows you to access the field state directly within your component logic.
+For very complex forms where you create individual components for each form field, Formisch provides the <Link href="/qwik/api/useField/">`useField`</Link> hook. It allows you to access the field state directly within your component logic.
 
 ```tsx
-import { useField$ } from '@formisch/qwik';
+import { useField } from '@formisch/qwik';
 import type { FormStore } from '@formisch/qwik';
 import { component$ } from '@qwik.dev/core';
 import * as v from 'valibot';
@@ -113,7 +113,7 @@ type EmailInputProps = {
 };
 
 export const EmailInput = component$<EmailInputProps>((props) => {
-  const field = useField$(props.form, { path: ['email'] });
+  const field = useField(props.form, { path: ['email'] });
 
   return (
     <div>
@@ -127,9 +127,9 @@ export const EmailInput = component$<EmailInputProps>((props) => {
 ### When to use which
 
 - **Use <Link href="/qwik/api/Field/">`Field`</Link> component**: When defining multiple fields in the same component. It ensures you don't accidentally access the wrong field store.
-- **Use <Link href="/qwik/api/useField/">`useField$`</Link> hook**: When creating field components for single fields. It allows you to access field state in your component logic.
+- **Use <Link href="/qwik/api/useField/">`useField`</Link> hook**: When creating field components for single fields. It allows you to access field state in your component logic.
 
-The <Link href="/qwik/api/Field/">`Field`</Link> component is essentially a thin wrapper around <Link href="/qwik/api/useField/">`useField$`</Link> that allows you to access the field state within JSX code.
+The <Link href="/qwik/api/Field/">`Field`</Link> component is essentially a thin wrapper around <Link href="/qwik/api/useField/">`useField`</Link> that allows you to access the field state within JSX code.
 
 ## Field store
 

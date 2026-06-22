@@ -10,10 +10,8 @@ export const properties: Record<string, PropertyProps> = {
     },
   },
   TValue: {
-    type: {
-      type: 'custom',
-      name: 'unknown',
-    },
+    modifier: 'extends',
+    type: 'object',
   },
   form: {
     type: {

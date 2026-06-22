@@ -45,10 +45,10 @@ Our goal is to develop a `TextInput` component so that the code ends up looking 
 <template>
   <Field :of="loginForm" :path="['email']" v-slot="field">
     <TextInput
-      v-bind="field.props"
+      v-model="field.input"
+      :props="field.props"
       type="email"
       label="Email"
-      :input="field.input"
       :errors="field.errors"
       required
     />

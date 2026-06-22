@@ -105,7 +105,7 @@ Writing this guard at every field gets repetitive. The common fix is to move it 
     isSubmitted: boolean;
   }
 
-  let { errors, isEdited, isSubmitted } = $props<FieldErrorProps>();
+  let { errors, isEdited, isSubmitted }: FieldErrorProps = $props();
 </script>
 
 {#if errors && (isEdited || isSubmitted)}

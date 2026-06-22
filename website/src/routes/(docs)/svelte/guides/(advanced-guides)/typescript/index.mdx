@@ -180,7 +180,7 @@ To pass your form to another component via props, you can use the <Link href="/s
     of: FormStore<typeof LoginSchema>;
   };
 
-  let { of } = $props<FormContentProps>();
+  let { of }: FormContentProps = $props();
 
   const handleSubmit: SubmitEventHandler<typeof LoginSchema> = (
     output,
@@ -206,7 +206,7 @@ You can create generic field components with proper TypeScript typing using the 
     of: FormStore<T>;
   };
 
-  let { of } = $props<EmailInputProps>();
+  let { of }: EmailInputProps = $props();
 
   const field = useField(of, { path: ['email'] });
 </script>
