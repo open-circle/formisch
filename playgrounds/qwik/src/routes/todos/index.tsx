@@ -23,21 +23,12 @@ import {
 } from '~/components';
 
 const TodoFormSchema = v.object({
-  heading: v.pipe(
-    v.string('Please enter a heading.'),
-    v.nonEmpty('Please enter a heading.')
-  ),
+  heading: v.pipe(v.string(), v.nonEmpty('Please enter a heading.')),
   todos: v.pipe(
     v.array(
       v.object({
-        label: v.pipe(
-          v.string('Please enter a label.'),
-          v.nonEmpty('Please enter a label.')
-        ),
-        deadline: v.pipe(
-          v.string('Please enter a deadline.'),
-          v.nonEmpty('Please enter a deadline.')
-        ),
+        label: v.pipe(v.string(), v.nonEmpty('Please enter a label.')),
+        deadline: v.pipe(v.string(), v.nonEmpty('Please enter a deadline.')),
       })
     ),
     v.nonEmpty('Please add at least one todo.'),
