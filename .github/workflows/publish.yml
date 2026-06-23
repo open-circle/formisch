@@ -26,7 +26,9 @@ jobs:
         run: pnpm build
         working-directory: frameworks/preact
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/preact
         continue-on-error: true
 
@@ -46,7 +48,9 @@ jobs:
         run: pnpm build
         working-directory: frameworks/qwik
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/qwik
         continue-on-error: true
 
@@ -66,7 +70,9 @@ jobs:
         run: pnpm build
         working-directory: frameworks/react
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/react
         continue-on-error: true
 
@@ -86,7 +92,9 @@ jobs:
         run: pnpm build
         working-directory: frameworks/solid
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/solid
         continue-on-error: true
 
@@ -106,7 +114,9 @@ jobs:
         run: pnpm build
         working-directory: frameworks/svelte
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/svelte
         continue-on-error: true
 
@@ -126,6 +136,8 @@ jobs:
         run: pnpm build
         working-directory: frameworks/vue
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/vue
         continue-on-error: true
