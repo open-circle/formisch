@@ -2,6 +2,11 @@
 
 All notable changes to the library will be documented in this file.
 
+## v1.0.0-rc.0 (June 23, 2026)
+
+- Release candidate for v1.0.0
+- Change `@formisch/core` to v1.0.0-rc.0
+
 ## v0.11.0 (June 22, 2026)
 
 - Change `@formisch/core` to v0.10.0
