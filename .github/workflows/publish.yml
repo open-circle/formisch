@@ -27,7 +27,10 @@ jobs:
         working-directory: frameworks/preact
       - name: Publish library
         run: |
-          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
           npm publish --access public --tag "$TAG"
         working-directory: frameworks/preact
         continue-on-error: true
@@ -49,7 +52,10 @@ jobs:
         working-directory: frameworks/qwik
       - name: Publish library
         run: |
-          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
           npm publish --access public --tag "$TAG"
         working-directory: frameworks/qwik
         continue-on-error: true
@@ -71,7 +77,10 @@ jobs:
         working-directory: frameworks/react
       - name: Publish library
         run: |
-          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
           npm publish --access public --tag "$TAG"
         working-directory: frameworks/react
         continue-on-error: true
@@ -93,7 +102,10 @@ jobs:
         working-directory: frameworks/solid
       - name: Publish library
         run: |
-          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
           npm publish --access public --tag "$TAG"
         working-directory: frameworks/solid
         continue-on-error: true
@@ -115,7 +127,10 @@ jobs:
         working-directory: frameworks/svelte
       - name: Publish library
         run: |
-          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
           npm publish --access public --tag "$TAG"
         working-directory: frameworks/svelte
         continue-on-error: true
@@ -137,7 +152,10 @@ jobs:
         working-directory: frameworks/vue
       - name: Publish library
         run: |
-          TAG=$(node -p "require('./package.json').version.split('-')[1]?.split('.')[0] ?? 'latest'")
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
           npm publish --access public --tag "$TAG"
         working-directory: frameworks/vue
         continue-on-error: true
