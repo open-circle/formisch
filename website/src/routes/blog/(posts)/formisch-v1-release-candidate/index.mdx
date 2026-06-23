@@ -16,11 +16,11 @@ import { Link } from '~/components';
 
 Formisch is officially in the Release Candidate (RC) phase! 🎉
 
-This means the core API and the overall design are now stable. Barring a critical issue, there will be no breaking changes before the 1.0 release, so if you held off on trying Formisch to avoid churn, now is a good time. We have spent recent months hardening the library against complex edge cases to improve reliability and runtime performance, and your feedback on the current API is the most valuable thing we can get before v1 locks in.
+This means the core API and the overall design are now stable. Barring a critical issue, there will be no breaking changes before the 1.0 release. So if you have been waiting for Formisch to stabilize before trying it, now is a good time. We have spent the last few months testing the library against complex edge cases to improve reliability and runtime performance. Your feedback on the current API is the most valuable thing we can get before v1 locks in.
 
 ## So, what actually is Formisch?
 
-Formisch is a schema-first, headless, fully type-safe library for managing form state. You describe your form once with a [Valibot](https://valibot.dev/) schema, and that single schema drives both runtime validation and your TypeScript types. There is no second type definition to keep in sync and no resolver to configure.
+Formisch is a schema-first, headless, fully type-safe library for managing form state. You describe your form once with a [Valibot](https://valibot.dev/) schema, and that single schema drives both runtime validation and your TypeScript types. You don't need separate type definitions to keep in sync or a resolver to configure.
 
 ```tsx
 import * as v from 'valibot';
@@ -71,9 +71,9 @@ export default function LoginForm() {
 
 You can run this exact example on the <Link href="/playground/login/">playground</Link> in your browser, no install required.
 
-The `path` is fully typed against your schema, so if you rename a field, TypeScript flags every place that no longer matches. Because state lives in fine-grained signals, only the fields that actually change re-render, and thanks to the modular design the bundle size starts at around 2.5 kB.
+The `path` is fully typed against your schema, so if you rename a field, TypeScript flags every place that no longer matches. Because state lives in fine-grained signals, only the fields that actually change re-render. And thanks to the modular design, the bundle size starts at around 2.5 kB.
 
-Formisch runs on React, Vue, Solid, Qwik, Svelte, and Preact from a single core, but there is no adapter tax: at build time it swaps in your framework's own reactivity, so you get real React updates, real Solid signals, and native performance with no extra layer in your bundle.
+Formisch runs on React, Vue, Solid, Qwik, Svelte, and Preact from a single core, but there is no adapter tax. At build time it swaps in your framework's own reactivity, so you get real React updates, real Solid signals, and native performance with no extra layer in your bundle.
 
 For a deeper look at the design decisions behind Formisch, read our <Link href="/blog/one-core-six-frameworks/">architecture post</Link>. We explain how the runtime works and why there is no abstraction layer.
 
@@ -93,15 +93,15 @@ Honestly, what kept it alive was a promise. In late 2024 I told [Shai Reznik](ht
 
 It did not come easily. My first architecture was a dead end. I tried to map the form's signal-based store onto a tree structure and ran straight into more edge cases than I could handle. I had to throw it away, go back to research, and start over. It took weeks to crack the part I am most proud of: efficient, per-field signals that work natively across every supported framework. When that finally clicked, Formisch became real.
 
-The vision behind all of this is bigger than any single library. I want Formisch to be a framework-agnostic platform for forms, basically _like Vite, but for forms_, so that form logic is something you build once and reuse everywhere instead of rebuilding it for every framework and every layer. The <Link href="/blog/one-core-six-frameworks/">architecture post</Link> goes deep on how that one-core-six-frameworks design actually works.
+The vision behind all of this is bigger than any single library. I want Formisch to be a framework-agnostic platform for forms, basically _like Vite, but for forms_. Form logic should be something you build once and reuse everywhere, instead of rebuilding it for every framework and every layer. The <Link href="/blog/one-core-six-frameworks/">architecture post</Link> goes deep on how that one-core-six-frameworks design actually works.
 
 ## What's new in the Release Candidate
 
 Getting to RC was less about adding features and more about hardening the ones already there, now backed by a test suite with 100% coverage:
 
-- **Hardened nested fields, field arrays, and tuples.** Lots of edge cases around inserting, moving, replacing, resetting, and resizing nested structures, the parts of a form that are easiest to get subtly wrong.
-- **More correct state and focus handling.** Dirty, touched, and the new edited state now behave predictably across resets and field-array operations, and a failed submit focuses the first field that can actually receive focus.
-- **New convenience helpers.** Methods like <Link href="/methods/api/isValid/">`isValid`</Link>, <Link href="/methods/api/isDirty/">`isDirty`</Link>, and <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>, plus an <Link href="/core/api/EmptyInput/">`emptyInput`</Link> config that gives required fields a sensible starting value so an empty field shows your own validation message.
+- **Hardened nested fields, field arrays, and tuples.** Lots of edge cases around inserting, moving, replacing, resetting, and resizing nested structures — the parts of a form that are easiest to get subtly wrong.
+- **More correct state and focus handling.** Dirty, touched, and the new edited state now behave predictably across resets and field-array operations. On a failed submit, focus moves to the first field that can actually receive it.
+- **New convenience helpers.** Methods like <Link href="/methods/api/isValid/">`isValid`</Link>, <Link href="/methods/api/isDirty/">`isDirty`</Link>, and <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>. There is also an <Link href="/core/api/EmptyInput/">`emptyInput`</Link> config that gives required fields a sensible starting value, so an empty field shows the expected error message.
 
 If something behaves unexpectedly in your forms, that feedback is the most valuable thing you can give us before v1 locks in.
 
