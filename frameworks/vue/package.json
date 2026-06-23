@@ -7,7 +7,7 @@
   "homepage": "https://formisch.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-circle/formisch"
+    "url": "git+https://github.com/open-circle/formisch.git"
   },
   "keywords": [
     "vue",
