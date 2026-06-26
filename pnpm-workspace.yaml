@@ -4,6 +4,11 @@ packages:
   - 'playgrounds/*'
   - 'scripts'
   - 'website'
+minimumReleaseAge: 10080  # minutes — 7 days
+minimumReleaseAgeExclude:
+  - valibot
+  - miniflare@4.20260603.0
+  - wrangler@4.98.0
 allowBuilds:
   '@parcel/watcher': true
   better-sqlite3: true
@@ -12,9 +17,6 @@ allowBuilds:
   sharp: true
   vercel: true
   workerd: true
-minimumReleaseAgeExclude:
-  - miniflare@4.20260603.0
-  - wrangler@4.98.0
 overrides:
   # Security: pin vulnerable deps to patched versions (CVE Lite high findings).
   # Keyed by major so only the affected major line is moved to its fixed version.
