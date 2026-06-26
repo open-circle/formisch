@@ -40,6 +40,10 @@ const LoginSchema = v.object({
 });
 ```
 
+### Field order
+
+The order in which you define fields in your schema matters. When a form is submitted with invalid values, Formisch focuses the first field with an error. Since this follows your schema, define your fields in the same order they appear in your form, so the focus moves to the first invalid field instead of one further down the page.
+
 ## Schema validation
 
 Your schema definition should reflect exactly the data you expect when submitting the form. For example, if the value of a field is optional and will only be submitted in certain cases, your schema should reflect this information by using `v.optional(…)`.
