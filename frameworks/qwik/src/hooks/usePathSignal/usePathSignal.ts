@@ -1,5 +1,5 @@
 import type { Path } from '@formisch/core/qwik';
-import { type ReadonlySignal, useSignal } from '@qwik.dev/core';
+import { type Signal, useSignal } from '@qwik.dev/core';
 
 // @__NO_SIDE_EFFECTS__
 function isEqual(a: Path, b: Path): boolean {
@@ -21,7 +21,7 @@ function isEqual(a: Path, b: Path): boolean {
 // @__NO_SIDE_EFFECTS__
 export function usePathSignal<TPath extends Path>(
   path: TPath
-): ReadonlySignal<TPath> {
+): Readonly<Signal<TPath>> {
   const signal = useSignal(path);
   if (!isEqual(signal.value, path)) {
     signal.value = path;

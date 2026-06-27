@@ -7,7 +7,7 @@ import type {
   ValidArrayPath,
   ValidPath,
 } from '@formisch/core/qwik';
-import type { QRL, ReadonlySignal } from '@qwik.dev/core';
+import type { QRL, Signal } from '@qwik.dev/core';
 import type * as v from 'valibot';
 
 /**
@@ -54,21 +54,21 @@ export interface FieldStore<
   /**
    * The path to the field within the form.
    */
-  readonly path: ReadonlySignal<ValidPath<v.InferInput<TSchema>, TFieldPath>>;
+  readonly path: Readonly<Signal<ValidPath<v.InferInput<TSchema>, TFieldPath>>>;
   /**
    * The current input value of the field.
    */
-  readonly input: ReadonlySignal<
-    PartialValues<PathValue<v.InferInput<TSchema>, TFieldPath>>
+  readonly input: Readonly<
+    Signal<PartialValues<PathValue<v.InferInput<TSchema>, TFieldPath>>>
   >;
   /**
    * The current error messages of the field.
    */
-  readonly errors: ReadonlySignal<[string, ...string[]] | null>;
+  readonly errors: Readonly<Signal<[string, ...string[]] | null>>;
   /**
    * Whether the field has been touched.
    */
-  readonly isTouched: ReadonlySignal<boolean>;
+  readonly isTouched: Readonly<Signal<boolean>>;
   /**
    * Whether the field value has been edited.
    */
@@ -76,11 +76,11 @@ export interface FieldStore<
   /**
    * Whether the field input differs from its initial value.
    */
-  readonly isDirty: ReadonlySignal<boolean>;
+  readonly isDirty: Readonly<Signal<boolean>>;
   /**
    * Whether the field is valid according to the schema.
    */
-  readonly isValid: ReadonlySignal<boolean>;
+  readonly isValid: Readonly<Signal<boolean>>;
   /**
    * Sets the field input value programmatically.
    */
@@ -103,21 +103,21 @@ export interface FieldArrayStore<
   /**
    * The path to the array field within the form.
    */
-  readonly path: ReadonlySignal<
-    ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>
+  readonly path: Readonly<
+    Signal<ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>>
   >;
   /**
    * The item IDs of the array field.
    */
-  readonly items: ReadonlySignal<string[]>;
+  readonly items: Readonly<Signal<string[]>>;
   /**
    * The current error messages of the field array.
    */
-  readonly errors: ReadonlySignal<[string, ...string[]] | null>;
+  readonly errors: Readonly<Signal<[string, ...string[]] | null>>;
   /**
    * Whether the field array has been touched.
    */
-  readonly isTouched: ReadonlySignal<boolean>;
+  readonly isTouched: Readonly<Signal<boolean>>;
   /**
    * Whether the field array value has been edited.
    */
@@ -125,9 +125,9 @@ export interface FieldArrayStore<
   /**
    * Whether the field array input differs from its initial value.
    */
-  readonly isDirty: ReadonlySignal<boolean>;
+  readonly isDirty: Readonly<Signal<boolean>>;
   /**
    * Whether the field array is valid according to the schema.
    */
-  readonly isValid: ReadonlySignal<boolean>;
+  readonly isValid: Readonly<Signal<boolean>>;
 }

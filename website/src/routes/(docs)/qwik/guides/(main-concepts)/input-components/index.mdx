@@ -66,14 +66,14 @@ In the first step, you create a new file for the `TextInput` component and, if y
 
 ```tsx
 import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type ReadonlySignal } from '@qwik.dev/core';
+import { component$, type Signal } from '@qwik.dev/core';
 
 interface TextInputProps extends FieldElementProps {
   type: 'text' | 'email' | 'tel' | 'password' | 'url' | 'date';
   label?: string;
   placeholder?: string;
-  input: ReadonlySignal<string | undefined>;
-  errors: ReadonlySignal<[string, ...string[]] | null>;
+  input: Readonly<Signal<string | undefined>>;
+  errors: Readonly<Signal<[string, ...string[]] | null>>;
   required?: boolean;
 }
 ```
@@ -84,7 +84,7 @@ In the next step, add the component function to the file. We can destructure the
 
 ```tsx
 import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type ReadonlySignal } from '@qwik.dev/core';
+import { component$, type Signal } from '@qwik.dev/core';
 
 interface TextInputProps extends FieldElementProps {
   /* ... */
@@ -102,7 +102,7 @@ After that, you can add the JSX code to the return statement.
 
 ```tsx
 import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type ReadonlySignal } from '@qwik.dev/core';
+import { component$, type Signal } from '@qwik.dev/core';
 
 interface TextInputProps extends FieldElementProps {
   /* ... */
@@ -142,14 +142,14 @@ Below is an overview of the entire code of the `TextInput` component.
 
 ```tsx
 import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type ReadonlySignal } from '@qwik.dev/core';
+import { component$, type Signal } from '@qwik.dev/core';
 
 interface TextInputProps extends FieldElementProps {
   type: 'text' | 'email' | 'tel' | 'password' | 'url' | 'date';
   label?: string;
   placeholder?: string;
-  input: ReadonlySignal<string | undefined>;
-  errors: ReadonlySignal<[string, ...string[]] | null>;
+  input: Readonly<Signal<string | undefined>>;
+  errors: Readonly<Signal<[string, ...string[]] | null>>;
   required?: boolean;
 }
 

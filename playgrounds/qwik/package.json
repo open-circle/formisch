@@ -31,12 +31,12 @@
   "devDependencies": {
     "@eslint/js": "^9.31.0",
     "@formisch/qwik": "workspace:*",
-    "@qwik.dev/core": "2.0.0-beta.5",
-    "@qwik.dev/router": "2.0.0-beta.5",
+    "@qwik.dev/core": "2.0.0-beta.37",
+    "@qwik.dev/router": "2.0.0-beta.37",
     "@tailwindcss/vite": "^4.1.11",
     "@types/node": "24.0.13",
     "eslint": "9.31.0",
-    "eslint-plugin-qwik": "2.0.0-beta.5",
+    "eslint-plugin-qwik": "2.0.0-beta.37",
     "globals": "16.3.0",
     "prettier": "3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
@@ -44,7 +44,7 @@
     "typescript": "5.8.3",
     "typescript-eslint": "8.36.0",
     "typescript-plugin-css-modules": "^5.1.0",
-    "vite": "6.3.5",
+    "vite": "7.3.5",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }

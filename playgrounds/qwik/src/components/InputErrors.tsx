@@ -1,15 +1,10 @@
-import {
-  component$,
-  ReadonlySignal,
-  useSignal,
-  useTask$,
-} from '@qwik.dev/core';
+import { component$, Signal, useSignal, useTask$ } from '@qwik.dev/core';
 import { isBrowser } from '@qwik.dev/core/build';
 import { Expandable } from './Expandable';
 
 type InputErrorProps = {
   name: string;
-  errors: ReadonlySignal<[string, ...string[]] | null>;
+  errors: Readonly<Signal<[string, ...string[]] | null>>;
 };
 
 /**
