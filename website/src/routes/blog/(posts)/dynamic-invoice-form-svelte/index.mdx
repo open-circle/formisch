@@ -453,11 +453,13 @@ The important part is that these pieces are not separate systems. The schema def
 
 ## When to use Formisch
 
-Formisch is a good fit when your form logic mostly lives on the client and the form itself becomes part of your application state. If you have nested data, dynamic fields, complex validation rules, or values that need to update as the user types, keeping the form model connected can remove a lot of manual synchronization.
+Formisch is a good fit when your form logic mostly lives on the client and you want a **schema-native** approach to building forms. Instead of defining your data shape, validation rules, transformations, and submitted output separately, the schema becomes the source of truth for the entire form. Fields, validation, and typed output all stay connected to that same model, reducing duplication and the amount of manual synchronization needed as your forms grow.
+
+This becomes especially useful when working with nested objects, dynamic collections, complex validation rules, or derived values that update as the user types. Rather than wiring those pieces together yourself, they continue to follow the same schema-driven structure.
+
+Because Formisch is built for Svelte 5, it also fits naturally with rune-based reactivity. Form state can participate in `$derived` calculations and other reactive logic without introducing another state management layer.
 
 It is also intentionally headless. Formisch does not provide pre-built inputs or decide how your UI should look. You control the markup and connect it to the form state. This works well when you already have a component system or design language and want the form layer to stay separate from your UI.
-
-Formisch keeps form state, validation, and UI connected, but still gives you full control over your markup. Because of that, it works really well for interactive, browser-first forms in both Svelte and SvelteKit apps.
 
 Native SvelteKit support is also planned, including support for progressively enhanced forms. If your main requirement today is a server-first workflow, a library built specifically for server actions may be a better fit until those capabilities arrive in Formisch.
 
