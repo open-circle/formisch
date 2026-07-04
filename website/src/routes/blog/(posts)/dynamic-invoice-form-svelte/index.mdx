@@ -1,11 +1,11 @@
 ---
+cover: Dynamic invoice form
 title: 'Building a Dynamic Invoice Form in Svelte 5 with Formisch'
 description: Build a dynamic invoice form in Svelte 5 using Formisch, Valibot, FieldArray, and typed schema validation.
+published: 2026-07-04
 authors:
   - flySewa
 ---
-
-
 
 # Building a Dynamic Invoice Form in Svelte 5 with Formisch
 
@@ -40,7 +40,6 @@ We'll be using:
 
 You can follow along here, or view the complete example on [Stackblitz](https://stackblitz.com/edit/sveltejs-kit-template-default-vbklpioo?file=src%2Froutes%2F%2Bpage.svelte)
 
----
 
 ## Step 1: Install dependencies
 
@@ -50,7 +49,6 @@ We'll start by installing Formisch and Valibot:
 npm install @formisch/svelte valibot
 ```
 
----
 
 ## Step 2: Define the form model
 
@@ -138,7 +136,6 @@ The `lineItems` field is modeled as an array because an invoice can contain a ch
 
 This keeps the form model as the place where the shape of the data is defined. When a field changes, gets added, or gets removed, the validation rules and submitted output stay connected to that same structure.
 
----
 
 ## Step 3: Create the form
 
@@ -181,13 +178,12 @@ const invoiceForm = createForm({
 });
 ```
 
-The initial values represent the input state of the form, not the final invoice object. That is why numeric values are still strings here â€” the user is editing input values, and the schema transformation handles converting them when the form is validated.
+The initial values represent the input state of the form, not the final invoice object. That is why numeric values are still strings here — the user is editing input values, and the schema transformation handles converting them when the form is validated.
 
 Starting with one `lineItem` also matches the validation rule from the schema. Since the invoice requires at least one item, the form begins in a state that already satisfies that constraint.
 
 With the form created, the next step is to connect individual fields to that state.
 
----
 
 ## Step 4: Connect fields
 
@@ -227,7 +223,6 @@ This means the component structure and the data structure stay aligned. The fiel
 
 You don't need separate bindings or error state for every input. Each field remains connected to the form model it belongs to.
 
----
 
 ## Step 5: Add dynamic line items
 
@@ -331,7 +326,6 @@ function removeLineItem(index) {
 
 The remove action is disabled when only one item remains because the schema requires at least one line item. The UI behavior and validation rules are coming from the same model.
 
----
 
 ## Step 6: Add reactive totals
 
@@ -404,7 +398,6 @@ function getLineTotal(index) {
 
 Because `invoiceInput` is connected to the form, any dependent values update when the form changes.
 
----
 
 ## Step 7: Submit the form
 
@@ -466,7 +459,6 @@ function resetInvoice() {
 
 Resetting restores the initial state and clears the form state in one operation.
 
----
 
 ## What we built
 
@@ -482,7 +474,6 @@ The important part is that these pieces are not separate systems. The schema def
 
 Instead of manually syncing inputs, errors, and derived values, the form stays connected throughout its lifecycle.
 
----
 
 ## When to use Formisch
 
@@ -497,7 +488,6 @@ This works well when you already have a component system or design language and 
 Formisch keeps form state, validation, and UI connected, but still gives you full control over your markup. Because of that, it works really well for interactive, browser-first forms in both Svelte and SvelteKit apps.
 
 Native SvelteKit support is also planned, including support for progressively enhanced forms. If your main requirement today is a server-first workflow, a library built specifically for server actions may be a better fit until those capabilities arrive in Formisch.
----
 
 ## What's next for Formisch
 
