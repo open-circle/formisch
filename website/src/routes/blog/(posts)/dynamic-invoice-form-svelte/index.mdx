@@ -54,9 +54,7 @@ npm install @formisch/svelte valibot
 
 Before connecting inputs, we need to define what our invoice form looks like.
 
-The form model describes the structure of our data: the fields the user can edit, the validation rules for each field, and the shape of the final output after submission.
-
-Instead of defining validation separately and then recreating the same structure as TypeScript types or default values, Formisch can use a schema as the source of truth.
+The form model describes the structure of our data: the fields the user can edit, the validation rules for each field, and the shape of the final output after submission. Instead of defining validation separately and then recreating the same structure as TypeScript types or default values, Formisch can use a schema as the source of truth.
 
 Our invoice needs basic metadata, client details, and a list of line items. We'll define those requirements with Valibot:
 
@@ -128,14 +126,9 @@ const InvoiceSchema = v.object({
 });
 ```
 
-The invoice form has fields like `quantity`, `unitPrice`, and `taxRate` that represent numbers in the final invoice data, but the values coming from the inputs are still part of the form's input state.
+The invoice form has fields like `quantity`, `unitPrice`, and `taxRate` that represent numbers in the final invoice data, but the values coming from the inputs are still part of the form's input state. Instead of converting those values in separate event handlers or before submission, we keep that logic with the field definition. The schema handles the transition from input values to the validated data shape we actually want to submit.
 
-Instead of converting those values in separate event handlers or before submission, we keep that logic with the field definition. The schema handles the transition from input values to the validated data shape we actually want to submit.
-
-The `lineItems` field is modeled as an array because an invoice can contain a changing number of items. Each item has its own fields and validation rules, while the array itself has rules like the minimum and maximum number of items allowed.
-
-This keeps the form model as the place where the shape of the data is defined. When a field changes, gets added, or gets removed, the validation rules and submitted output stay connected to that same structure.
-
+The `lineItems` field is modeled as an array because an invoice can contain a changing number of items. Each item has its own fields and validation rules, while the array itself has rules like the minimum and maximum number of items allowed. This keeps the form model as the place where the shape of the data is defined. When a field changes, gets added, or gets removed, the validation rules and submitted output stay connected to that same structure.
 
 ## Step 3: Create the form
 
@@ -178,9 +171,7 @@ const invoiceForm = createForm({
 });
 ```
 
-The initial values represent the input state of the form, not the final invoice object. That is why numeric values are still strings here — the user is editing input values, and the schema transformation handles converting them when the form is validated.
-
-Starting with one `lineItem` also matches the validation rule from the schema. Since the invoice requires at least one item, the form begins in a state that already satisfies that constraint.
+The initial values represent the input state of the form, not the final invoice object. That is why numeric values are still strings here — the user is editing input values, and the schema transformation handles converting them when the form is validated. Starting with one `lineItem` also matches the validation rule from the schema. Since the invoice requires at least one item, the form begins in a state that already satisfies that constraint.
 
 With the form created, the next step is to connect individual fields to that state.
 
@@ -219,16 +210,11 @@ The `path` tells Formisch where this field exists in the form model. For nested 
 >
 ```
 
-This means the component structure and the data structure stay aligned. The field already knows how to read its value, update the form state, and expose validation results.
-
-You don't need separate bindings or error state for every input. Each field remains connected to the form model it belongs to.
-
+This means the component structure and the data structure stay aligned. The field already knows how to read its value, update the form state, and expose validation results. You don't need separate bindings or error state for every input. Each field remains connected to the form model it belongs to.
 
 ## Step 5: Add dynamic line items
 
-Line items are where forms usually become more complex. The number of rows is not fixed, and each row has its own fields and validation state.
-
-Instead of manually keeping track of indexes, values, and errors when items are added or removed, Formisch provides `FieldArray` to keep the collection connected to the form model.
+Line items are where forms usually become more complex. The number of rows is not fixed, and each row has its own fields and validation state. Instead of manually keeping track of indexes, values, and errors when items are added or removed, Formisch provides `FieldArray` to keep the collection connected to the form model.
 
 ```svelte
 <FieldArray of={invoiceForm} path={['lineItems']}>
@@ -329,9 +315,7 @@ The remove action is disabled when only one item remains because the schema requ
 
 ## Step 6: Add reactive totals
 
-The invoice total depends on several values in the form: quantities, prices, tax, and discounts.
-
-Instead of updating totals manually inside every input handler, we can derive them from the current form state.
+The invoice total depends on several values in the form: quantities, prices, tax, and discounts. Instead of updating totals manually inside every input handler, we can derive them from the current form state.
 
 Svelte 5's `$derived` works well here because the calculation automatically stays connected to the values it depends on.
 
@@ -380,9 +364,7 @@ function calculateTotals(input) {
 }
 ```
 
-`getInput` lets us derive only the parts of the form we need. Using `$derived.by()`, the totals stay connected to the relevant fields without recreating the entire form input object whenever an unrelated field changes.
-
-We still derive the invoice totals from those values, but the calculation now depends only on the fields it actually uses. That keeps the totals reactive without adding extra synchronization between the form fields and the invoice summary.
+`getInput` lets us derive only the parts of the form we need. Using `$derived.by()`, the totals stay connected to the relevant fields without recreating the entire form input object whenever an unrelated field changes. We still derive the invoice totals from those values, but the calculation now depends only on the fields it actually uses. That keeps the totals reactive without adding extra synchronization between the form fields and the invoice summary.
 
 For individual row totals, we can use the same input state:
 
@@ -401,9 +383,7 @@ Because `invoiceInput` is connected to the form, any dependent values update whe
 
 ## Step 7: Submit the form
 
-At this point, the form state, validation, and fields are all connected. The final step is handling the transition from editable input values to the validated invoice data your application can use.
-
-By default, Formisch runs validation on submission and provides the parsed output from the schema. This behavior can be configured if your application needs a different validation strategy.
+At this point, the form state, validation, and fields are all connected. The final step is handling the transition from editable input values to the validated invoice data your application can use. By default, Formisch runs validation on submission and provides the parsed output from the schema. This behavior can be configured if your application needs a different validation strategy.
 
 ```javascript
 type InvoiceOutput = v.InferOutput<typeof InvoiceSchema>;
@@ -440,9 +420,7 @@ Then connect the submit handler to the form:
 </Form>
 ```
 
-The value received here is the validated schema output, not just the raw values from the inputs.
-
-That means fields like `quantity`, `unitPrice`, `taxRate`, and `discount` have already gone through their transformations. The form moves from input state to application data at the validation boundary.
+The value received here is the validated schema output, not just the raw values from the inputs. That means fields like `quantity`, `unitPrice`, `taxRate`, and `discount` have already gone through their transformations. The form moves from input state to application data at the validation boundary.
 
 The form state also exposes submission and validation status, so the UI can react without maintaining separate loading flags.
 
@@ -470,20 +448,14 @@ The invoice form now includes:
 - Derived values using Svelte 5 reactivity
 - Validated and transformed output on submission
 
-The important part is that these pieces are not separate systems. The schema defines the shape, fields connect the UI, and submission produces the validated result from the same model.
-
-Instead of manually syncing inputs, errors, and derived values, the form stays connected throughout its lifecycle.
+The important part is that these pieces are not separate systems. The schema defines the shape, fields connect the UI, and submission produces the validated result from the same model. Instead of manually syncing inputs, errors, and derived values, the form stays connected throughout its lifecycle.
 
 
 ## When to use Formisch
 
-Formisch is a good fit when your form logic mostly lives on the client and the form itself becomes part of your application state.
+Formisch is a good fit when your form logic mostly lives on the client and the form itself becomes part of your application state. If you have nested data, dynamic fields, complex validation rules, or values that need to update as the user types, keeping the form model connected can remove a lot of manual synchronization.
 
-If you have nested data, dynamic fields, complex validation rules, or values that need to update as the user types, keeping the form model connected can remove a lot of manual synchronization.
-
-It is also intentionally headless. Formisch does not provide pre-built inputs or decide how your UI should look. You control the markup and connect it to the form state.
-
-This works well when you already have a component system or design language and want the form layer to stay separate from your UI.
+It is also intentionally headless. Formisch does not provide pre-built inputs or decide how your UI should look. You control the markup and connect it to the form state. This works well when you already have a component system or design language and want the form layer to stay separate from your UI.
 
 Formisch keeps form state, validation, and UI connected, but still gives you full control over your markup. Because of that, it works really well for interactive, browser-first forms in both Svelte and SvelteKit apps.
 
@@ -491,9 +463,7 @@ Native SvelteKit support is also planned, including support for progressively en
 
 ## What's next for Formisch
 
-Formisch is currently in [RC](https://formisch.dev/blog/formisch-v1-release-candidate/), with v1 approaching.
-
-As we prepare for v1, feedback from developers building real forms is especially useful. If you try Formisch in your own projects, let us know what works well, what feels unclear, and what you'd like improved.
+Formisch is currently in [RC](https://formisch.dev/blog/formisch-v1-release-candidate/), with v1 approaching. As we prepare for v1, feedback from developers building real forms is especially useful. If you try Formisch in your own projects, let us know what works well, what feels unclear, and what you'd like improved.
 
 For a deeper look at the ideas behind Formisch and how it works internally, you can read the [architecture post](https://formisch.dev/blog/one-core-six-frameworks/).
 
