@@ -390,7 +390,7 @@ type InvoiceOutput = v.InferOutput<typeof InvoiceSchema>;
 
 let submittedInvoice = $state<InvoiceOutput | null>(null);
 
-const submitInvoice = async (output) => {
+const submitInvoice = async (output: InvoiceOutput) => {
   submittedInvoice = output;
 
   console.log('Invoice submitted:', output);
