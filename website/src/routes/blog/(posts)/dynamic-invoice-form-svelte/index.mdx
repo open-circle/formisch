@@ -1,13 +1,11 @@
 ---
-cover: Dynamic invoice form
+cover: Invoice Form
 title: 'Building a Dynamic Invoice Form in Svelte 5 with Formisch'
 description: Build a dynamic invoice form in Svelte 5 using Formisch, Valibot, FieldArray, and typed schema validation.
-published: 2026-07-04
+published: 2026-07-15
 authors:
   - flySewa
 ---
-
-# Building a Dynamic Invoice Form in Svelte 5 with Formisch
 
 Svelte 5 gives us powerful primitives for managing state with runes, but forms still have their own set of challenges.
 
@@ -15,9 +13,9 @@ A field is not only a value. It has validation state, errors, transformations, a
 
 At this point, form state management moves away from handling individual inputs and towards managing the entire form model.
 
-Formisch approaches this by treating the form as a connected structure. It's a headless form library designed to stay lightweight while keeping the schema, state, validation, and submitted output connected. The schema, state, validation, and submitted output all come from the same source, while still letting you control the UI.
+Formisch approaches this by treating the form as a single connected structure. It's a headless, lightweight library where the schema, state, validation, and submitted output all come from one source, while you stay in full control of the UI.
 
-To demonstrate this, we'll build a dynamic invoice form and look at how Formisch works with Svelte 5's rune-based reactivity to manage:
+To see this in practice, we'll build a dynamic invoice form and walk through how Formisch works with Svelte 5's rune-based reactivity to manage:
 
 - Invoice details
 - Client information
@@ -40,7 +38,6 @@ We'll be using:
 
 You can follow along here, view the complete example on [Stackblitz](https://stackblitz.com/edit/sveltejs-kit-template-default-vbklpioo?file=src%2Froutes%2F%2Bpage.svelte), or clone the [runnable example](https://github.com/open-circle/formisch/tree/main/examples/svelte-invoice-form) from the repo.
 
-
 ## Step 1: Install dependencies
 
 We'll start by installing Formisch and Valibot:
@@ -48,7 +45,6 @@ We'll start by installing Formisch and Valibot:
 ```bash
 npm install @formisch/svelte valibot
 ```
-
 
 ## Step 2: Define the form model
 
@@ -58,7 +54,7 @@ The form model describes the structure of our data: the fields the user can edit
 
 Our invoice needs basic metadata, client details, and a list of line items. We'll define those requirements with Valibot:
 
-```javascript
+```ts
 import * as v from 'valibot';
 
 const moneyInput = (message) =>
@@ -91,20 +87,17 @@ const InvoiceSchema = v.object({
       v.string(),
       v.nonEmpty('Client email is required'),
       v.email('Enter a valid email address')
-    )
+    ),
   }),
 
   lineItems: v.pipe(
     v.array(
       v.object({
-        description: v.pipe(
-          v.string(),
-          v.nonEmpty('Description is required')
-        ),
+        description: v.pipe(v.string(), v.nonEmpty('Description is required')),
 
         quantity: positiveNumberInput('Quantity is required'),
 
-        unitPrice: moneyInput('Unit price is required')
+        unitPrice: moneyInput('Unit price is required'),
       })
     ),
 
@@ -122,7 +115,7 @@ const InvoiceSchema = v.object({
 
   discount: moneyInput('Discount is required'),
 
-  notes: v.optional(v.string())
+  notes: v.optional(v.string()),
 });
 ```
 
@@ -136,7 +129,7 @@ With the form model defined, we can create the form state from that schema.
 
 `createForm` connects the schema to the reactive form state. From this point, Formisch can use the same structure for fields, validation, and submission.
 
-```javascript
+```ts
 import { createForm } from '@formisch/svelte';
 
 const invoiceForm = createForm({
@@ -145,36 +138,33 @@ const invoiceForm = createForm({
   initialInput: {
     invoiceNumber: 'INV-001',
 
-    issueDate: new Date()
-      .toISOString()
-      .slice(0, 10),
+    issueDate: new Date().toISOString().slice(0, 10),
 
     dueDate: '',
 
     client: {
       name: '',
-      email: ''
+      email: '',
     },
 
     lineItems: [
       {
         description: '',
         quantity: '1',
-        unitPrice: '0'
-      }
+        unitPrice: '0',
+      },
     ],
 
     taxRate: '7.5',
     discount: '0',
-    notes: ''
-  }
+    notes: '',
+  },
 });
 ```
 
 The initial values represent the input state of the form, not the final invoice object. That is why numeric values are still strings here — the user is editing input values, and the schema transformation handles converting them when the form is validated. Starting with one `lineItem` also matches the validation rule from the schema. Since the invoice requires at least one item, the form begins in a state that already satisfies that constraint.
 
 With the form created, the next step is to connect individual fields to that state.
-
 
 ## Step 4: Connect fields
 
@@ -187,11 +177,7 @@ A field is connected through the `Field` component:
   {#snippet children(field)}
     <label>
       Invoice Number
-      <input
-        {...field.props}
-        value={field.input}
-        type="text"
-      />
+      <input {...field.props} value={field.input} type="text" />
     </label>
 
     {#if field.errors}
@@ -247,7 +233,12 @@ Line items are where forms usually become more complex. The number of rows is no
           {#snippet children(field)}
             <label>
               Quantity
-              <input {...field.props} value={field.input} type="number" min="1" />
+              <input
+                {...field.props}
+                value={field.input}
+                type="number"
+                min="1"
+              />
             </label>
             {#if field.errors}
               <p class="error">{field.errors[0]}</p>
@@ -259,7 +250,13 @@ Line items are where forms usually become more complex. The number of rows is no
           {#snippet children(field)}
             <label>
               Unit Price
-              <input {...field.props} value={field.input} type="number" min="0" step="0.01" />
+              <input
+                {...field.props}
+                value={field.input}
+                type="number"
+                min="0"
+                step="0.01"
+              />
             </label>
             {#if field.errors}
               <p class="error">{field.errors[0]}</p>
@@ -280,7 +277,8 @@ Line items are where forms usually become more complex. The number of rows is no
 
 The field paths follow the same structure as the schema:
 
-```javascript
+{/* prettier-ignore */}
+```ts
 ['lineItems', index, 'description']
 ```
 
@@ -288,7 +286,7 @@ That means the UI structure mirrors the data structure. A row in the interface m
 
 To add and remove items:
 
-```javascript
+```ts
 import { insert, remove } from '@formisch/svelte';
 
 function addLineItem() {
@@ -297,21 +295,20 @@ function addLineItem() {
     initialInput: {
       description: '',
       quantity: '1',
-      unitPrice: '0'
-    }
+      unitPrice: '0',
+    },
   });
 }
 
 function removeLineItem(index) {
   remove(invoiceForm, {
     path: ['lineItems'],
-    at: index
+    at: index,
   });
 }
 ```
 
 The remove action is disabled when only one item remains because the schema requires at least one line item. The UI behavior and validation rules are coming from the same model.
-
 
 ## Step 6: Add reactive totals
 
@@ -319,30 +316,14 @@ The invoice total depends on several values in the form: quantities, prices, tax
 
 Svelte 5's `$derived` works well here because the calculation automatically stays connected to the values it depends on.
 
-```javascript
+```ts
 import { getInput } from '@formisch/svelte';
 
-let invoiceInput = $derived.by(() => {
-  const taxRate = getInput(invoiceForm, {
-    path: ['taxRate']
-  });
-
-  const discount = getInput(invoiceForm, {
-    path: ['discount']
-  });
-
-  const lineItems = getInput(invoiceForm, {
-    path: ['lineItems']
-  });
-
-  return {
-    taxRate,
-    discount,
-    lineItems
-  };
-});
-
-let totals = $derived(calculateTotals(invoiceInput));
+const invoiceInput = $derived.by(() => ({
+  taxRate: getInput(invoiceForm, { path: ['taxRate'] }),
+  discount: getInput(invoiceForm, { path: ['discount'] }),
+  lineItems: getInput(invoiceForm, { path: ['lineItems'] }),
+}));
 
 function calculateTotals(input) {
   const subtotal = input.lineItems.reduce((sum, item) => {
@@ -359,16 +340,18 @@ function calculateTotals(input) {
     subtotal,
     tax,
     discount,
-    total
+    total,
   };
 }
+
+const totals = $derived(calculateTotals(invoiceInput));
 ```
 
-`getInput` lets us derive only the parts of the form we need. Using `$derived.by()`, the totals stay connected to the relevant fields without recreating the entire form input object whenever an unrelated field changes. We still derive the invoice totals from those values, but the calculation now depends only on the fields it actually uses. That keeps the totals reactive without adding extra synchronization between the form fields and the invoice summary.
+`getInput` lets us read only the parts of the form we need. Wrapping those reads in `$derived.by()` keeps the totals connected to just the tax rate, discount, and line items, so they recalculate when those fields change and ignore unrelated updates. The totals stay reactive without any manual synchronization between the form fields and the invoice summary.
 
 For individual row totals, we can use the same input state:
 
-```javascript
+```ts
 function getLineTotal(index) {
   const item = invoiceInput.lineItems[index];
 
@@ -380,12 +363,11 @@ function getLineTotal(index) {
 
 Because `invoiceInput` is connected to the form, any dependent values update when the form changes.
 
-
 ## Step 7: Submit the form
 
 At this point, the form state, validation, and fields are all connected. The final step is handling the transition from editable input values to the validated invoice data your application can use. By default, Formisch runs validation on submission and provides the parsed output from the schema. This behavior can be configured if your application needs a different validation strategy.
 
-```javascript
+```ts
 type InvoiceOutput = v.InferOutput<typeof InvoiceSchema>;
 
 let submittedInvoice = $state<InvoiceOutput | null>(null);
@@ -400,22 +382,12 @@ const submitInvoice = async (output: InvoiceOutput) => {
 Then connect the submit handler to the form:
 
 ```svelte
-<Form
-  of={invoiceForm}
-  onsubmit={submitInvoice}
->
+<Form of={invoiceForm} onsubmit={submitInvoice}>
   <button
     type="submit"
-    disabled={
-      invoiceForm.isSubmitting ||
-      invoiceForm.isValidating
-    }
+    disabled={invoiceForm.isSubmitting || invoiceForm.isValidating}
   >
-    {
-      invoiceForm.isSubmitting
-        ? 'Submitting...'
-        : 'Submit Invoice'
-    }
+    {invoiceForm.isSubmitting ? 'Submitting...' : 'Submit Invoice'}
   </button>
 </Form>
 ```
@@ -426,7 +398,7 @@ The form state also exposes submission and validation status, so the UI can reac
 
 To reset the form:
 
-```javascript
+```ts
 import { reset } from '@formisch/svelte';
 
 function resetInvoice() {
@@ -436,7 +408,6 @@ function resetInvoice() {
 ```
 
 Resetting restores the initial state and clears the form state in one operation.
-
 
 ## What we built
 
@@ -449,7 +420,6 @@ The invoice form now includes:
 - Validated and transformed output on submission
 
 The important part is that these pieces are not separate systems. The schema defines the shape, fields connect the UI, and submission produces the validated result from the same model. Instead of manually syncing inputs, errors, and derived values, the form stays connected throughout its lifecycle.
-
 
 ## When to use Formisch
 
