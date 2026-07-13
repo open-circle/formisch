@@ -57,7 +57,7 @@ Our invoice needs basic metadata, client details, and a list of line items. We'l
 ```ts
 import * as v from 'valibot';
 
-const moneyInput = (message) =>
+const moneyInput = (message: string) =>
   v.pipe(
     v.string(),
     v.nonEmpty(message),
@@ -65,7 +65,7 @@ const moneyInput = (message) =>
     v.minValue(0, 'Amount cannot be negative')
   );
 
-const positiveNumberInput = (message) =>
+const positiveNumberInput = (message: string) =>
   v.pipe(
     v.string(),
     v.nonEmpty(message),
@@ -300,7 +300,7 @@ function addLineItem() {
   });
 }
 
-function removeLineItem(index) {
+function removeLineItem(index: number) {
   remove(invoiceForm, {
     path: ['lineItems'],
     at: index,
@@ -319,49 +319,44 @@ Svelte 5's `$derived` works well here because the calculation automatically stay
 ```ts
 import { getInput } from '@formisch/svelte';
 
-const invoiceInput = $derived.by(() => ({
-  taxRate: getInput(invoiceForm, { path: ['taxRate'] }),
-  discount: getInput(invoiceForm, { path: ['discount'] }),
-  lineItems: getInput(invoiceForm, { path: ['lineItems'] }),
-}));
-
-function calculateTotals(input) {
-  const subtotal = input.lineItems.reduce((sum, item) => {
-    return sum + Number(item.quantity) * Number(item.unitPrice);
-  }, 0);
-
-  const tax = subtotal * (Number(input.taxRate) / 100);
-
-  const discount = Number(input.discount);
-
-  const total = Math.max(subtotal + tax - discount, 0);
-
-  return {
-    subtotal,
-    tax,
-    discount,
-    total,
-  };
+// Coerce a raw input string to a finite number, falling back to 0 while a
+// field is empty or mid-edit so the totals never flash "NaN".
+function toNumber(value: unknown): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
-const totals = $derived(calculateTotals(invoiceInput));
+const taxRate = $derived(getInput(invoiceForm, { path: ['taxRate'] }));
+const discount = $derived(getInput(invoiceForm, { path: ['discount'] }));
+const lineItems = $derived(getInput(invoiceForm, { path: ['lineItems'] }));
+
+const totals = $derived.by(() => {
+  const subtotal = lineItems.reduce(
+    (sum, item) => sum + toNumber(item.quantity) * toNumber(item.unitPrice),
+    0
+  );
+  const tax = subtotal * (toNumber(taxRate) / 100);
+  const discountAmount = toNumber(discount);
+  const total = Math.max(subtotal + tax - discountAmount, 0);
+  return { subtotal, tax, discount: discountAmount, total };
+});
 ```
 
-`getInput` lets us read only the parts of the form we need. Wrapping those reads in `$derived.by()` keeps the totals connected to just the tax rate, discount, and line items, so they recalculate when those fields change and ignore unrelated updates. The totals stay reactive without any manual synchronization between the form fields and the invoice summary.
+`getInput` reads a single field from the form, and wrapping each read in `$derived` gives us reactive values for just the tax rate, discount, and line items. The `totals` derived then combines them, recalculating whenever one of those fields changes while ignoring unrelated updates. Everything stays reactive without any manual synchronization between the form fields and the invoice summary.
 
-For individual row totals, we can use the same input state:
+For individual row totals, we can reuse the derived `lineItems`:
 
 ```ts
-function getLineTotal(index) {
-  const item = invoiceInput.lineItems[index];
+function getLineTotal(index: number): number {
+  const item = lineItems[index];
 
   if (!item) return 0;
 
-  return Number(item.quantity) * Number(item.unitPrice);
+  return toNumber(item.quantity) * toNumber(item.unitPrice);
 }
 ```
 
-Because `invoiceInput` is connected to the form, any dependent values update when the form changes.
+Because these derived values are connected to the form, anything computed from them updates when the form changes.
 
 ## Step 7: Submit the form
 

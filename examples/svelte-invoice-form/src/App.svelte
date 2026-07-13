@@ -48,27 +48,25 @@
     return Number.isFinite(parsed) ? parsed : 0;
   }
 
-  // Derive only the parts of the form the totals depend on, so the summary
-  // stays reactive without recreating the whole input on every keystroke.
-  const invoiceInput = $derived.by(() => ({
-    taxRate: getInput(invoiceForm, { path: ['taxRate'] }),
-    discount: getInput(invoiceForm, { path: ['discount'] }),
-    lineItems: getInput(invoiceForm, { path: ['lineItems'] }),
-  }));
+  // Derive each input the totals depend on individually, so every value stays
+  // reactive and only recomputes when its own field changes.
+  const taxRate = $derived(getInput(invoiceForm, { path: ['taxRate'] }));
+  const discount = $derived(getInput(invoiceForm, { path: ['discount'] }));
+  const lineItems = $derived(getInput(invoiceForm, { path: ['lineItems'] }));
 
   const totals = $derived.by(() => {
-    const subtotal = invoiceInput.lineItems.reduce(
+    const subtotal = lineItems.reduce(
       (sum, item) => sum + toNumber(item.quantity) * toNumber(item.unitPrice),
       0
     );
-    const tax = subtotal * (toNumber(invoiceInput.taxRate) / 100);
-    const discount = toNumber(invoiceInput.discount);
-    const total = Math.max(subtotal + tax - discount, 0);
-    return { subtotal, tax, discount, total };
+    const tax = subtotal * (toNumber(taxRate) / 100);
+    const discountAmount = toNumber(discount);
+    const total = Math.max(subtotal + tax - discountAmount, 0);
+    return { subtotal, tax, discount: discountAmount, total };
   });
 
   function getLineTotal(index: number): number {
-    const item = invoiceInput.lineItems[index];
+    const item = lineItems[index];
     if (!item) return 0;
     return toNumber(item.quantity) * toNumber(item.unitPrice);
   }

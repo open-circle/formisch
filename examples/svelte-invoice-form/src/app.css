@@ -121,6 +121,14 @@ textarea:focus {
   gap: 0.75rem;
 }
 
+/* Stack the multi-column sections on narrow screens so inputs stay usable. */
+@media (max-width: 640px) {
+  .grid,
+  .line-item-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
 .line-total {
   text-align: right;
   color: var(--muted);

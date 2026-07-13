@@ -33,7 +33,7 @@ Then open the printed local URL.
 ```
 src/
 ├── App.svelte        # The invoice form (fields, array, totals, submit)
-├── lib/schema.ts     # Valibot InvoiceSchema + inferred InvoiceOutput type
+├── schema.ts         # Valibot InvoiceSchema + inferred InvoiceOutput type
 ├── main.ts           # App entry point
 └── app.css           # Minimal styling
 ```
