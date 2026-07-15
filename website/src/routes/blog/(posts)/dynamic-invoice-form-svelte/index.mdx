@@ -312,62 +312,80 @@ The remove action is disabled when only one item remains because the schema requ
 
 ## Step 6: Add reactive totals
 
-The invoice total depends on several values in the form: quantities, prices, tax, and discounts. Instead of updating totals manually inside every input handler, we can derive them from the current form state.
-
-Svelte 5's `$derived` works well here because the calculation automatically stays connected to the values it depends on.
+The invoice total depends on several values in the form: quantities, prices, tax, and discounts. Instead of updating totals manually inside every input handler, we can derive only the fields the calculation depends on. Svelte 5's $derived keeps those values connected to the form state, so the totals update automatically whenever one of the relevant fields changes.
 
 ```ts
-import { getInput } from '@formisch/svelte';
+import { getInput } from '@formisch/svelte';import { getInput } from '@formisch/svelte';
 
-// Coerce a raw input string to a finite number, falling back to 0 while a
-// field is empty or mid-edit so the totals never flash "NaN".
-function toNumber(value: unknown): number {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
+const taxRate = $derived(
+  getInput(invoiceForm, {
+    path: ['taxRate']
+  })
+);
 
-const taxRate = $derived(getInput(invoiceForm, { path: ['taxRate'] }));
-const discount = $derived(getInput(invoiceForm, { path: ['discount'] }));
-const lineItems = $derived(getInput(invoiceForm, { path: ['lineItems'] }));
+const discount = $derived(
+  getInput(invoiceForm, {
+    path: ['discount']
+  })
+);
+
+const lineItems = $derived(
+  getInput(invoiceForm, {
+    path: ['lineItems']
+  })
+);
 
 const totals = $derived.by(() => {
-  const subtotal = lineItems.reduce(
-    (sum, item) => sum + toNumber(item.quantity) * toNumber(item.unitPrice),
-    0
-  );
-  const tax = subtotal * (toNumber(taxRate) / 100);
-  const discountAmount = toNumber(discount);
+  const subtotal = lineItems.reduce((sum, item) => {
+    return sum + Number(item.quantity) * Number(item.unitPrice);
+  }, 0);
+
+  const tax = subtotal * (Number(taxRate) / 100);
+
+  const discountAmount = Number(discount);
+
   const total = Math.max(subtotal + tax - discountAmount, 0);
-  return { subtotal, tax, discount: discountAmount, total };
+
+  return {
+    subtotal,
+    tax,
+    discount: discountAmount,
+    total
+  };
 });
 ```
 
-`getInput` reads a single field from the form, and wrapping each read in `$derived` gives us reactive values for just the tax rate, discount, and line items. The `totals` derived then combines them, recalculating whenever one of those fields changes while ignoring unrelated updates. Everything stays reactive without any manual synchronization between the form fields and the invoice summary.
+`getInput`() lets us derive individual fields from the form state. Here we derive taxRate, discount, and lineItems separately, then use `$derived.by`() to calculate the invoice totals. Because each derived value stays connected only to the field it represents, the `totals` only recompute when one of those values changes. Changes to unrelated fields elsewhere in the form won't trigger the calculation, keeping the derived state focused on exactly the data it needs.
 
-For individual row totals, we can reuse the derived `lineItems`:
+For individual row totals, we can reuse the same derived lineItems state:
 
 ```ts
-function getLineTotal(index: number): number {
+function getLineTotal(index) {
   const item = lineItems[index];
 
   if (!item) return 0;
 
-  return toNumber(item.quantity) * toNumber(item.unitPrice);
+  return Number(item.quantity) * Number(item.unitPrice);
 }
 ```
-
-Because these derived values are connected to the form, anything computed from them updates when the form changes.
+Because lineItems stays connected to the form state, each row total updates automatically whenever that item's quantity or unit price changes.
 
 ## Step 7: Submit the form
 
 At this point, the form state, validation, and fields are all connected. The final step is handling the transition from editable input values to the validated invoice data your application can use. By default, Formisch runs validation on submission and provides the parsed output from the schema. This behavior can be configured if your application needs a different validation strategy.
 
 ```ts
+import {
+  createForm,
+  reset,
+  type SubmitHandler
+} from '@formisch/svelte';
+
 type InvoiceOutput = v.InferOutput<typeof InvoiceSchema>;
 
 let submittedInvoice = $state<InvoiceOutput | null>(null);
 
-const submitInvoice = async (output: InvoiceOutput) => {
+const submitInvoice: SubmitHandler<typeof InvoiceSchema> = (output) => {
   submittedInvoice = output;
 
   console.log('Invoice submitted:', output);
