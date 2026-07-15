@@ -315,7 +315,7 @@ The remove action is disabled when only one item remains because the schema requ
 The invoice total depends on several values in the form: quantities, prices, tax, and discounts. Instead of updating totals manually inside every input handler, we can derive only the fields the calculation depends on. Svelte 5's $derived keeps those values connected to the form state, so the totals update automatically whenever one of the relevant fields changes.
 
 ```ts
-import { getInput } from '@formisch/svelte';import { getInput } from '@formisch/svelte';
+import { getInput } from '@formisch/svelte';
 
 const taxRate = $derived(
   getInput(invoiceForm, {
@@ -360,14 +360,20 @@ const totals = $derived.by(() => {
 For individual row totals, we can reuse the same derived lineItems state:
 
 ```ts
-function getLineTotal(index) {
+function toNumber(value: unknown): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function getLineTotal(index: number): number {
   const item = lineItems[index];
 
   if (!item) return 0;
 
-  return Number(item.quantity) * Number(item.unitPrice);
+  return toNumber(item.quantity) * toNumber(item.unitPrice);
 }
 ```
+
 Because lineItems stays connected to the form state, each row total updates automatically whenever that item's quantity or unit price changes.
 
 ## Step 7: Submit the form
