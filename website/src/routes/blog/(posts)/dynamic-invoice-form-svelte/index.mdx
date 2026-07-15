@@ -13,7 +13,7 @@ A field is not only a value. It has validation state, errors, transformations, a
 
 At this point, form state management moves away from handling individual inputs and towards managing the entire form model.
 
-Formisch approaches this by treating the form as a single connected structure. It's a headless, lightweight library where the schema, state, validation, and submitted output all come from one source, while you stay in full control of the UI.
+Formisch approaches this by treating the form as a single connected model. It's a headless, lightweight library where the schema, state, validation, and submitted output all come from one source, while you stay in full control of the UI.
 
 To see this in practice, we'll build a dynamic invoice form and walk through how Formisch works with Svelte 5's rune-based reactivity to manage:
 
@@ -168,7 +168,7 @@ With the form created, the next step is to connect individual fields to that sta
 
 ## Step 4: Connect fields
 
-Formisch is headless by design. It does not decide what your inputs should look like. Instead, it gives you the state and bindings needed to connect your own markup.
+Formisch is headless by design and does not decide what your inputs should look like. Instead, it gives you the state and bindings needed to connect your own markup.
 
 A field is connected through the `Field` component:
 
@@ -312,37 +312,44 @@ The remove action is disabled when only one item remains because the schema requ
 
 ## Step 6: Add reactive totals
 
-The invoice total depends on several values in the form: quantities, prices, tax, and discounts. Instead of updating totals manually inside every input handler, we can derive only the fields the calculation depends on. Svelte 5's $derived keeps those values connected to the form state, so the totals update automatically whenever one of the relevant fields changes.
+The invoice total depends on several values in the form: `quantities`, `prices`, `tax`, and `discounts`. Instead of updating totals manually inside every input handler, we can derive only the fields the calculation depends on. Svelte 5's `$derived` keeps those values connected to the form state, so the totals update automatically whenever one of the relevant fields changes.
 
 ```ts
 import { getInput } from '@formisch/svelte';
 
+function toNumber(value: unknown): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 const taxRate = $derived(
   getInput(invoiceForm, {
-    path: ['taxRate']
+    path: ['taxRate'],
   })
 );
 
 const discount = $derived(
   getInput(invoiceForm, {
-    path: ['discount']
+    path: ['discount'],
   })
 );
 
 const lineItems = $derived(
   getInput(invoiceForm, {
-    path: ['lineItems']
+    path: ['lineItems'],
   })
 );
 
 const totals = $derived.by(() => {
-  const subtotal = lineItems.reduce((sum, item) => {
-    return sum + Number(item.quantity) * Number(item.unitPrice);
-  }, 0);
+  const subtotal = lineItems.reduce(
+    (sum, item) =>
+      sum + toNumber(item.quantity) * toNumber(item.unitPrice),
+    0
+  );
 
-  const tax = subtotal * (Number(taxRate) / 100);
+  const tax = subtotal * (toNumber(taxRate) / 100);
 
-  const discountAmount = Number(discount);
+  const discountAmount = toNumber(discount);
 
   const total = Math.max(subtotal + tax - discountAmount, 0);
 
@@ -350,21 +357,16 @@ const totals = $derived.by(() => {
     subtotal,
     tax,
     discount: discountAmount,
-    total
+    total,
   };
 });
 ```
 
-`getInput`() lets us derive individual fields from the form state. Here we derive taxRate, discount, and lineItems separately, then use `$derived.by`() to calculate the invoice totals. Because each derived value stays connected only to the field it represents, the `totals` only recompute when one of those values changes. Changes to unrelated fields elsewhere in the form won't trigger the calculation, keeping the derived state focused on exactly the data it needs.
+`getInput` lets us derive individual fields from the form state. Here we derive `taxRate`, `discount`, and `lineItems` separately, then use `$derived.by` to calculate the invoice totals. The small `toNumber` helper keeps the calculation stable while a user is editing numeric fields, so the UI never briefly displays `NaN` if an input is temporarily empty. Because each derived value stays connected only to the field it represents, the totals only recompute when one of those values changes. Changes to unrelated fields elsewhere in the form won't trigger the calculation, keeping the derived state focused on exactly the data it needs.
 
-For individual row totals, we can reuse the same derived lineItems state:
+For individual row totals, we can reuse the same derived `lineItems` state:
 
 ```ts
-function toNumber(value: unknown): number {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
 function getLineTotal(index: number): number {
   const item = lineItems[index];
 
@@ -374,7 +376,7 @@ function getLineTotal(index: number): number {
 }
 ```
 
-Because lineItems stays connected to the form state, each row total updates automatically whenever that item's quantity or unit price changes.
+Because `lineItems` stays connected to the form state, each row total updates automatically whenever that item's quantity or unit price changes.
 
 ## Step 7: Submit the form
 
@@ -382,7 +384,6 @@ At this point, the form state, validation, and fields are all connected. The fin
 
 ```ts
 import {
-  createForm,
   reset,
   type SubmitHandler
 } from '@formisch/svelte';
