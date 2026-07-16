@@ -340,8 +340,7 @@ const lineItems = $derived(
 
 const totals = $derived.by(() => {
   const subtotal = lineItems.reduce(
-    (sum, item) =>
-      sum + toNumber(item.quantity) * toNumber(item.unitPrice),
+    (sum, item) => sum + toNumber(item.quantity) * toNumber(item.unitPrice),
     0
   );
 
