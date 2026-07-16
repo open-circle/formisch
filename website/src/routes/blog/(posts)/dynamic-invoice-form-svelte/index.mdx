@@ -2,7 +2,7 @@
 cover: Invoice Form
 title: 'Building a Dynamic Invoice Form in Svelte 5 with Formisch'
 description: Build a dynamic invoice form in Svelte 5 using Formisch, Valibot, FieldArray, and typed schema validation.
-published: 2026-07-15
+published: 2026-07-16
 authors:
   - flySewa
 ---
@@ -36,7 +36,7 @@ We'll be using:
 - [Formisch](https://formisch.dev)
 - [Valibot](https://valibot.dev) for schema validation
 
-You can follow along here, view the complete example on [Stackblitz](https://stackblitz.com/edit/sveltejs-kit-template-default-vbklpioo?file=src%2Froutes%2F%2Bpage.svelte), or clone the [runnable example](https://github.com/open-circle/formisch/tree/main/examples/svelte-invoice-form) from the repo.
+You can follow along here, view the complete example on [Stackblitz](https://stackblitz.com/edit/sveltejs-kit-template-default-umydieqm?file=src%2Froutes%2F%2Bpage.svelte), or clone the [runnable example](https://github.com/open-circle/formisch/tree/main/examples/svelte-invoice-form) from the repo.
 
 ## Step 1: Install dependencies
 
@@ -383,10 +383,7 @@ Because `lineItems` stays connected to the form state, each row total updates au
 At this point, the form state, validation, and fields are all connected. The final step is handling the transition from editable input values to the validated invoice data your application can use. By default, Formisch runs validation on submission and provides the parsed output from the schema. This behavior can be configured if your application needs a different validation strategy.
 
 ```ts
-import {
-  reset,
-  type SubmitHandler
-} from '@formisch/svelte';
+import { type SubmitHandler } from '@formisch/svelte';
 
 type InvoiceOutput = v.InferOutput<typeof InvoiceSchema>;
 
