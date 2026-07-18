@@ -29,7 +29,6 @@ import { InputLabelComponent } from './input-label.component.ts';
           [id]="field().name()"
           [attr.accept]="accept()"
           [multiple]="!!multiple()"
-          [attr.aria-invalid]="!!field().errors()"
           [attr.aria-errormessage]="
             field().errors() ? field().name() + '-error' : null
           "

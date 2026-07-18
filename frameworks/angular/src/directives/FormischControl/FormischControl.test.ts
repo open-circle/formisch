@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { getFieldStore, INTERNAL } from '@formisch/core/angular';
+import { setErrors } from '@formisch/methods/angular';
 import * as v from 'valibot';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { injectField, injectForm } from '../../functions/index.ts';
@@ -78,6 +79,17 @@ describe('FormischControl', () => {
     input.dispatchEvent(new Event('input'));
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(fixture.componentInstance.field.input()).toBe('test@example.com');
+  });
+
+  it('sets the aria-invalid attribute from the field errors', () => {
+    const { fixture, input } = render();
+    expect(input.getAttribute('aria-invalid')).toBe('false');
+    setErrors(fixture.componentInstance.form, {
+      path: ['email'],
+      errors: ['Custom error'],
+    });
+    fixture.detectChanges();
+    expect(input.getAttribute('aria-invalid')).toBe('true');
   });
 
   it('writes programmatic input updates into the element', () => {

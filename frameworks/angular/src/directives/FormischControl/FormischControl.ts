@@ -16,9 +16,9 @@ import { setElementInput } from '../../utils/index.ts';
 
 /**
  * Binds a native form control to a field. Writes the field input into the
- * element, wires the element name and the input/change/focus/blur handlers,
- * and registers the element so features like focusing the first invalid field
- * on submit work.
+ * element, wires the element name, the `aria-invalid` attribute, and the
+ * input/change/focus/blur handlers, and registers the element so features
+ * like focusing the first invalid field on submit work.
  *
  * ```html
  * <input [formischControl]="field" />
@@ -29,6 +29,7 @@ import { setElementInput } from '../../utils/index.ts';
   standalone: true,
   host: {
     '[attr.name]': 'fieldName()',
+    '[attr.aria-invalid]': 'fieldInvalid()',
     '(input)': 'control().onInput($event)',
     '(change)': 'control().onChange()',
     '(focus)': 'control().onFocus()',
@@ -44,6 +45,9 @@ export class FormischControl {
 
   protected readonly fieldName: Signal<string> = computed(() =>
     this.formischControl().name()
+  );
+  protected readonly fieldInvalid: Signal<boolean> = computed(
+    () => !!this.formischControl().errors()
   );
   protected readonly control: Signal<FieldControl> = computed(
     () => this.formischControl()[CONTROL]

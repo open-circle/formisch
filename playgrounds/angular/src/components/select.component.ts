@@ -39,7 +39,6 @@ interface SelectOption {
           [required]="!!required()"
           [class]="selectClasses()"
           [attr.size]="size()"
-          [attr.aria-invalid]="!!field().errors()"
           [attr.aria-errormessage]="
             field().errors() ? field().name() + '-error' : null
           "

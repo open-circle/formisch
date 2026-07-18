@@ -17,7 +17,6 @@ import { InputErrorsComponent } from './input-errors.component.ts';
         class="mt-1 h-4 w-4 cursor-pointer lg:mt-1 lg:h-5 lg:w-5"
         type="checkbox"
         [value]="value()"
-        [attr.aria-invalid]="!!field().errors()"
         [attr.aria-errormessage]="
           field().errors() ? field().name() + '-error' : null
         "

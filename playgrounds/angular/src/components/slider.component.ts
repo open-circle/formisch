@@ -28,7 +28,6 @@ import { InputLabelComponent } from './input-label.component.ts';
         [attr.min]="min()"
         [attr.max]="max()"
         [attr.step]="step()"
-        [attr.aria-invalid]="!!field().errors()"
         [attr.aria-errormessage]="
           field().errors() ? field().name() + '-error' : null
         "
