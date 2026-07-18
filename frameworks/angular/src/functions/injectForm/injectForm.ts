@@ -48,6 +48,7 @@ export function injectForm(config: FormConfig): FormStore {
     isSubmitted: computed(() => internalFormStore.isSubmitted.value),
     isValidating: computed(() => internalFormStore.isValidating.value),
     isTouched: computed(() => getFieldBool(internalFormStore, 'isTouched')),
+    isEdited: computed(() => getFieldBool(internalFormStore, 'isEdited')),
     isDirty: computed(() => getFieldBool(internalFormStore, 'isDirty')),
     isValid: computed(() => !getFieldBool(internalFormStore, 'errors')),
     errors: computed(() => internalFormStore.errors.value),

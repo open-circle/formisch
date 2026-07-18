@@ -44,6 +44,11 @@ describe('injectFieldArray', () => {
     expect(fieldArray.isTouched()).toBe(false);
   });
 
+  it('initializes isEdited to false', () => {
+    const { fieldArray } = setup();
+    expect(fieldArray.isEdited()).toBe(false);
+  });
+
   it('initializes isDirty to false', () => {
     const { fieldArray } = setup();
     expect(fieldArray.isDirty()).toBe(false);

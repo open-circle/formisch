@@ -46,9 +46,20 @@ describe('injectField', () => {
     expect(field.isTouched()).toBe(false);
   });
 
+  it('initializes isEdited to false', () => {
+    const { field } = setup();
+    expect(field.isEdited()).toBe(false);
+  });
+
   it('initializes isDirty to false', () => {
     const { field } = setup();
     expect(field.isDirty()).toBe(false);
+  });
+
+  it('marks the field as edited when setInput is called', () => {
+    const { field } = setup();
+    field.setInput('test@example.com');
+    expect(field.isEdited()).toBe(true);
   });
 
   it('initializes isValid to true', () => {

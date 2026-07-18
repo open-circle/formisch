@@ -73,6 +73,7 @@ export function injectFieldArray(
     items: computed(() => internalFieldStore().items.value),
     errors: computed(() => internalFieldStore().errors.value),
     isTouched: computed(() => getFieldBool(internalFieldStore(), 'isTouched')),
+    isEdited: computed(() => getFieldBool(internalFieldStore(), 'isEdited')),
     isDirty: computed(() => getFieldBool(internalFieldStore(), 'isDirty')),
     isValid: computed(() => !getFieldBool(internalFieldStore(), 'errors')),
   };

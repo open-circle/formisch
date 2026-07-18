@@ -88,6 +88,7 @@ export function injectField(
     input: computed(() => getFieldInput(internalFieldStore())),
     errors: computed(() => internalFieldStore().errors.value),
     isTouched: computed(() => getFieldBool(internalFieldStore(), 'isTouched')),
+    isEdited: computed(() => getFieldBool(internalFieldStore(), 'isEdited')),
     isDirty: computed(() => getFieldBool(internalFieldStore(), 'isDirty')),
     isValid: computed(() => !getFieldBool(internalFieldStore(), 'errors')),
     setInput(value) {

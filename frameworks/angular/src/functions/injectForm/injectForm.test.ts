@@ -39,6 +39,11 @@ describe('injectForm', () => {
     expect(form.isTouched()).toBe(false);
   });
 
+  it('initializes isEdited to false', () => {
+    const form = setup();
+    expect(form.isEdited()).toBe(false);
+  });
+
   it('initializes isDirty to false', () => {
     const form = setup();
     expect(form.isDirty()).toBe(false);
