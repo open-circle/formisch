@@ -1,10 +1,11 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { type FieldStore, FormischControl } from '@formisch/angular';
 
 /**
  * Simple radio button input. Should be used inside a RadioGroup component.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-radio',
   standalone: true,
   imports: [FormischControl],

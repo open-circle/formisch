@@ -1,4 +1,4 @@
-import { Location } from '@angular/common';
+import { ChangeDetectionStrategy, Location } from '@angular/common';
 import {
   afterNextRender,
   Component,
@@ -28,6 +28,7 @@ interface IndicatorStyle {
  * Root application component with tab navigation and sliding indicator.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],

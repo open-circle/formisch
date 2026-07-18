@@ -1,4 +1,9 @@
-import { Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { type FieldStore, FormischControl } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
@@ -10,6 +15,7 @@ import { InputLabelComponent } from './input-label.component.ts';
  * requirements.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-file-input',
   standalone: true,
   host: { class: 'block' },

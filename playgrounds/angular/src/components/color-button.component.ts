@@ -1,4 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from '@angular/core';
 import clsx from 'clsx';
 
 type Color = 'green' | 'yellow' | 'purple' | 'blue' | 'red';
@@ -7,6 +12,7 @@ type Color = 'green' | 'yellow' | 'purple' | 'blue' | 'red';
  * Button with a specified color used for demo purposes in the playground.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-color-button',
   standalone: true,
   template: `

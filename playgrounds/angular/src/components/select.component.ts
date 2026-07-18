@@ -1,4 +1,9 @@
-import { Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { type FieldStore, FormischControl } from '@formisch/angular';
 import clsx from 'clsx';
 import { AngleDownIconComponent } from '../icons/angle-down-icon.component.ts';
@@ -16,6 +21,7 @@ interface SelectOption {
  * entry requirements.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-select',
   standalone: true,
   host: { class: 'block' },

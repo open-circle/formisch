@@ -1,4 +1,9 @@
-import { Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { type FieldStore, FormischControl } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
@@ -9,6 +14,7 @@ import { InputLabelComponent } from './input-label.component.ts';
  * displayed in or around the field to communicate the entry requirements.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-text-input',
   standalone: true,
   imports: [InputLabelComponent, InputErrorsComponent, FormischControl],

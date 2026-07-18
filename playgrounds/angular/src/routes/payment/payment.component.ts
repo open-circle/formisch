@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import {
   FormischField,
   FormischForm,
@@ -55,6 +55,7 @@ const PaymentSchema = v.intersect([
 ]);
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-payment',
   standalone: true,
   imports: [

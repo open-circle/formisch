@@ -1,4 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from '@angular/core';
 import clsx from 'clsx';
 import { UnstyledButtonComponent } from './unstyled-button.component.ts';
 
@@ -6,6 +11,7 @@ import { UnstyledButtonComponent } from './unstyled-button.component.ts';
  * Button used for navigation, to confirm form entries, or perform actions.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-action-button',
   standalone: true,
   imports: [UnstyledButtonComponent],

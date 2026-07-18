@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   FormischField,
   FormischFieldArray,
@@ -43,6 +43,7 @@ const TodosSchema = v.object({
 });
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-todos',
   standalone: true,
   imports: [

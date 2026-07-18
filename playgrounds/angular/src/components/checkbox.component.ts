@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { type FieldStore, FormischControl } from '@formisch/angular';
 import { InputErrorsComponent } from './input-errors.component.ts';
 
@@ -7,6 +7,7 @@ import { InputErrorsComponent } from './input-errors.component.ts';
  * checkbox describes the selection option.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-checkbox',
   standalone: true,
   imports: [InputErrorsComponent, FormischControl],

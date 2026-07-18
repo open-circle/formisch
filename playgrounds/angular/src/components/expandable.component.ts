@@ -1,5 +1,6 @@
 import {
   afterRenderEffect,
+  ChangeDetectionStrategy,
   Component,
   computed,
   ElementRef,
@@ -13,6 +14,7 @@ import clsx from 'clsx';
  * Wrapper component to vertically expand or collapse content.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-expandable',
   standalone: true,
   host: { class: 'block' },

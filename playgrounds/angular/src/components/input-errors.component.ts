@@ -1,10 +1,17 @@
-import { Component, effect, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  signal,
+} from '@angular/core';
 import { ExpandableComponent } from './expandable.component.ts';
 
 /**
  * Input error that tells the user what to do to fix the problem.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-input-errors',
   standalone: true,
   imports: [ExpandableComponent],

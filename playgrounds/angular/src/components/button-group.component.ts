@@ -1,10 +1,11 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import clsx from 'clsx';
 
 /**
  * Button group displays multiple related actions side-by-side.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-button-group',
   standalone: true,
   template: `

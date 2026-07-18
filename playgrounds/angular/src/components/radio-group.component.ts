@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import type { FieldStore } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
@@ -15,6 +15,7 @@ interface RadioOption {
  * Uses fieldset and legend for proper HTML semantics and accessibility.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-radio-group',
   standalone: true,
   host: { class: 'block' },

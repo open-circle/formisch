@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { type FieldStore, FormischControl } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
@@ -10,6 +10,7 @@ import { InputLabelComponent } from './input-label.component.ts';
  * entry requirements.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-slider',
   standalone: true,
   host: { class: 'block' },

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   FormischField,
   FormischFieldArray,
@@ -27,6 +27,7 @@ const NestedFormSchema = v.object({
 });
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-nested',
   standalone: true,
   imports: [

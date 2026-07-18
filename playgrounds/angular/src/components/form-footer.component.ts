@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { type FormStore, reset } from '@formisch/angular';
 import { ActionButtonComponent } from './action-button.component.ts';
 
@@ -6,6 +6,7 @@ import { ActionButtonComponent } from './action-button.component.ts';
  * Form footer with buttons to reset and submit the form.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-form-footer',
   standalone: true,
   imports: [ActionButtonComponent],

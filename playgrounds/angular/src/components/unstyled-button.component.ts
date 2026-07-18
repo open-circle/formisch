@@ -1,4 +1,10 @@
-import { Component, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import clsx from 'clsx';
 import { SpinnerComponent } from './spinner.component.ts';
 
@@ -6,6 +12,7 @@ import { SpinnerComponent } from './spinner.component.ts';
  * Basic button component with loading state and spinner animation.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-unstyled-button',
   standalone: true,
   imports: [SpinnerComponent],

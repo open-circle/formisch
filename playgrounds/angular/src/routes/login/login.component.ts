@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormischField, FormischForm, injectForm } from '@formisch/angular';
 import * as v from 'valibot';
 import { FormFooterComponent } from '../../components/form-footer.component.ts';
@@ -19,6 +19,7 @@ const LoginSchema = v.object({
 });
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-login',
   standalone: true,
   imports: [

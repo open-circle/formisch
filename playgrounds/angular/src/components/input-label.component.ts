@@ -1,10 +1,11 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import clsx from 'clsx';
 
 /**
  * Input label for a form field.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-input-label',
   standalone: true,
   // Behave like Solid's label element: an inline-block box when a label is

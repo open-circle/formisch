@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormischField, FormischForm, injectForm } from '@formisch/angular';
 import * as v from 'valibot';
 import { CheckboxComponent } from '../../components/checkbox.component.ts';
@@ -29,6 +29,7 @@ const SpecialFormSchema = v.object({
 });
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-special',
   standalone: true,
   imports: [

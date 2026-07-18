@@ -1,4 +1,10 @@
-import { Component, effect, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  signal,
+} from '@angular/core';
 import { type FormStore } from '@formisch/angular';
 import clsx from 'clsx';
 import { ExpandableComponent } from './expandable.component.ts';
@@ -8,6 +14,7 @@ import { ExpandableComponent } from './expandable.component.ts';
  * user.
  */
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-form-error',
   standalone: true,
   imports: [ExpandableComponent],
