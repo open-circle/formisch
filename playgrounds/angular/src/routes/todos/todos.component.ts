@@ -66,95 +66,89 @@ const TodosSchema = v.object({
       <app-form-header [form]="form" heading="Todo form" />
 
       <div class="space-y-8 md:space-y-10 lg:space-y-12">
-        <ng-container *formischField="['heading'] of form; let field">
-          <app-text-input
-            [field]="field"
-            type="text"
-            label="Heading"
-            placeholder="Shopping list"
-            [required]="true"
-          />
-        </ng-container>
+        <app-text-input
+          *formischField="['heading'] of form; let field"
+          [field]="field"
+          type="text"
+          label="Heading"
+          placeholder="Shopping list"
+          [required]="true"
+        />
 
-        <ng-container *formischFieldArray="['todos'] of form; let fieldArray">
-          <div class="space-y-5 px-8 lg:px-10">
-            <app-input-label label="Todos" margin="none" [required]="true" />
+        <div
+          *formischFieldArray="['todos'] of form; let fieldArray"
+          class="space-y-5 px-8 lg:px-10"
+        >
+          <app-input-label label="Todos" margin="none" [required]="true" />
 
-            <div>
-              <div auto-animate class="space-y-5">
-                @for (
-                  item of fieldArray.items();
-                  track item;
-                  let index = $index
-                ) {
-                  <div
-                    class="flex flex-wrap gap-5 rounded-2xl border-2 border-slate-200 bg-slate-100/25 p-5 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/10 dark:hover:border-slate-700"
-                  >
-                    <ng-container
-                      *formischField="
-                        ['todos', index, 'label'] of form;
-                        let field
-                      "
-                    >
-                      <app-text-input
-                        [field]="field"
-                        type="text"
-                        class="w-full p-0! md:w-auto md:flex-1"
-                        placeholder="Enter task"
-                        [required]="true"
-                      />
-                    </ng-container>
+          <div>
+            <div auto-animate class="space-y-5">
+              @for (
+                item of fieldArray.items();
+                track item;
+                let index = $index
+              ) {
+                <div
+                  class="flex flex-wrap gap-5 rounded-2xl border-2 border-slate-200 bg-slate-100/25 p-5 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/10 dark:hover:border-slate-700"
+                >
+                  <app-text-input
+                    *formischField="
+                      ['todos', index, 'label'] of form;
+                      let field
+                    "
+                    [field]="field"
+                    type="text"
+                    class="p-0! w-full md:w-auto md:flex-1"
+                    placeholder="Enter task"
+                    [required]="true"
+                  />
 
-                    <ng-container
-                      *formischField="
-                        ['todos', index, 'deadline'] of form;
-                        let field
-                      "
-                    >
-                      <app-text-input
-                        [field]="field"
-                        type="date"
-                        class="flex-1 p-0!"
-                        [required]="true"
-                      />
-                    </ng-container>
+                  <app-text-input
+                    *formischField="
+                      ['todos', index, 'deadline'] of form;
+                      let field
+                    "
+                    [field]="field"
+                    type="date"
+                    class="p-0! flex-1"
+                    [required]="true"
+                  />
 
-                    <app-color-button
-                      color="red"
-                      label="Delete"
-                      width="auto"
-                      (clicked)="handleRemove(index)"
-                    />
-                  </div>
-                }
-              </div>
-              <app-input-errors name="todos" [errors]="fieldArray.errors()" />
+                  <app-color-button
+                    color="red"
+                    label="Delete"
+                    width="auto"
+                    (clicked)="handleRemove(index)"
+                  />
+                </div>
+              }
             </div>
-
-            <div class="flex flex-wrap gap-5">
-              <app-color-button
-                color="green"
-                label="Add new"
-                (clicked)="handleInsert()"
-              />
-              <app-color-button
-                color="yellow"
-                label="Move first to end"
-                (clicked)="handleMoveFirstToEnd(fieldArray.items().length)"
-              />
-              <app-color-button
-                color="purple"
-                label="Swap first two"
-                (clicked)="handleSwapFirstTwo()"
-              />
-              <app-color-button
-                color="blue"
-                label="Replace first"
-                (clicked)="handleReplaceFirst()"
-              />
-            </div>
+            <app-input-errors name="todos" [errors]="fieldArray.errors()" />
           </div>
-        </ng-container>
+
+          <div class="flex flex-wrap gap-5">
+            <app-color-button
+              color="green"
+              label="Add new"
+              (clicked)="handleInsert()"
+            />
+            <app-color-button
+              color="yellow"
+              label="Move first to end"
+              (clicked)="handleMoveFirstToEnd(fieldArray.items().length)"
+            />
+            <app-color-button
+              color="purple"
+              label="Swap first two"
+              (clicked)="handleSwapFirstTwo()"
+            />
+            <app-color-button
+              color="blue"
+              label="Replace first"
+              (clicked)="handleReplaceFirst()"
+            />
+          </div>
+        </div>
       </div>
 
       <app-form-footer [form]="form" />

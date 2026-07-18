@@ -74,60 +74,53 @@ const PaymentSchema = v.intersect([
       <app-form-header [form]="form" heading="Payment form" />
 
       <div class="space-y-8 md:space-y-10 lg:space-y-12">
-        <ng-container *formischField="['owner'] of form; let field">
-          <app-text-input
-            [field]="field"
-            type="text"
-            label="Owner"
-            placeholder="John Doe"
-            [required]="true"
-          />
-        </ng-container>
+        <app-text-input
+          *formischField="['owner'] of form; let field"
+          [field]="field"
+          type="text"
+          label="Owner"
+          placeholder="John Doe"
+          [required]="true"
+        />
 
-        <ng-container *formischField="['type'] of form; let field">
-          <app-select
-            [field]="field"
-            [options]="paymentTypes"
-            label="Type"
-            placeholder="Card or PayPal?"
-            [required]="true"
-          />
-        </ng-container>
+        <app-select
+          *formischField="['type'] of form; let field"
+          [field]="field"
+          [options]="paymentTypes"
+          label="Type"
+          placeholder="Card or PayPal?"
+          [required]="true"
+        />
 
         @if (paymentType() === 'card') {
-          <ng-container *formischField="['card', 'number'] of form; let field">
-            <app-text-input
-              [field]="field"
-              type="text"
-              label="Number"
-              placeholder="1234 1234 1234 1234"
-              [required]="true"
-            />
-          </ng-container>
+          <app-text-input
+            *formischField="['card', 'number'] of form; let field"
+            [field]="field"
+            type="text"
+            label="Number"
+            placeholder="1234 1234 1234 1234"
+            [required]="true"
+          />
 
-          <ng-container
+          <app-text-input
             *formischField="['card', 'expiration'] of form; let field"
-          >
-            <app-text-input
-              [field]="field"
-              type="text"
-              label="Expiration"
-              placeholder="MM/YY"
-              [required]="true"
-            />
-          </ng-container>
+            [field]="field"
+            type="text"
+            label="Expiration"
+            placeholder="MM/YY"
+            [required]="true"
+          />
         }
 
         @if (paymentType() === 'paypal') {
-          <ng-container *formischField="['paypal', 'email'] of form; let field">
-            <app-text-input
-              [field]="field"
-              type="email"
-              label="Email"
-              placeholder="example@email.com"
-              [required]="true"
-            />
-          </ng-container>
+          <app-text-input
+            *formischField="['paypal', 'email'] of form; let field"
+            [field]="field"
+            type="email"
+            label="Email"
+            placeholder="example@email.com"
+            [required]="true"
+          />
         }
       </div>
 

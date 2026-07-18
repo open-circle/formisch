@@ -32,10 +32,10 @@ export interface FormischFieldContext<
  * `of` keyword so the context guard can infer the field's value type.
  *
  * ```html
- * <ng-container *formischField="['todos', i, 'label'] of form; let field">
- *   <input [formischControl]="field" />
- * </ng-container>
+ * <input *formischField="['todos', i, 'label'] of form; let field" [formischControl]="field" />
  * ```
+ *
+ * Use an `<ng-container>` host when one field spans multiple elements.
  */
 @Directive({
   selector: '[formischField]',

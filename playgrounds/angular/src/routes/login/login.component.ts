@@ -37,25 +37,23 @@ const LoginSchema = v.object({
       <app-form-header [form]="form" heading="Login form" />
 
       <div class="space-y-8 md:space-y-10 lg:space-y-12">
-        <ng-container *formischField="['email'] of form; let field">
-          <app-text-input
-            [field]="field"
-            type="email"
-            label="Email"
-            placeholder="example@email.com"
-            [required]="true"
-          />
-        </ng-container>
+        <app-text-input
+          *formischField="['email'] of form; let field"
+          [field]="field"
+          type="email"
+          label="Email"
+          placeholder="example@email.com"
+          [required]="true"
+        />
 
-        <ng-container *formischField="['password'] of form; let field">
-          <app-text-input
-            [field]="field"
-            type="password"
-            label="Password"
-            placeholder="********"
-            [required]="true"
-          />
-        </ng-container>
+        <app-text-input
+          *formischField="['password'] of form; let field"
+          [field]="field"
+          type="password"
+          label="Password"
+          placeholder="********"
+          [required]="true"
+        />
       </div>
 
       <app-form-footer [form]="form" />

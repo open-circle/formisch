@@ -52,13 +52,18 @@ const SpecialFormSchema = v.object({
       <app-form-header [form]="form" heading="Special form" />
 
       <div class="space-y-8 md:space-y-10 lg:space-y-12">
-        <ng-container *formischField="['number'] of form; let field">
-          <app-text-input [field]="field" type="number" label="Number" />
-        </ng-container>
+        <app-text-input
+          *formischField="['number'] of form; let field"
+          [field]="field"
+          type="number"
+          label="Number"
+        />
 
-        <ng-container *formischField="['range'] of form; let field">
-          <app-slider [field]="field" label="Range" />
-        </ng-container>
+        <app-slider
+          *formischField="['range'] of form; let field"
+          [field]="field"
+          label="Range"
+        />
 
         <label
           class="block px-8 font-medium md:text-lg lg:mb-5 lg:px-10 lg:text-xl"
@@ -66,59 +71,60 @@ const SpecialFormSchema = v.object({
           Checkbox array
         </label>
 
-        <ng-container *formischField="['checkbox', 'array'] of form; let field">
-          <div
-            class="mx-8 flex flex-wrap gap-6 rounded-2xl border-2 border-slate-200 p-6 lg:gap-10 lg:p-10 dark:border-slate-800"
-          >
-            @for (option of checkboxOptions; track option.value) {
-              <app-checkbox
-                [field]="field"
-                [label]="option.label"
-                [value]="option.value"
-                class="p-0!"
-              />
-            }
-          </div>
-        </ng-container>
-
-        <ng-container
-          *formischField="['checkbox', 'boolean'] of form; let field"
+        <div
+          *formischField="['checkbox', 'array'] of form; let field"
+          class="mx-8 flex flex-wrap gap-6 rounded-2xl border-2 border-slate-200 p-6 lg:gap-10 lg:p-10 dark:border-slate-800"
         >
-          <app-checkbox [field]="field" label="Checkbox boolean" />
-        </ng-container>
+          @for (option of checkboxOptions; track option.value) {
+            <app-checkbox
+              [field]="field"
+              [label]="option.label"
+              [value]="option.value"
+              class="p-0!"
+            />
+          }
+        </div>
 
-        <ng-container *formischField="['radio'] of form; let field">
-          <app-radio-group
-            [field]="field"
-            label="Radio group"
-            [options]="radioOptions"
-          />
-        </ng-container>
+        <app-checkbox
+          *formischField="['checkbox', 'boolean'] of form; let field"
+          [field]="field"
+          label="Checkbox boolean"
+        />
 
-        <ng-container *formischField="['select', 'array'] of form; let field">
-          <app-select
-            [field]="field"
-            [options]="selectOptions"
-            label="Select array"
-            [multiple]="true"
-          />
-        </ng-container>
+        <app-radio-group
+          *formischField="['radio'] of form; let field"
+          [field]="field"
+          label="Radio group"
+          [options]="radioOptions"
+        />
 
-        <ng-container *formischField="['select', 'string'] of form; let field">
-          <app-select
-            [field]="field"
-            [options]="selectOptions"
-            label="Select string"
-          />
-        </ng-container>
+        <app-select
+          *formischField="['select', 'array'] of form; let field"
+          [field]="field"
+          [options]="selectOptions"
+          label="Select array"
+          [multiple]="true"
+        />
 
-        <ng-container *formischField="['file', 'list'] of form; let field">
-          <app-file-input [field]="field" label="File list" [multiple]="true" />
-        </ng-container>
+        <app-select
+          *formischField="['select', 'string'] of form; let field"
+          [field]="field"
+          [options]="selectOptions"
+          label="Select string"
+        />
 
-        <ng-container *formischField="['file', 'item'] of form; let field">
-          <app-file-input [field]="field" label="File item" />
-        </ng-container>
+        <app-file-input
+          *formischField="['file', 'list'] of form; let field"
+          [field]="field"
+          label="File list"
+          [multiple]="true"
+        />
+
+        <app-file-input
+          *formischField="['file', 'item'] of form; let field"
+          [field]="field"
+          label="File item"
+        />
       </div>
 
       <app-form-footer [form]="form" />
