@@ -43,7 +43,11 @@ describe('FormischForm', () => {
       selector: 'formisch-form-test-host',
       standalone: true,
       imports: [FormischForm],
-      template: `<form [formischForm]="form" [formischSubmit]="handleSubmit">
+      template: `<form
+        [formischForm]="form"
+        [formischSubmit]="handleSubmit"
+        #directive="formischForm"
+      >
         <button type="submit" data-testid="submit">Submit</button>
       </form>`,
     })
@@ -152,6 +156,15 @@ describe('FormischForm', () => {
     fixture.detectChanges();
     const form = (fixture.nativeElement as HTMLElement).querySelector('form');
     expect(form?.hasAttribute('novalidate')).toBe(true);
+  });
+
+  it('is exportable as formischForm in template references', () => {
+    const fixture = TestBed.createComponent(TestHost);
+    fixture.detectChanges();
+    const directive = fixture.debugElement.children[0].references[
+      'directive'
+    ] as { formischForm(): unknown };
+    expect(directive.formischForm()).toBe(fixture.componentInstance.form);
   });
 
   it('registers the form element on the store', async () => {

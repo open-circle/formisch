@@ -40,6 +40,7 @@ export interface FormischFieldContext<
 @Directive({
   selector: '[formischField]',
   standalone: true,
+  exportAs: 'formischField',
 })
 export class FormischField<
   TSchema extends FormSchema = FormSchema,

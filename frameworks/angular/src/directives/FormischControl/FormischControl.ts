@@ -27,6 +27,7 @@ import { setElementInput } from '../../utils/index.ts';
 @Directive({
   selector: '[formischControl]',
   standalone: true,
+  exportAs: 'formischControl',
   host: {
     '[attr.name]': 'fieldName()',
     '[attr.aria-invalid]': 'fieldInvalid()',

@@ -27,6 +27,7 @@ import type { FormStore } from '../../types/index.ts';
 @Directive({
   selector: 'form[formischForm]',
   standalone: true,
+  exportAs: 'formischForm',
   host: {
     novalidate: '',
     '(submit)': 'handleFormSubmit($event)',

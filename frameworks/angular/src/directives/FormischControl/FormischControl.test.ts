@@ -29,7 +29,11 @@ describe('FormischControl', () => {
     @Component({
       standalone: true,
       imports: [FormischControl],
-      template: `<input data-testid="input" [formischControl]="field" />`,
+      template: `<input
+        data-testid="input"
+        [formischControl]="field"
+        #directive="formischControl"
+      />`,
     })
     class TestHostComponent {
       readonly form = injectForm({ schema: Schema });
@@ -79,6 +83,14 @@ describe('FormischControl', () => {
     input.dispatchEvent(new Event('input'));
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(fixture.componentInstance.field.input()).toBe('test@example.com');
+  });
+
+  it('is exportable as formischControl in template references', () => {
+    const { fixture } = render();
+    const directive = fixture.debugElement.children[0].references[
+      'directive'
+    ] as { formischControl(): unknown };
+    expect(directive.formischControl()).toBe(fixture.componentInstance.field);
   });
 
   it('sets the aria-invalid attribute from the field errors', () => {
