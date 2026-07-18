@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { type FieldStore, FormischControl } from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
@@ -25,7 +25,6 @@ import { InputLabelComponent } from './input-label.component.ts';
         class="w-full"
         type="range"
         [id]="field().name()"
-        [value]="value()"
         [attr.min]="min()"
         [attr.max]="max()"
         [attr.step]="step()"
@@ -47,11 +46,6 @@ export class SliderComponent {
   readonly step = input<number>();
   readonly required = input<boolean>(false);
   readonly class = input<string>('');
-
-  protected readonly value = computed<string | number>(() => {
-    const input = this.field().input();
-    return input == null ? '' : (input as string | number);
-  });
 
   protected readonly containerClasses = () =>
     clsx('px-8 lg:px-10', this.class());

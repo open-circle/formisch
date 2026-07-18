@@ -49,10 +49,7 @@ interface SelectOption {
             {{ placeholder() }}
           </option>
           @for (option of options(); track option.value) {
-            <option
-              [value]="option.value"
-              [selected]="isSelected(option.value)"
-            >
+            <option [value]="option.value">
               {{ option.label }}
             </option>
           }
@@ -90,10 +87,6 @@ export class SelectComponent {
 
   protected readonly containerClasses = () =>
     clsx('px-8 lg:px-10', this.class());
-
-  protected isSelected(value: string): boolean {
-    return this.values().includes(value);
-  }
 
   protected readonly selectClasses = computed(() =>
     clsx(

@@ -1,4 +1,5 @@
 import {
+  afterRenderEffect,
   computed,
   Directive,
   effect,
@@ -11,14 +12,16 @@ import {
 import type { FieldElement } from '@formisch/core/angular';
 import { CONTROL, type FieldControl } from '../../types/control.ts';
 import type { FieldStore } from '../../types/index.ts';
+import { setElementInput } from '../../utils/index.ts';
 
 /**
- * Binds a native form control to a field. Wires the element name, the
- * input/change/focus/blur handlers, and registers the element so features like
- * focusing the first invalid field on submit work.
+ * Binds a native form control to a field. Writes the field input into the
+ * element, wires the element name and the input/change/focus/blur handlers,
+ * and registers the element so features like focusing the first invalid field
+ * on submit work.
  *
  * ```html
- * <input [value]="field.input()" [formischControl]="field" />
+ * <input [formischControl]="field" />
  * ```
  */
 @Directive({
@@ -58,6 +61,18 @@ export class FormischControl {
       if (cleanup) {
         onCleanup(cleanup);
       }
+    });
+
+    // Write the field input into the element after each render in which the
+    // input or the bound field changed. Runs in the write phase because
+    // sibling DOM such as select options must be rendered first.
+    afterRenderEffect({
+      write: () => {
+        setElementInput(
+          this.elementRef.nativeElement,
+          this.formischControl().input()
+        );
+      },
     });
   }
 }

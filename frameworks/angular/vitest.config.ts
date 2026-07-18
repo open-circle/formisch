@@ -8,6 +8,13 @@ export default defineConfig({
       },
     },
   },
+  resolve: {
+    // The inlined @formisch/core workspace package must not resolve its own
+    // copy of @angular/core (pnpm installs core's older dev dependency next
+    // to it). Two copies create two separate signal graphs, which silently
+    // breaks dependency tracking between core signals and package computeds.
+    dedupe: ['@angular/core'],
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/vitest/setup.ts'],

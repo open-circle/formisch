@@ -33,7 +33,7 @@ export interface FormischFieldContext<
  *
  * ```html
  * <ng-container *formischField="['todos', i, 'label'] of form; let field">
- *   <input [value]="field.input()" [formischControl]="field" />
+ *   <input [formischControl]="field" />
  * </ng-container>
  * ```
  */

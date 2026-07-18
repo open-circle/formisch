@@ -22,7 +22,6 @@ import { InputLabelComponent } from './input-label.component.ts';
     <input
       [type]="type()"
       [id]="field().name()"
-      [value]="value()"
       [placeholder]="placeholder() ?? ''"
       [attr.aria-invalid]="!!field().errors()"
       [attr.aria-errormessage]="
@@ -40,11 +39,6 @@ export class TextInputComponent {
   readonly label = input<string>();
   readonly placeholder = input<string>();
   readonly required = input<boolean>(false);
-
-  protected readonly value = computed<string | number>(() => {
-    const input = this.field().input();
-    return input == null ? '' : (input as string | number);
-  });
 
   protected readonly inputClass = computed(() =>
     clsx(

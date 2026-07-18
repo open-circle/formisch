@@ -1,4 +1,5 @@
 import {
+  ApplicationRef,
   Component,
   provideZonelessChangeDetection,
   signal,
@@ -77,6 +78,65 @@ describe('FormischControl', () => {
     input.dispatchEvent(new Event('input'));
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(fixture.componentInstance.field.input()).toBe('test@example.com');
+  });
+
+  it('writes programmatic input updates into the element', () => {
+    const { fixture, input } = render();
+    // In TestBed, afterRenderEffect callbacks only run during an
+    // ApplicationRef tick, which fixture.detectChanges() does not trigger
+    const appRef = TestBed.inject(ApplicationRef);
+    appRef.tick();
+    fixture.componentInstance.field.setInput('test@example.com');
+    appRef.tick();
+    expect(input.value).toBe('test@example.com');
+  });
+});
+
+let InitialHost: Type<{
+  form: FormStore<typeof Schema>;
+  field: FieldStore<typeof Schema, ['email']>;
+}>;
+
+describe('FormischControl initial value', () => {
+  beforeAll(async () => {
+    const FormischControl = await loadDistComponent('FormischControl');
+
+    @Component({
+      standalone: true,
+      imports: [FormischControl],
+      template: `<input data-testid="input" [formischControl]="field" />`,
+    })
+    class InitialHostComponent {
+      readonly form = injectForm({
+        schema: Schema,
+        initialInput: { email: 'initial@example.com' },
+      });
+      readonly field = injectField(this.form, { path: ['email'] });
+    }
+
+    InitialHost = InitialHostComponent as Type<{
+      form: FormStore<typeof Schema>;
+      field: FieldStore<typeof Schema, ['email']>;
+    }>;
+  });
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [InitialHost],
+      providers: [provideZonelessChangeDetection()],
+    });
+  });
+
+  it('writes the initial field input into the element', () => {
+    const fixture = TestBed.createComponent(InitialHost);
+    fixture.detectChanges();
+    // In TestBed, afterRenderEffect callbacks only run during an
+    // ApplicationRef tick, which fixture.detectChanges() does not trigger
+    TestBed.inject(ApplicationRef).tick();
+    const input = (
+      fixture.nativeElement as HTMLElement
+    ).querySelector<HTMLInputElement>('[data-testid="input"]')!;
+    expect(input.value).toBe('initial@example.com');
   });
 });
 
