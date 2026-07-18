@@ -26,6 +26,15 @@ describe('reset', () => {
       expect(store.children.name.isTouched.value).toBe(false);
     });
 
+    test('should reset field edited state', () => {
+      const store = createTestStore(v.object({ name: v.string() }));
+      store.children.name.isEdited.value = true;
+
+      reset(store);
+
+      expect(store.children.name.isEdited.value).toBe(false);
+    });
+
     test('should reset field errors', () => {
       const store = createTestStore(v.object({ name: v.string() }));
       store.children.name.errors.value = ['Error'];
@@ -153,6 +162,17 @@ describe('reset', () => {
     });
   });
 
+  describe('form reset with keepEdited', () => {
+    test('should keep edited state', () => {
+      const store = createTestStore(v.object({ name: v.string() }));
+      store.children.name.isEdited.value = true;
+
+      reset(store, { keepEdited: true });
+
+      expect(store.children.name.isEdited.value).toBe(true);
+    });
+  });
+
   describe('form reset with keepErrors', () => {
     test('should keep field errors', () => {
       const store = createTestStore(v.object({ name: v.string() }));
@@ -275,7 +295,7 @@ describe('reset', () => {
       expect(store.children.name.initialInput.value).toBeNull();
     });
 
-    test('should reset field to undefined when initialInput is explicitly undefined', () => {
+    test('should reset field to its empty input when initialInput is explicitly undefined', () => {
       const store = createTestStore(v.object({ name: v.string() }), {
         initialInput: { name: 'John' },
       });
@@ -283,8 +303,10 @@ describe('reset', () => {
 
       reset(store, { path: ['name'], initialInput: undefined });
 
-      expect(store.children.name.input.value).toBeUndefined();
-      expect(store.children.name.initialInput.value).toBeUndefined();
+      // A required string falls back to its empty input, staying consistent
+      // with form initialization
+      expect(store.children.name.input.value).toBe('');
+      expect(store.children.name.initialInput.value).toBe('');
     });
 
     test('should keep existing initial input when initialInput key is omitted', () => {
@@ -297,6 +319,53 @@ describe('reset', () => {
 
       expect(store.children.name.input.value).toBe('John');
       expect(store.children.name.initialInput.value).toBe('John');
+    });
+
+    test('should reset nullish object field to new initial input', () => {
+      const store = createTestStore(
+        v.object({ user: v.nullish(v.object({ name: v.string() })) })
+      );
+
+      reset(store, { path: ['user'], initialInput: { name: 'John' } });
+
+      expect(store.children.user.initialInput.value).toBe(true);
+      expect(store.children.user.input.value).toBe(true);
+      const userStore = store.children.user;
+      expect(userStore.kind).toBe('object');
+      if (userStore.kind === 'object') {
+        expect(userStore.children.name.initialInput.value).toBe('John');
+        expect(userStore.children.name.input.value).toBe('John');
+      }
+    });
+
+    test('should reset nullish object field to undefined initial input', () => {
+      const store = createTestStore(
+        v.object({ user: v.nullish(v.object({ name: v.string() })) }),
+        { initialInput: { user: { name: 'John' } } }
+      );
+
+      reset(store, { path: ['user'], initialInput: undefined });
+
+      expect(store.children.user.initialInput.value).toBeUndefined();
+      expect(store.children.user.input.value).toBeUndefined();
+    });
+
+    test('should reset nullish array field to new initial input', () => {
+      const store = createTestStore(
+        v.object({ items: v.nullish(v.array(v.string())) })
+      );
+
+      reset(store, { path: ['items'], initialInput: ['x', 'y'] });
+
+      expect(store.children.items.initialInput.value).toBe(true);
+      expect(store.children.items.input.value).toBe(true);
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+      if (itemsStore.kind === 'array') {
+        expect(itemsStore.items.value).toHaveLength(2);
+        expect(itemsStore.children[0].input.value).toBe('x');
+        expect(itemsStore.children[1].input.value).toBe('y');
+      }
     });
   });
 

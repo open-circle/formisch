@@ -1,5 +1,9 @@
 import { batch, createId } from '../../framework/index.ts';
-import type { InternalFieldStore, PathKey } from '../../types/index.ts';
+import type {
+  EmptyInput,
+  InternalFieldStore,
+  InternalFormStore,
+} from '../../types/index.ts';
 import { initializeFieldStore } from '../initializeFieldStore/index.ts';
 
 /**
@@ -7,10 +11,12 @@ import { initializeFieldStore } from '../initializeFieldStore/index.ts';
  * For arrays, initializes missing children if needed. Updates `initialInput`
  * and `initialItems` properties.
  *
+ * @param internalFormStore The form store providing the empty input config.
  * @param internalFieldStore The field store to update.
  * @param initialInput The initial input value.
  */
 export function setInitialFieldInput(
+  internalFormStore: InternalFormStore,
   internalFieldStore: InternalFieldStore,
   initialInput: unknown
 ): void {
@@ -18,59 +24,54 @@ export function setInitialFieldInput(
   batch(() => {
     // If field store is array, handle array initial input
     if (internalFieldStore.kind === 'array') {
-      // Set array input
-      internalFieldStore.input.value =
+      // Set initial array input
+      internalFieldStore.initialInput.value =
         initialInput == null ? initialInput : true;
 
       // Normalize input to empty array if nullish
       const initialArrayInput = initialInput ?? [];
 
-      // If initial input exceeds children capacity, initialize new children
-      if (
-        // @ts-expect-error
-        initialArrayInput.length > internalFieldStore.children.length
-      ) {
-        // Parse path for child initialization
-        const path = JSON.parse(internalFieldStore.name) as PathKey[];
+      // Tuples have a fixed number of children, so ignore any extra input items
+      // instead of growing them (they have no `item` schema to initialize
+      // additional children, unlike dynamic arrays)
+      const length =
+        internalFieldStore.schema.type === 'array'
+          ? (initialArrayInput as unknown[]).length
+          : internalFieldStore.children.length;
 
+      // If initial input exceeds children capacity, initialize new children
+      if (length > internalFieldStore.children.length) {
         // Initialize missing children
         for (
           let index = internalFieldStore.children.length;
-          // @ts-expect-error
-          index < initialArrayInput.length;
+          index < length;
           index++
         ) {
           // Create empty child object
           // @ts-expect-error
           internalFieldStore.children[index] = {};
 
-          // Add current index to path
-          path.push(index);
-
           // Initialize field store for new child
           initializeFieldStore(
+            internalFormStore,
             internalFieldStore.children[index],
             // @ts-expect-error
             internalFieldStore.schema.item,
             // @ts-expect-error
             initialArrayInput[index],
-            path
+            [...internalFieldStore.path, index]
           );
-
-          // Remove index from path for next iteration
-          path.pop();
         }
       }
 
       // Set initial items with unique IDs
-      internalFieldStore.initialItems.value =
-        // @ts-expect-error
-        initialArrayInput.map(createId);
+      internalFieldStore.initialItems.value = Array.from({ length }, createId);
 
       // Set initial input for each array item
       for (let index = 0; index < internalFieldStore.children.length; index++) {
         // Recursively set initial input for child
         setInitialFieldInput(
+          internalFormStore,
           internalFieldStore.children[index],
           // @ts-expect-error
           initialArrayInput[index]
@@ -79,14 +80,15 @@ export function setInitialFieldInput(
 
       // Otherwise, if field store is object, handle object initial input
     } else if (internalFieldStore.kind === 'object') {
-      // Set object input
-      internalFieldStore.input.value =
+      // Set initial object input
+      internalFieldStore.initialInput.value =
         initialInput == null ? initialInput : true;
 
       // Set initial input for each object property
       for (const key in internalFieldStore.children) {
         // Recursively set initial input for child
         setInitialFieldInput(
+          internalFormStore,
           internalFieldStore.children[key],
           // @ts-expect-error
           initialInput?.[key]
@@ -95,8 +97,15 @@ export function setInitialFieldInput(
 
       // Otherwise, handle value field initial input
     } else {
-      // Set initial input
-      internalFieldStore.initialInput.value = initialInput;
+      // Fall back to the empty input for this field's type when no input is
+      // provided so the initial input stays consistent with form
+      // initialization. Optional and nullable fields stay `undefined`.
+      internalFieldStore.initialInput.value =
+        initialInput === undefined && !internalFieldStore.isNullish
+          ? internalFormStore.emptyInput[
+              internalFieldStore.schema.type as keyof EmptyInput
+            ]
+          : initialInput;
     }
   });
 }

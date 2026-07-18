@@ -75,6 +75,10 @@ export interface FieldStore<
    */
   readonly isTouched: ReadonlySignal<boolean>;
   /**
+   * Whether the field value has been edited.
+   */
+  readonly isEdited: ReadonlySignal<boolean>;
+  /**
    * Whether the field input differs from its initial value.
    */
   readonly isDirty: ReadonlySignal<boolean>;
@@ -119,6 +123,10 @@ export interface FieldArrayStore<
    * Whether the field array has been touched.
    */
   readonly isTouched: ReadonlySignal<boolean>;
+  /**
+   * Whether the field array value has been edited.
+   */
+  readonly isEdited: ReadonlySignal<boolean>;
   /**
    * Whether the field array input differs from its initial value.
    */

@@ -31,9 +31,9 @@ describe('injectField', () => {
     expect(field.path).toEqual(['email']);
   });
 
-  it('initializes input as a signal with undefined', () => {
+  it('initializes input as a signal with an empty string', () => {
     const { field } = setup();
-    expect(field.input()).toBeUndefined();
+    expect(field.input()).toBe('');
   });
 
   it('initializes errors to null', () => {
@@ -78,7 +78,7 @@ describe('injectField', () => {
   it('does not change the input value when the control onChange is called', () => {
     const { field } = setup();
     field[CONTROL].onChange();
-    expect(field.input()).toBeUndefined();
+    expect(field.input()).toBe('');
   });
 
   it('registers and unregisters the element via the control ref', () => {

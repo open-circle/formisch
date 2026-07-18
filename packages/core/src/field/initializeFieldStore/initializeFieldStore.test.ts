@@ -11,17 +11,141 @@ describe('initializeFieldStore', () => {
       const field = store.children.name;
       expect(field.kind).toBe('value');
       expect(field.name).toBe('["name"]');
+      expect(field.path).toStrictEqual(['name']);
       expect(field.input.value).toBe('John');
       expect(field.initialInput.value).toBe('John');
       expect(field.startInput.value).toBe('John');
       expect(field.errors.value).toBeNull();
       expect(field.isTouched.value).toBe(false);
+      expect(field.isEdited.value).toBe(false);
       expect(field.isDirty.value).toBe(false);
     });
+  });
 
-    test('should initialize with undefined input', () => {
+  describe('empty input config', () => {
+    test('should default required string to empty string', () => {
       const store = createTestStore(v.object({ name: v.string() }));
+      expect(store.children.name.input.value).toBe('');
+      expect(store.children.name.initialInput.value).toBe('');
+      expect(store.children.name.startInput.value).toBe('');
+    });
+
+    test('should default required piped string to empty string', () => {
+      const store = createTestStore(
+        v.object({ name: v.pipe(v.string(), v.nonEmpty()) })
+      );
+      expect(store.children.name.input.value).toBe('');
+    });
+
+    test('should not default required non-string to empty string', () => {
+      const store = createTestStore(v.object({ age: v.number() }));
+      expect(store.children.age.input.value).toBeUndefined();
+    });
+
+    test('should keep optional string as undefined', () => {
+      const store = createTestStore(v.object({ name: v.optional(v.string()) }));
       expect(store.children.name.input.value).toBeUndefined();
+    });
+
+    test('should keep nullable string as undefined', () => {
+      const store = createTestStore(v.object({ name: v.nullable(v.string()) }));
+      expect(store.children.name.input.value).toBeUndefined();
+    });
+
+    test('should keep a non-optional inside an optional as undefined', () => {
+      const store = createTestStore(
+        v.object({ name: v.optional(v.nonOptional(v.string())) })
+      );
+      expect(store.children.name.input.value).toBeUndefined();
+    });
+
+    test('should keep a non-nullish inside a nullish as undefined', () => {
+      const store = createTestStore(
+        v.object({ name: v.nullish(v.nonNullish(v.string())) })
+      );
+      expect(store.children.name.input.value).toBeUndefined();
+    });
+
+    test('should use explicit initial input over empty string default', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        initialInput: { name: 'John' },
+      });
+      expect(store.children.name.input.value).toBe('John');
+    });
+
+    test('should default nested required string to empty string', () => {
+      const store = createTestStore(
+        v.object({ user: v.object({ name: v.string() }) })
+      );
+      const userStore = store.children.user;
+      expect(userStore.kind).toBe('object');
+      if (userStore.kind === 'object') {
+        expect(userStore.children.name.input.value).toBe('');
+      }
+    });
+
+    test('should default number and boolean to undefined', () => {
+      const store = createTestStore(
+        v.object({ age: v.number(), active: v.boolean() })
+      );
+      expect(store.children.age.input.value).toBeUndefined();
+      expect(store.children.active.input.value).toBeUndefined();
+    });
+
+    test('should apply configured empty input per type', () => {
+      const date = new Date('2020-01-01');
+      const store = createTestStore(
+        v.object({
+          name: v.string(),
+          age: v.number(),
+          active: v.boolean(),
+          birthday: v.date(),
+        }),
+        { emptyInput: { number: 0, boolean: false, date } }
+      );
+      expect(store.children.name.input.value).toBe('');
+      expect(store.children.age.input.value).toBe(0);
+      expect(store.children.active.input.value).toBe(false);
+      expect(store.children.birthday.input.value).toBe(date);
+    });
+
+    test('should opt out of the empty string default', () => {
+      const store = createTestStore(v.object({ name: v.string() }), {
+        emptyInput: { string: undefined },
+      });
+      expect(store.children.name.input.value).toBeUndefined();
+    });
+
+    test('should apply configured empty input to nested and array children', () => {
+      const store = createTestStore(
+        v.object({
+          user: v.object({ age: v.number() }),
+          scores: v.array(v.number()),
+        }),
+        { initialInput: { scores: [undefined] }, emptyInput: { number: 0 } }
+      );
+      const userStore = store.children.user;
+      expect(userStore.kind).toBe('object');
+      if (userStore.kind === 'object') {
+        expect(userStore.children.age.input.value).toBe(0);
+      }
+      const scoresStore = store.children.scores;
+      expect(scoresStore.kind).toBe('array');
+      if (scoresStore.kind === 'array') {
+        expect(scoresStore.children[0].input.value).toBe(0);
+      }
+    });
+
+    test('should store whether a value field is nullish for resetting', () => {
+      const store = createTestStore(
+        v.object({ name: v.string(), nickname: v.optional(v.string()) })
+      );
+      const nameStore = store.children.name;
+      const nicknameStore = store.children.nickname;
+      if (nameStore.kind === 'value' && nicknameStore.kind === 'value') {
+        expect(nameStore.isNullish).toBe(false);
+        expect(nicknameStore.isNullish).toBe(true);
+      }
     });
   });
 
@@ -30,8 +154,51 @@ describe('initializeFieldStore', () => {
       const store = createTestStore(v.object({ a: v.string(), b: v.number() }));
       expect(store.kind).toBe('object');
       expect(store.name).toBe('[]');
+      expect(store.path).toStrictEqual([]);
       expect(store.children).toHaveProperty('a');
       expect(store.children).toHaveProperty('b');
+    });
+
+    test('should set the path for deeply nested fields', () => {
+      const store = createTestStore(
+        v.object({
+          groups: v.array(
+            v.object({ tags: v.array(v.object({ label: v.string() })) })
+          ),
+        }),
+        { initialInput: { groups: [{ tags: [{ label: 'a' }] }] } }
+      );
+
+      expect(store.path).toStrictEqual([]);
+      const groupsStore = store.children.groups;
+      expect(groupsStore.kind).toBe('array');
+      if (groupsStore.kind === 'array') {
+        expect(groupsStore.path).toStrictEqual(['groups']);
+        const groupStore = groupsStore.children[0];
+        expect(groupStore.path).toStrictEqual(['groups', 0]);
+        if (groupStore.kind === 'object') {
+          const tagsStore = groupStore.children.tags;
+          expect(tagsStore.path).toStrictEqual(['groups', 0, 'tags']);
+          if (
+            tagsStore.kind === 'array' &&
+            tagsStore.children[0].kind === 'object'
+          ) {
+            expect(tagsStore.children[0].path).toStrictEqual([
+              'groups',
+              0,
+              'tags',
+              0,
+            ]);
+            expect(tagsStore.children[0].children.label.path).toStrictEqual([
+              'groups',
+              0,
+              'tags',
+              0,
+              'label',
+            ]);
+          }
+        }
+      }
     });
 
     test('should initialize nested object', () => {

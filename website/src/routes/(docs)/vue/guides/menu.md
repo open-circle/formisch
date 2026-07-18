@@ -18,6 +18,7 @@
 
 ## Advanced guides
 
+- [Validation](/vue/guides/validation/)
 - [Special inputs](/vue/guides/special-inputs/)
 - [Controlled fields](/vue/guides/controlled-fields/)
 - [Nested fields](/vue/guides/nested-fields/)

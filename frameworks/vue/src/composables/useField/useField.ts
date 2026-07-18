@@ -57,15 +57,27 @@ export function useField(
   );
 
   onUnmounted(() => {
-    internalFieldStore.value.elements =
-      internalFieldStore.value.elements.filter(
-        (element) => element.isConnected
-      );
+    const internalFieldStoreValue = internalFieldStore.value;
+    const elements = internalFieldStoreValue.elements.filter(
+      (element) => element.isConnected
+    );
+    // Keep `initialElements` in sync unless a reorder has moved the elements,
+    // so resetting a remounted field restores its live element, not a stale one
+    if (
+      internalFieldStoreValue.elements ===
+      internalFieldStoreValue.initialElements
+    ) {
+      internalFieldStoreValue.initialElements = elements;
+    }
+    internalFieldStoreValue.elements = elements;
   });
 
   const input = computed(() => getFieldInput(internalFieldStore.value));
   const isTouched = computed(() =>
     getFieldBool(internalFieldStore.value, 'isTouched')
+  );
+  const isEdited = computed(() =>
+    getFieldBool(internalFieldStore.value, 'isEdited')
   );
   const isDirty = computed(() =>
     getFieldBool(internalFieldStore.value, 'isDirty')
@@ -94,6 +106,9 @@ export function useField(
     },
     get isTouched() {
       return isTouched.value;
+    },
+    get isEdited() {
+      return isEdited.value;
     },
     get isDirty() {
       return isDirty.value;

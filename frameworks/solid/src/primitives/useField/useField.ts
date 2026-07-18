@@ -60,6 +60,9 @@ export function useField(
   const getIsTouched = createMemo(() =>
     getFieldBool(getInternalFieldStore(), 'isTouched')
   );
+  const getIsEdited = createMemo(() =>
+    getFieldBool(getInternalFieldStore(), 'isEdited')
+  );
   const getIsDirty = createMemo(() =>
     getFieldBool(getInternalFieldStore(), 'isDirty')
   );
@@ -79,6 +82,9 @@ export function useField(
     },
     get isTouched() {
       return getIsTouched();
+    },
+    get isEdited() {
+      return getIsEdited();
     },
     get isDirty() {
       return getIsDirty();
@@ -104,9 +110,17 @@ export function useField(
         const internalFieldStore = getInternalFieldStore();
         internalFieldStore.elements.push(element);
         onCleanup(() => {
-          internalFieldStore.elements = internalFieldStore.elements.filter(
+          const elements = internalFieldStore.elements.filter(
             (el) => el !== element
           );
+          // Keep `initialElements` in sync unless a reorder has moved the
+          // elements, so resetting a remounted field restores its live element
+          if (
+            internalFieldStore.elements === internalFieldStore.initialElements
+          ) {
+            internalFieldStore.initialElements = elements;
+          }
+          internalFieldStore.elements = elements;
         });
       },
       onFocus() {

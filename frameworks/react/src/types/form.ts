@@ -22,6 +22,10 @@ export interface FormStore<TSchema extends FormSchema = FormSchema>
    */
   readonly isTouched: boolean;
   /**
+   * Whether any field in the form has been edited.
+   */
+  readonly isEdited: boolean;
+  /**
    * Whether any field in the form differs from its initial value.
    */
   readonly isDirty: boolean;
@@ -33,7 +37,7 @@ export interface FormStore<TSchema extends FormSchema = FormSchema>
    * The current error messages of the form.
    *
    * Hint: This property only contains validation errors at the root level
-   * of the form. To get all errors from all fields, use `getAllErrors`.
+   * of the form. To get all errors from all fields, use `getDeepErrors`.
    */
   readonly errors: [string, ...string[]] | null;
 }

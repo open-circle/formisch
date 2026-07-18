@@ -77,8 +77,8 @@ export const properties: Record<string, PropertyProps> = {
                   items: [
                     {
                       type: 'custom',
+                      spread: true,
                       name: 'TFieldArrayPath',
-                      modifier: '...',
                     },
                     'number',
                   ],

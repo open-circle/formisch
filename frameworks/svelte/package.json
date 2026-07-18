@@ -1,20 +1,28 @@
 {
   "name": "@formisch/svelte",
   "description": "The lightweight, schema-first, and fully type-safe form library for Svelte",
-  "version": "0.8.0",
+  "version": "1.0.0-rc.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-circle/formisch"
+    "url": "git+https://github.com/open-circle/formisch.git"
   },
   "keywords": [
     "svelte",
+    "svelte-form",
     "form",
-    "typescript",
+    "forms",
+    "form-validation",
+    "validation",
     "schema",
-    "validation"
+    "typescript",
+    "type-safe",
+    "signals",
+    "bundle-size",
+    "modular",
+    "valibot"
   ],
   "type": "module",
   "main": "./dist/index.js",
@@ -58,7 +66,8 @@
     "@sveltejs/vite-plugin-svelte": "^6.2.0",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/svelte": "^5.2.4",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@types/node": "24.0.13",
+    "@vitest/coverage-v8": "^4.1.7",
     "eslint": "^9.35.0",
     "eslint-plugin-svelte": "^3.12.2",
     "globals": "^16.4.0",
@@ -69,7 +78,7 @@
     "typescript": "^5.9.2",
     "valibot": "^1.4.1",
     "vite": "^7.1.5",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.7"
   },
   "peerDependencies": {
     "svelte": "^5.29.0",

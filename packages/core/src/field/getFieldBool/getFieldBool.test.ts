@@ -29,6 +29,13 @@ describe('getFieldBool', () => {
       store.children.name.isDirty.value = true;
       expect(getFieldBool(store.children.name, 'isDirty')).toBe(true);
     });
+
+    test('should check isEdited property', () => {
+      const store = createTestStore(v.object({ name: v.string() }));
+      expect(getFieldBool(store.children.name, 'isEdited')).toBe(false);
+      store.children.name.isEdited.value = true;
+      expect(getFieldBool(store.children.name, 'isEdited')).toBe(true);
+    });
   });
 
   describe('object fields', () => {

@@ -5,6 +5,7 @@ import type { MaybePromise } from '../utils/index.ts';
 
 // Re-export all other types from the base form module
 export type {
+  EmptyInput,
   ValidationMode,
   FormConfig,
   InternalFormStore,

@@ -181,7 +181,7 @@ export const FieldValueList = component$((props: FieldValuesProps) => {
               {value instanceof File ? value.name : String(value)}
             </span>
           ) : (
-            <FieldValueList class="mt-3 ml-2" values={value} />
+            <FieldValueList class="ml-2 mt-3" values={value} />
           )}
         </li>
       ))}

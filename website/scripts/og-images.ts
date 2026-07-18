@@ -15,7 +15,7 @@ import { findNestedFiles } from './utils/index';
 interface RouteInfo {
   /** Path component (e.g. "solid_guides_introduction") or "index" for "/". */
   slug: string;
-  /** First URL segment for the small "formisch.dev/<segment>" badge. */
+  /** Area segment for the small "formisch.dev/<segment>" badge. */
   pathLabel: string;
   title: string;
   description?: string;
@@ -23,6 +23,9 @@ interface RouteInfo {
 
 const ROUTES_DIR = path.join('src', 'routes');
 const OUT_DIR = path.join('public', 'og');
+
+/** Area segments that follow a package or framework prefix in the URL. */
+const AREA_LIST = ['guides', 'api'];
 
 function urlPathFromFilePath(filePath: string): string {
   return filePath
@@ -93,7 +96,13 @@ async function collectRoutes(): Promise<RouteInfo[]> {
   for (const filePath of filePaths) {
     const urlPath = urlPathFromFilePath(filePath);
     const slug = slugFromUrlPath(urlPath);
-    const pathLabel = urlPath.replace(/\/+$/, '').split('/')[0] ?? '';
+    // Prefer the area segment (e.g. "guides" in "/solid/guides/...") over the
+    // framework or package prefix; fall back to the first segment for routes
+    // without one (e.g. "/blog/...", "/playground/...").
+    const segments = urlPath.replace(/\/+$/, '').split('/');
+    const pathLabel = AREA_LIST.includes(segments[1])
+      ? segments[1]
+      : (segments[0] ?? '');
 
     const source = await fsp.readFile(filePath, 'utf8');
     const extracted = filePath.endsWith('.mdx')

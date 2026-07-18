@@ -22,7 +22,7 @@ const handleInput = (event: Event) => {
 
 <template>
   <label
-    class="flex cursor-pointer items-center space-x-3 font-medium select-none md:text-lg lg:text-xl"
+    class="flex cursor-pointer select-none items-center space-x-3 font-medium md:text-lg lg:text-xl"
   >
     <input
       v-bind="props.props"

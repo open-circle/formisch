@@ -28,6 +28,10 @@ interface ResetBaseConfig {
    */
   readonly keepTouched?: boolean | undefined;
   /**
+   * Whether to keep the edited state during reset. Defaults to false.
+   */
+  readonly keepEdited?: boolean | undefined;
+  /**
    * Whether to keep the error messages during reset. Defaults to false.
    */
   readonly keepErrors?: boolean | undefined;
@@ -116,12 +120,20 @@ export function reset(
 
       // If initial input is provided, set it
       if (config && 'initialInput' in config) {
-        setInitialFieldInput(internalFieldStore, config.initialInput);
+        setInitialFieldInput(
+          internalFormStore,
+          internalFieldStore,
+          config.initialInput
+        );
       }
 
       // Reset state of fields by walking field store
       walkFieldStore(internalFieldStore, (internalFieldStore) => {
         // Reset elements to initial elements
+        // Hint: `copyItemState` and `swapItemState` move elements between field
+        // stores during array methods, so this restores each field's original
+        // element. Without it, focus and file reset target the wrong element
+        // after a reorder followed by a reset.
         internalFieldStore.elements = internalFieldStore.initialElements;
 
         // Reset errors if it is not to be kept
@@ -132,6 +144,11 @@ export function reset(
         // Reset is touched if it is not to be kept
         if (!config?.keepTouched) {
           internalFieldStore.isTouched.value = false;
+        }
+
+        // Reset is edited if it is not to be kept
+        if (!config?.keepEdited) {
+          internalFieldStore.isEdited.value = false;
         }
 
         // Reset start input to initial input

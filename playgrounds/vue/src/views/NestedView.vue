@@ -66,7 +66,7 @@ const nestedForm = useForm({
                   :props="field.props"
                   :errors="field.errors"
                   type="text"
-                  class="flex-1 p-0!"
+                  class="p-0! flex-1"
                   placeholder="Enter item"
                 />
               </Field>
@@ -106,7 +106,7 @@ const nestedForm = useForm({
                       v-model="field.input"
                       :props="field.props"
                       :errors="field.errors"
-                      class="flex-1 p-0!"
+                      class="p-0! flex-1"
                       type="text"
                       placeholder="Enter option"
                     />

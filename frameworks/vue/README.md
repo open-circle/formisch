@@ -9,6 +9,7 @@ Formisch is also available for [Preact][formisch-preact], [Qwik][formisch-qwik],
 - Small bundle size starting at 2.5 kB
 - Schema-based validation with Valibot
 - Type safety with autocompletion in editor
+- Open source and fully tested with 100 % coverage
 - It's fast – DOM updates are fine-grained
 - Minimal, readable and well thought out API
 - Supports all native HTML form fields
@@ -49,7 +50,7 @@ const loginForm = useForm({ schema: LoginSchema });
 </template>
 ```
 
-In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include `focus`, `getErrors`, `getAllErrors`, `getInput`, `insert`, `move`, `remove`, `replace`, `reset`, `setErrors`, `setInput`, `submit`, `swap` and `validate`. These methods allow you to control the form programmatically.
+In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include `focus`, `getDeepErrorEntries`, `getDeepErrors`, `getDirtyInput`, `getDirtyPaths`, `getErrors`, `getInput`, `handleSubmit`, `insert`, `isDirty`, `isEdited`, `isTouched`, `isValid`, `move`, `pickDirty`, `remove`, `replace`, `reset`, `setErrors`, `setInput`, `submit`, `swap` and `validate`. These methods allow you to control the form programmatically.
 
 ## Comparison
 

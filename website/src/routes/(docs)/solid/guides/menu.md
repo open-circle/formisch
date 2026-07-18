@@ -18,6 +18,7 @@
 
 ## Advanced guides
 
+- [Validation](/solid/guides/validation/)
 - [Special inputs](/solid/guides/special-inputs/)
 - [Controlled fields](/solid/guides/controlled-fields/)
 - [Nested fields](/solid/guides/nested-fields/)

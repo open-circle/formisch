@@ -17,10 +17,10 @@ export default component$(() => {
   return (
     <main class="flex flex-1 flex-col items-center py-12 md:py-20 lg:py-28 xl:py-32">
       {/* Article */}
-      <article class="flex w-full max-w-(--breakpoint-xl) flex-col gap-12 md:gap-20 lg:gap-24">
-        <div class="mx-8 flex max-w-(--breakpoint-md) flex-col gap-5 md:items-center md:gap-7 md:self-center lg:mx-10 lg:gap-9">
+      <article class="max-w-(--breakpoint-xl) flex w-full flex-col gap-12 md:gap-20 lg:gap-24">
+        <div class="max-w-(--breakpoint-md) mx-8 flex flex-col gap-5 md:items-center md:gap-7 md:self-center lg:mx-10 lg:gap-9">
           {/* Title */}
-          <h1 class="text-2xl leading-normal font-medium text-slate-900 md:text-center md:text-3xl lg:text-4xl dark:text-slate-200">
+          <h1 class="text-2xl font-medium leading-normal text-slate-900 md:text-center md:text-3xl lg:text-4xl dark:text-slate-200">
             {head.title}
           </h1>
 
@@ -36,7 +36,7 @@ export default component$(() => {
         <PostCover variant="post" label={head.frontmatter.cover} />
 
         {/* Content */}
-        <div class="mdx flex w-full max-w-(--breakpoint-lg) flex-col lg:self-center">
+        <div class="mdx max-w-(--breakpoint-lg) flex w-full flex-col lg:self-center">
           <Slot />
 
           {/* Edit page button */}
@@ -54,7 +54,7 @@ export default component$(() => {
       </article>
 
       {/* Credits */}
-      <div class="w-full max-w-(--breakpoint-lg)">
+      <div class="max-w-(--breakpoint-lg) w-full">
         <Credits />
       </div>
     </main>

@@ -5,10 +5,7 @@ import { FormFooter, FormHeader, Select, TextInput } from '../../components';
 
 const PaymentFormSchema = v.intersect([
   v.object({
-    owner: v.pipe(
-      v.string('Please enter your name.'),
-      v.nonEmpty('Please enter your name.')
-    ),
+    owner: v.pipe(v.string(), v.nonEmpty('Please enter your name.')),
   }),
   v.variant(
     'type',
@@ -17,12 +14,12 @@ const PaymentFormSchema = v.intersect([
         type: v.literal('card'),
         card: v.object({
           number: v.pipe(
-            v.string('Please enter your card number.'),
+            v.string(),
             v.nonEmpty('Please enter your card number.'),
             v.creditCard('The card number is badly formatted.')
           ),
           expiration: v.pipe(
-            v.string('Please enter the expiration date.'),
+            v.string(),
             v.nonEmpty('Please enter the expiration date.'),
             v.regex(
               /^(?:0[1-9]|1[0-2])\/(?:2[5-9]|3[0-9])$/,
@@ -35,7 +32,7 @@ const PaymentFormSchema = v.intersect([
         type: v.literal('paypal'),
         paypal: v.object({
           email: v.pipe(
-            v.string('Please enter your PayPal email.'),
+            v.string(),
             v.nonEmpty('Please enter your PayPal email.'),
             v.email('The email address is badly formatted.')
           ),

@@ -58,6 +58,9 @@ export function useForm(config: FormConfig): FormStore {
       get isTouched() {
         return getFieldBool(internalFormStore, 'isTouched');
       },
+      get isEdited() {
+        return getFieldBool(internalFormStore, 'isEdited');
+      },
       get isDirty() {
         return getFieldBool(internalFormStore, 'isDirty');
       },

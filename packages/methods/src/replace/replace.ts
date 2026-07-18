@@ -74,12 +74,14 @@ export function replace<
 
       // Replace input of field array item
       resetItemState(
+        internalFormStore,
         internalArrayStore.children[config.at],
         config.initialInput
       );
 
-      // Mark field array as touched and dirty
+      // Mark field array as touched, edited and dirty
       internalArrayStore.isTouched.value = true;
+      internalArrayStore.isEdited.value = true;
       internalArrayStore.isDirty.value = true;
 
       // Validate if required

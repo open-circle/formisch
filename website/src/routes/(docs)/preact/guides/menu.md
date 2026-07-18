@@ -17,6 +17,7 @@
 
 ## Advanced guides
 
+- [Validation](/preact/guides/validation/)
 - [Special inputs](/preact/guides/special-inputs/)
 - [Controlled fields](/preact/guides/controlled-fields/)
 - [Nested fields](/preact/guides/nested-fields/)

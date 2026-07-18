@@ -22,6 +22,11 @@ export function getFieldStore(
   let internalFieldStore: InternalFieldStore = internalFormStore;
 
   // Traverse path to find target field store
+  // TODO: This does not guard against paths that exist in the type but not at
+  // runtime (e.g. a not-yet-created dynamic array index), so navigating into a
+  // missing child returns `undefined` and crashes consumers like the deep error
+  // methods. A clean fix likely throws an error or returns `undefined` here
+  // and handles it in all callers.
   for (const key of path) {
     // Navigate to child at current path key
     // @ts-expect-error

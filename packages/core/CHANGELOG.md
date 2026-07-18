@@ -2,6 +2,37 @@
 
 All notable changes to the library will be documented in this file.
 
+## v1.0.0-rc.0 (June 23, 2026)
+
+- Release candidate for v1.0.0
+
+## v0.10.0 (June 22, 2026)
+
+- Add `emptyInput` form config to define the value a required field of a given type starts at when no initial input is provided, defaulting to `{ string: '' }` so an untouched string field matches the DOM and validates with its own message instead of a type mismatch (issue #53)
+- Change `FormSchema` to structurally accept any schema with an object output, so generic object schemas (e.g. `v.GenericSchema<{ email: string }>`) can again be used to type a partial `FormStore` for reusable field components (issue #147)
+
+## v0.9.0 (June 21, 2026)
+
+- Add `isEdited` field state that is set when a field's value changes, is not set on focus, and stays set after reverting to the initial value
+- Add `path` property to internal field stores so the path no longer needs to be reconstructed from the stringified `name`
+- Change `walkFieldStore` utility to allow the callback to stop the walk early by returning `true` and to return whether the walk was stopped
+- Fix `resetItemState` to keep a non-nullish array, object or tuple consistent with its initial state instead of `undefined` when its input is omitted (issue #139)
+
+## v0.8.0 (June 15, 2026)
+
+- Add `focusFieldElement` utility that focuses the first focusable element of a field store
+- Fix `setFieldBool` to set the boolean property on object field stores themselves, not only on their children
+- Fix `setInitialFieldInput` to update the initial input instead of the current input of array and object field stores, so resetting nullish arrays and objects to a new initial input works
+- Fix `resetItemState` to initialize missing array children, so resetting an item whose nested array grew beyond its existing field stores no longer leaves items without a child store
+- Fix `resetItemState`, `setFieldInput` and `setInitialFieldInput` to keep tuple field stores at their fixed length instead of growing them for a longer input, which previously threw
+- Fix `resetItemState` to keep `initialElements` in sync with `elements` while a field owns its element array, so a later reset restores the field's live element after a replaced or remounted field re-registers
+- Change `ValidArrayPath` to reject fixed-length tuples, so field array methods only accept dynamic array paths
+- Fix `setFieldInput` to clear stale state from reused child stores when an array grows after shrinking, without losing their dirty baseline so a changed value is still detected as dirty
+- Fix `decodeFormData` to complete missing trailing tuple items, so unchecked checkboxes and absent arrays at the end of tuples are restored
+- Fix `decodeFormData` to preserve a decoded `null` for nullable booleans instead of coercing it to `false`
+- Fix `validateFormInput` to focus the first erroring field whose element can actually receive focus, so the focus is no longer consumed by a field without a focusable element (e.g. unmounted, disabled or hidden)
+- Fix `validateFormInput` to always reset the validating state, even if schema parsing throws
+
 ## v0.7.0 (May 24, 2026)
 
 - Add `FormSchema` type that constrains a form's root schema to object schemas (sync or async) and combinators (`intersect`, `union`, `variant`)

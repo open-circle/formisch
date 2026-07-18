@@ -11,7 +11,7 @@ type ApiListProps = {
  * List to display APIs and navigate to their documentation.
  */
 export const ApiList = component$<ApiListProps>(({ label, items }) => (
-  <ul class="ml-8! flex list-none flex-row flex-wrap gap-2 lg:ml-10!">
+  <ul class="ml-8! lg:ml-10! flex list-none flex-row flex-wrap gap-2">
     {label && label + ': '}
     {items.map((item, index) => (
       <li key={item.href} class="p-0!">

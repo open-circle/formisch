@@ -60,6 +60,9 @@ export function useFieldArray(
       isTouched: computed(() =>
         getFieldBool(internalFieldStore.value, 'isTouched')
       ),
+      isEdited: computed(() =>
+        getFieldBool(internalFieldStore.value, 'isEdited')
+      ),
       isDirty: computed(() =>
         getFieldBool(internalFieldStore.value, 'isDirty')
       ),

@@ -19,6 +19,42 @@ describe('insert', () => {
     }
   });
 
+  test('should default a new item without input to its empty input', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [{ name: 'a' }] } }
+    );
+
+    insert(store, { path: ['items'] });
+
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+    if (itemsStore.kind === 'array') {
+      const newItem = itemsStore.children[1];
+      if (newItem.kind === 'object') {
+        expect(newItem.children.name.input.value).toBe('');
+      }
+    }
+  });
+
+  test('should apply configured empty input to a new item', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ score: v.number() })) }),
+      { initialInput: { items: [{ score: 1 }] }, emptyInput: { number: 0 } }
+    );
+
+    insert(store, { path: ['items'] });
+
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+    if (itemsStore.kind === 'array') {
+      const newItem = itemsStore.children[1];
+      if (newItem.kind === 'object') {
+        expect(newItem.children.score.input.value).toBe(0);
+      }
+    }
+  });
+
   test('should insert item at specific index and shift children', () => {
     const store = createTestStore(v.object({ items: v.array(v.string()) }), {
       initialInput: { items: ['a', 'b'] },
@@ -63,7 +99,7 @@ describe('insert', () => {
     expect(itemsStore.kind).toBe('array');
     if (itemsStore.kind === 'array') {
       // Pre-initialize slot at index 2 and also at index 0 to make resetItemState branch execute
-      initializeChildSlot(itemsStore, 2);
+      initializeChildSlot(store, itemsStore, 2);
 
       // Store reference to original child at index 0
       const originalChild = itemsStore.children[0];
@@ -79,6 +115,49 @@ describe('insert', () => {
     }
   });
 
+  test('should initialize missing children when inserting item with longer nested array', () => {
+    const store = createTestStore(
+      v.object({ list: v.array(v.object({ tags: v.array(v.string()) })) }),
+      { initialInput: { list: [{ tags: ['a'] }] } }
+    );
+
+    // Insert at occupied index 0 - the reused child's nested tags array grows
+    insert(store, {
+      path: ['list'],
+      at: 0,
+      initialInput: { tags: ['x', 'y'] },
+    });
+
+    const listStore = store.children.list;
+    expect(listStore.kind).toBe('array');
+    if (listStore.kind === 'array') {
+      expect(listStore.items.value).toHaveLength(2);
+
+      const newItemStore = listStore.children[0];
+      expect(newItemStore.kind).toBe('object');
+      if (newItemStore.kind === 'object') {
+        const tagsStore = newItemStore.children.tags;
+        expect(tagsStore.kind).toBe('array');
+        if (tagsStore.kind === 'array') {
+          expect(tagsStore.items.value).toHaveLength(2);
+          expect(tagsStore.children).toHaveLength(2);
+          expect(tagsStore.children[0].input.value).toBe('x');
+          expect(tagsStore.children[1].input.value).toBe('y');
+        }
+      }
+
+      const shiftedItemStore = listStore.children[1];
+      expect(shiftedItemStore.kind).toBe('object');
+      if (shiftedItemStore.kind === 'object') {
+        const tagsStore = shiftedItemStore.children.tags;
+        expect(tagsStore.kind).toBe('array');
+        if (tagsStore.kind === 'array') {
+          expect(tagsStore.children[0].input.value).toBe('a');
+        }
+      }
+    }
+  });
+
   test('should mark array as dirty after insert', () => {
     const store = createTestStore(v.object({ items: v.array(v.string()) }), {
       initialInput: { items: ['a'] },
@@ -87,6 +166,16 @@ describe('insert', () => {
     insert(store, { path: ['items'], initialInput: 'b' });
 
     expect(store.children.items.isDirty.value).toBe(true);
+  });
+
+  test('should mark array as edited after insert', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: ['a'] },
+    });
+
+    insert(store, { path: ['items'], initialInput: 'b' });
+
+    expect(store.children.items.isEdited.value).toBe(true);
   });
 
   test('should insert object item', () => {

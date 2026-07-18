@@ -113,7 +113,7 @@ export const DocsLayout = component$(() => {
           'relative flex-1 py-12 md:py-14 lg:w-px lg:py-24 xl:py-32',
           // Shown: padding on both sides. Hidden: drop the right padding so the
           // article fills the freed chapters column (a same-property override).
-          'no-chapters:lg:pr-0 lg:pr-9 lg:pl-9'
+          'no-chapters:lg:pr-0 lg:pl-9 lg:pr-9'
         )}
       >
         {/* Navigation buttons */}

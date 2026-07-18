@@ -39,13 +39,12 @@ describe('setFieldBool', () => {
       }
     });
 
-    test('should not set property on object itself', () => {
+    test('should set property on object itself', () => {
       const store = createTestStore(
         v.object({ user: v.object({ name: v.string() }) })
       );
       setFieldBool(store.children.user, 'isTouched', true);
-      // Object fields don't have their own isTouched set directly
-      expect(store.children.user.isTouched.value).toBe(false);
+      expect(store.children.user.isTouched.value).toBe(true);
     });
   });
 

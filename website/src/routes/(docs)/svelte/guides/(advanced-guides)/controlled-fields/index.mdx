@@ -70,7 +70,7 @@ You also have to handle `NaN`. While typing a floating point number, the value c
     oninput,
     onchange,
     onblur,
-  } = $props<NumberInputProps>();
+  }: NumberInputProps = $props();
 
   // Update value if it is not `NaN`
   const getValue = () => (!Number.isNaN(input) ? input : undefined);
@@ -151,7 +151,7 @@ The same applies to dates. An `<input type="date" />` works with `yyyy-mm-dd` st
     oninput,
     onchange,
     onblur,
-  } = $props<DateInputProps>();
+  }: DateInputProps = $props();
 
   // Transform date to string
   const getValue = () =>

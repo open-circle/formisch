@@ -56,6 +56,7 @@ export function useField(
 
   const input = $derived(getFieldInput(internalFieldStore));
   const isTouched = $derived(getFieldBool(internalFieldStore, 'isTouched'));
+  const isEdited = $derived(getFieldBool(internalFieldStore, 'isEdited'));
   const isDirty = $derived(getFieldBool(internalFieldStore, 'isDirty'));
   const isValid = $derived(!getFieldBool(internalFieldStore, 'errors'));
 
@@ -71,6 +72,9 @@ export function useField(
     },
     get isTouched() {
       return isTouched;
+    },
+    get isEdited() {
+      return isEdited;
     },
     get isDirty() {
       return isDirty;
@@ -90,9 +94,17 @@ export function useField(
       [createAttachmentKey()](element) {
         internalFieldStore.elements.push(element);
         return () => {
-          internalFieldStore.elements = internalFieldStore.elements.filter(
+          const elements = internalFieldStore.elements.filter(
             (el) => el !== element
           );
+          // Keep `initialElements` in sync unless a reorder has moved the
+          // elements, so resetting a remounted field restores its live element
+          if (
+            internalFieldStore.elements === internalFieldStore.initialElements
+          ) {
+            internalFieldStore.initialElements = elements;
+          }
+          internalFieldStore.elements = elements;
         };
       },
       onfocus() {

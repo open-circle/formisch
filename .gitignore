@@ -20,6 +20,9 @@ backups
 # Claude generated files
 docs/superpowers
 
+# Security reports
+cve-report
+
 # Others
 logs
 *.log

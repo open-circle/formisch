@@ -21,21 +21,12 @@ import {
 } from '../../components';
 
 const TodoFormSchema = v.object({
-  heading: v.pipe(
-    v.string('Please enter a heading.'),
-    v.nonEmpty('Please enter a heading.')
-  ),
+  heading: v.pipe(v.string(), v.nonEmpty('Please enter a heading.')),
   todos: v.pipe(
     v.array(
       v.object({
-        label: v.pipe(
-          v.string('Please enter a label.'),
-          v.nonEmpty('Please enter a label.')
-        ),
-        deadline: v.pipe(
-          v.string('Please enter a deadline.'),
-          v.nonEmpty('Please enter a deadline.')
-        ),
+        label: v.pipe(v.string(), v.nonEmpty('Please enter a label.')),
+        deadline: v.pipe(v.string(), v.nonEmpty('Please enter a deadline.')),
       })
     ),
     v.nonEmpty('Please add at least one todo.'),
@@ -93,7 +84,7 @@ export default function Page() {
                         {(field) => (
                           <TextInput
                             {...field.props}
-                            className="w-full p-0! md:w-auto md:flex-1"
+                            className="p-0! w-full md:w-auto md:flex-1"
                             input={field.input}
                             errors={field.errors}
                             type="text"
@@ -107,7 +98,7 @@ export default function Page() {
                         {(field) => (
                           <TextInput
                             {...field.props}
-                            className="flex-1 p-0!"
+                            className="p-0! flex-1"
                             type="date"
                             input={field.input}
                             errors={field.errors}

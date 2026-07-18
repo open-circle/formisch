@@ -100,6 +100,14 @@ export const properties: Record<string, PropertyProps> = {
           },
         },
         {
+          key: 'isEdited',
+          value: {
+            type: 'custom',
+            name: 'ReadonlySignal',
+            generics: ['boolean'],
+          },
+        },
+        {
           key: 'isDirty',
           value: {
             type: 'custom',
@@ -186,6 +194,13 @@ export const properties: Record<string, PropertyProps> = {
     },
   },
   isTouched: {
+    type: {
+      type: 'custom',
+      name: 'ReadonlySignal',
+      generics: ['boolean'],
+    },
+  },
+  isEdited: {
     type: {
       type: 'custom',
       name: 'ReadonlySignal',

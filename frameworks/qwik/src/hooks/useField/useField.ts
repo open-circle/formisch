@@ -62,10 +62,19 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
   useTask$(({ track, cleanup }) => {
     track(internalFieldStore);
     cleanup(() => {
-      internalFieldStore.value.elements =
-        internalFieldStore.value.elements.filter(
-          (element) => element.isConnected
-        );
+      const internalFieldStoreValue = internalFieldStore.value;
+      const elements = internalFieldStoreValue.elements.filter(
+        (element) => element.isConnected
+      );
+      // Keep `initialElements` in sync unless a reorder has moved the elements,
+      // so resetting a remounted field restores its live element, not a stale one
+      if (
+        internalFieldStoreValue.elements ===
+        internalFieldStoreValue.initialElements
+      ) {
+        internalFieldStoreValue.initialElements = elements;
+      }
+      internalFieldStoreValue.elements = elements;
     });
   });
 
@@ -75,6 +84,9 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
     errors: createComputed$(() => internalFieldStore.value.errors.value),
     isTouched: createComputed$(() =>
       getFieldBool(internalFieldStore.value, 'isTouched')
+    ),
+    isEdited: createComputed$(() =>
+      getFieldBool(internalFieldStore.value, 'isEdited')
     ),
     isDirty: createComputed$(() =>
       getFieldBool(internalFieldStore.value, 'isDirty')

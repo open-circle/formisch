@@ -154,6 +154,7 @@ See <Link href="/solid/api/createForm/">`createForm`</Link>.
 - `inline code` for API names, variables, files
 - Proper heading hierarchy (h1 → h2 → h3)
 - Concise, focused paragraphs
+- No em-dash pairs (`… — aside — …`); use commas, parentheses, or two sentences. A single trailing em dash is fine.
 
 ## Guide Structure Patterns
 

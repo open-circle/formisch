@@ -1,5 +1,6 @@
 import {
   type BaseFormStore,
+  focusFieldElement,
   type FormSchema,
   getFieldStore,
   INTERNAL,
@@ -22,7 +23,7 @@ export interface FocusFieldConfig<
 }
 
 /**
- * Focuses the first input element of a field. This is useful for
+ * Focuses the first focusable input element of a field. This is useful for
  * programmatically setting focus to a specific field, such as after
  * validation errors or user interactions.
  *
@@ -36,5 +37,5 @@ export function focus<
   form: BaseFormStore<TSchema>,
   config: FocusFieldConfig<TSchema, TFieldPath>
 ): void {
-  getFieldStore(form[INTERNAL], config.path).elements[0]?.focus();
+  focusFieldElement(getFieldStore(form[INTERNAL], config.path));
 }

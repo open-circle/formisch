@@ -27,7 +27,7 @@ const form = createForm<TSchema>(config);
 
 ### Explanation
 
-`createForm` creates a reactive form store that manages form state using the provided Valibot schema. Validation runs when a field is blurred or the form is submitted by default, but this can be customized with the `validate` and `revalidate` options.
+`createForm` creates a reactive form store that manages form state using the provided Valibot schema. Validation runs when the form is submitted by default, and revalidates on input thereafter, but this can be customized with the `validate` and `revalidate` options.
 
 ## Returns
 
@@ -61,7 +61,7 @@ The following APIs can be combined with `createForm`.
 <ApiList
   items={[
     { text: 'focus', href: '/methods/api/focus/' },
-    { text: 'getAllErrors', href: '/methods/api/getAllErrors/' },
+    { text: 'getDeepErrors', href: '/methods/api/getDeepErrors/' },
     { text: 'getErrors', href: '/methods/api/getErrors/' },
     { text: 'getInput', href: '/methods/api/getInput/' },
     { text: 'handleSubmit', href: '/methods/api/handleSubmit/' },

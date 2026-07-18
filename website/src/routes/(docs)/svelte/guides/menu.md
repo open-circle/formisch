@@ -18,6 +18,7 @@
 
 ## Advanced guides
 
+- [Validation](/svelte/guides/validation/)
 - [Special inputs](/svelte/guides/special-inputs/)
 - [Controlled fields](/svelte/guides/controlled-fields/)
 - [Nested fields](/svelte/guides/nested-fields/)

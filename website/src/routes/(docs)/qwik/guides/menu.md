@@ -17,6 +17,7 @@
 
 ## Advanced guides
 
+- [Validation](/qwik/guides/validation/)
 - [Special inputs](/qwik/guides/special-inputs/)
 - [Controlled fields](/qwik/guides/controlled-fields/)
 - [Nested fields](/qwik/guides/nested-fields/)

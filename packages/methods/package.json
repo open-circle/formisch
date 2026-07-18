@@ -1,13 +1,13 @@
 {
   "name": "@formisch/methods",
   "description": "The lightweight, schema-first, and fully type-safe form library for React, Solid, Vue, Svelte and more",
-  "version": "0.8.0",
+  "version": "1.0.0-rc.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-circle/formisch"
+    "url": "git+https://github.com/open-circle/formisch.git"
   },
   "keywords": [
     "modular",
@@ -71,7 +71,7 @@
     "@formisch/eslint-config": "workspace:*",
     "@types/node": "24.0.13",
     "@types/react": "^19.2.5",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/coverage-v8": "^4.1.7",
     "eslint": "^9.31.0",
     "jsdom": "^26.1.0",
     "rolldown": "1.0.0-beta.26",
@@ -79,7 +79,7 @@
     "tsdown": "^0.16.8",
     "typescript": "^5.8.3",
     "valibot": "^1.4.1",
-    "vitest": "3.2.4"
+    "vitest": "4.1.7"
   },
   "peerDependencies": {
     "@angular/core": ">=17.0.0",

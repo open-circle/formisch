@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import * as v from 'valibot';
-import { describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   arrayPath,
   createTestStore,
@@ -249,6 +249,10 @@ describe('validateFormInput', () => {
   });
 
   describe('focus behavior', () => {
+    beforeEach(() => {
+      document.body.innerHTML = '';
+    });
+
     test('should focus first error field when shouldFocus is true', async () => {
       const schema = v.object({ name: v.string(), email: v.string() });
       const store = createTestStore(schema, {
@@ -260,12 +264,12 @@ describe('validateFormInput', () => {
       });
 
       const inputElement = document.createElement('input');
-      const mockFocus = vi.spyOn(inputElement, 'focus');
+      document.body.appendChild(inputElement);
       store.children.name.elements = [inputElement];
 
       await validateFormInput(store, { shouldFocus: true });
 
-      expect(mockFocus).toHaveBeenCalledOnce();
+      expect(document.activeElement).toBe(inputElement);
     });
 
     test('should not focus when shouldFocus is false', async () => {
@@ -276,6 +280,7 @@ describe('validateFormInput', () => {
       });
 
       const inputElement = document.createElement('input');
+      document.body.appendChild(inputElement);
       const mockFocus = vi.spyOn(inputElement, 'focus');
       store.children.name.elements = [inputElement];
 
@@ -292,12 +297,59 @@ describe('validateFormInput', () => {
       });
 
       const inputElement = document.createElement('input');
+      document.body.appendChild(inputElement);
       const mockFocus = vi.spyOn(inputElement, 'focus');
       store.children.name.elements = [inputElement];
 
       await validateFormInput(store);
 
       expect(mockFocus).not.toHaveBeenCalled();
+    });
+
+    test('should focus next error field when the first has no element', async () => {
+      const schema = v.object({ name: v.string(), email: v.string() });
+      const store = createTestStore(schema, {
+        initialInput: { name: '', email: '' },
+        issues: [
+          validationIssue('Name is required', [objectPath('name')]),
+          validationIssue('Email is required', [objectPath('email')]),
+        ],
+      });
+
+      // The first erroring field (name) has no registered element, so focus
+      // must fall through to the second erroring field (email)
+      const emailInput = document.createElement('input');
+      document.body.appendChild(emailInput);
+      store.children.email.elements = [emailInput];
+
+      await validateFormInput(store, { shouldFocus: true });
+
+      expect(document.activeElement).toBe(emailInput);
+    });
+
+    test('should skip an erroring field whose element cannot be focused', async () => {
+      const schema = v.object({ name: v.string(), email: v.string() });
+      const store = createTestStore(schema, {
+        initialInput: { name: '', email: '' },
+        issues: [
+          validationIssue('Name is required', [objectPath('name')]),
+          validationIssue('Email is required', [objectPath('email')]),
+        ],
+      });
+
+      // The first erroring field has a disabled (unfocusable) element, so the
+      // focus must fall through to the second erroring field
+      const nameInput = document.createElement('input');
+      nameInput.disabled = true;
+      const emailInput = document.createElement('input');
+      document.body.appendChild(nameInput);
+      document.body.appendChild(emailInput);
+      store.children.name.elements = [nameInput];
+      store.children.email.elements = [emailInput];
+
+      await validateFormInput(store, { shouldFocus: true });
+
+      expect(document.activeElement).toBe(emailInput);
     });
 
     test('should only focus first field with error', async () => {
@@ -312,6 +364,8 @@ describe('validateFormInput', () => {
 
       const nameInput = document.createElement('input');
       const emailInput = document.createElement('input');
+      document.body.appendChild(nameInput);
+      document.body.appendChild(emailInput);
       const mockFocusName = vi.spyOn(nameInput, 'focus');
       const mockFocusEmail = vi.spyOn(emailInput, 'focus');
       store.children.name.elements = [nameInput];
@@ -321,6 +375,7 @@ describe('validateFormInput', () => {
 
       expect(mockFocusName).toHaveBeenCalledOnce();
       expect(mockFocusEmail).not.toHaveBeenCalled();
+      expect(document.activeElement).toBe(nameInput);
     });
   });
 
@@ -356,6 +411,18 @@ describe('validateFormInput', () => {
       expect(store.validators).toBe(0);
       await validateFormInput(store);
       expect(store.validators).toBe(0);
+    });
+
+    test('should reset validation state when parse rejects', async () => {
+      const schema = v.object({ name: v.string() });
+      const parse = vi.fn().mockRejectedValue(new Error('Parse failed'));
+      const store = createFormStore({ schema }, parse);
+
+      await expect(validateFormInput(store)).rejects.toThrow('Parse failed');
+
+      // The validators counter and isValidating must not leak on error
+      expect(store.validators).toBe(0);
+      expect(store.isValidating.value).toBe(false);
     });
 
     test('should handle concurrent validations', async () => {
