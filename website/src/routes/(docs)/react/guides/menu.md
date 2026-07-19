@@ -31,3 +31,4 @@
 
 - [From React Hook Form](/react/guides/migrate-from-react-hook-form/)
 - [From TanStack Form](/react/guides/migrate-from-tanstack-form/)
+- [From Formik](/react/guides/migrate-from-formik/)
