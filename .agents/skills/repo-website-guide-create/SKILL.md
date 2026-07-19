@@ -28,6 +28,7 @@ website/src/routes/{framework}/guides/
 - `(get-started)` - Introductory content
 - `(main-concepts)` - Core library concepts
 - `(advanced-guides)` - Advanced features
+- `(migration-guides)` - Migration from other form libraries
 
 ## Step-by-Step Process
 
@@ -38,6 +39,7 @@ Determine the appropriate category:
 - **(get-started)**: Introduction, Installation, LLMs.txt
 - **(main-concepts)**: Define form, Create form, Add fields, Handle submission
 - **(advanced-guides)**: Controlled fields, Field arrays, TypeScript
+- **(migration-guides)**: Migrate from React Hook Form, Migrate from TanStack Form
 
 ### Step 2: Create Guide Directory
 

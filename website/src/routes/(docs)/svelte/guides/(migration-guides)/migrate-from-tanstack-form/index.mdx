@@ -1,0 +1,406 @@
+---
+title: Migrate from TanStack Form
+description: >-
+  Learn how to migrate your Svelte forms from TanStack Form to Formisch. This
+  guide compares both APIs side by side and walks you through the migration
+  step by step.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from TanStack Form
+
+This guide walks you through migrating a form from [TanStack Form](https://tanstack.com/form/latest) (`@tanstack/svelte-form`) to Formisch. It covers the mental-model differences, a complete side-by-side example, a step-by-step migration path, and a mapping of TanStack Form APIs to their Formisch equivalents.
+
+Migrating is a rewrite of the form layer, not a drop-in replacement. The two libraries structure forms differently: TanStack Form configures validation per field and reads state through subscriptions, while Formisch derives everything from a single Valibot schema. The form markup and your submission logic usually carry over with small changes. Both libraries can coexist in the same application, so you can migrate one form at a time and remove `@tanstack/svelte-form` once the last form is converted.
+
+## Key differences
+
+TanStack Form infers its types from the `defaultValues` object you pass to `createForm`. Validation is attached separately: each field (or the form itself) receives a `validators` object keyed by trigger, such as `onChange`, `onBlur`, `onSubmit` or `onMount`, with async variants like `onChangeAsync`. A validator can be a function or a Standard Schema, so a Valibot schema can already appear in a TanStack Form codebase, but it is one validator among many rather than the definition of the form.
+
+Formisch is schema-first. A single Valibot schema is the source of the form's TypeScript types, its runtime validation, and its structure, all at once. There is no `defaultValues` object to keep aligned with a separate type, and no per-field validator wiring. Validation always parses the entire form against the schema, so cross-field rules work without extra setup, and its timing is controlled form-wide by the `validate` and `revalidate` config.
+
+The remaining differences you will notice during migration:
+
+- **Field addressing**: TanStack Form uses string names like `"todos[0].label"`. Formisch uses type-safe path arrays like `['todos', 0, 'label']` that TypeScript checks against your schema.
+- **Input binding**: TanStack Form wires `value`, `oninput` and `onblur` by hand through `field.handleChange` and `field.handleBlur`. Formisch bundles the event handlers into `field.props`, which you spread onto the input element.
+- **Reactivity**: TanStack Form reads state through explicit subscriptions (`form.Subscribe`, `form.useStore`, now `form.useSelector`) with selector functions. Formisch state is fine-grained through Svelte 5 runes, so you read properties like `form.isSubmitting` directly and only the affected parts of the UI update.
+- **Submission**: TanStack Form calls the `onSubmit` option with the current values. Formisch validates against the schema first and calls your `onsubmit` handler only with typed, validated output.
+
+## Side-by-side example
+
+The same login form with two validated fields and a submit handler, first in TanStack Form, then in Formisch.
+
+### TanStack Form
+
+```svelte
+<script lang="ts">
+  import { createForm } from '@tanstack/svelte-form';
+
+  const form = createForm(() => ({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    onSubmit: async ({ value }) => {
+      console.log(value);
+    },
+  }));
+</script>
+
+<form
+  onsubmit={(event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    form.handleSubmit();
+  }}
+>
+  <form.Field
+    name="email"
+    validators={{
+      onBlur: ({ value }) =>
+        !value
+          ? 'Please enter your email.'
+          : !/^\S+@\S+\.\S+$/.test(value)
+            ? 'The email address is badly formatted.'
+            : undefined,
+    }}
+  >
+    {#snippet children(field)}
+      <input
+        type="email"
+        name={field.name}
+        value={field.state.value}
+        onblur={field.handleBlur}
+        oninput={(event) => field.handleChange(event.currentTarget.value)}
+      />
+      {#if field.state.meta.errors.length}
+        <div>{field.state.meta.errors[0]}</div>
+      {/if}
+    {/snippet}
+  </form.Field>
+
+  <form.Field
+    name="password"
+    validators={{
+      onBlur: ({ value }) =>
+        !value
+          ? 'Please enter your password.'
+          : value.length < 8
+            ? 'Your password must have 8 characters or more.'
+            : undefined,
+    }}
+  >
+    {#snippet children(field)}
+      <input
+        type="password"
+        name={field.name}
+        value={field.state.value}
+        onblur={field.handleBlur}
+        oninput={(event) => field.handleChange(event.currentTarget.value)}
+      />
+      {#if field.state.meta.errors.length}
+        <div>{field.state.meta.errors[0]}</div>
+      {/if}
+    {/snippet}
+  </form.Field>
+
+  <form.Subscribe selector={(state) => state.isSubmitting}>
+    {#snippet children(isSubmitting)}
+      <button type="submit" disabled={isSubmitting}>Login</button>
+    {/snippet}
+  </form.Subscribe>
+</form>
+```
+
+### Formisch
+
+```svelte
+<script lang="ts">
+  import { createForm, Field, Form } from '@formisch/svelte';
+  import type { SubmitHandler } from '@formisch/svelte';
+  import * as v from 'valibot';
+
+  const LoginSchema = v.object({
+    email: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your email.'),
+      v.email('The email address is badly formatted.')
+    ),
+    password: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your password.'),
+      v.minLength(8, 'Your password must have 8 characters or more.')
+    ),
+  });
+
+  const loginForm = createForm({
+    schema: LoginSchema,
+    validate: 'blur',
+  });
+
+  const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+    console.log(values);
+  };
+</script>
+
+<Form of={loginForm} onsubmit={submitForm}>
+  <Field of={loginForm} path={['email']}>
+    {#snippet children(field)}
+      <input {...field.props} value={field.input} type="email" />
+      {#if field.errors}
+        <div>{field.errors[0]}</div>
+      {/if}
+    {/snippet}
+  </Field>
+
+  <Field of={loginForm} path={['password']}>
+    {#snippet children(field)}
+      <input {...field.props} value={field.input} type="password" />
+      {#if field.errors}
+        <div>{field.errors[0]}</div>
+      {/if}
+    {/snippet}
+  </Field>
+
+  <button type="submit" disabled={loginForm.isSubmitting}>Login</button>
+</Form>
+```
+
+The validation rules, error messages and types now live in one schema, the input wiring collapses into `{...field.props}`, and form state is read directly from the store without a subscription component.
+
+## Migration steps
+
+### Install Formisch
+
+Add Formisch and Valibot to your project. Valibot is a peer dependency:
+
+```bash
+npm install @formisch/svelte valibot
+```
+
+Keep `@tanstack/svelte-form` installed until all forms are migrated. See the <Link href="/svelte/guides/installation/">installation</Link> guide for other package managers.
+
+### Move validation into a Valibot schema
+
+Collect the rules from your `validators` objects and express them as one Valibot schema. Each per-field validator becomes a validation action in the schema, together with its error message. The `onBlur` validator of the email field above becomes:
+
+```ts
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  // ...
+});
+```
+
+If your TanStack Form validators already use Valibot through Standard Schema, you can often merge the per-field schemas into a single object schema and reuse them as they are. Define the fields in the same order they appear in your form, since Formisch focuses the first invalid field on submit based on the schema order. See the <Link href="/svelte/guides/define-your-form/">define your form</Link> guide for details.
+
+### Replace the form setup
+
+TanStack Form's `createForm` takes a function returning options with `defaultValues` and `onSubmit`. The Formisch <Link href="/svelte/api/createForm/">`createForm`</Link> rune takes a plain config object with your schema:
+
+```ts
+const loginForm = createForm({
+  schema: LoginSchema,
+  validate: 'blur',
+});
+```
+
+You no longer need a `defaultValues` object just to establish types. Required string fields start as an empty string automatically. If you prefilled fields with `defaultValues`, pass those values as `initialInput`. The submission handler moves to the <Link href="/svelte/api/Form/">`Form`</Link> component in the next steps.
+
+### Replace field bindings
+
+Replace `form.Field` with the <Link href="/svelte/api/Field/">`Field`</Link> component. The string `name` becomes a type-safe `path` array, the manual event wiring becomes a spread of `field.props`, and errors move from `field.state.meta.errors` to `field.errors`:
+
+```svelte
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <input {...field.props} value={field.input} type="email" />
+    {#if field.errors}
+      <div>{field.errors[0]}</div>
+    {/if}
+  {/snippet}
+</Field>
+```
+
+For field components built with TanStack Form's form composition (`useFieldContext`), the Formisch counterpart is the <Link href="/svelte/api/useField/">`useField`</Link> rune, which gives you the same field store inside your own components. See the <Link href="/svelte/guides/add-form-fields/">add form fields</Link> and <Link href="/svelte/guides/input-components/">input components</Link> guides.
+
+### Update submission handling
+
+Replace the native `<form>` element and the manual `form.handleSubmit()` call with the <Link href="/svelte/api/Form/">`Form`</Link> component. It renders a `<form>` element, calls `event.preventDefault()` for you, and only invokes your handler after the schema validation passes:
+
+```svelte
+<script lang="ts">
+  const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+    // `values` is the validated, fully typed schema output
+    await loginUser(values);
+  };
+</script>
+
+<Form of={loginForm} onsubmit={submitForm}>
+  <!-- fields -->
+</Form>
+```
+
+Unlike TanStack Form's `onSubmit`, which receives the current form values, the Formisch handler receives the parsed schema output. See the <Link href="/svelte/guides/handle-submission/">handle submission</Link> guide to learn more.
+
+## API mapping
+
+| TanStack Form                                               | Formisch                                                                                |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `createForm(() => ({ … }))`                                 | <Link href="/svelte/api/createForm/">`createForm`</Link>`({ schema })`                  |
+| `defaultValues`                                             | `initialInput` config                                                                   |
+| `onSubmit` option                                           | `onsubmit` prop of <Link href="/svelte/api/Form/">`Form`</Link>                         |
+| `validators` config                                         | Valibot schema plus `validate` / `revalidate` config                                    |
+| `<form.Field name="…">`                                     | <Link href="/svelte/api/Field/">`Field`</Link> with `path` array                        |
+| `field.state.value`                                         | `field.input`                                                                           |
+| `field.handleChange` / `handleBlur`                         | Spread `field.props`, or `field.onInput` for custom inputs                              |
+| `field.state.meta.errors`                                   | `field.errors`                                                                          |
+| `field.state.meta.isTouched`                                | `field.isTouched`                                                                       |
+| `field.state.meta.isDirty`                                  | `field.isEdited`                                                                        |
+| `form.Subscribe` / `form.useStore` (now `form.useSelector`) | Direct property access, e.g. `form.isSubmitting`                                        |
+| `state.isSubmitting`                                        | `form.isSubmitting`                                                                     |
+| `state.canSubmit`                                           | No direct equivalent (see below)                                                        |
+| `form.handleSubmit()`                                       | <Link href="/methods/api/submit/">`submit`</Link>`(form)`                               |
+| `form.reset()`                                              | <Link href="/methods/api/reset/">`reset`</Link>`(form)`                                 |
+| `form.setFieldValue(name, value)`                           | <Link href="/methods/api/setInput/">`setInput`</Link>`(form, { path, input })`          |
+| `form.state.values`                                         | <Link href="/methods/api/getInput/">`getInput`</Link>`(form)`                           |
+| `form.validateAllFields`                                    | <Link href="/methods/api/validate/">`validate`</Link>`(form)`                           |
+| `<form.Field mode="array">`                                 | <Link href="/svelte/api/FieldArray/">`FieldArray`</Link>                                |
+| `field.pushValue` / `insertValue`                           | <Link href="/methods/api/insert/">`insert`</Link>`(form, { path })`                     |
+| `field.removeValue`                                         | <Link href="/methods/api/remove/">`remove`</Link>`(form, { path, at })`                 |
+| `field.moveValue`                                           | <Link href="/methods/api/move/">`move`</Link>`(form, { path, from, to })`               |
+| `field.swapValues`                                          | <Link href="/methods/api/swap/">`swap`</Link>`(form, { path, at, and })`                |
+| `field.replaceValue`                                        | <Link href="/methods/api/replace/">`replace`</Link>`(form, { path, at, initialInput })` |
+
+A few entries deserve a short note:
+
+- **`canSubmit`**: Formisch does not compute a "can submit" flag. The common pattern is to keep the submit button enabled: on submit, Formisch validates the whole form and automatically focuses the first field with an error. If you still want to reflect validity in the UI, `form.isValid` reflects the result of the last validation run, but with the default `validate: 'submit'` timing it stays `true` until the first submit, so combine it with `validate: 'initial'` for TanStack-like behavior.
+- **Dirty state**: TanStack Form's `isDirty` is persistent (it stays `true` after a change is reverted), which matches Formisch's `isEdited`. Formisch's `isDirty` compares the current input against the initial input, which matches TanStack Form's `!isDefaultValue`.
+- **`onMount` validator**: use `validate: 'initial'` in the Formisch config to validate as soon as the form is created.
+- **Async validators**: there is no counterpart to `onChangeAsyncDebounceMs`. Async checks live in the schema via `v.pipeAsync` and `v.checkAsync`, and the form-level `form.isValidating` reflects the in-flight state (Formisch does not track validating state per field, because validation always parses the whole schema).
+
+## Common patterns
+
+### Form state
+
+TanStack Form reads reactive state through the `form.Subscribe` component or the `form.useStore` hook (now `form.useSelector`) with a selector, as shown in the side-by-side example above. In Formisch, the form store returned by the <Link href="/svelte/api/createForm/">`createForm`</Link> rune is reactive through Svelte 5 runes, so you access properties directly and only the affected parts of the DOM update:
+
+```svelte
+<button type="submit" disabled={loginForm.isSubmitting}>
+  {loginForm.isSubmitting ? 'Submitting...' : 'Login'}
+</button>
+```
+
+The form store exposes `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid` and `errors`.
+
+### Validation timing
+
+In TanStack Form, timing is part of each validator: the same rule behaves differently depending on whether you register it as `onChange`, `onBlur` or `onSubmit`. In Formisch, the rules live in the schema and the timing is configured once for the whole form:
+
+```ts
+const loginForm = createForm({
+  schema: LoginSchema,
+  validate: 'blur', // first validation on blur
+  revalidate: 'input', // revalidate on every keystroke afterwards
+});
+```
+
+`validate` controls when a field is first validated (`'initial'`, `'touch'`, `'input'`, `'change'`, `'blur'` or `'submit'`, defaulting to `'submit'`), and `revalidate` controls subsequent runs once a field has an error or the form was submitted (defaulting to `'input'`). To reveal errors only at the right moment, combine `field.isEdited` with `form.isSubmitted` as shown in the <Link href="/svelte/guides/validation/">validation</Link> guide.
+
+### Field arrays
+
+TanStack Form handles arrays with `mode="array"` and helper methods on the field:
+
+```svelte
+<form.Field name="todos" mode="array">
+  {#snippet children(todosField)}
+    {#each todosField.state.value as _, index}
+      <form.Field name={`todos[${index}].label`}>
+        {#snippet children(field)}
+          <input
+            value={field.state.value}
+            oninput={(event) => field.handleChange(event.currentTarget.value)}
+          />
+        {/snippet}
+      </form.Field>
+    {/each}
+    <button type="button" onclick={() => todosField.pushValue({ label: '' })}>
+      Add todo
+    </button>
+  {/snippet}
+</form.Field>
+```
+
+Formisch provides the <Link href="/svelte/api/FieldArray/">`FieldArray`</Link> component, whose `items` array contains stable IDs for keying the `{#each}` block, together with standalone methods like <Link href="/methods/api/insert/">`insert`</Link> and <Link href="/methods/api/remove/">`remove`</Link>:
+
+```svelte
+<script lang="ts">
+  import { Field, FieldArray, insert } from '@formisch/svelte';
+</script>
+
+<FieldArray of={todoForm} path={['todos']}>
+  {#snippet children(fieldArray)}
+    {#each fieldArray.items as item, index (item)}
+      <Field of={todoForm} path={['todos', index, 'label']}>
+        {#snippet children(field)}
+          <input {...field.props} value={field.input} type="text" />
+        {/snippet}
+      </Field>
+    {/each}
+    <button
+      type="button"
+      onclick={() =>
+        insert(todoForm, { path: ['todos'], initialInput: { label: '' } })}
+    >
+      Add todo
+    </button>
+  {/snippet}
+</FieldArray>
+```
+
+Constraints such as a minimum or maximum number of items move into the schema, for example with `v.nonEmpty()` and `v.maxLength(10)` on the array. See the <Link href="/svelte/guides/field-arrays/">field arrays</Link> guide for the full picture.
+
+### Reset
+
+TanStack Form resets with `form.reset()`, or `form.reset(values)` to also update the default values. Formisch uses the <Link href="/methods/api/reset/">`reset`</Link> method:
+
+```ts
+import { reset } from '@formisch/svelte';
+
+// Reset the form to its initial input
+reset(loginForm);
+
+// Reset and replace the initial input (the new dirty baseline)
+reset(loginForm, { initialInput: { email: 'user@example.com' } });
+```
+
+Passing `initialInput` also updates the baseline for dirty tracking, just like passing values to TanStack Form's `reset` updates its default values.
+
+### Special inputs
+
+In TanStack Form, every input type is wired manually by passing the parsed value to `field.handleChange`, for example toggling a boolean for a checkbox. In Formisch, you spread `field.props` and set the state attribute that matches the input type:
+
+```svelte
+<Field of={form} path={['cookies']}>
+  {#snippet children(field)}
+    <label>
+      <input {...field.props} type="checkbox" checked={field.input} />
+      Yes, I want cookies
+    </label>
+  {/snippet}
+</Field>
+```
+
+Checkboxes, radio buttons, selects and file inputs are covered in the <Link href="/svelte/guides/special-inputs/">special inputs</Link> guide. One thing to watch out for: Formisch's event handlers read values from the DOM as strings, so fields with a non-string schema like `v.number()` or `v.date()` must be controlled as described in the <Link href="/svelte/guides/controlled-fields/">controlled fields</Link> guide. Custom components that don't expose a native element use `field.onInput` instead of `field.props`.
+
+## Next steps
+
+With your first form migrated, work through the main concepts to solidify the Formisch mental model: <Link href="/svelte/guides/define-your-form/">define your form</Link>, <Link href="/svelte/guides/create-your-form/">create your form</Link>, <Link href="/svelte/guides/add-form-fields/">add form fields</Link> and <Link href="/svelte/guides/handle-submission/">handle submission</Link>. The <Link href="/svelte/guides/form-methods/">form methods</Link> guide lists everything that replaces TanStack Form's imperative API, and the <Link href="/svelte/guides/validation/">validation</Link> guide covers error timing and async checks in depth.
