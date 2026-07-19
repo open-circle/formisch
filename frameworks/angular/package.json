@@ -61,8 +61,7 @@
     "zone.js": "^0.15.0"
   },
   "peerDependencies": {
-    "@angular/common": ">=17.0.0",
-    "@angular/core": ">=17.3.0",
+    "@angular/core": ">=19.0.0",
     "typescript": ">=5",
     "valibot": "^1.4.1"
   },
