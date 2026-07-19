@@ -48,9 +48,11 @@ Three reasons to pick Formisch over the alternatives above:
 
 **Formisch** makes the most sense for new projects in TypeScript-heavy codebases, especially when you expect forms to grow in complexity. The schema-first design means there is a single source of truth for types, runtime validation, and form structure, so there is less to keep aligned over time. Reactivity is fine-grained through Svelte 5 runes. The main considerations are that Formisch currently supports only [Valibot](https://valibot.dev) as the schema library, and is presently a client-side form layer — dedicated SvelteKit integration is planned for one of the next releases.
 
-## Migrating from Superforms
+## Migrating to Formisch
 
-Migrating from Superforms to Formisch is not a drop-in replacement. Superforms is built around SvelteKit's server form actions, while Formisch is a pure client-side form layer. Migration typically means moving validation and submission out of `+page.server.ts` actions into client-side handlers, or wiring server validation separately. The two libraries can coexist in the same application, so you can migrate one form at a time.
+Migrating to Formisch is not a drop-in replacement. Superforms in particular is built around SvelteKit's server form actions, while Formisch is a pure client-side form layer, so migration typically means moving validation and submission out of `+page.server.ts` actions into client-side handlers. The libraries can coexist in the same application, so you can migrate one form at a time.
+
+We provide a dedicated migration guide for each library, with a side-by-side example, step-by-step instructions, and an API mapping table: <Link href="/svelte/guides/migrate-from-superforms/">migrate from Superforms</Link> and <Link href="/svelte/guides/migrate-from-tanstack-form/">migrate from TanStack Form</Link>.
 
 ## Next steps
 

@@ -1,0 +1,475 @@
+---
+title: Migrate from TanStack Form
+description: >-
+  Learn how to migrate your Vue forms from TanStack Form to Formisch. This
+  guide compares both APIs side by side and walks through the migration step
+  by step.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from TanStack Form
+
+If your Vue forms are built with [TanStack Form](https://tanstack.com/form/latest) and you are considering a switch, this guide is for you. It explains how the two libraries differ, shows the same form implemented in both, and maps each TanStack Form API to its Formisch equivalent.
+
+Migration is a rewrite of the form layer, not a drop-in replacement. Both libraries are headless and type-safe, but they build on different foundations, so the form setup, field bindings, and validation configuration change, while the components and markup around your forms usually stay the same.
+
+The good news is that both libraries can coexist in the same application without conflict. You can install Formisch next to `@tanstack/vue-form` and migrate one form at a time instead of all at once. Since both libraries export a composable named `useForm`, the import path determines which one a component uses.
+
+## Key differences
+
+TanStack Form infers your form's types from a `defaultValues` object and attaches validation separately through `validators` objects, either on the form or on individual fields. Each validator is bound to its own trigger such as `onChange`, `onBlur`, or `onSubmit`, with async variants and debouncing available per validator. Reactivity comes from TanStack Store: you subscribe to state explicitly with `form.useStore` selectors or the `form.Subscribe` component.
+
+Formisch is schema-first. A single Valibot schema passed to the <Link href="/vue/api/useForm/">`useForm`</Link> composable is the source of types, validation rules, and form structure all at once. There is no `defaultValues` object to keep aligned with your types and no validator configuration scattered across fields. Validation always parses the entire form against the schema in one pass, and its timing is controlled form-wide with the `validate` and `revalidate` config.
+
+In practice, the migration comes down to these shifts:
+
+- **Source of truth**: `defaultValues` plus per-field validators become one Valibot schema.
+- **Validation timing**: per-validator triggers become the form-wide `validate` and `revalidate` config.
+- **Field addressing**: string names like `` `people[${i}].name` `` become path arrays like `['people', i, 'name']`.
+- **Field binding**: manual `:value`, `@input`, and `@blur` wiring becomes `v-bind="field.props"` with `v-model`.
+- **Reactivity**: explicit `form.useStore` and `form.Subscribe` subscriptions become direct property access on the reactive form store, powered by Vue's reactivity system.
+
+If you already use TanStack Form's Standard Schema support with a Valibot schema, the mental gap is smaller than it looks. The difference is that in TanStack Form the schema is one of several possible validation sources, while in Formisch the schema is the form definition itself.
+
+## Side-by-side example
+
+The following login form has two validated fields, displays error messages, and disables the submit button while the form is submitting. Both versions implement the same behavior.
+
+### TanStack Form
+
+```vue
+<script setup lang="ts">
+import { useForm } from '@tanstack/vue-form';
+
+const form = useForm({
+  defaultValues: {
+    email: '',
+    password: '',
+  },
+  onSubmit: async ({ value }) => {
+    console.log(value);
+  },
+});
+</script>
+
+<template>
+  <form @submit.prevent.stop="form.handleSubmit">
+    <form.Field
+      name="email"
+      :validators="{
+        onBlur: ({ value }) =>
+          !value
+            ? 'Please enter your email.'
+            : !value.includes('@')
+              ? 'The email address is badly formatted.'
+              : undefined,
+      }"
+    >
+      <template v-slot="{ field }">
+        <input
+          type="email"
+          :name="field.name"
+          :value="field.state.value"
+          @blur="field.handleBlur"
+          @input="
+            (e) => field.handleChange((e.target as HTMLInputElement).value)
+          "
+        />
+        <div v-if="field.state.meta.errors.length">
+          {{ field.state.meta.errors[0] }}
+        </div>
+      </template>
+    </form.Field>
+    <form.Field
+      name="password"
+      :validators="{
+        onBlur: ({ value }) =>
+          !value
+            ? 'Please enter your password.'
+            : value.length < 8
+              ? 'Your password must have 8 characters or more.'
+              : undefined,
+      }"
+    >
+      <template v-slot="{ field }">
+        <input
+          type="password"
+          :name="field.name"
+          :value="field.state.value"
+          @blur="field.handleBlur"
+          @input="
+            (e) => field.handleChange((e.target as HTMLInputElement).value)
+          "
+        />
+        <div v-if="field.state.meta.errors.length">
+          {{ field.state.meta.errors[0] }}
+        </div>
+      </template>
+    </form.Field>
+    <form.Subscribe>
+      <template v-slot="{ canSubmit, isSubmitting }">
+        <button type="submit" :disabled="!canSubmit">
+          {{ isSubmitting ? 'Logging in...' : 'Login' }}
+        </button>
+      </template>
+    </form.Subscribe>
+  </form>
+</template>
+```
+
+### Formisch
+
+```vue
+<script setup lang="ts">
+import { Field, Form, useForm } from '@formisch/vue';
+import type { SubmitHandler } from '@formisch/vue';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+const loginForm = useForm({
+  schema: LoginSchema,
+  validate: 'blur',
+});
+
+const submitForm: SubmitHandler<typeof LoginSchema> = async (output) => {
+  console.log(output);
+};
+</script>
+
+<template>
+  <Form :of="loginForm" @submit="submitForm">
+    <Field :of="loginForm" :path="['email']" v-slot="field">
+      <input v-bind="field.props" v-model="field.input" type="email" />
+      <div v-if="field.errors">{{ field.errors[0] }}</div>
+    </Field>
+    <Field :of="loginForm" :path="['password']" v-slot="field">
+      <input v-bind="field.props" v-model="field.input" type="password" />
+      <div v-if="field.errors">{{ field.errors[0] }}</div>
+    </Field>
+    <button type="submit" :disabled="loginForm.isSubmitting">
+      {{ loginForm.isSubmitting ? 'Logging in...' : 'Login' }}
+    </button>
+  </Form>
+</template>
+```
+
+Note how the validation rules moved from the individual `form.Field` components into the schema, and how the manual event wiring collapsed into `v-bind="field.props"` with `v-model`. The `validate: 'blur'` config replaces the per-field `onBlur` triggers, so errors still first appear when a field loses focus.
+
+## Migration steps
+
+### Install Formisch
+
+Add Formisch and Valibot alongside your existing setup. Both libraries can run in the same app during the migration.
+
+```bash
+npm install @formisch/vue valibot
+```
+
+See the <Link href="/vue/guides/installation/">installation</Link> guide for other package managers and TypeScript requirements.
+
+### Move validation into a Valibot schema
+
+Collect the validation rules from your `validators` objects and express them as a single Valibot schema. Each field-level validator function typically becomes one or two pipe actions with the same error messages.
+
+```ts
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+```
+
+If you already pass a Valibot schema to TanStack Form's `validators` option via Standard Schema, you can reuse it as is. Define the fields in the same order they appear in your form, since Formisch focuses the first invalid field on submit based on the schema order. See the <Link href="/vue/guides/define-your-form/">define your form</Link> guide for details on schema design.
+
+### Replace the form setup
+
+Replace `useForm` from `@tanstack/vue-form` with the <Link href="/vue/api/useForm/">`useForm`</Link> composable from `@formisch/vue`. The schema replaces `defaultValues` entirely: types are inferred from it, and required string fields automatically start as empty strings. If you need prefilled values, pass a partial `initialInput`.
+
+```ts
+import { useForm } from '@formisch/vue';
+
+const loginForm = useForm({
+  schema: LoginSchema,
+  initialInput: {
+    email: 'user@example.com',
+  },
+});
+```
+
+Without further config, Formisch validates on submit. If your TanStack Form validators ran on blur or change, add the matching `validate` config, such as `validate: 'blur'` for the login form above, to preserve the timing (see the <Link href="#validation-timing">validation timing</Link> section below).
+
+The `onSubmit` option has no counterpart here. Submission moves to the template, as shown below. See the <Link href="/vue/guides/create-your-form/">create your form</Link> guide for all configuration options.
+
+### Replace field bindings
+
+Replace each `form.Field` component with the <Link href="/vue/api/Field/">`Field`</Link> component. Instead of a string `name`, it takes the form store via `of` and a `path` array that is type-checked against your schema. The manual `:value`, `@input`, and `@blur` wiring is replaced by spreading `field.props` and binding `v-model` to `field.input`.
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <input v-bind="field.props" v-model="field.input" type="email" />
+    <div v-if="field.errors">{{ field.errors[0] }}</div>
+  </Field>
+</template>
+```
+
+Error output changes from `field.state.meta.errors` to `field.errors`, which is either `null` or a non-empty array of strings. For single-field components, the <Link href="/vue/api/useField/">`useField`</Link> composable is the counterpart to TanStack Form's `useField`. See the <Link href="/vue/guides/add-form-fields/">add form fields</Link> guide for both approaches.
+
+### Update submission handling
+
+Replace the native `<form>` element and its `@submit.prevent.stop="form.handleSubmit"` wiring with the <Link href="/vue/api/Form/">`Form`</Link> component, and move the logic from the `onSubmit` option into a handler passed to its `@submit` event. The handler only runs after successful validation and receives the fully typed, validated output. Calling `event.preventDefault()` is taken care of for you.
+
+```vue
+<script setup lang="ts">
+import type { SubmitHandler } from '@formisch/vue';
+
+const submitForm: SubmitHandler<typeof LoginSchema> = async (output) => {
+  await login(output);
+};
+</script>
+
+<template>
+  <Form :of="loginForm" @submit="submitForm">
+    <!-- Fields and submit button -->
+  </Form>
+</template>
+```
+
+Also remove the `form.Subscribe` wrapper around the submit button. The form store is reactive, so the button reads `loginForm.isSubmitting` directly, as shown in the side-by-side example and covered in the <Link href="#form-state">form state</Link> section below.
+
+See the <Link href="/vue/guides/handle-submission/">handle submission</Link> guide for async submission and programmatic submits.
+
+## API mapping
+
+| TanStack Form                              | Formisch                                                                                                           |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `useForm({ defaultValues, onSubmit })`     | <Link href="/vue/api/useForm/">`useForm`</Link>`({ schema })`                                                      |
+| `defaultValues`                            | `initialInput` (optional and partial)                                                                              |
+| `onSubmit` option                          | `@submit` on the <Link href="/vue/api/Form/">`Form`</Link> component                                               |
+| `form.handleSubmit`                        | <Link href="/methods/api/submit/">`submit`</Link> or <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> |
+| `form.Field` with `name` string            | <Link href="/vue/api/Field/">`Field`</Link> with `path` array                                                      |
+| `form.Field` with `mode="array"`           | <Link href="/vue/api/FieldArray/">`FieldArray`</Link>                                                              |
+| `useField`                                 | <Link href="/vue/api/useField/">`useField`</Link>                                                                  |
+| `field.state.value` + `field.handleChange` | `v-model="field.input"`                                                                                            |
+| `field.handleBlur`                         | Included in `v-bind="field.props"`                                                                                 |
+| `field.state.meta.errors`                  | `field.errors`                                                                                                     |
+| `field.state.meta.isTouched`               | `field.isTouched`                                                                                                  |
+| `field.state.meta.isDirty`                 | `field.isEdited`                                                                                                   |
+| `field.state.meta.isDefaultValue`          | `!field.isDirty`                                                                                                   |
+| `validators` with `onChange`, `onBlur`, …  | Valibot schema plus `validate` and `revalidate` config                                                             |
+| `validators` with `onChangeAsync`          | Async schema with `v.pipeAsync` and `v.checkAsync`                                                                 |
+| `form.useStore` and `form.Subscribe`       | Direct reactive property access, e.g. `loginForm.isValid`                                                          |
+| `form.state.isSubmitting`                  | `form.isSubmitting`                                                                                                |
+| `form.state.canSubmit`                     | No direct equivalent (see below)                                                                                   |
+| `form.reset(values)`                       | <Link href="/methods/api/reset/">`reset`</Link>`(form, { initialInput })`                                          |
+| `form.resetField(name)`                    | <Link href="/methods/api/reset/">`reset`</Link>`(form, { path })`                                                  |
+| `form.setFieldValue(name, value)`          | <Link href="/methods/api/setInput/">`setInput`</Link>`(form, { path, input })`                                     |
+| `form.getFieldValue(name)`                 | <Link href="/methods/api/getInput/">`getInput`</Link>`(form, { path })`                                            |
+| `form.validateAllFields(cause)`            | <Link href="/methods/api/validate/">`validate`</Link>`(form)`                                                      |
+| `field.pushValue(value)`                   | <Link href="/methods/api/insert/">`insert`</Link>`(form, { path, initialInput })`                                  |
+| `field.removeValue(index)`                 | <Link href="/methods/api/remove/">`remove`</Link>`(form, { path, at })`                                            |
+| `form.moveFieldValues(name, from, to)`     | <Link href="/methods/api/move/">`move`</Link>`(form, { path, from, to })`                                          |
+| `form.swapFieldValues(name, i1, i2)`       | <Link href="/methods/api/swap/">`swap`</Link>`(form, { path, at, and })`                                           |
+| `form.replaceFieldValue(name, i, value)`   | <Link href="/methods/api/replace/">`replace`</Link>`(form, { path, at, initialInput })`                            |
+
+A few entries deserve extra context:
+
+- **`canSubmit`**: Formisch has no combined flag. Forms stay submittable, validation runs on submit, blocks the handler when invalid, and automatically focuses the first field with an error. To prevent double submits, disable the button with `form.isSubmitting`. If you want a validity-based flag instead, `form.isValid` reflects the result of the last validation run, but with the default `validate: 'submit'` timing it stays `true` until the first submit, so combine it with `validate: 'initial'` for TanStack-like behavior.
+- **`form.useStore` and `form.Subscribe`**: Formisch needs neither. The form store is reactive through Vue's reactivity system, so reading `form.isDirty` in a template or computed property subscribes automatically, and only what you read triggers updates.
+- **`field.state.meta.errorMap`**: There is no per-trigger error map. Since validation always parses the whole schema, each field holds a single `errors` array.
+- **Dirty semantics**: TanStack Form's `isDirty` stays `true` once a field was changed, even if the value is reverted. That matches Formisch's `isEdited`. Formisch's `isDirty` compares the current input against the initial input, matching the inverse of TanStack Form's `isDefaultValue`.
+- **`listeners`**: For side effects on field changes, use Vue's `watch` with a reactive read, for example `watch(() => getInput(form, { path: ['country'] }), callback)`. Reading values with Formisch methods is reactive.
+
+## Common patterns
+
+### Form state
+
+In TanStack Form, you subscribe to form state through selectors or the `form.Subscribe` component to keep re-renders scoped:
+
+```vue
+<template>
+  <form.Subscribe>
+    <template v-slot="{ isSubmitting }">
+      <button type="submit" :disabled="isSubmitting">Submit</button>
+    </template>
+  </form.Subscribe>
+</template>
+```
+
+In Formisch, the form store itself is reactive. Read `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors` directly wherever you need them:
+
+```vue
+<template>
+  <p v-if="loginForm.isDirty">You have unsaved changes.</p>
+  <button type="submit" :disabled="loginForm.isSubmitting">Submit</button>
+</template>
+```
+
+Note that `form.errors` only contains errors at the root level of the form. To collect the errors of all fields, use the <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link> method.
+
+### Validation timing
+
+TanStack Form binds timing to each validator: an `onBlur` validator runs on blur, an `onChange` validator on every change, and so on. Formisch configures timing once for the whole form:
+
+```ts
+const loginForm = useForm({
+  schema: LoginSchema,
+  validate: 'blur', // first validation of a field on blur
+  revalidate: 'input', // revalidate on every keystroke afterwards
+});
+```
+
+`validate` controls when a field is first validated (`'initial'`, `'touch'`, `'input'`, `'change'`, `'blur'`, or `'submit'`), and `revalidate` controls when it is validated again once it has an error or the form has been submitted. The defaults are `'submit'` and `'input'`.
+
+Async validators like `onChangeAsync` move into the schema itself. Use `v.pipeAsync` with `v.checkAsync` for checks like username availability, and use the form's `isValidating` state, the counterpart to TanStack Form's `isValidating`, to indicate progress. The <Link href="/vue/guides/validation/">validation</Link> guide covers this in depth, including how to reveal errors only at the right moment.
+
+### Field arrays
+
+In TanStack Form, you mark a field as an array with `mode="array"`, address items with interpolated name strings, and mutate the array through methods on the field:
+
+```vue
+<template>
+  <form.Field name="people" mode="array">
+    <template v-slot="{ field }">
+      <div v-for="(_, i) of field.state.value" :key="i">
+        <form.Field :name="`people[${i}].name`">
+          <template v-slot="{ field: subField }">
+            <input
+              :value="subField.state.value"
+              @input="
+                (e) =>
+                  subField.handleChange((e.target as HTMLInputElement).value)
+              "
+            />
+          </template>
+        </form.Field>
+        <button type="button" @click="field.removeValue(i)">Remove</button>
+      </div>
+      <button type="button" @click="field.pushValue({ name: '' })">Add</button>
+    </template>
+  </form.Field>
+</template>
+```
+
+In Formisch, the <Link href="/vue/api/FieldArray/">`FieldArray`</Link> component provides an `items` array of unique string identifiers to use as `v-for` keys, which keeps Vue's rendering correct when items are added, moved, or removed. Array mutations go through standalone methods:
+
+```vue
+<script setup lang="ts">
+import { Field, FieldArray, insert, remove, useForm } from '@formisch/vue';
+import * as v from 'valibot';
+
+const PeopleSchema = v.object({
+  people: v.array(v.object({ name: v.pipe(v.string(), v.nonEmpty()) })),
+});
+
+const peopleForm = useForm({ schema: PeopleSchema });
+</script>
+
+<template>
+  <FieldArray :of="peopleForm" :path="['people']" v-slot="fieldArray">
+    <div v-for="(item, index) in fieldArray.items" :key="item">
+      <Field :of="peopleForm" :path="['people', index, 'name']" v-slot="field">
+        <input v-bind="field.props" v-model="field.input" type="text" />
+      </Field>
+      <button
+        type="button"
+        @click="remove(peopleForm, { path: ['people'], at: index })"
+      >
+        Remove
+      </button>
+    </div>
+    <button
+      type="button"
+      @click="
+        insert(peopleForm, { path: ['people'], initialInput: { name: '' } })
+      "
+    >
+      Add
+    </button>
+  </FieldArray>
+</template>
+```
+
+The <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/swap/">`swap`</Link>, and <Link href="/methods/api/replace/">`replace`</Link> methods cover the remaining array operations. See the <Link href="/vue/guides/field-arrays/">field arrays</Link> guide for validation of the array itself and nested arrays.
+
+### Reset
+
+TanStack Form resets through methods on the form instance:
+
+```ts
+form.reset(); // back to defaultValues
+form.resetField('email'); // reset a single field
+```
+
+Formisch provides a standalone <Link href="/methods/api/reset/">`reset`</Link> method that can also establish a new baseline, which is useful when refreshed server data should become the new initial state:
+
+```ts
+import { reset } from '@formisch/vue';
+
+// Reset the entire form to its initial input
+reset(loginForm);
+
+// Reset a single field
+reset(loginForm, { path: ['email'] });
+
+// Reset with a new baseline, e.g. after refreshing server data
+reset(loginForm, { initialInput: { email: 'new@example.com' } });
+```
+
+Because resetting changes values programmatically, your inputs must be controlled with `v-model` as shown throughout this guide. See the <Link href="/vue/guides/controlled-fields/">controlled fields</Link> guide for details.
+
+### Special inputs
+
+In TanStack Form, checkboxes, selects, and number inputs require manual wiring because `field.handleChange` receives whatever you extract from the event:
+
+```vue
+<input
+  type="checkbox"
+  :checked="field.state.value"
+  @change="(e) => field.handleChange((e.target as HTMLInputElement).checked)"
+  @blur="field.handleBlur"
+/>
+```
+
+In Formisch, the combination of `v-bind="field.props"` and `v-model="field.input"` covers native input types without extra code:
+
+```vue
+<template>
+  <Field :of="form" :path="['cookies']" v-slot="field">
+    <label>
+      <input type="checkbox" v-bind="field.props" v-model="field.input" />
+      Yes, I want cookies
+    </label>
+  </Field>
+</template>
+```
+
+The <Link href="/vue/guides/special-inputs/">special inputs</Link> guide covers checkboxes, checkbox groups, radio buttons, selects, and file inputs.
+
+## Next steps
+
+With your first form migrated, work through the <Link href="/vue/guides/define-your-form/">define your form</Link> and <Link href="/vue/guides/add-form-fields/">add form fields</Link> guides to deepen your understanding of the schema-first approach. The <Link href="/vue/guides/validation/">validation</Link> guide explains how to fine-tune validation timing and error display, the <Link href="/vue/guides/form-methods/">form methods</Link> guide gives an overview of all available methods, and the <Link href="/vue/guides/input-components/">input components</Link> guide shows how to wrap the field bindings from this guide into reusable components.

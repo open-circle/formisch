@@ -26,3 +26,8 @@
 - [Field arrays](/solid/guides/field-arrays/)
 - [TypeScript](/solid/guides/typescript/)
 - [Architecture](/solid/guides/architecture/)
+
+## Migration guides
+
+- [From Felte](/solid/guides/migrate-from-felte/)
+- [From TanStack Form](/solid/guides/migrate-from-tanstack-form/)

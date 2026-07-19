@@ -26,3 +26,8 @@
 - [Field arrays](/svelte/guides/field-arrays/)
 - [TypeScript](/svelte/guides/typescript/)
 - [Architecture](/svelte/guides/architecture/)
+
+## Migration guides
+
+- [From Superforms](/svelte/guides/migrate-from-superforms/)
+- [From TanStack Form](/svelte/guides/migrate-from-tanstack-form/)
