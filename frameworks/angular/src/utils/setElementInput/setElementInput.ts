@@ -9,17 +9,25 @@ import type { FieldElement } from '@formisch/core/angular';
  * @param input The field input.
  */
 export function setElementInput(element: FieldElement, input: unknown): void {
-  // If element is select, sync the selected state of its options
+  // If element is select, sync the selection
   if (element instanceof HTMLSelectElement) {
-    const values = Array.isArray(input)
-      ? input.map(String)
-      : input == null
-        ? []
-        : [String(input)];
-    for (const option of element.options) {
-      const selected = values.includes(option.value);
-      if (option.selected !== selected) {
-        option.selected = selected;
+    // If multiple, sync the selected state of each option
+    if (element.multiple) {
+      const values = Array.isArray(input) ? input.map(String) : [];
+      for (const option of element.options) {
+        const selected = values.includes(option.value);
+        if (option.selected !== selected) {
+          option.selected = selected;
+        }
+      }
+
+      // Otherwise, write the value so a nullish input selects the empty
+      // placeholder option instead of deselecting every option, which would
+      // make the browser fall back to the first non-disabled option
+    } else {
+      const value = input == null ? '' : String(input);
+      if (element.value !== value) {
+        element.value = value;
       }
     }
     return;

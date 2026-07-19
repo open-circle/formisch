@@ -87,12 +87,13 @@ describe('setElementInput', () => {
     expect(element.checked).toBe(false);
   });
 
-  it('syncs the option selection of a single select', () => {
+  it('syncs the value of a single select', () => {
     const element = createSelect(['', 'option_1', 'option_2'], false);
     setElementInput(element, 'option_2');
     expect(element.value).toBe('option_2');
     setElementInput(element, undefined);
-    expect(element.options[2].selected).toBe(false);
+    expect(element.value).toBe('');
+    expect(element.options[0].selected).toBe(true);
   });
 
   it('syncs the option selection of a multiple select', () => {
