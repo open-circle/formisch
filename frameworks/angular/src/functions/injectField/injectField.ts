@@ -75,9 +75,16 @@ export function injectField(
   );
 
   destroyRef.onDestroy(() => {
-    internalFieldStore().elements = internalFieldStore().elements.filter(
+    const fieldStore = internalFieldStore();
+    const elements = fieldStore.elements.filter(
       (element) => element.isConnected
     );
+    // Keep `initialElements` in sync unless a reorder has moved the elements,
+    // so resetting a remounted field restores its live element, not a stale one
+    if (fieldStore.elements === fieldStore.initialElements) {
+      fieldStore.initialElements = elements;
+    }
+    fieldStore.elements = elements;
   });
 
   return {
@@ -101,9 +108,15 @@ export function injectField(
           const fieldStore = internalFieldStore();
           fieldStore.elements.push(element);
           return () => {
-            fieldStore.elements = fieldStore.elements.filter(
+            const elements = fieldStore.elements.filter(
               (currentElement) => currentElement !== element
             );
+            // Keep `initialElements` in sync unless a reorder has moved the
+            // elements (see the destroy cleanup above)
+            if (fieldStore.elements === fieldStore.initialElements) {
+              fieldStore.initialElements = elements;
+            }
+            fieldStore.elements = elements;
           };
         }
       },

@@ -102,4 +102,30 @@ describe('injectField', () => {
     cleanup?.();
     expect(internalFieldStore.elements).not.toContain(element);
   });
+
+  it('keeps initialElements in sync when unregistering the element', () => {
+    const { form, field } = setup();
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    const element = document.createElement('input');
+    const cleanup = field[CONTROL].ref(element);
+    expect(internalFieldStore.initialElements).toContain(element);
+    cleanup?.();
+    expect(internalFieldStore.initialElements).not.toContain(element);
+    expect(internalFieldStore.elements).toBe(
+      internalFieldStore.initialElements
+    );
+  });
+
+  it('does not touch initialElements when a reorder moved the elements', () => {
+    const { form, field } = setup();
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    const element = document.createElement('input');
+    const cleanup = field[CONTROL].ref(element);
+    const initialElements = internalFieldStore.initialElements;
+    // Simulate a reorder having moved the elements to a new array
+    internalFieldStore.elements = [...internalFieldStore.elements];
+    cleanup?.();
+    expect(internalFieldStore.initialElements).toBe(initialElements);
+    expect(internalFieldStore.initialElements).toContain(element);
+  });
 });
