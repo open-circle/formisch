@@ -37,6 +37,7 @@ export default function App() {
                 autoComplete="email"
                 keyboardType="email-address"
                 placeholder="you@example.com"
+                testID="field-email"
               />
               {field.errors && (
                 <Text style={styles.error}>{field.errors[0]}</Text>
@@ -56,6 +57,7 @@ export default function App() {
                 autoComplete="password"
                 secureTextEntry
                 placeholder="••••••••"
+                testID="field-password"
               />
               {field.errors && (
                 <Text style={styles.error}>{field.errors[0]}</Text>
@@ -65,6 +67,7 @@ export default function App() {
         </Field>
 
         <Button
+          testID="submit-button"
           title="Login"
           onPress={handleSubmit(loginForm, (output) => {
             setSubmittedEmail(output.email);
