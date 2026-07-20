@@ -26,8 +26,23 @@ jobs:
           verbose: 'true'
           sarif: 'true'
 
+      # The CLI writes a timestamped SARIF file and stamps its own per-CVE
+      # partialFingerprints, which the upload action flags as inconsistent on
+      # every run. Copy to a stable filename and strip the fingerprints so the
+      # upload action computes consistent ones (results stay distinct via
+      # their per-CVE rule IDs).
+      - name: Normalize SARIF report
+        id: sarif
+        if: always()
+        run: |
+          file=$(ls -t cve-lite-scan-*.sarif 2>/dev/null | head -n 1)
+          if [[ -n "$file" ]]; then
+            jq 'del(.runs[]?.results[]?.partialFingerprints)' "$file" > cve-lite.sarif
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Upload SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v4
-        if: always()
+        if: always() && steps.sarif.outputs.exists == 'true'
         with:
-          sarif_file: ${{ github.workspace }}
+          sarif_file: cve-lite.sarif
