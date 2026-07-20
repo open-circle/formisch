@@ -8,7 +8,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "qa:ios": "bash scripts/qa-ios.sh",
+    "qa:ios:doctor": "agent-device doctor --platform ios"
   },
   "dependencies": {
     "@formisch/react-native": "workspace:*",
