@@ -1,8 +1,8 @@
-# Formisch for Preact
+# Formisch for React Native
 
-Formisch is a schema-based, headless form library for Preact. It manages form state and validation. It is type-safe, fast by default and its bundle size is small due to its modular design. Try it out in our [playground](https://stackblitz.com/edit/formisch-playground-preact)!
+Formisch is a schema-based, headless form library for React Native. It manages form state and validation. It is type-safe, fast by default and its bundle size is small due to its modular design.
 
-Formisch is also available for [Qwik][formisch-qwik], [React][formisch-react], [React Native][formisch-react-native], [SolidJS][formisch-solid], [Svelte][formisch-svelte] and [Vue][formisch-vue].
+Formisch is also available for [Preact][formisch-preact], [Qwik][formisch-qwik], [React][formisch-react], [SolidJS][formisch-solid], [Svelte][formisch-svelte] and [Vue][formisch-vue].
 
 ## Highlights
 
@@ -10,16 +10,18 @@ Formisch is also available for [Qwik][formisch-qwik], [React][formisch-react], [
 - Schema-based validation with Valibot
 - Type safety with autocompletion in editor
 - Open source and fully tested with 100 % coverage
-- It's fast – DOM updates are fine-grained
+- It's fast – re-renders only if necessary
 - Minimal, readable and well thought out API
-- Supports all native HTML form fields
+- Supports native `TextInput` fields
 
 ## Example
 
-Every form starts with the `useForm` hook. It initializes your form's store based on the provided Valibot schema and infers its types. Next, wrap your form in the `<Form />` component. It's a thin layer around the native `<form />` element that handles form validation and submission. Then, you can access the state of a field with the `useField` hook or the `<Field />` component to connect your inputs.
+Every form starts with the `useForm` hook. It initializes your form's store based on the provided Valibot schema and infers its types. Next, wrap your fields in the `<Form />` component. Unlike the DOM frameworks, React Native has no native form element or submit event, so submission is triggered explicitly with `handleSubmit` from a button's `onPress` handler. Then, you can access the state of a field with the `useField` hook or the `<Field />` component to connect your `TextInput`.
 
 ```tsx
-import { Field, Form, useForm } from '@formisch/preact';
+import { Field, Form, useForm } from '@formisch/react-native';
+import { handleSubmit } from '@formisch/methods/react-native';
+import { Button, Text, TextInput } from 'react-native';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -27,36 +29,48 @@ const LoginSchema = v.object({
   password: v.pipe(v.string(), v.minLength(8)),
 });
 
-export default function LoginPage() {
+export default function LoginScreen() {
   const loginForm = useForm({
     schema: LoginSchema,
   });
 
   return (
-    <Form of={loginForm} onSubmit={(output, event) => console.log(output)}>
+    <Form of={loginForm}>
       <Field of={loginForm} path={['email']}>
         {(field) => (
-          <div>
-            <input {...field.props} value={field.input} type="email" />
-            {field.errors.value && <div>{field.errors.value[0]}</div>}
-          </div>
+          <>
+            <TextInput
+              {...field.props}
+              value={field.input ?? ''}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            {field.errors && <Text>{field.errors[0]}</Text>}
+          </>
         )}
       </Field>
       <Field of={loginForm} path={['password']}>
         {(field) => (
-          <div>
-            <input {...field.props} value={field.input} type="password" />
-            {field.errors.value && <div>{field.errors.value[0]}</div>}
-          </div>
+          <>
+            <TextInput
+              {...field.props}
+              value={field.input ?? ''}
+              secureTextEntry
+            />
+            {field.errors && <Text>{field.errors[0]}</Text>}
+          </>
         )}
       </Field>
-      <button type="submit">Login</button>
+      <Button
+        title="Login"
+        onPress={handleSubmit(loginForm, (output) => console.log(output))}
+      />
     </Form>
   );
 }
 ```
 
-In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include `focus`, `getDeepErrorEntries`, `getDeepErrors`, `getDirtyInput`, `getDirtyPaths`, `getErrors`, `getInput`, `handleSubmit`, `insert`, `isDirty`, `isEdited`, `isTouched`, `isValid`, `move`, `pickDirty`, `remove`, `replace`, `reset`, `setErrors`, `setInput`, `submit`, `swap` and `validate`. These methods allow you to control the form programmatically.
+In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include `focus`, `getDeepErrorEntries`, `getDeepErrors`, `getDirtyInput`, `getDirtyPaths`, `getErrors`, `getInput`, `handleSubmit`, `insert`, `isDirty`, `isEdited`, `isTouched`, `isValid`, `move`, `pickDirty`, `remove`, `replace`, `reset`, `setErrors`, `setInput`, `swap` and `validate`. These methods allow you to control the form programmatically.
 
 ## Comparison
 
@@ -80,9 +94,9 @@ Find a bug or have an idea how to improve the library? Please fill out an [issue
 
 This project is available free of charge and licensed under the [MIT license](https://github.com/open-circle/formisch/blob/main/LICENSE.md).
 
+[formisch-preact]: https://github.com/open-circle/formisch/tree/main/frameworks/preact
 [formisch-qwik]: https://github.com/open-circle/formisch/tree/main/frameworks/qwik
 [formisch-react]: https://github.com/open-circle/formisch/tree/main/frameworks/react
-[formisch-react-native]: https://github.com/open-circle/formisch/tree/main/frameworks/react-native
 [formisch-solid]: https://github.com/open-circle/formisch/tree/main/frameworks/solid
 [formisch-svelte]: https://github.com/open-circle/formisch/tree/main/frameworks/svelte
 [formisch-vue]: https://github.com/open-circle/formisch/tree/main/frameworks/vue
