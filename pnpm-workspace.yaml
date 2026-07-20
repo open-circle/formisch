@@ -10,6 +10,7 @@ allowBuilds:
   deasync: true
   esbuild: true
   sharp: true
+  unrs-resolver: true
   vercel: true
   workerd: true
 minimumReleaseAgeExclude:
