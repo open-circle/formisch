@@ -1,0 +1,17 @@
+node_modules/
+.expo/
+dist/
+web-build/
+*.local
+.playwright-cli/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

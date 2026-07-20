@@ -1,0 +1,30 @@
+{
+  "name": "formisch-playground-react-native",
+  "private": true,
+  "version": "0.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@formisch/react-native": "workspace:*",
+    "expo": "^57.0.7",
+    "expo-status-bar": "^57.0.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-native": "^0.86.0",
+    "react-native-web": "^0.21.2",
+    "valibot": "^1.4.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^8.0.1",
+    "@types/react": "^19.2.5",
+    "eslint": "^9.39.1",
+    "eslint-config-expo": "^57.0.0",
+    "typescript": "~5.9.3"
+  }
+}
