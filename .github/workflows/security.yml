@@ -4,6 +4,15 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Advisories are published without code changes, so also scan on a daily
+  # schedule instead of only when a push or pull request happens to run
+  schedule:
+    - cron: '30 5 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   scan:
@@ -14,17 +23,19 @@ jobs:
       security-events: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
       - name: Scan for vulnerabilities
-        uses: OWASP/cve-lite-cli@v1
+        uses: OWASP/cve-lite-cli@631eac57629e8d37a6821da3269467fd9224c905 # v1.27.0
         with:
           path: .
           fail-on: critical
           verbose: 'true'
           sarif: 'true'
+          # Pinned because the scan gates merges; bump deliberately
+          version: '1.27.0'
 
       # The CLI writes a timestamped SARIF file and stamps its own per-CVE
       # partialFingerprints, which the upload action flags as inconsistent on
@@ -42,7 +53,7 @@ jobs:
           fi
 
       - name: Upload SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
         if: always() && steps.sarif.outputs.exists == 'true'
         with:
           sarif_file: cve-lite.sarif
