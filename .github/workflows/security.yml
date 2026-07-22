@@ -35,7 +35,7 @@ jobs:
         id: sarif
         if: always()
         run: |
-          file=$(ls -t cve-lite-scan-*.sarif 2>/dev/null | head -n 1)
+          file=$(ls -t cve-lite-scan-*.sarif 2>/dev/null | head -n 1 || true)
           if [[ -n "$file" ]]; then
             jq 'del(.runs[]?.results[]?.partialFingerprints)' "$file" > cve-lite.sarif
             echo "exists=true" >> "$GITHUB_OUTPUT"
