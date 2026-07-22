@@ -59,7 +59,9 @@ jobs:
               .runs[]?.results[]? |= (
                 ((.message.text // "") | split(" ") | first // "") as $pv |
                 ([$lines | to_entries[]
-                  | select($pv != "" and (.value | contains($pv)))
+                  | select($pv != "" and (.value
+                      | sub("^ +"; "") | ltrimstr("\u0027")
+                      | startswith($pv)))
                   | .key] | first) as $idx |
                 if $idx != null then
                   (.locations[0].physicalLocation.region =
