@@ -38,17 +38,21 @@ jobs:
           version: '1.27.0'
 
       # The CLI writes a timestamped SARIF file and stamps its own per-CVE
-      # partialFingerprints, which the upload action flags as inconsistent on
-      # every run. Copy to a stable filename and strip the fingerprints so the
-      # upload action computes consistent ones (results stay distinct via
-      # their per-CVE rule IDs).
+      # partialFingerprints that differ between runs, so code scanning never
+      # matches alerts across runs and reports everything as new. Copy to a
+      # stable filename and rewrite each fingerprint to a deterministic value
+      # derived from the rule ID and the affected package@version (the first
+      # token of the message). Deleting the fingerprints instead would merge
+      # same-CVE findings for different package versions, as all results share
+      # the same lockfile location.
       - name: Normalize SARIF report
         id: sarif
         if: always()
         run: |
           file=$(ls -t cve-lite-scan-*.sarif 2>/dev/null | head -n 1 || true)
           if [[ -n "$file" ]]; then
-            jq 'del(.runs[]?.results[]?.partialFingerprints)' "$file" > cve-lite.sarif
+            jq '.runs[]?.results[]? |= (.partialFingerprints = {primaryLocationLineHash: ((.ruleId // "unknown") + ":" + ((.message.text // "") | split(" ") | first))})' \
+              "$file" > cve-lite.sarif
             echo "exists=true" >> "$GITHUB_OUTPUT"
           fi
 
