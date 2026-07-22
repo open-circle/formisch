@@ -37,22 +37,40 @@ jobs:
           # Pinned because the scan gates merges; bump deliberately
           version: '1.27.0'
 
-      # The CLI writes a timestamped SARIF file and stamps its own per-CVE
-      # partialFingerprints that differ between runs, so code scanning never
-      # matches alerts across runs and reports everything as new. Copy to a
-      # stable filename and rewrite each fingerprint to a deterministic value
-      # derived from the rule ID and the affected package@version (the first
-      # token of the message). Deleting the fingerprints instead would merge
-      # same-CVE findings for different package versions, as all results share
-      # the same lockfile location.
+      # The CLI writes a timestamped SARIF file, anchors every result at
+      # pnpm-lock.yaml line 1, and stamps per-CVE partialFingerprints that
+      # differ between runs, so code scanning never matches alerts across
+      # runs and reports everything as new. Copy to a stable filename and
+      # point each finding at the lockfile line of its affected
+      # package@version (the first token of the message). The upload action
+      # then computes content-based fingerprints that are distinct per
+      # finding and stable across runs, and alerts link to the actual
+      # lockfile entry. Findings whose package cannot be located keep a
+      # deterministic fingerprint as fallback so they never collapse into
+      # one alert.
       - name: Normalize SARIF report
         id: sarif
         if: always()
         run: |
           file=$(ls -t cve-lite-scan-*.sarif 2>/dev/null | head -n 1 || true)
           if [[ -n "$file" ]]; then
-            jq '.runs[]?.results[]? |= (.partialFingerprints = {primaryLocationLineHash: ((.ruleId // "unknown") + ":" + ((.message.text // "") | split(" ") | first))})' \
-              "$file" > cve-lite.sarif
+            jq --rawfile lock pnpm-lock.yaml '
+              ($lock | split("\n")) as $lines |
+              .runs[]?.results[]? |= (
+                ((.message.text // "") | split(" ") | first // "") as $pv |
+                ([$lines | to_entries[]
+                  | select($pv != "" and (.value | contains($pv)))
+                  | .key] | first) as $idx |
+                if $idx != null then
+                  (.locations[0].physicalLocation.region =
+                    { startLine: ($idx + 1) })
+                  | del(.partialFingerprints)
+                else
+                  .partialFingerprints =
+                    { primaryLocationLineHash:
+                        ((.ruleId // "unknown") + ":" + $pv) }
+                end
+              )' "$file" > cve-lite.sarif
             echo "exists=true" >> "$GITHUB_OUTPUT"
           fi
 
