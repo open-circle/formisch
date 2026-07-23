@@ -2,6 +2,7 @@ import type * as v from 'valibot';
 import { vi } from 'vitest';
 import { createFormStore } from '../form/createFormStore/createFormStore.ts';
 import type {
+  EmptyInput,
   FormSchema,
   InternalFormStore,
   ValidationMode,
@@ -14,6 +15,7 @@ interface CreateTestStoreConfig {
   validate?: ValidationMode | undefined;
   revalidate?: Exclude<ValidationMode, 'initial'> | undefined;
   initialInput?: unknown | undefined;
+  emptyInput?: EmptyInput | undefined;
   issues?: [v.BaseIssue<unknown>, ...v.BaseIssue<unknown>[]] | undefined;
 }
 
@@ -29,7 +31,7 @@ export function createTestStore<TSchema extends FormSchema>(
   schema: TSchema,
   config: CreateTestStoreConfig = {}
 ): InternalFormStore<TSchema> {
-  const { validate, revalidate, initialInput, issues } = config;
+  const { validate, revalidate, initialInput, emptyInput, issues } = config;
 
   const result: v.SafeParseResult<TSchema> = issues
     ? {
@@ -52,6 +54,7 @@ export function createTestStore<TSchema extends FormSchema>(
     {
       schema,
       initialInput: initialInput as v.InferInput<TSchema>,
+      emptyInput,
       validate,
       revalidate,
     },

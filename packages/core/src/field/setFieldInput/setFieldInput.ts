@@ -4,7 +4,6 @@ import type {
   InternalFieldStore,
   InternalFormStore,
   Path,
-  PathKey,
 } from '../../types/index.ts';
 import { initializeFieldStore } from '../initializeFieldStore/index.ts';
 
@@ -12,10 +11,12 @@ import { initializeFieldStore } from '../initializeFieldStore/index.ts';
  * Sets the input for a nested field store and all its children, updating
  * touched and dirty states accordingly. Handles dynamic array resizing.
  *
+ * @param internalFormStore The form store providing the empty input config.
  * @param internalFieldStore The field store to update.
  * @param input The new input value.
  */
 function setNestedInput(
+  internalFormStore: InternalFormStore,
   internalFieldStore: InternalFieldStore,
   input: unknown
 ): void {
@@ -43,9 +44,6 @@ function setNestedInput(
 
       // Otherwise, if new array is longer, extend items
     } else if (length > items.length) {
-      // Parse path for child initialization
-      const path = JSON.parse(internalFieldStore.name) as PathKey[];
-
       // Initialize or reset each newly visible child
       for (let index = items.length; index < length; index++) {
         // Reset the reused stale child but keep its start input as baseline
@@ -56,6 +54,7 @@ function setNestedInput(
         // like a direct edit on a never-shrunk array would be.
         if (internalFieldStore.children[index]) {
           resetItemState(
+            internalFormStore,
             internalFieldStore.children[index],
             // @ts-expect-error
             arrayInput[index],
@@ -68,21 +67,16 @@ function setNestedInput(
           // @ts-expect-error
           internalFieldStore.children[index] = {};
 
-          // Add current index to path
-          path.push(index);
-
           // Initialize field store for new child
           initializeFieldStore(
+            internalFormStore,
             internalFieldStore.children[index],
             // @ts-expect-error
             internalFieldStore.schema.item,
             // @ts-expect-error
             arrayInput[index],
-            path
+            [...internalFieldStore.path, index]
           );
-
-          // Remove index from path for next iteration
-          path.pop();
         }
       }
 
@@ -98,6 +92,7 @@ function setNestedInput(
     for (let index = 0; index < length; index++) {
       // Recursively set nested input
       setNestedInput(
+        internalFormStore,
         internalFieldStore.children[index],
         // @ts-expect-error
         arrayInput[index]
@@ -119,6 +114,7 @@ function setNestedInput(
     for (const key in internalFieldStore.children) {
       // Recursively set nested input
       setNestedInput(
+        internalFormStore,
         internalFieldStore.children[key],
         // @ts-expect-error
         input?.[key]
@@ -183,7 +179,7 @@ export function setFieldInput(
       }
 
       // Set nested input on target field
-      setNestedInput(internalFieldStore, input);
+      setNestedInput(internalFormStore, internalFieldStore, input);
     });
   });
 }

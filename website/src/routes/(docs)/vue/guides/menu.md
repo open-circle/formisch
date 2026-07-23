@@ -26,3 +26,9 @@
 - [Field arrays](/vue/guides/field-arrays/)
 - [TypeScript](/vue/guides/typescript/)
 - [Architecture](/vue/guides/architecture/)
+
+## Migration guides
+
+- [From VeeValidate](/vue/guides/migrate-from-vee-validate/)
+- [From FormKit](/vue/guides/migrate-from-formkit/)
+- [From TanStack Form](/vue/guides/migrate-from-tanstack-form/)

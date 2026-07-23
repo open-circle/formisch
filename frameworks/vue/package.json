@@ -1,20 +1,29 @@
 {
   "name": "@formisch/vue",
   "description": "The lightweight, schema-first, and fully type-safe form library for Vue",
-  "version": "0.9.0",
+  "version": "1.0.0-rc.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-circle/formisch"
+    "url": "git+https://github.com/open-circle/formisch.git"
   },
   "keywords": [
     "vue",
+    "vuejs",
+    "vue-form",
     "form",
-    "typescript",
+    "forms",
+    "form-validation",
+    "validation",
     "schema",
-    "validation"
+    "typescript",
+    "type-safe",
+    "signals",
+    "bundle-size",
+    "modular",
+    "valibot"
   ],
   "type": "module",
   "main": "./dist/index.js",

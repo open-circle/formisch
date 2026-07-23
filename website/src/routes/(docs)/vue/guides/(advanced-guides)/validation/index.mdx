@@ -74,7 +74,7 @@ const LoginSchema = v.object({
 
 const loginForm = useForm({
   schema: LoginSchema,
-  validate: 'input',
+  validate: 'change',
 });
 </script>
 
@@ -92,6 +92,39 @@ const loginForm = useForm({
 ```
 
 `isEdited` is the right flag for this. `isTouched` would reveal the error as soon as the user tabs through a field without changing it, and `isDirty` would hide the error again if the user clears an invalid value back to its initial state. `isEdited` avoids both: it turns on only after a real change and stays on. Pair it with `validate: 'input'` (or `'change'`) so the error appears as soon as the field becomes invalid, and with `isSubmitted` so that the errors of all fields — including the ones the user never touched — become visible after a submit attempt.
+
+### Reuse the guard across fields
+
+Writing this guard at every field gets repetitive. The common fix is to move it into a small reusable component, either on its own or folded into the `TextInput` from the <Link href="/vue/guides/input-components/">input components</Link> guide, so the `isEdited || isSubmitted` logic lives in exactly one place:
+
+```vue
+<script setup lang="ts">
+interface FieldErrorProps {
+  errors: [string, ...string[]] | null;
+  isEdited: boolean;
+  isSubmitted: boolean;
+}
+
+defineProps<FieldErrorProps>();
+</script>
+
+<template>
+  <div v-if="errors && (isEdited || isSubmitted)">{{ errors[0] }}</div>
+</template>
+```
+
+Each field then stays focused on its input:
+
+```vue
+<Field :of="loginForm" :path="['email']" v-slot="field">
+  <input v-model="field.input" v-bind="field.props" type="email" />
+  <FieldError
+    :errors="field.errors"
+    :is-edited="field.isEdited"
+    :is-submitted="loginForm.isSubmitted"
+  />
+</Field>
+```
 
 ## Validating state
 

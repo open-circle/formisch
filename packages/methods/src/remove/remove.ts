@@ -65,6 +65,7 @@ export function remove<
       // Move all child stores after the removed item one index down
       for (let index = config.at; index < items.length - 1; index++) {
         copyItemState(
+          internalFormStore,
           internalArrayStore.children[index + 1],
           internalArrayStore.children[index]
         );

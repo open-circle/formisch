@@ -82,7 +82,7 @@ In the first step, you create a new file for the `TextInput` component and, if y
     input,
     errors,
     ...props
-  } = $props<TextInputProps>();
+  }: TextInputProps = $props();
 </script>
 ```
 
@@ -145,7 +145,7 @@ Below is an overview of the entire code of the `TextInput` component.
     input,
     errors,
     ...props
-  } = $props<TextInputProps>();
+  }: TextInputProps = $props();
 </script>
 
 <div>

@@ -11,7 +11,6 @@ export const properties: Record<string, PropertyProps> = {
         },
         {
           key: 'autofocus',
-          optional: true,
           value: 'boolean',
         },
         {

@@ -47,9 +47,11 @@ Three reasons to pick Formisch over the alternatives above:
 
 **Formisch** makes the most sense for new projects in TypeScript-heavy codebases, especially when you expect forms to grow in complexity. The schema-first design means there is a single source of truth for types, runtime validation, and form structure, so there is less to keep aligned over time. The main consideration is that Formisch currently supports only [Valibot](https://valibot.dev) as the schema library.
 
-## Migrating from Felte
+## Migrating to Formisch
 
-Migrating from Felte to Formisch is not a drop-in replacement. The mental model is different: instead of attaching form behavior to an element through a directive, you start from a Valibot schema and build your fields around it. Formisch and Felte can coexist in the same application, so you can migrate one form at a time and use the most complex form first as a reference point.
+Migrating to Formisch is not a drop-in replacement. The mental model is different: instead of attaching form behavior to a component or element, you start from a Valibot schema and build your fields around it. The libraries can coexist in the same application, so you can migrate one form at a time.
+
+We provide a dedicated migration guide for each library, with a side-by-side example, step-by-step instructions, and an API mapping table: <Link href="/solid/guides/migrate-from-felte/">migrate from Felte</Link> and <Link href="/solid/guides/migrate-from-tanstack-form/">migrate from TanStack Form</Link>.
 
 ## Next steps
 

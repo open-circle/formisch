@@ -1,0 +1,429 @@
+---
+title: Migrate from TanStack Form
+description: >-
+  Learn how to migrate your React forms from TanStack Form to Formisch, with a
+  side-by-side example, step-by-step instructions, and an API mapping table.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from TanStack Form
+
+This guide walks you through migrating your React forms from [TanStack Form](https://tanstack.com/form/latest) to Formisch. It explains the mental-model shift, shows the same form in both libraries side by side, breaks the migration into small steps, and maps common TanStack Form APIs to their Formisch equivalents.
+
+Migrating is a rewrite of the form layer, not a drop-in replacement. The component structure often stays similar, but the way you define types, validation, and state access changes. The good news: TanStack Form supports Standard Schema validators, so if you already validate with [Valibot](https://valibot.dev), your schemas carry over unchanged.
+
+Both libraries can coexist in the same application without conflicts. You can migrate one form at a time and remove `@tanstack/react-form` once the last form has been converted. Since both libraries export a hook named `useForm`, the import path determines which one a component uses.
+
+## Key differences
+
+TanStack Form starts from a state container: you declare `defaultValues`, TypeScript infers the form's types from them, and you attach validators to the form or to individual fields, each with its own trigger like `onChange`, `onBlur`, or `onSubmit`. Reactivity is subscription-based: you opt into re-renders with `form.Subscribe` or `useStore` selectors.
+
+Formisch starts from a schema: a single Valibot schema is the source of types, validation rules, and form structure at once. There is no `defaultValues` object to keep aligned with your types and no per-field validator configuration. Validation always parses the entire form against the schema, so cross-field rules work without extra wiring, and its timing is controlled form-wide with the `validate` and `revalidate` config. Reactivity is built on fine-grained signals wired into React's render cycle, so you read state directly from the form store and only the components that depend on it re-render.
+
+In practice, the migration boils down to these changes:
+
+- **Types**: Inferred from the schema instead of from `defaultValues`.
+- **Validation**: Defined once in the schema instead of spread across `validators` configs; timing moves from per-validator triggers to the form-wide `validate` and `revalidate` options.
+- **Field addressing**: Path arrays like `['todos', 0, 'label']` instead of interpolated string names like `` `todos[${index}].label` ``.
+- **Field binding**: Spreading `field.props` instead of manually wiring `value`, `onChange`, and `onBlur`.
+- **State access**: Reading the form store directly instead of subscribing with selectors.
+- **Errors**: Plain string arrays in `field.errors` instead of issue objects in `field.state.meta.errors`.
+
+## Side-by-side example
+
+The following login form validates an email and a password and logs the values on submission. Both versions use the exact same Valibot schema, which TanStack Form accepts as a Standard Schema validator.
+
+### TanStack Form
+
+```tsx
+import { useForm } from '@tanstack/react-form';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+export default function LoginPage() {
+  const form = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    validators: {
+      onChange: LoginSchema,
+    },
+    onSubmit: async ({ value }) => {
+      console.log(value);
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      <form.Field name="email">
+        {(field) => (
+          <div>
+            <input
+              name={field.name}
+              value={field.state.value}
+              onChange={(event) => field.handleChange(event.target.value)}
+              onBlur={field.handleBlur}
+              type="email"
+            />
+            {!field.state.meta.isValid && (
+              <div>{field.state.meta.errors[0]?.message}</div>
+            )}
+          </div>
+        )}
+      </form.Field>
+      <form.Field name="password">
+        {(field) => (
+          <div>
+            <input
+              name={field.name}
+              value={field.state.value}
+              onChange={(event) => field.handleChange(event.target.value)}
+              onBlur={field.handleBlur}
+              type="password"
+            />
+            {!field.state.meta.isValid && (
+              <div>{field.state.meta.errors[0]?.message}</div>
+            )}
+          </div>
+        )}
+      </form.Field>
+      <form.Subscribe selector={(state) => state.isSubmitting}>
+        {(isSubmitting) => (
+          <button type="submit" disabled={isSubmitting}>
+            Login
+          </button>
+        )}
+      </form.Subscribe>
+    </form>
+  );
+}
+```
+
+### Formisch
+
+```tsx
+import { Field, Form, useForm } from '@formisch/react';
+import type { SubmitHandler } from '@formisch/react';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+export default function LoginPage() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+  });
+
+  const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+    console.log(values);
+  };
+
+  return (
+    <Form of={loginForm} onSubmit={submitForm}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="email" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="password" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit" disabled={loginForm.isSubmitting}>
+        Login
+      </button>
+    </Form>
+  );
+}
+```
+
+Notice what disappeared: the `defaultValues` object (required string fields start as `''` automatically), the manual `value`, `onChange`, and `onBlur` wiring (replaced by spreading `field.props`), the `event.preventDefault()` boilerplate (the <Link href="/react/api/Form/">`Form`</Link> component handles it), and the `form.Subscribe` wrapper around the submit button (`loginForm.isSubmitting` is read directly). One timing difference: the TanStack Form version validates on every change from the start, while Formisch by default waits until the first submit and then revalidates on every input. Pass `validate: 'input'` to <Link href="/react/api/useForm/">`useForm`</Link> if you want to match the TanStack Form behavior.
+
+## Migration steps
+
+### Install Formisch
+
+Install Formisch and Valibot alongside your existing setup. Both form libraries can run in the same app during the migration.
+
+```bash
+npm install @formisch/react valibot
+```
+
+See the <Link href="/react/guides/installation/">installation</Link> guide for other package managers and TypeScript requirements.
+
+### Move validation into a Valibot schema
+
+If your form already passes a Valibot schema to `validators`, you can reuse it as is. If you use another Standard Schema library like Zod, or hand-written validator functions attached to fields, rewrite the rules as a single Valibot schema. Each field-level validator becomes a validation rule in the schema:
+
+```ts
+import * as v from 'valibot';
+
+// Before: onChange: ({ value }) => (!value ? 'Please enter your email.' : undefined)
+// After: defined once in the schema
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(v.string(), v.nonEmpty(), v.minLength(8)),
+});
+```
+
+Define the fields in the same order they appear in your form, because Formisch focuses the first field with an error after a failed submission. See the <Link href="/react/guides/define-your-form/">define your form</Link> guide for details.
+
+### Replace the form setup
+
+Swap the `useForm` import from `@tanstack/react-form` to `@formisch/react` and pass your schema instead of `defaultValues` and `validators`. The `onSubmit` option moves out of the hook (see below). If your `defaultValues` contained real data instead of empty placeholders, pass it as `initialInput`:
+
+```tsx
+import { useForm } from '@formisch/react';
+
+const loginForm = useForm({
+  schema: LoginSchema,
+  initialInput: {
+    email: 'user@example.com',
+  },
+});
+```
+
+Required string fields start as `''` automatically, so you no longer need to list every field just to initialize it. See the <Link href="/react/guides/create-your-form/">create your form</Link> guide for all configuration options.
+
+### Replace field bindings
+
+Replace each `form.Field` with the <Link href="/react/api/Field/">`Field`</Link> component. String names become path arrays, and the manual event wiring becomes a spread of `field.props`:
+
+```tsx
+import { Field } from '@formisch/react';
+
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <div>
+      <input {...field.props} value={field.input} type="email" />
+      {field.errors && <div>{field.errors[0]}</div>}
+    </div>
+  )}
+</Field>;
+```
+
+`field.state.value` becomes `field.input`, and `field.state.meta.errors` becomes `field.errors`, which is either `null` or a non-empty array of strings, so no `.message` access is needed. For nested fields, `name="user.email"` becomes `path={['user', 'email']}` with full autocompletion from your schema. If you extracted fields into their own components, use the <Link href="/react/api/useField/">`useField`</Link> hook instead, as shown in the <Link href="/react/guides/add-form-fields/">add form fields</Link> guide.
+
+### Update submission handling
+
+Replace the native `<form>` element and its `handleSubmit` boilerplate with the <Link href="/react/api/Form/">`Form`</Link> component. Your `onSubmit` option becomes a handler passed to `Form`, and it receives the validated output of your schema, fully typed by <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link>:
+
+```tsx
+import { Form } from '@formisch/react';
+import type { SubmitHandler } from '@formisch/react';
+
+const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+  await fetch('/api/login', {
+    method: 'POST',
+    body: JSON.stringify(values),
+  });
+};
+
+<Form of={loginForm} onSubmit={submitForm}>
+  {/* fields */}
+  <button type="submit" disabled={loginForm.isSubmitting}>
+    Login
+  </button>
+</Form>;
+```
+
+`event.preventDefault()` is called automatically, and the handler only runs when the form input passes your schema. See the <Link href="/react/guides/handle-submission/">handle submission</Link> guide for async patterns and submitting without a `<form>` element.
+
+## API mapping
+
+| TanStack Form                            | Formisch                                                                                                                 |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `useForm({ defaultValues, validators })` | <Link href="/react/api/useForm/">`useForm`</Link> with `schema`                                                          |
+| `defaultValues`                          | `initialInput` (optional, types come from the schema)                                                                    |
+| `onSubmit` option of `useForm`           | `onSubmit` prop of <Link href="/react/api/Form/">`Form`</Link>                                                           |
+| `<form>` element + `form.handleSubmit()` | <Link href="/react/api/Form/">`Form`</Link> component                                                                    |
+| `form.Field` with `name="user.email"`    | <Link href="/react/api/Field/">`Field`</Link> with `path={['user', 'email']}`                                            |
+| `field.state.value`                      | `field.input`                                                                                                            |
+| `field.handleChange`, `field.handleBlur` | Spread `field.props`, or `field.onChange` for custom inputs                                                              |
+| `field.state.meta.errors`                | `field.errors`                                                                                                           |
+| `field.state.meta.isTouched`             | `field.isTouched`                                                                                                        |
+| `field.state.meta.isDirty`               | `field.isEdited` (see below)                                                                                             |
+| `field.state.meta.isDefaultValue`        | `!field.isDirty` (see below)                                                                                             |
+| `form.Subscribe`, `useStore(form.store)` | Read the form store directly (e.g. `form.isSubmitting`, `form.isDirty`)                                                  |
+| `state.canSubmit`                        | No direct equivalent (see below)                                                                                         |
+| `form.state.values`                      | <Link href="/methods/api/getInput/">`getInput`</Link>                                                                    |
+| `form.setFieldValue(name, value)`        | <Link href="/methods/api/setInput/">`setInput`</Link>                                                                    |
+| `form.reset()`                           | <Link href="/methods/api/reset/">`reset`</Link>                                                                          |
+| `form.Field` with `mode="array"`         | <Link href="/react/api/FieldArray/">`FieldArray`</Link> or <Link href="/react/api/useFieldArray/">`useFieldArray`</Link> |
+| `pushValue`, `insertValue`               | <Link href="/methods/api/insert/">`insert`</Link>                                                                        |
+| `removeValue`, `moveValue`               | <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/move/">`move`</Link>                         |
+| `swapValues`, `replaceValue`             | <Link href="/methods/api/swap/">`swap`</Link>, <Link href="/methods/api/replace/">`replace`</Link>                       |
+| `createFormHook`, `useAppForm`           | No equivalent needed (see below)                                                                                         |
+| `asyncDebounceMs`                        | No direct equivalent (see below)                                                                                         |
+
+A few entries deserve a short note:
+
+- **`state.canSubmit`**: Formisch does not compute a combined "can submit" flag. The idiomatic pattern is to keep the submit button enabled and let submission trigger validation, which focuses the first invalid field. If you want a validity-based flag, `form.isValid` reflects the result of the last validation run. With the default `validate: 'submit'` timing it stays `true` until the first submit, so combine it with `validate: 'initial'` if you want TanStack-like behavior.
+- **Dirty state** is split differently. TanStack Form's `isDirty` stays `true` once a field was changed, even if the value is reverted. That matches Formisch's `isEdited`. Formisch's `isDirty` compares the current input against the initial input and turns back off when they match, like TanStack Form's `isDefaultValue` inverted.
+- **`createFormHook` and `useAppForm`**: These exist in TanStack Form to pre-bind typed field components and share form configuration. Formisch does not need them, since every hook and component is already fully typed by your schema. The role of pre-bound field components is filled by regular <Link href="/react/guides/input-components/">input components</Link>.
+- **`asyncDebounceMs`**: Formisch has no built-in debounce option. Async rules live in the schema via `v.pipeAsync` and `v.checkAsync`, and `form.isValidating` is `true` while they run. See the <Link href="/react/guides/validation/">validation</Link> guide.
+
+## Common patterns
+
+### Form state
+
+In TanStack Form you subscribe to state with a selector to control re-renders, either through `form.Subscribe` (as with the submit button in the side-by-side example above) or with the `useStore` hook in component logic. In Formisch you read the form store directly. The store is built on fine-grained signals wired into React's render cycle, so components re-render only when the properties they read change, without selectors:
+
+```tsx
+<button type="submit" disabled={loginForm.isSubmitting}>
+  {loginForm.isSubmitting ? 'Submitting...' : 'Login'}
+</button>
+```
+
+The form store exposes `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors`. To read field values in component logic, use the <Link href="/methods/api/getInput/">`getInput`</Link> method, which also stays reactive inside components.
+
+### Validation timing
+
+TanStack Form couples timing to each validator: the key you register a rule under (`onChange`, `onBlur`, `onSubmit`, `onMount`) decides when it runs. In Formisch, the rules live in the schema and timing is configured once for the whole form:
+
+```tsx
+const loginForm = useForm({
+  schema: LoginSchema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+The `validate` option controls when a field is first validated (`'initial'`, `'touch'`, `'input'`, `'change'`, `'blur'`, or `'submit'`), and `revalidate` controls when it is checked again after it has an error or the form was submitted. As a rough mapping, `validators.onSubmit` corresponds to `validate: 'submit'` (the default), `validators.onBlur` to `validate: 'blur'`, `validators.onChange` to `validate: 'input'`, and `validators.onMount` to `validate: 'initial'`. Unlike TanStack Form, every validation pass parses the entire schema, so cross-field rules stay correct no matter which field triggered it. The <Link href="/react/guides/validation/">validation</Link> guide covers this in depth, including how to show errors only at the right time.
+
+### Field arrays
+
+In TanStack Form you set `mode="array"` on a field, map over `field.state.value`, and address items with interpolated string names:
+
+```tsx
+<form.Field name="todos" mode="array">
+  {(todosField) => (
+    <div>
+      {todosField.state.value.map((_, index) => (
+        <form.Field key={index} name={`todos[${index}].label`}>
+          {(field) => (
+            <input
+              value={field.state.value}
+              onChange={(event) => field.handleChange(event.target.value)}
+            />
+          )}
+        </form.Field>
+      ))}
+      <button type="button" onClick={() => todosField.pushValue({ label: '' })}>
+        Add todo
+      </button>
+    </div>
+  )}
+</form.Field>
+```
+
+In Formisch you use the <Link href="/react/api/FieldArray/">`FieldArray`</Link> component and standalone methods. The `items` array contains stable unique IDs to use as keys, so React correctly tracks items when they are added, moved, or removed:
+
+```tsx
+import { Field, FieldArray, insert } from '@formisch/react';
+
+<FieldArray of={todoForm} path={['todos']}>
+  {(fieldArray) => (
+    <div>
+      {fieldArray.items.map((item, index) => (
+        <Field key={item} of={todoForm} path={['todos', index, 'label']}>
+          {(field) => <input {...field.props} value={field.input} />}
+        </Field>
+      ))}
+      <button
+        type="button"
+        onClick={() =>
+          insert(todoForm, { path: ['todos'], initialInput: { label: '' } })
+        }
+      >
+        Add todo
+      </button>
+    </div>
+  )}
+</FieldArray>;
+```
+
+The <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/swap/">`swap`</Link>, and <Link href="/methods/api/replace/">`replace`</Link> methods cover the operations of `pushValue`, `removeValue`, `moveValue`, `swapValues`, and `replaceValue`. For example, `todosField.removeValue(index)` becomes `remove(todoForm, { path: ['todos'], at: index })`. Rules like a minimum or maximum number of items move into the schema, for example `v.pipe(v.array(…), v.maxLength(10))`. See the <Link href="/react/guides/field-arrays/">field arrays</Link> guide for the full picture.
+
+### Reset
+
+Where TanStack Form offers `form.reset()` to restore `defaultValues`, Formisch provides the <Link href="/methods/api/reset/">`reset`</Link> method, which can also target individual fields or update the baseline:
+
+```tsx
+import { reset } from '@formisch/react';
+
+// Reset the entire form to its initial input
+reset(loginForm);
+
+// Reset a single field
+reset(loginForm, { path: ['email'] });
+
+// Reset with a new initial input (e.g. refreshed server data)
+reset(loginForm, { initialInput: { email: 'jane@example.com' } });
+```
+
+Passing `initialInput` updates the dirty-tracking baseline, which is the right tool when server data changes. Use <Link href="/methods/api/setInput/">`setInput`</Link> instead when you only want to change the current value.
+
+### Special inputs
+
+In TanStack Form, checkboxes, selects, and files are wired manually, for example with `field.handleChange(event.target.checked)`. In Formisch, spreading `field.props` covers all native input types; you only set the state attribute that matches the input:
+
+```tsx
+<Field of={form} path={['cookies']}>
+  {(field) => (
+    <label>
+      <input {...field.props} type="checkbox" checked={field.input} />
+      Yes, I want cookies
+    </label>
+  )}
+</Field>
+```
+
+See the <Link href="/react/guides/special-inputs/">special inputs</Link> guide for radio groups, multi-selects, and file inputs. One caveat carried over from the DOM: event handlers read strings, so fields with a non-string schema like `v.number()` or `v.date()` need to be controlled, as explained in the <Link href="/react/guides/controlled-fields/">controlled fields</Link> guide. This replaces patterns like `field.handleChange(event.target.valueAsNumber)`.
+
+## Next steps
+
+You now have everything you need to convert your forms one by one. To deepen your understanding of the Formisch side, read the <Link href="/react/guides/define-your-form/">define your form</Link> and <Link href="/react/guides/add-form-fields/">add form fields</Link> guides, explore the <Link href="/react/guides/form-methods/">form methods</Link> for programmatic control, and check out the <Link href="/react/guides/typescript/">TypeScript</Link> guide to get the most out of schema-based type inference.

@@ -1,0 +1,30 @@
+---
+title: IsFieldTouchedConfig
+description: Configuration interface for checking whether a specific field is touched.
+source: /packages/methods/src/isTouched/isTouched.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# IsFieldTouchedConfig
+
+Configuration interface for checking whether a specific field is touched. Used by the `isTouched` method when a specific field path is provided.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Definition
+
+- `IsFieldTouchedConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'isTouched', href: '../isTouched/' }]} />

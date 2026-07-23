@@ -1,9 +1,10 @@
 import { initializeFieldStore } from '../../field/initializeFieldStore/index.ts';
 import { batch, createId } from '../../framework/index.ts';
 import type {
+  EmptyInput,
   FieldElement,
   InternalFieldStore,
-  PathKey,
+  InternalFormStore,
 } from '../../types/index.ts';
 
 /**
@@ -13,6 +14,7 @@ import type {
  * the new input value. Keeps the `initialInput` and `initialItems` state
  * unchanged for form reset functionality.
  *
+ * @param internalFormStore The form store providing the empty input config.
  * @param internalFieldStore The field store to reset.
  * @param input The new input value (can be any type including array or object).
  * @param keepStart Whether to keep `startInput` and `startItems` as the dirty
@@ -20,6 +22,7 @@ import type {
  * is reused for an in-place edit so its dirty state is detected correctly.
  */
 export function resetItemState(
+  internalFormStore: InternalFormStore,
   internalFieldStore: InternalFieldStore,
   input: unknown,
   keepStart = false
@@ -93,9 +96,6 @@ export function resetItemState(
           // Set current items
           internalFieldStore.items.value = newItems;
 
-          // Parse path lazily, only when a missing child must be initialized
-          let path: PathKey[] | undefined;
-
           // Reset state for each array item
           for (let index = 0; index < length; index++) {
             // A tuple reset without input (or with nullish input) resets each
@@ -106,6 +106,7 @@ export function resetItemState(
             if (internalFieldStore.children[index]) {
               // Recursively reset child with corresponding input
               resetItemState(
+                internalFormStore,
                 internalFieldStore.children[index],
                 itemInput,
                 keepStart
@@ -113,27 +114,19 @@ export function resetItemState(
 
               // Otherwise, initialize a new child with the corresponding input
             } else {
-              // Parse path only when needed
-              path ??= JSON.parse(internalFieldStore.name) as PathKey[];
-
               // Create empty child object
               // @ts-expect-error
               internalFieldStore.children[index] = {};
 
-              // Add current index to path
-              path.push(index);
-
               // Initialize field store for new child
               initializeFieldStore(
+                internalFormStore,
                 internalFieldStore.children[index],
                 // @ts-expect-error
                 internalFieldStore.schema.item,
                 itemInput,
-                path
+                [...internalFieldStore.path, index]
               );
-
-              // Remove index from path for next iteration
-              path.pop();
             }
           }
 
@@ -154,6 +147,7 @@ export function resetItemState(
         for (const key in internalFieldStore.children) {
           // Recursively reset child with corresponding input
           resetItemState(
+            internalFormStore,
             internalFieldStore.children[key],
             // @ts-expect-error
             input?.[key],
@@ -164,13 +158,23 @@ export function resetItemState(
 
       // Otherwise, if field store is value, handle primitive type reset
     } else {
+      // Fall back to the empty input for this field's type when no input is
+      // provided so the reset value stays consistent with the initial input.
+      // Optional and nullable fields stay `undefined` as they accept it.
+      const valueInput =
+        input === undefined && !internalFieldStore.isNullish
+          ? internalFormStore.emptyInput[
+              internalFieldStore.schema.type as keyof EmptyInput
+            ]
+          : input;
+
       // Set start input unless it is kept as the dirty baseline
       if (!keepStart) {
-        internalFieldStore.startInput.value = input;
+        internalFieldStore.startInput.value = valueInput;
       }
 
       // Set current input
-      internalFieldStore.input.value = input;
+      internalFieldStore.input.value = valueInput;
     }
   });
 }

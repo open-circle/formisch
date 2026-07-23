@@ -38,7 +38,7 @@ export interface FormStore<TSchema extends FormSchema = FormSchema>
    * The current error messages of the form.
    *
    * Hint: This property only contains validation errors at the root level
-   * of the form. To get all errors from all fields, use `getAllErrors`.
+   * of the form. To get all errors from all fields, use `getDeepErrors`.
    */
   readonly errors: ReadonlySignal<[string, ...string[]] | null>;
 }

@@ -49,6 +49,21 @@ export const properties: Record<string, PropertyProps> = {
           },
         },
         {
+          key: 'emptyInput',
+          optional: true,
+          value: {
+            type: 'union',
+            options: [
+              {
+                type: 'custom',
+                name: 'EmptyInput',
+                href: '/core/api/EmptyInput/',
+              },
+              'undefined',
+            ],
+          },
+        },
+        {
           key: 'validate',
           optional: true,
           value: {
@@ -113,6 +128,19 @@ export const properties: Record<string, PropertyProps> = {
       ],
     },
   },
+  emptyInput: {
+    type: {
+      type: 'union',
+      options: [
+        {
+          type: 'custom',
+          name: 'EmptyInput',
+          href: '/core/api/EmptyInput/',
+        },
+        'undefined',
+      ],
+    },
+  },
   validate: {
     type: {
       type: 'union',
@@ -132,8 +160,18 @@ export const properties: Record<string, PropertyProps> = {
       options: [
         {
           type: 'custom',
-          name: 'ValidationMode',
-          href: '/core/api/ValidationMode/',
+          name: 'Exclude',
+          generics: [
+            {
+              type: 'custom',
+              name: 'ValidationMode',
+              href: '/core/api/ValidationMode/',
+            },
+            {
+              type: 'string',
+              value: 'initial',
+            },
+          ],
         },
         'undefined',
       ],

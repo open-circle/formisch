@@ -1,0 +1,420 @@
+---
+title: Migrate from TanStack Form
+description: >-
+  Learn how to migrate your forms from TanStack Form to Formisch. This guide
+  maps the TanStack Form API to its Formisch equivalents and walks you through
+  the migration step by step.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from TanStack Form
+
+This guide walks you through migrating a SolidJS app from [TanStack Form](https://tanstack.com/form/latest) (`@tanstack/solid-form`) to Formisch. It covers the mental-model shift, a side-by-side example, concrete migration steps, and an API mapping table you can use as a reference while porting your forms.
+
+Migrating is a rewrite of the form layer, not a drop-in replacement. The two libraries structure forms differently, so you will replace form setup, field bindings, and validation config rather than swapping imports. The good news: both libraries are headless and use render-prop field components, so your markup and styling carry over largely unchanged.
+
+Formisch and TanStack Form can coexist in the same application. You can migrate one form at a time and remove `@tanstack/solid-form` once the last form is ported.
+
+## Key differences
+
+TanStack Form derives its types from the `defaultValues` object and attaches validation as per-validator config: each field (or the form) declares `onChange`, `onBlur`, or `onSubmit` validators, each with its own trigger and optional async variant. Form state is read through subscriptions, either the `form.Subscribe` component or the `form.useStore` hook with a selector.
+
+Formisch is schema-first. A single Valibot schema is the source of types, runtime validation, and form structure all at once. There is no `defaultValues` object to keep aligned with your validators and no per-field validation config. This changes three things in practice:
+
+- **Validation location**: Validation rules move out of your JSX and into the schema. Whenever validation runs, Formisch parses the entire form against the schema in one pass and distributes the issues to the individual fields, so cross-field rules work without extra wiring.
+- **Validation timing**: Instead of choosing a trigger per validator, you configure timing form-wide with the `validate` and `revalidate` options of <Link href="/solid/api/createForm/">`createForm`</Link>.
+- **Reactivity**: Form state like `isSubmitting` or a field's `errors` are fine-grained signals you read directly, for example `form.isSubmitting` in JSX. There is no subscription component or selector hook.
+
+Formisch is also several times smaller (from ~2.5 kB min+gzip) because methods like <Link href="/methods/api/reset/">`reset`</Link> and <Link href="/methods/api/insert/">`insert`</Link> are imported individually and tree-shaken. The main trade-off is that Formisch currently supports only [Valibot](https://valibot.dev) as the schema library, while TanStack Form accepts any Standard Schema validator. If your TanStack Form validators are already Valibot schemas, migration is mostly a matter of merging them into one object schema.
+
+## Side-by-side example
+
+The following login form has two validated fields, shows errors below each input, disables the submit button while submitting, and logs the values on submit.
+
+### TanStack Form
+
+```tsx
+import { createForm } from '@tanstack/solid-form';
+
+export default function LoginPage() {
+  const form = createForm(() => ({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    onSubmit: async ({ value }) => {
+      console.log(value);
+    },
+  }));
+
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      <form.Field
+        name="email"
+        validators={{
+          onBlur: ({ value }) =>
+            !value.includes('@')
+              ? 'The email address is badly formatted.'
+              : undefined,
+        }}
+      >
+        {(field) => (
+          <div>
+            <input
+              type="email"
+              name={field().name}
+              value={field().state.value}
+              onBlur={field().handleBlur}
+              onInput={(event) =>
+                field().handleChange(event.currentTarget.value)
+              }
+            />
+            {!field().state.meta.isValid && (
+              <div>{field().state.meta.errors.join(', ')}</div>
+            )}
+          </div>
+        )}
+      </form.Field>
+      <form.Field
+        name="password"
+        validators={{
+          onBlur: ({ value }) =>
+            value.length < 8
+              ? 'Your password must have 8 characters or more.'
+              : undefined,
+        }}
+      >
+        {(field) => (
+          <div>
+            <input
+              type="password"
+              name={field().name}
+              value={field().state.value}
+              onBlur={field().handleBlur}
+              onInput={(event) =>
+                field().handleChange(event.currentTarget.value)
+              }
+            />
+            {!field().state.meta.isValid && (
+              <div>{field().state.meta.errors.join(', ')}</div>
+            )}
+          </div>
+        )}
+      </form.Field>
+      <form.Subscribe selector={(state) => state.isSubmitting}>
+        {(isSubmitting) => (
+          <button type="submit" disabled={isSubmitting()}>
+            Login
+          </button>
+        )}
+      </form.Subscribe>
+    </form>
+  );
+}
+```
+
+### Formisch
+
+```tsx
+import { createForm, Field, Form } from '@formisch/solid';
+import type { SubmitHandler } from '@formisch/solid';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email('The email address is badly formatted.')),
+  password: v.pipe(
+    v.string(),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+export default function LoginPage() {
+  const loginForm = createForm({
+    schema: LoginSchema,
+    validate: 'blur',
+  });
+
+  const handleLogin: SubmitHandler<typeof LoginSchema> = async (output) => {
+    console.log(output);
+  };
+
+  return (
+    <Form of={loginForm} onSubmit={handleLogin}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="email" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="password" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit" disabled={loginForm.isSubmitting}>
+        Login
+      </button>
+    </Form>
+  );
+}
+```
+
+The validation rules moved from the `validators` props into the schema, the manual `<form>` element with `preventDefault` and `form.handleSubmit()` became the <Link href="/solid/api/Form/">`Form`</Link> component, and the input wiring collapsed into spreading `field.props`. Because the submit handler receives values that already passed the schema, `output` is fully typed as the schema's output type.
+
+## Migration steps
+
+### Install Formisch
+
+Formisch uses Valibot as a peer dependency, so install both packages. See the <Link href="/solid/guides/installation/">installation</Link> guide for details.
+
+```bash
+npm install valibot @formisch/solid
+```
+
+### Move validation into a Valibot schema
+
+Collect the `defaultValues` shape and all `validators` of a form and express them as a single Valibot schema, as shown in the side-by-side example above. Inline validator functions become Valibot pipes, and if you already passed Valibot schemas as Standard Schema validators, merge them into one object schema. Use `v.nonEmpty('…')` to require a value with its own error message, and define the fields in the same order they appear in your form, since Formisch focuses the first invalid field on submit based on the schema order. See the <Link href="/solid/guides/define-your-form/">define your form</Link> guide for more on schema design.
+
+### Replace the form setup
+
+TanStack Form's `createForm` takes a function returning an options object with `defaultValues` and `onSubmit`. Formisch's <Link href="/solid/api/createForm/">`createForm`</Link> primitive takes a plain config object with your schema. You no longer need `defaultValues` to define the form's shape: required string fields start as an empty string automatically. Only pass `initialInput` when fields should start with actual values.
+
+```tsx
+// Before
+const form = createForm(() => ({
+  defaultValues: { email: '', password: '' },
+  onSubmit: async ({ value }) => console.log(value),
+}));
+
+// After
+const loginForm = createForm({
+  schema: LoginSchema,
+  validate: 'blur',
+});
+```
+
+The `validate: 'blur'` option mirrors the `onBlur` validators from before. See the <Link href="/solid/guides/create-your-form/">create your form</Link> guide for all configuration options.
+
+### Replace field bindings
+
+Replace each `form.Field` with the <Link href="/solid/api/Field/">`Field`</Link> component. Two things change: the `name` string becomes a type-safe `path` array (`name="details.email"` becomes `path={['details', 'email']}`), and the manual wiring of `value`, `onBlur`, and `onInput` collapses into spreading `field.props`. Note that the Formisch field store is a plain object, not an accessor, so it is `field.input` instead of `field().state.value`.
+
+```tsx
+// Before
+<form.Field name="email">
+  {(field) => (
+    <input
+      type="email"
+      name={field().name}
+      value={field().state.value}
+      onBlur={field().handleBlur}
+      onInput={(event) => field().handleChange(event.currentTarget.value)}
+    />
+  )}
+</form.Field>
+
+// After
+<Field of={loginForm} path={['email']}>
+  {(field) => <input {...field.props} value={field.input} type="email" />}
+</Field>
+```
+
+Error display changes from `field().state.meta.errors` to `field.errors`, which is either `null` or a non-empty array of strings. If you built reusable field components with `createField` or wrapper components, rebuild them with the <Link href="/solid/api/useField/">`useField`</Link> primitive as shown in the <Link href="/solid/guides/add-form-fields/">add form fields</Link> and <Link href="/solid/guides/input-components/">input components</Link> guides.
+
+### Update submission handling
+
+The `onSubmit` option of the form config becomes the `onSubmit` prop of the <Link href="/solid/api/Form/">`Form`</Link> component, which also replaces the manual `<form>` element, `event.preventDefault()`, and `form.handleSubmit()` call. Your handler receives the validated output directly instead of a `{ value }` object, and it only runs when the schema passes. Also replace `form.Subscribe` and `form.useStore` reads with direct property access, for example `disabled={loginForm.isSubmitting}` on the submit button.
+
+```tsx
+const handleLogin: SubmitHandler<typeof LoginSchema> = async (output) => {
+  await loginUser(output);
+};
+
+<Form of={loginForm} onSubmit={handleLogin}>
+  {/* fields */}
+  <button type="submit" disabled={loginForm.isSubmitting}>
+    Login
+  </button>
+</Form>;
+```
+
+See the <Link href="/solid/guides/handle-submission/">handle submission</Link> guide for details, including how to trigger submission programmatically.
+
+## API mapping
+
+| TanStack Form                                     | Formisch                                                                                                                                            |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `createForm(() => ({ … }))`                       | <Link href="/solid/api/createForm/">`createForm`</Link> with a plain config object                                                                  |
+| `defaultValues`                                   | `schema` defines the shape; `initialInput` sets values                                                                                              |
+| `validators` (form- or field-level)               | Valibot schema passed to `schema`                                                                                                                   |
+| `onChange` / `onBlur` / `onSubmit` validator keys | `validate` and `revalidate` config options                                                                                                          |
+| `onSubmit` config option                          | `onSubmit` prop of <Link href="/solid/api/Form/">`Form`</Link>                                                                                      |
+| `<form>` with `form.handleSubmit()`               | <Link href="/solid/api/Form/">`Form`</Link> component                                                                                               |
+| `<form.Field name="…">`                           | <Link href="/solid/api/Field/">`Field`</Link> with `path` array                                                                                     |
+| `field().state.value`                             | `field.input`                                                                                                                                       |
+| `field().handleChange` / `field().handleBlur`     | Spread `field.props`, or `field.onInput` for custom inputs                                                                                          |
+| `field().state.meta.errors`                       | `field.errors`                                                                                                                                      |
+| `field().state.meta.isTouched`                    | `field.isTouched`                                                                                                                                   |
+| `field().state.meta.isDirty`                      | `field.isEdited`                                                                                                                                    |
+| `!field().state.meta.isDefaultValue`              | `field.isDirty`                                                                                                                                     |
+| `form.Subscribe` / `form.useStore`                | Direct property access, e.g. `form.isSubmitting`                                                                                                    |
+| `form.state.values`                               | <Link href="/methods/api/getInput/">`getInput`</Link>                                                                                               |
+| `form.setFieldValue(name, value)`                 | <Link href="/methods/api/setInput/">`setInput`</Link>                                                                                               |
+| Setting errors manually                           | <Link href="/methods/api/setErrors/">`setErrors`</Link>                                                                                             |
+| Triggering validation manually                    | <Link href="/methods/api/validate/">`validate`</Link>                                                                                               |
+| `form.reset()`                                    | <Link href="/methods/api/reset/">`reset`</Link>                                                                                                     |
+| `<form.Field mode="array">`                       | <Link href="/solid/api/FieldArray/">`FieldArray`</Link>                                                                                             |
+| `pushValue` / `insertValue` / `removeValue`       | <Link href="/methods/api/insert/">`insert`</Link> / <Link href="/methods/api/remove/">`remove`</Link>                                               |
+| `moveValue` / `swapValues` / `replaceValue`       | <Link href="/methods/api/move/">`move`</Link> / <Link href="/methods/api/swap/">`swap`</Link> / <Link href="/methods/api/replace/">`replace`</Link> |
+
+A few entries deserve a note:
+
+- **`state.canSubmit`** has no direct equivalent. With the default `validate: 'submit'` timing, `form.isValid` stays `true` until the first submit, so a validity-based disabled state would not reflect the actual input before then. Use `form.isSubmitting` to disable during submission, or combine `form.isValid` with `validate: 'initial'` if you want TanStack-like behavior.
+- **Dirty state** is split differently. TanStack Form's `isDirty` stays `true` once a field was changed, even if the value is reverted. That matches Formisch's `isEdited`. Formisch's `isDirty` compares the current input against the initial input and turns back off when they match, like TanStack Form's `isDefaultValue` inverted.
+- **`onChangeAsyncDebounceMs`** has no equivalent. Async validation is expressed in the schema with Valibot's async API (`v.pipeAsync`, `v.checkAsync`), and the form exposes `isValidating` while it runs. Built-in debouncing is not provided.
+- **`form.Subscribe` and `form.useStore`** are unnecessary. Formisch state is exposed as fine-grained signals, so reading `form.isSubmitting` in JSX is already reactive and only updates what depends on it.
+
+## Common patterns
+
+### Form state
+
+In TanStack Form you subscribe to state with a selector to scope updates:
+
+```tsx
+<form.Subscribe selector={(state) => state.isSubmitting}>
+  {(isSubmitting) => <button disabled={isSubmitting()}>Login</button>}
+</form.Subscribe>
+```
+
+In Formisch you read the store directly. Properties like `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors` are backed by signals, so no subscription wrapper is needed:
+
+```tsx
+<button type="submit" disabled={loginForm.isSubmitting}>
+  {loginForm.isSubmitting ? 'Logging in...' : 'Login'}
+</button>
+```
+
+To read field values outside a field, replace `form.useStore((state) => state.values.email)` with `getInput(loginForm, { path: ['email'] })`. The <Link href="/methods/api/getInput/">`getInput`</Link> method is reactive as well, so any computation that calls it updates when the value changes.
+
+### Validation timing
+
+TanStack Form decides timing per validator: an `onChange` validator runs on every change, an `onBlur` validator on blur, and so on, per field. Formisch configures timing once for the whole form with `validate` (first validation, defaults to `'submit'`) and `revalidate` (after a field has an error or the form was submitted, defaults to `'input'`):
+
+```tsx
+const loginForm = createForm({
+  schema: LoginSchema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+This two-phase model replaces most per-field trigger combinations: fields stay quiet until first validated, then correct themselves live. To show errors only after a user actually changed a field, combine `field.isEdited` with `form.isSubmitted` as shown in the <Link href="/solid/guides/validation/">validation</Link> guide.
+
+### Field arrays
+
+TanStack Form uses `form.Field` with `mode="array"` and Solid's `<Index>` component, with helpers like `pushValue` and `removeValue` on the field:
+
+```tsx
+<form.Field name="todos" mode="array">
+  {(field) => (
+    <div>
+      <Index each={field().state.value}>
+        {(_, index) => (
+          <form.Field name={`todos[${index}].label`}>
+            {(subField) => (
+              <input
+                value={subField().state.value}
+                onInput={(event) =>
+                  subField().handleChange(event.currentTarget.value)
+                }
+              />
+            )}
+          </form.Field>
+        )}
+      </Index>
+      <button type="button" onClick={() => field().pushValue({ label: '' })}>
+        Add todo
+      </button>
+    </div>
+  )}
+</form.Field>
+```
+
+Formisch provides the <Link href="/solid/api/FieldArray/">`FieldArray`</Link> component. Its `items` array contains stable unique IDs designed for Solid's `<For>` component, and array operations are standalone methods:
+
+```tsx
+import { Field, FieldArray, insert } from '@formisch/solid';
+import { For } from 'solid-js';
+
+<FieldArray of={todoForm} path={['todos']}>
+  {(fieldArray) => (
+    <div>
+      <For each={fieldArray.items}>
+        {(_, getIndex) => (
+          <Field of={todoForm} path={['todos', getIndex(), 'label']}>
+            {(field) => (
+              <input {...field.props} value={field.input ?? ''} type="text" />
+            )}
+          </Field>
+        )}
+      </For>
+      <button
+        type="button"
+        onClick={() =>
+          insert(todoForm, { path: ['todos'], initialInput: { label: '' } })
+        }
+      >
+        Add todo
+      </button>
+    </div>
+  )}
+</FieldArray>;
+```
+
+Rules for the array itself, like a minimum or maximum length, live in the schema via `v.pipe(v.array(…), v.maxLength(10))`, and their errors appear on `fieldArray.errors`. See the <Link href="/solid/guides/field-arrays/">field arrays</Link> guide for the remaining methods and nested arrays.
+
+### Reset
+
+`form.reset()` becomes the standalone <Link href="/methods/api/reset/">`reset`</Link> method. It can also update the initial input at the same time, which is the right tool when server data is refreshed and the form's baseline should change:
+
+```tsx
+import { reset } from '@formisch/solid';
+
+// Reset to the initial values
+reset(loginForm);
+
+// Reset with new initial values
+reset(loginForm, { initialInput: { email: 'user@example.com' } });
+```
+
+### Special inputs
+
+In TanStack Form, non-text inputs are wired manually, for example a checkbox with `checked={field().state.value}` and `onChange={(event) => field().handleChange(event.currentTarget.checked)}`. In Formisch, `field.props` handles native checkboxes, radio buttons, selects, and file inputs automatically. You only set the visual state:
+
+```tsx
+<Field of={form} path={['terms']}>
+  {(field) => (
+    <input {...field.props} type="checkbox" checked={!!field.input} />
+  )}
+</Field>
+```
+
+See the <Link href="/solid/guides/special-inputs/">special inputs</Link> guide for selects, radio groups, and file inputs, and the <Link href="/solid/guides/controlled-fields/">controlled fields</Link> guide for fields with non-string types like numbers and dates.
+
+## Next steps
+
+After migrating your first form, read the <Link href="/solid/guides/define-your-form/">define your form</Link> and <Link href="/solid/guides/validation/">validation</Link> guides to get the most out of the schema-first approach, and the <Link href="/solid/guides/form-methods/">form methods</Link> guide for the full set of methods to read and manipulate form state. If your forms use custom input components, the <Link href="/solid/guides/input-components/">input components</Link> guide shows how to port them cleanly.

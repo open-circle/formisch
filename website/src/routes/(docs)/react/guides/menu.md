@@ -26,3 +26,9 @@
 - [Field arrays](/react/guides/field-arrays/)
 - [TypeScript](/react/guides/typescript/)
 - [Architecture](/react/guides/architecture/)
+
+## Migration guides
+
+- [From React Hook Form](/react/guides/migrate-from-react-hook-form/)
+- [From TanStack Form](/react/guides/migrate-from-tanstack-form/)
+- [From Formik](/react/guides/migrate-from-formik/)

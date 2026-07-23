@@ -19,6 +19,42 @@ describe('insert', () => {
     }
   });
 
+  test('should default a new item without input to its empty input', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [{ name: 'a' }] } }
+    );
+
+    insert(store, { path: ['items'] });
+
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+    if (itemsStore.kind === 'array') {
+      const newItem = itemsStore.children[1];
+      if (newItem.kind === 'object') {
+        expect(newItem.children.name.input.value).toBe('');
+      }
+    }
+  });
+
+  test('should apply configured empty input to a new item', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ score: v.number() })) }),
+      { initialInput: { items: [{ score: 1 }] }, emptyInput: { number: 0 } }
+    );
+
+    insert(store, { path: ['items'] });
+
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+    if (itemsStore.kind === 'array') {
+      const newItem = itemsStore.children[1];
+      if (newItem.kind === 'object') {
+        expect(newItem.children.score.input.value).toBe(0);
+      }
+    }
+  });
+
   test('should insert item at specific index and shift children', () => {
     const store = createTestStore(v.object({ items: v.array(v.string()) }), {
       initialInput: { items: ['a', 'b'] },
@@ -63,7 +99,7 @@ describe('insert', () => {
     expect(itemsStore.kind).toBe('array');
     if (itemsStore.kind === 'array') {
       // Pre-initialize slot at index 2 and also at index 0 to make resetItemState branch execute
-      initializeChildSlot(itemsStore, 2);
+      initializeChildSlot(store, itemsStore, 2);
 
       // Store reference to original child at index 0
       const originalChild = itemsStore.children[0];

@@ -74,6 +74,7 @@ export function replace<
 
       // Replace input of field array item
       resetItemState(
+        internalFormStore,
         internalArrayStore.children[config.at],
         config.initialInput
       );

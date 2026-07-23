@@ -114,7 +114,7 @@ export function TextInput({ label, input, errors, ...props }: TextInputProps) {
         name={name}
         id={name}
         required={required}
-        value={input}
+        value={input ?? ''}
         aria-invalid={!!errors}
         aria-errormessage={`${name}-error`}
       />

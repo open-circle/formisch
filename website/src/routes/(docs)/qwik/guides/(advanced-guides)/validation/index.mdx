@@ -75,7 +75,7 @@ const LoginSchema = v.object({
 export default component$(() => {
   const loginForm = useForm$(() => ({
     schema: LoginSchema,
-    validate: 'input',
+    validate: 'change',
   }));
 
   return (
@@ -98,6 +98,48 @@ export default component$(() => {
 ```
 
 `isEdited` is the right flag for this. `isTouched` would reveal the error as soon as the user tabs through a field without changing it, and `isDirty` would hide the error again if the user clears an invalid value back to its initial state. `isEdited` avoids both: it turns on only after a real change and stays on. Pair it with `validate: 'input'` (or `'change'`) so the error appears as soon as the field becomes invalid, and with `isSubmitted` so that the errors of all fields — including the ones the user never touched — become visible after a submit attempt.
+
+### Reuse the guard across fields
+
+Writing this guard at every field gets repetitive. The common fix is to move it into a small reusable component, either on its own or folded into the `TextInput` from the <Link href="/qwik/guides/input-components/">input components</Link> guide, so the `isEdited || isSubmitted` logic lives in exactly one place:
+
+```tsx
+import { component$, type ReadonlySignal } from '@qwik.dev/core';
+
+interface FieldErrorProps {
+  errors: ReadonlySignal<[string, ...string[]] | null>;
+  isEdited: ReadonlySignal<boolean>;
+  isSubmitted: ReadonlySignal<boolean>;
+}
+
+export const FieldError = component$<FieldErrorProps>(
+  ({ errors, isEdited, isSubmitted }) => {
+    if (!errors.value || (!isEdited.value && !isSubmitted.value)) {
+      return null;
+    }
+    return <div>{errors.value[0]}</div>;
+  }
+);
+```
+
+Each field then stays focused on its input:
+
+```tsx
+<Field
+  of={loginForm}
+  path={['email']}
+  render$={(field) => (
+    <div>
+      <input {...field.props} value={field.input.value} type="email" />
+      <FieldError
+        errors={field.errors}
+        isEdited={field.isEdited}
+        isSubmitted={loginForm.isSubmitted}
+      />
+    </div>
+  )}
+/>
+```
 
 ## Validating state
 

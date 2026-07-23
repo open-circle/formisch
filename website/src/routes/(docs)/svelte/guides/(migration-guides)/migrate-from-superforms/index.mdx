@@ -1,0 +1,401 @@
+---
+title: Migrate from Superforms
+description: >-
+  Learn how to migrate your forms from Superforms to Formisch. This guide
+  compares both APIs side by side and walks you through the migration one
+  step at a time.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from Superforms
+
+This guide walks you through migrating a form from [Superforms](https://superforms.rocks) to Formisch. It covers the mental-model differences, shows the same form implemented in both libraries, and maps the Superforms API to its Formisch equivalents.
+
+Migrating is a rewrite of the form layer, not a drop-in replacement. Superforms is built around SvelteKit's server form actions, while Formisch is a pure client-side form layer. Migration typically means moving validation and submission out of `+page.server.ts` actions into client-side handlers, or wiring server validation separately. The good news: if you already validate with Valibot, your schemas carry over unchanged.
+
+Both libraries can coexist in the same application, so you can migrate one form at a time instead of rewriting everything at once.
+
+## Key differences
+
+The biggest shift is where the form lives. Superforms is server-first: you initialize the form with `superValidate` in a `load` function, post to a form action, and connect the client with `superForm` and `use:enhance`. Even in SPA mode, the API keeps this server-shaped structure with a `SuperValidated` object and an `onUpdate` event. Formisch is client-first: you call the <Link href="/svelte/api/createForm/">`createForm`</Link> rune directly in your component, and there is no `load` function, form action, or adapter involved. Dedicated SvelteKit integration is planned for one of the next releases; until then, server validation is something you wire up separately, for example by parsing the same Valibot schema in an API endpoint.
+
+Beyond that, three differences shape the migration:
+
+- **Schema handling**: Both libraries are schema-based, but Superforms supports many schema libraries through adapters like `valibot(schema)` and `valibotClient(schema)`. Formisch supports only Valibot and takes the schema directly, without an adapter. The schema is the single source of truth for types, validation, and form structure at once.
+- **Validation location and timing**: Superforms validates on the server by default, and client-side validation is opt-in via the `validators` option with timing controlled by `validationMethod`. Formisch always validates on the client against your schema, and timing is controlled by the `validate` and `revalidate` config.
+- **Reactivity**: Superforms exposes Svelte stores that hold the whole form, like `$form`, `$errors`, and `$tainted`, and you connect inputs with `bind:value={$form.email}`. Formisch is headless with fine-grained per-field reactivity: the <Link href="/svelte/api/Field/">`Field`</Link> component and <Link href="/svelte/api/useField/">`useField`</Link> rune expose a store for a single field, and you connect inputs by spreading `field.props`. Nested data works out of the box through path arrays, so there is no equivalent of the `dataType: 'json'` option.
+
+One trade-off to be aware of: because Formisch runs entirely on the client, your forms no longer submit without JavaScript. If progressive enhancement through form actions is a hard requirement, Superforms remains the better fit for that form.
+
+## Side-by-side example
+
+The following login form has two validated fields and a submit handler. Both versions use the same Valibot schema.
+
+### Superforms
+
+Superforms splits the form across three files: the shared schema, the server route with the `load` function and form action, and the page component.
+
+```ts
+// src/lib/schemas.ts
+import * as v from 'valibot';
+
+export const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+```
+
+```ts
+// src/routes/login/+page.server.ts
+import { LoginSchema } from '$lib/schemas';
+import { fail } from '@sveltejs/kit';
+import { superValidate } from 'sveltekit-superforms';
+import { valibot } from 'sveltekit-superforms/adapters';
+
+export const load = async () => {
+  const form = await superValidate(valibot(LoginSchema));
+  return { form };
+};
+
+export const actions = {
+  default: async ({ request }) => {
+    const form = await superValidate(request, valibot(LoginSchema));
+    if (!form.valid) {
+      return fail(400, { form });
+    }
+    // Log in the user with form.data
+    return { form };
+  },
+};
+```
+
+```svelte
+<!-- src/routes/login/+page.svelte -->
+<script lang="ts">
+  import { superForm } from 'sveltekit-superforms';
+  import { valibotClient } from 'sveltekit-superforms/adapters';
+  import { LoginSchema } from '$lib/schemas';
+
+  let { data } = $props();
+
+  const { form, errors, enhance, submitting } = superForm(data.form, {
+    validators: valibotClient(LoginSchema),
+  });
+</script>
+
+<form method="POST" use:enhance>
+  <input
+    type="email"
+    name="email"
+    aria-invalid={$errors.email ? 'true' : undefined}
+    bind:value={$form.email}
+  />
+  {#if $errors.email}<div>{$errors.email}</div>{/if}
+
+  <input
+    type="password"
+    name="password"
+    aria-invalid={$errors.password ? 'true' : undefined}
+    bind:value={$form.password}
+  />
+  {#if $errors.password}<div>{$errors.password}</div>{/if}
+
+  <button disabled={$submitting}>Login</button>
+</form>
+```
+
+### Formisch
+
+The same form in Formisch is a single component. The schema stays exactly the same.
+
+```svelte
+<!-- src/routes/login/+page.svelte -->
+<script lang="ts">
+  import { createForm, Field, Form } from '@formisch/svelte';
+  import type { SubmitHandler } from '@formisch/svelte';
+  import * as v from 'valibot';
+
+  const LoginSchema = v.object({
+    email: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your email.'),
+      v.email('The email address is badly formatted.')
+    ),
+    password: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your password.'),
+      v.minLength(8, 'Your password must have 8 characters or more.')
+    ),
+  });
+
+  const loginForm = createForm({
+    schema: LoginSchema,
+    validate: 'blur',
+    revalidate: 'input',
+  });
+
+  const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+    // Log in the user with the validated values
+    await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+  };
+</script>
+
+<Form of={loginForm} onsubmit={submitForm}>
+  <Field of={loginForm} path={['email']}>
+    {#snippet children(field)}
+      <input {...field.props} value={field.input} type="email" />
+      {#if field.errors}<div>{field.errors[0]}</div>{/if}
+    {/snippet}
+  </Field>
+
+  <Field of={loginForm} path={['password']}>
+    {#snippet children(field)}
+      <input {...field.props} value={field.input} type="password" />
+      {#if field.errors}<div>{field.errors[0]}</div>{/if}
+    {/snippet}
+  </Field>
+
+  <button type="submit" disabled={loginForm.isSubmitting}>Login</button>
+</Form>
+```
+
+## Migration steps
+
+### Install Formisch
+
+Install the Svelte package of Formisch. If you used the Valibot adapter with Superforms, Valibot is already installed; otherwise add it as well, since it is a peer dependency.
+
+```bash
+npm install @formisch/svelte valibot
+```
+
+You can keep `sveltekit-superforms` installed while you migrate form by form and remove it at the end.
+
+### Move validation into a Valibot schema
+
+If your Superforms setup already uses Valibot, your schemas carry over unchanged. Just drop the adapter: instead of wrapping the schema in `valibot(...)` or `valibotClient(...)`, you pass it directly to <Link href="/svelte/api/createForm/">`createForm`</Link>. If you used Zod or another schema library, rewrite the schema in Valibot. Most validations translate one to one.
+
+```ts
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.nonEmpty(), v.email()),
+  password: v.pipe(v.string(), v.nonEmpty(), v.minLength(8)),
+});
+```
+
+Define the fields in the same order they appear in your form, since Formisch focuses the first invalid field on submit based on the schema order. See the <Link href="/svelte/guides/define-your-form/">define your form</Link> guide for details on how the schema shapes your form.
+
+### Replace the form setup
+
+Remove the `superValidate` call from your `load` function and the `data.form` plumbing, and replace `superForm` with the <Link href="/svelte/api/createForm/">`createForm`</Link> rune. Initial values that previously came from the `load` function move into the `initialInput` config.
+
+```svelte
+<script lang="ts">
+  import { createForm } from '@formisch/svelte';
+
+  const loginForm = createForm({
+    schema: LoginSchema,
+    initialInput: {
+      email: 'user@example.com',
+    },
+  });
+</script>
+```
+
+If your Superforms form used client-side `validators`, carry the timing over with `validate: 'blur'` and `revalidate: 'input'`, as explained in the <Link href="#validation-timing">validation timing</Link> section below. Without these options, Formisch validates on submit first and then revalidates on every input.
+
+The form store returned by <Link href="/svelte/api/createForm/">`createForm`</Link> replaces the destructured stores of `superForm`: you access field state through the <Link href="/svelte/api/Field/">`Field`</Link> component and form state through properties like `loginForm.isSubmitting`.
+
+### Replace field bindings
+
+In Superforms, inputs bind to the central form store with `bind:value={$form.email}` and read errors from `$errors.email`. In Formisch, you wrap each input in a <Link href="/svelte/api/Field/">`Field`</Link> component, spread `field.props` onto the element, and set its `value` from `field.input`. The `name` attribute and all event handlers are included in `field.props`.
+
+```svelte
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <input {...field.props} value={field.input} type="email" />
+    {#if field.errors}<div>{field.errors[0]}</div>{/if}
+  {/snippet}
+</Field>
+```
+
+The `path` property is an array of keys, so nested fields like `$form.user.email` become `path={['user', 'email']}` without any `dataType: 'json'` configuration. For fields with a non-string schema like `v.number()` or `v.boolean()`, see the <Link href="/svelte/guides/controlled-fields/">controlled fields</Link> and <Link href="/svelte/guides/special-inputs/">special inputs</Link> guides.
+
+### Update submission handling
+
+Replace the form action and `use:enhance` with the <Link href="/svelte/api/Form/">`Form`</Link> component and its `onsubmit` property. Where Superforms posts to a form action and processes the result in `onUpdate` or `onUpdated`, Formisch validates on the client and calls your handler with the typed output of your schema. Logic from your form action moves into this handler, for example as a `fetch` call to an API endpoint.
+
+```svelte
+<script lang="ts">
+  import type { SubmitHandler } from '@formisch/svelte';
+
+  const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+    await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+  };
+</script>
+
+<Form of={loginForm} onsubmit={submitForm}>
+  <!-- fields -->
+  <button type="submit">Login</button>
+</Form>
+```
+
+If you still need server-side validation, parse the submitted data in your endpoint with the same Valibot schema. This keeps a single source of truth for both sides. See the <Link href="/svelte/guides/handle-submission/">handle submission</Link> guide for async submission and error handling patterns.
+
+## API mapping
+
+| Superforms                                 | Formisch                                                                                |
+| ------------------------------------------ | --------------------------------------------------------------------------------------- |
+| `superValidate(valibot(schema))` in `load` | Not needed, <Link href="/svelte/api/createForm/">`createForm`</Link> runs on the client |
+| `superForm(data.form, options)`            | <Link href="/svelte/api/createForm/">`createForm`</Link> rune                           |
+| `defaults(valibot(schema))`                | `initialInput` config of <Link href="/svelte/api/createForm/">`createForm`</Link>       |
+| `validators: valibotClient(schema)`        | `schema` config, validation always comes from the schema                                |
+| `validationMethod`                         | `validate` / `revalidate` config                                                        |
+| `dataType: 'json'`                         | Not needed, path arrays support nested data                                             |
+| `bind:value={$form.email}`                 | <Link href="/svelte/api/Field/">`Field`</Link> with `field.props` and `field.input`     |
+| `$errors.email`                            | `field.errors`                                                                          |
+| `$allErrors`                               | <Link href="/methods/api/getDeepErrorEntries/">`getDeepErrorEntries`</Link>             |
+| `$constraints`                             | No equivalent (see notes)                                                               |
+| `use:enhance` with form action             | <Link href="/svelte/api/Form/">`Form`</Link> with `onsubmit`                            |
+| `onUpdate` / `onUpdated` events            | <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link> passed to `onsubmit`       |
+| `$submitting`                              | `form.isSubmitting`                                                                     |
+| `$delayed` / `$timeout`                    | No equivalent (see notes)                                                               |
+| `$posted`                                  | `form.isSubmitted`                                                                      |
+| `$tainted` / `isTainted('email')`          | `field.isDirty` / <Link href="/methods/api/isDirty/">`isDirty`</Link>                   |
+| `reset({ data, newState })`                | <Link href="/methods/api/reset/">`reset`</Link> with `initialInput`                     |
+| `validateForm()` / `validate('email')`     | <Link href="/methods/api/validate/">`validate`</Link>                                   |
+| `submit()`                                 | <Link href="/methods/api/submit/">`submit`</Link>                                       |
+| `setError(form, 'email', message)`         | <Link href="/methods/api/setErrors/">`setErrors`</Link>                                 |
+| `$message` / `setMessage`                  | No equivalent (see notes)                                                               |
+| `taintedMessage`                           | No equivalent (see notes)                                                               |
+
+A few entries have no direct counterpart:
+
+- **`$constraints`**: Superforms derives HTML validation attributes like `required` and `minlength` from the schema. Formisch validates at runtime against the schema instead and does not generate constraint attributes. Set attributes like `required` on your inputs yourself where you want them for accessibility or styling.
+- **`$delayed` / `$timeout`**: Formisch exposes `isSubmitting` and `isValidating` but has no built-in loading timers. If you need a delayed spinner, wrap `form.isSubmitting` in your own timer logic.
+- **`$message` / `setMessage`**: Status messages are not form state in Formisch. Use regular Svelte state that you set in your submit handler.
+- **`taintedMessage`**: There is no built-in navigation guard. You can build one with SvelteKit's `beforeNavigate` and the <Link href="/methods/api/isDirty/">`isDirty`</Link> method.
+- **`validate('email')`**: Formisch has no partial validation. The <Link href="/methods/api/validate/">`validate`</Link> method always parses the whole form against the schema, which keeps cross-field rules correct, and then distributes the errors to the individual fields.
+
+## Common patterns
+
+### Form state
+
+Superforms spreads form state across several stores like `$submitting`, `$posted`, and `$tainted` with the `isTainted` helper. In Formisch, the form store exposes reactive properties directly: `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors`. Each field offers per-field `isTouched`, `isEdited`, `isDirty`, and `isValid` counterparts.
+
+```svelte
+<button type="submit" disabled={loginForm.isSubmitting || !loginForm.isDirty}>
+  {loginForm.isSubmitting ? 'Saving...' : 'Save'}
+</button>
+```
+
+To check the dirty state of a single field outside of a <Link href="/svelte/api/Field/">`Field`</Link> component, like `isTainted('email')` in Superforms, use the <Link href="/methods/api/isDirty/">`isDirty`</Link> method. Wrap the call in `$derived` so it stays reactive:
+
+```ts
+import { isDirty } from '@formisch/svelte';
+
+const emailIsDirty = $derived(isDirty(loginForm, { path: ['email'] }));
+```
+
+### Validation timing
+
+The `validationMethod` option of Superforms maps onto the `validate` and `revalidate` config of <Link href="/svelte/api/createForm/">`createForm`</Link>. The default `'auto'` behavior, where a field is first checked on blur and then re-checked on input once it has errors, corresponds to `validate: 'blur'` with `revalidate: 'input'`:
+
+```ts
+const loginForm = createForm({
+  schema: LoginSchema,
+  validate: 'blur', // 'onblur' part of Superforms 'auto'
+  revalidate: 'input', // 'oninput' part of Superforms 'auto'
+});
+```
+
+`'oninput'` maps to `validate: 'input'`, `'onblur'` to `validate: 'blur'`, and `'onsubmit'` to `validate: 'submit'`, which is the Formisch default. Note that `validate` and `revalidate` control when validation runs, not when errors are shown. The <Link href="/svelte/guides/validation/">validation</Link> guide shows how to reveal errors at the right time using flags like `field.isEdited` and `form.isSubmitted`.
+
+### Field arrays
+
+In Superforms, dynamic arrays require `dataType: 'json'`, an `{#each}` loop over `$form.tags`, and manual array mutations like `$form.tags = [...$form.tags, { name: '' }]`. Formisch provides the <Link href="/svelte/api/FieldArray/">`FieldArray`</Link> component, which exposes stable `items` keys for the `{#each}` block, together with methods like <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/move/">`move`</Link>, and <Link href="/methods/api/swap/">`swap`</Link>:
+
+```svelte
+<script lang="ts">
+  import { Field, FieldArray, insert } from '@formisch/svelte';
+</script>
+
+<FieldArray of={todoForm} path={['todos']}>
+  {#snippet children(fieldArray)}
+    {#each fieldArray.items as item, index (item)}
+      <Field of={todoForm} path={['todos', index, 'label']}>
+        {#snippet children(field)}
+          <input {...field.props} value={field.input} type="text" />
+        {/snippet}
+      </Field>
+    {/each}
+  {/snippet}
+</FieldArray>
+
+<button
+  type="button"
+  onclick={() =>
+    insert(todoForm, { path: ['todos'], initialInput: { label: '' } })}
+>
+  Add todo
+</button>
+```
+
+See the <Link href="/svelte/guides/field-arrays/">field arrays</Link> guide for the full API.
+
+### Reset
+
+The `reset()` method of Superforms maps to the <Link href="/methods/api/reset/">`reset`</Link> method of Formisch. Calling it without a config restores the initial values. Passing `initialInput` replaces the baseline, which covers both the `data` and `newState` options of Superforms at once, since future resets will use the new values:
+
+```ts
+import { reset } from '@formisch/svelte';
+
+// Reset to the initial values
+reset(loginForm);
+
+// Reset to new values that become the new baseline
+reset(loginForm, { initialInput: { email: 'new@example.com' } });
+```
+
+There is no `resetForm` option because Formisch does not reset the form after submission by default. If you want that behavior, call <Link href="/methods/api/reset/">`reset`</Link> at the end of your submit handler.
+
+### Special inputs
+
+Superforms binds special input types directly to the `$form` store, for example with `bind:checked={$form.cookies}` for a checkbox. In Formisch, you spread `field.props` and set the state attribute that matches the input type:
+
+```svelte
+<Field of={form} path={['cookies']}>
+  {#snippet children(field)}
+    <label>
+      <input {...field.props} type="checkbox" checked={field.input} />
+      Yes, I want cookies
+    </label>
+  {/snippet}
+</Field>
+```
+
+Checkboxes, radio buttons, selects and file inputs are covered in the <Link href="/svelte/guides/special-inputs/">special inputs</Link> guide. One thing to watch out for: Formisch's event handlers read values from the DOM as strings, so fields with a non-string schema like `v.number()` or `v.date()` must be controlled as described in the <Link href="/svelte/guides/controlled-fields/">controlled fields</Link> guide.
+
+## Next steps
+
+You now have everything you need to migrate your forms. To deepen your understanding of Formisch, work through the main concepts starting with <Link href="/svelte/guides/define-your-form/">define your form</Link> and <Link href="/svelte/guides/add-form-fields/">add form fields</Link>. The <Link href="/svelte/guides/validation/">validation</Link> guide covers error display in depth, the <Link href="/svelte/guides/form-methods/">form methods</Link> guide lists all available methods, and the <Link href="/svelte/guides/controlled-fields/">controlled fields</Link> guide explains how to handle non-string values.

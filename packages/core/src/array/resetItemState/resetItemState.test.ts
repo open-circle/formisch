@@ -21,7 +21,7 @@ describe('resetItemState', () => {
       nameStore.errors.value = ['Error'];
       nameStore.elements = [document.createElement('input')];
 
-      resetItemState(nameStore, 'reset-value');
+      resetItemState(store, nameStore, 'reset-value');
 
       expect(nameStore.input.value).toBe('reset-value');
       expect(nameStore.startInput.value).toBe('reset-value');
@@ -41,7 +41,7 @@ describe('resetItemState', () => {
       const nameStore = store.children.name;
       nameStore.input.value = 'modified';
 
-      resetItemState(nameStore, undefined);
+      resetItemState(store, nameStore, undefined);
 
       expect(nameStore.input.value).toBe(undefined);
       expect(nameStore.startInput.value).toBe(undefined);
@@ -64,7 +64,7 @@ describe('resetItemState', () => {
         userStore.children.name.isTouched.value = true;
         userStore.children.age.input.value = 99;
 
-        resetItemState(userStore, { name: 'Jane', age: 25 });
+        resetItemState(store, userStore, { name: 'Jane', age: 25 });
 
         expect(userStore.input.value).toBe(true);
         expect(userStore.startInput.value).toBe(true);
@@ -85,7 +85,7 @@ describe('resetItemState', () => {
       expect(userStore.kind).toBe('object');
 
       if (userStore.kind === 'object') {
-        resetItemState(userStore, null);
+        resetItemState(store, userStore, null);
 
         expect(userStore.input.value).toBe(null);
         expect(userStore.startInput.value).toBe(null);
@@ -107,7 +107,7 @@ describe('resetItemState', () => {
         itemsStore.children[0].input.value = 'modified';
         itemsStore.isTouched.value = true;
 
-        resetItemState(itemsStore, ['x', 'y', 'z']);
+        resetItemState(store, itemsStore, ['x', 'y', 'z']);
 
         expect(itemsStore.input.value).toBe(true);
         expect(itemsStore.isTouched.value).toBe(false);
@@ -127,7 +127,7 @@ describe('resetItemState', () => {
       expect(itemsStore.kind).toBe('array');
 
       if (itemsStore.kind === 'array') {
-        resetItemState(itemsStore, null);
+        resetItemState(store, itemsStore, null);
 
         expect(itemsStore.items.value).toEqual([]);
         expect(itemsStore.startItems.value).toEqual([]);
@@ -147,7 +147,7 @@ describe('resetItemState', () => {
       expect(itemsStore.kind).toBe('array');
 
       if (itemsStore.kind === 'array') {
-        resetItemState(itemsStore, null);
+        resetItemState(store, itemsStore, null);
 
         expect(itemsStore.items.value).toEqual([]);
         // A nullish array preserves the explicit nullish value
@@ -166,7 +166,7 @@ describe('resetItemState', () => {
       if (itemsStore.kind === 'array') {
         const originalId = itemsStore.items.value[0];
 
-        resetItemState(itemsStore, ['new']);
+        resetItemState(store, itemsStore, ['new']);
 
         expect(itemsStore.items.value[0]).not.toBe(originalId);
       }
@@ -182,7 +182,7 @@ describe('resetItemState', () => {
       const nameStore = store.children.name;
       nameStore.errors.value = ['Error'];
 
-      resetItemState(nameStore, 'Jane', true);
+      resetItemState(store, nameStore, 'Jane', true);
 
       // Current input is updated and errors are cleared, but the start input is
       // preserved so the field is still detected as dirty
@@ -202,7 +202,7 @@ describe('resetItemState', () => {
       if (itemsStore.kind === 'array') {
         const startItems = itemsStore.startItems.value;
 
-        resetItemState(itemsStore, ['x', 'y', 'z'], true);
+        resetItemState(store, itemsStore, ['x', 'y', 'z'], true);
 
         // Current items grow to the new length while the start items are kept
         expect(itemsStore.items.value.length).toBe(3);
@@ -223,7 +223,7 @@ describe('resetItemState', () => {
       // Precondition: the store owns its array (elements === initialElements)
       expect(field.elements).toBe(field.initialElements);
 
-      resetItemState(field, 'b');
+      resetItemState(store, field, 'b');
 
       // Both stay the same (empty) array, so an element registered on remount
       // is reflected in initialElements for a later reset
@@ -244,7 +244,7 @@ describe('resetItemState', () => {
       field.elements = [document.createElement('input')];
       expect(field.elements).not.toBe(field.initialElements);
 
-      resetItemState(field, 'b');
+      resetItemState(store, field, 'b');
 
       // The reorder home baseline is preserved
       expect(field.initialElements).toBe(home);
@@ -262,7 +262,7 @@ describe('resetItemState', () => {
 
       if (itemsStore.kind === 'array') {
         // Reset with more items than children exist
-        resetItemState(itemsStore, ['x', 'y', 'z']);
+        resetItemState(store, itemsStore, ['x', 'y', 'z']);
 
         // Should initialize missing children so every item has a field store
         expect(itemsStore.items.value.length).toBe(3);
@@ -286,7 +286,9 @@ describe('resetItemState', () => {
       if (pairStore.kind === 'array') {
         // Reset with more items than the tuple defines (tuples have no
         // `schema.item`, so the extra entry must not be initialized)
-        expect(() => resetItemState(pairStore, ['x', 2, 3])).not.toThrow();
+        expect(() =>
+          resetItemState(store, pairStore, ['x', 2, 3])
+        ).not.toThrow();
 
         // The tuple keeps its fixed length, ignoring the extra entry
         expect(pairStore.items.value).toHaveLength(2);
@@ -307,20 +309,21 @@ describe('resetItemState', () => {
 
       if (pairStore.kind === 'array') {
         // Reset without input, e.g. replacing an item that omits the tuple key
-        resetItemState(pairStore, undefined);
+        resetItemState(store, pairStore, undefined);
 
-        // The tuple stays present with its fixed children reset to undefined,
+        // The tuple stays present with its fixed children reset to their empty
+        // input (an empty string for the string, undefined for the number),
         // instead of collapsing to an empty array
         expect(pairStore.input.value).toBe(true);
         expect(pairStore.items.value).toHaveLength(2);
         expect(pairStore.children).toHaveLength(2);
-        expect(pairStore.children[0].input.value).toBeUndefined();
+        expect(pairStore.children[0].input.value).toBe('');
         expect(pairStore.children[1].input.value).toBeUndefined();
 
-        // An explicit null input normalizes to undefined children too, so it
-        // stays consistent with the initial state
-        resetItemState(pairStore, null);
-        expect(pairStore.children[0].input.value).toBeUndefined();
+        // An explicit null input normalizes to the empty input too, so it stays
+        // consistent with the initial state
+        resetItemState(store, pairStore, null);
+        expect(pairStore.children[0].input.value).toBe('');
         expect(pairStore.children[1].input.value).toBeUndefined();
       }
     });

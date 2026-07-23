@@ -1,5 +1,6 @@
 import { batch, untrack } from '../../framework/index.ts';
 import type { InternalFieldStore } from '../../types/index.ts';
+import { walkFieldStore } from '../walkFieldStore/index.ts';
 
 /**
  * Sets the specified boolean property for the field store and all nested
@@ -16,28 +17,13 @@ export function setFieldBool(
 ): void {
   // Batch all state updates for optimal reactivity performance
   batch(() => {
-    // Set property on current field
-    internalFieldStore[type].value = bool;
-
-    // If field store is array, set property on children
-    if (internalFieldStore.kind === 'array') {
-      // Set property on each array item
-      for (
-        let index = 0;
-        index < untrack(() => internalFieldStore.items.value).length;
-        index++
-      ) {
-        // Recursively set property on child
-        setFieldBool(internalFieldStore.children[index], type, bool);
-      }
-
-      // Otherwise, if field store is object, set property on children
-    } else if (internalFieldStore.kind === 'object') {
-      // Set property on each object property
-      for (const key in internalFieldStore.children) {
-        // Recursively set property on child
-        setFieldBool(internalFieldStore.children[key], type, bool);
-      }
-    }
+    // Untracked to avoid subscribing a surrounding reactive scope to the
+    // form structure
+    untrack(() => {
+      // Set property on each field store
+      walkFieldStore(internalFieldStore, (internalFieldStore) => {
+        internalFieldStore[type].value = bool;
+      });
+    });
   });
 }
