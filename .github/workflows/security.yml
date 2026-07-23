@@ -4,6 +4,15 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Advisories are published without code changes, so also scan on a daily
+  # schedule instead of only when a push or pull request happens to run
+  schedule:
+    - cron: '30 5 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   scan:
@@ -14,20 +23,61 @@ jobs:
       security-events: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Scan for vulnerabilities
-        uses: OWASP/cve-lite-cli@b75564dad3a775a44be45dbf722c3aeb1b9ac22e # v1.19.2
+        uses: OWASP/cve-lite-cli@631eac57629e8d37a6821da3269467fd9224c905 # v1.27.0
         with:
           path: .
           fail-on: critical
           verbose: 'true'
           sarif: 'true'
+          # Pinned because the scan gates merges; bump deliberately
+          version: '1.27.0'
+
+      # The CLI writes a timestamped SARIF file, anchors every result at
+      # pnpm-lock.yaml line 1, and stamps per-CVE partialFingerprints that
+      # differ between runs, so code scanning never matches alerts across
+      # runs and reports everything as new. Copy to a stable filename and
+      # point each finding at the lockfile line of its affected
+      # package@version (the first token of the message). The upload action
+      # then computes content-based fingerprints that are distinct per
+      # finding and stable across runs, and alerts link to the actual
+      # lockfile entry. Findings whose package cannot be located keep a
+      # deterministic fingerprint as fallback so they never collapse into
+      # one alert.
+      - name: Normalize SARIF report
+        id: sarif
+        if: always()
+        run: |
+          file=$(ls -t cve-lite-scan-*.sarif 2>/dev/null | head -n 1 || true)
+          if [[ -n "$file" ]]; then
+            jq --rawfile lock pnpm-lock.yaml '
+              ($lock | split("\n")) as $lines |
+              .runs[]?.results[]? |= (
+                ((.message.text // "") | split(" ") | first // "") as $pv |
+                ([$lines | to_entries[]
+                  | select($pv != "" and (.value
+                      | sub("^ +"; "") | ltrimstr("\u0027")
+                      | startswith($pv)))
+                  | .key] | first) as $idx |
+                if $idx != null then
+                  (.locations[0].physicalLocation.region =
+                    { startLine: ($idx + 1) })
+                  | del(.partialFingerprints)
+                else
+                  .partialFingerprints =
+                    { primaryLocationLineHash:
+                        ((.ruleId // "unknown") + ":" + $pv) }
+                end
+              )' "$file" > cve-lite.sarif
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Upload SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
-        if: always()
+        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        if: always() && steps.sarif.outputs.exists == 'true'
         with:
-          sarif_file: ${{ github.workspace }}
+          sarif_file: cve-lite.sarif
