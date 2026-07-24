@@ -53,19 +53,23 @@ const DOC_PATHS_PATTERN = DOC_PATHS.map((docPath) =>
   docPath.replaceAll('/', '\\/')
 ).join('|');
 
+// Characters allowed in a page name. Besides word characters, dots and
+// hyphens, this includes `$` so that Qwik pages such as `useForm$` are matched.
+const PAGE_NAME = '[\\w$.-]';
+
 // Path of documentation pages and their Markdown version. The first group
 // captures the path prefix (e.g. `react/api` or `blog`), the second the page
 // name and the third the optional ".md" suffix, including the naive "/.md"
 // suffix that agents produce by appending ".md" to a page URL that ends with a
 // trailing slash.
 export const DOCS_PATH_REGEX = new RegExp(
-  `^\\/(${DOC_PATHS_PATTERN})\\/([\\w.-]+?)(\\.md|\\/\\.md)?\\/?$`
+  `^\\/(${DOC_PATHS_PATTERN})\\/(${PAGE_NAME}+?)(\\.md|\\/\\.md)?\\/?$`
 );
 
 // Path prefix and page name of a documentation page. Matched case-insensitively
 // as our static assets are case-sensitive but agents may guess the casing.
 export const AREA_PATH_REGEX = new RegExp(
-  `^(${DOC_PATHS_PATTERN})\\/([\\w.-]+)$`,
+  `^(${DOC_PATHS_PATTERN})\\/(${PAGE_NAME}+)$`,
   'i'
 );
 

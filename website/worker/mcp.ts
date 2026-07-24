@@ -417,8 +417,8 @@ async function executeGetDoc(
     return notFound(input.path, pageName.toLowerCase(), index);
   }
 
-  // Resolve a bare name like "focus" or "useForm" via the search index
-  if (/^[\w.-]+$/.test(cleanPath)) {
+  // Resolve a bare name like "focus" or "useForm$" via the search index
+  if (/^[\w$.-]+$/.test(cleanPath)) {
     const name = cleanPath.toLowerCase();
     const matches = index.filter((entry) => entry.lower.name === name);
     if (matches.length) {

@@ -45,7 +45,7 @@ const detailsText =
 // Regular expression to rewrite links to documentation pages to their Markdown
 // version so that AI agents stay within the Markdown context
 const DOC_LINK_REGEX = new RegExp(
-  `\\]\\(\\/(${DOC_PATHS.map((docPath) => docPath.replaceAll('/', '\\/')).join('|')})\\/([\\w.-]+?)\\/(#[^)]*)?\\)`,
+  `\\]\\(\\/(${DOC_PATHS.map((docPath) => docPath.replaceAll('/', '\\/')).join('|')})\\/([\\w$.-]+?)\\/(#[^)]*)?\\)`,
   'g'
 );
 
@@ -63,7 +63,7 @@ function convertMenuToLlms(markdown: string): string {
       .replaceAll(/^#/gm, '##')
       // Replace relative paths with URLs to Markdown files
       .replaceAll(
-        /\(\/([\w-]+)\/([\w-]+)\/([\w-]+)\/\)/gm,
+        /\(\/([\w-]+)\/([\w-]+)\/([\w$-]+)\/\)/gm,
         `(${ORIGIN}/$1/$2/$3.md)`
       )
   );
@@ -105,7 +105,7 @@ function extractFilePathsOfMenu(
     };
 
     // Extract file paths from group using regex
-    const filePaths = group.matchAll(/\(\/([\w-]+)\/([\w-]+)\/([\w-]+)\/\)/gm);
+    const filePaths = group.matchAll(/\(\/([\w-]+)\/([\w-]+)\/([\w$-]+)\/\)/gm);
 
     // Add data of each file path to group data
     for (const regexMatch of filePaths) {
@@ -249,7 +249,7 @@ async function convertMdxToMd(
         /<Property\s+\{\.\.\.properties(?:\.([\w$]+)|\['([^']+)'\])\}\s*\/>/g,
         (_match, dotName: string | undefined, bracketName: string) => {
           const name = dotName ?? bracketName;
-          const data = properties[name];
+          const data = properties[name] as PropertyProps | undefined;
           if (!data) {
             throw new Error(`Missing property "${name}" in ${dirPath}`);
           }
@@ -488,8 +488,9 @@ for (const framework of FRAMEWORKS) {
             area: file.area,
             group: areaGroup.title,
             name: file.name,
-            title: (frontmatter.data.title as string) ?? file.name,
-            description: (frontmatter.data.description as string) ?? '',
+            title: (frontmatter.data.title as string | undefined) ?? file.name,
+            description:
+              (frontmatter.data.description as string | undefined) ?? '',
             excerpt: paragraphs[1]?.slice(0, 400) ?? '',
             headings: extractHeadings(mdContent),
           });
@@ -586,8 +587,8 @@ for (const blogGroup of groupsOfBlog) {
       area: 'blog',
       group: blogGroup.title,
       name: post.name,
-      title: (frontmatter.data.title as string) ?? post.name,
-      description: (frontmatter.data.description as string) ?? '',
+      title: (frontmatter.data.title as string | undefined) ?? post.name,
+      description: (frontmatter.data.description as string | undefined) ?? '',
       excerpt: paragraphs[2]?.slice(0, 400) ?? '',
       headings: extractHeadings(mdContent),
     });
