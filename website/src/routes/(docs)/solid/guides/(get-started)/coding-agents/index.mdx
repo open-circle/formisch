@@ -14,13 +14,13 @@ Formisch is built to be consumed by AI coding agents. This page describes the ag
 
 ## Agent skill
 
-Our [`SKILL.md`](https://github.com/open-circle/agent-skills/blob/main/skills/formisch/SKILL.md) file teaches AI agents how to build forms and manage form state with Formisch. Install it with the [Agent Skills CLI](https://agentskills.io/):
+Formisch defines form values and validation with [Valibot](https://valibot.dev/) schemas, so an agent needs two skills: our [Formisch SKILL.md](https://github.com/open-circle/agent-skills/blob/main/skills/formisch/SKILL.md) for building forms and managing form state, and the [Valibot SKILL.md](https://github.com/open-circle/agent-skills/blob/main/skills/valibot/SKILL.md) for writing the schemas. Install both with the [Agent Skills CLI](https://agentskills.io/):
 
 ```bash
-npx skills add open-circle/agent-skills --skill formisch
+npx skills add open-circle/agent-skills --skill formisch valibot
 ```
 
-The skill is also published at [`/.well-known/agent-skills/formisch/SKILL.md`](/.well-known/agent-skills/formisch/SKILL.md) and listed in our [discovery index](/.well-known/agent-skills/index.json).
+The Formisch skill is also published at [`/.well-known/agent-skills/formisch/SKILL.md`](/.well-known/agent-skills/formisch/SKILL.md) and listed in our [discovery index](/.well-known/agent-skills/index.json). For Valibot's MCP server and llms.txt files, see [Valibot's coding agents guide](https://valibot.dev/guides/coding-agents/).
 
 ## MCP server
 
