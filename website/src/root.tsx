@@ -23,6 +23,17 @@ export default component$(() => (
       class="font-lexend flex min-h-screen flex-col bg-white text-slate-600 dark:bg-gray-900 dark:text-slate-400"
       window:onResize$={() => disableTransitions()}
     >
+      {/* Hint for AI agents on how to consume our documentation as Markdown */}
+      <div class="sr-only">
+        This documentation is available as Markdown for AI agents. Append
+        &quot;.md&quot; to any documentation URL (e.g.
+        &quot;/react/api/useForm/&quot; becomes
+        &quot;/react/api/useForm.md&quot;) or send an &quot;Accept:
+        text/markdown&quot; header to receive the Markdown version. An MCP
+        server with tools to search and read this documentation is available at{' '}
+        <a href="/mcp">/mcp</a>. A machine-readable index of all Markdown
+        resources is available at <a href="/llms.txt">/llms.txt</a>.
+      </div>
       <Providers />
     </body>
   </QwikRouterProvider>

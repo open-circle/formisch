@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd ../packages/core && pnpm build && cd ../methods && pnpm build && cd ../../frameworks/qwik && pnpm build && cd ../../website && pnpm sitemap && pnpm llms && pnpm og && pnpm build",
+  "buildCommand": "cd ../packages/core && pnpm build && cd ../methods && pnpm build && cd ../../frameworks/qwik && pnpm build && cd ../../website && pnpm sitemap && pnpm llms && pnpm agents && pnpm og && pnpm build",
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": true,

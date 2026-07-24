@@ -4,7 +4,7 @@
 
 - [Introduction](/qwik/guides/introduction/)
 - [Installation](/qwik/guides/installation/)
-- [LLMs.txt](/qwik/guides/llms-txt/)
+- [Coding agents](/qwik/guides/coding-agents/)
 
 ## Main concepts
 

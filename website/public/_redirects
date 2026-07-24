@@ -16,3 +16,23 @@
 /vue/guides/ /vue/guides/introduction/ 302
 /core/api /solid/api/ 302
 /core/api/ /solid/api/ 302
+
+# The former "LLMs.txt" guide is now the broader "Coding agents" guide
+/preact/guides/llms-txt /preact/guides/coding-agents/ 301
+/preact/guides/llms-txt/ /preact/guides/coding-agents/ 301
+/preact/guides/llms-txt.md /preact/guides/coding-agents.md 301
+/qwik/guides/llms-txt /qwik/guides/coding-agents/ 301
+/qwik/guides/llms-txt/ /qwik/guides/coding-agents/ 301
+/qwik/guides/llms-txt.md /qwik/guides/coding-agents.md 301
+/react/guides/llms-txt /react/guides/coding-agents/ 301
+/react/guides/llms-txt/ /react/guides/coding-agents/ 301
+/react/guides/llms-txt.md /react/guides/coding-agents.md 301
+/solid/guides/llms-txt /solid/guides/coding-agents/ 301
+/solid/guides/llms-txt/ /solid/guides/coding-agents/ 301
+/solid/guides/llms-txt.md /solid/guides/coding-agents.md 301
+/svelte/guides/llms-txt /svelte/guides/coding-agents/ 301
+/svelte/guides/llms-txt/ /svelte/guides/coding-agents/ 301
+/svelte/guides/llms-txt.md /svelte/guides/coding-agents.md 301
+/vue/guides/llms-txt /vue/guides/coding-agents/ 301
+/vue/guides/llms-txt/ /vue/guides/coding-agents/ 301
+/vue/guides/llms-txt.md /vue/guides/coding-agents.md 301

@@ -5,7 +5,7 @@
 - [Introduction](/solid/guides/introduction/)
 - [Installation](/solid/guides/installation/)
 - [Comparison](/solid/guides/comparison/)
-- [LLMs.txt](/solid/guides/llms-txt/)
+- [Coding agents](/solid/guides/coding-agents/)
 
 ## Main concepts
 
