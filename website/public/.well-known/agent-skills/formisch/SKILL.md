@@ -4,7 +4,7 @@ description: Form handling with Formisch, the type-safe form library for modern 
 license: MIT
 metadata:
   author: open-circle
-  version: "1.1"
+  version: "1.2"
 ---
 
 # Formisch
@@ -88,9 +88,10 @@ The form store manages all form state. Access it via the framework-specific hook
 **Form Store Properties:**
 
 - `isSubmitting` — Form is currently being submitted
-- `isSubmitted` — Form has been successfully submitted
+- `isSubmitted` — Form submission has been attempted
 - `isValidating` — Validation is in progress
 - `isTouched` — At least one field has been touched
+- `isEdited` — At least one field has been edited
 - `isDirty` — At least one field differs from initial value
 - `isValid` — All fields pass validation
 - `errors` — Root-level validation errors
@@ -102,11 +103,12 @@ Each field has its own reactive store with:
 - `path` — Path array to the field
 - `input` — Current field value
 - `errors` — Field-specific errors
-- `isTouched` — Field has been focused and blurred
+- `isTouched` — Field has been focused
+- `isEdited` — Field value has been edited
 - `isDirty` — Field value differs from initial value
 - `isValid` — Field passes validation
 - `props` — Props to spread onto input elements
-- `onChange` (React) / `onInput` (other frameworks) — Sets the field input value programmatically. Use this when the field cannot be connected to a native HTML element.
+- `onChange` (React) / `onInput` (Solid, Svelte, Preact, Qwik) — Sets the field input value programmatically. Use this when the field cannot be connected to a native HTML element. In Vue, set `field.input` directly (e.g. with `v-model`).
 
 ### Dirty Tracking
 
@@ -312,9 +314,9 @@ const LoginSchema = v.object({
 });
 
 export default component$(() => {
-  const loginForm = useForm$({
+  const loginForm = useForm$(() => ({
     schema: LoginSchema,
-  });
+  }));
 
   return (
     <Form of={loginForm} onSubmit$={(output) => console.log(output)}>
@@ -357,14 +359,16 @@ const form = useForm({
   },
 
   // Optional: When first validation occurs
-  // Options: 'initial' | 'blur' | 'input' | 'submit' (default)
+  // Options: 'initial' | 'touch' | 'input' | 'change' | 'blur' | 'submit' (default)
   validate: "submit",
 
   // Optional: When revalidation occurs after first validation
-  // Options: 'blur' | 'input' (default) | 'submit'
+  // Options: 'touch' | 'input' (default) | 'change' | 'blur' | 'submit'
   revalidate: "input",
 });
 ```
+
+In Qwik, `useForm$` must receive a function that returns the config, e.g. `useForm$(() => ({ schema: MySchema }))`. This allows Qwik to convert the config into a QRL.
 
 ## Field Paths
 
@@ -396,7 +400,7 @@ All methods follow a consistent API pattern:
 ### Reading Values
 
 ```ts
-import { getInput, getErrors, getAllErrors } from "@formisch/react";
+import { getInput, getErrors, getDeepErrors } from "@formisch/react";
 
 // Get field value
 const email = getInput(form, { path: ["email"] });
@@ -407,8 +411,11 @@ const allInputs = getInput(form);
 // Get field errors
 const emailErrors = getErrors(form, { path: ["email"] });
 
-// Get all errors across all fields
-const allErrors = getAllErrors(form);
+// Get all errors across all fields (including form-level errors)
+const allErrors = getDeepErrors(form);
+
+// Get all errors of a field and its descendants
+const todoErrors = getDeepErrors(form, { path: ["todos"] });
 ```
 
 ### Setting Values
@@ -445,8 +452,13 @@ reset(form, {
 ```ts
 import { validate, focus, submit, handleSubmit } from "@formisch/react";
 
-// Validate form manually
-const isValid = await validate(form);
+// Validate form manually (returns a Valibot SafeParseResult, not a boolean)
+const result = await validate(form);
+if (result.success) {
+  console.log(result.output);
+} else {
+  console.log(result.issues);
+}
 
 // Validate and focus first error field
 await validate(form, { shouldFocus: true });
@@ -703,22 +715,26 @@ import type {
 
 Controls when the **first** validation occurs:
 
-| Value       | Description                                |
-| ----------- | ------------------------------------------ |
-| `'initial'` | Validate immediately on form creation      |
-| `'blur'`    | Validate when field loses focus            |
-| `'input'`   | Validate on every input change             |
-| `'submit'`  | Validate only on form submission (default) |
+| Value       | Description                                    |
+| ----------- | ---------------------------------------------- |
+| `'initial'` | Validate immediately on form creation          |
+| `'touch'`   | Validate when a field is first focused         |
+| `'input'`   | Validate on every input event                  |
+| `'change'`  | Validate on change events (value is committed) |
+| `'blur'`    | Validate when field loses focus                |
+| `'submit'`  | Validate only on form submission (default)     |
 
 ### revalidate Option
 
 Controls when validation runs **after** the first validation:
 
-| Value      | Description                                |
-| ---------- | ------------------------------------------ |
-| `'blur'`   | Revalidate when field loses focus          |
-| `'input'`  | Revalidate on every input change (default) |
-| `'submit'` | Revalidate only on form submission         |
+| Value      | Description                                      |
+| ---------- | ------------------------------------------------ |
+| `'touch'`  | Revalidate when a field is first focused         |
+| `'input'`  | Revalidate on every input event (default)        |
+| `'change'` | Revalidate on change events (value is committed) |
+| `'blur'`   | Revalidate when field loses focus                |
+| `'submit'` | Revalidate only on form submission               |
 
 ## Special Inputs
 
@@ -787,6 +803,7 @@ For complex field components, use the `useField` hook instead of the `Field` com
 
 ```tsx
 import { useField } from "@formisch/react";
+import { useEffect } from "react";
 
 function EmailInput({ form }) {
   const field = useField(form, { path: ["email"] });
@@ -814,7 +831,7 @@ function EmailInput({ form }) {
 
 ## Using Component Libraries
 
-When using component libraries that don't expose their underlying native HTML elements, you cannot spread `field.props` directly. Instead, use `field.onChange` (React) or `field.onInput` (other frameworks) to update the value programmatically:
+When using component libraries that don't expose their underlying native HTML elements, you cannot spread `field.props` directly. Instead, update the value programmatically with `field.onChange` (React), `field.onInput` (Solid, Svelte, Preact, Qwik), or by assigning to `field.input` (Vue):
 
 ```tsx
 import { DatePicker } from "some-component-library";
@@ -829,7 +846,7 @@ import { DatePicker } from "some-component-library";
 </Field>;
 ```
 
-The `field.onChange` method updates the field value and triggers validation, just like a native input would.
+These setters update the field value and trigger validation, just like a native input would.
 
 This is useful for:
 
