@@ -83,6 +83,96 @@
       "source": "/core/api/",
       "destination": "/solid/api/",
       "statusCode": 302
+    },
+    {
+      "source": "/preact/guides/llms-txt",
+      "destination": "/preact/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/preact/guides/llms-txt/",
+      "destination": "/preact/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/preact/guides/llms-txt.md",
+      "destination": "/preact/guides/coding-agents.md",
+      "statusCode": 301
+    },
+    {
+      "source": "/qwik/guides/llms-txt",
+      "destination": "/qwik/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/qwik/guides/llms-txt/",
+      "destination": "/qwik/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/qwik/guides/llms-txt.md",
+      "destination": "/qwik/guides/coding-agents.md",
+      "statusCode": 301
+    },
+    {
+      "source": "/react/guides/llms-txt",
+      "destination": "/react/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/react/guides/llms-txt/",
+      "destination": "/react/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/react/guides/llms-txt.md",
+      "destination": "/react/guides/coding-agents.md",
+      "statusCode": 301
+    },
+    {
+      "source": "/solid/guides/llms-txt",
+      "destination": "/solid/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/solid/guides/llms-txt/",
+      "destination": "/solid/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/solid/guides/llms-txt.md",
+      "destination": "/solid/guides/coding-agents.md",
+      "statusCode": 301
+    },
+    {
+      "source": "/svelte/guides/llms-txt",
+      "destination": "/svelte/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/svelte/guides/llms-txt/",
+      "destination": "/svelte/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/svelte/guides/llms-txt.md",
+      "destination": "/svelte/guides/coding-agents.md",
+      "statusCode": 301
+    },
+    {
+      "source": "/vue/guides/llms-txt",
+      "destination": "/vue/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/vue/guides/llms-txt/",
+      "destination": "/vue/guides/coding-agents/",
+      "statusCode": 301
+    },
+    {
+      "source": "/vue/guides/llms-txt.md",
+      "destination": "/vue/guides/coding-agents.md",
+      "statusCode": 301
     }
   ],
   "headers": [
