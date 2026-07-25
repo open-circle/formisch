@@ -1,13 +1,15 @@
+import angular from '@analogjs/vite-plugin-angular';
 import { configDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  esbuild: {
-    tsconfigRaw: {
-      compilerOptions: {
-        experimentalDecorators: true,
-      },
-    },
-  },
+  // Angular's JIT compiler cannot discover signal inputs declared with
+  // `input()`, so the directives must be compiled ahead of time to be usable
+  // in a test. This plugin runs the Angular compiler over the sources, which
+  // lets the tests import from `src` and keeps coverage attributed to `src`.
+  // It needs a tsconfig that emits, hence `tsconfig.spec.json` rather than the
+  // `noEmit` base config — with a non-emitting one it silently builds an empty
+  // program and every directive falls back to (broken) JIT compilation.
+  plugins: [angular({ tsconfig: './tsconfig.spec.json' })],
   resolve: {
     // The inlined @formisch/core workspace package must not resolve its own
     // copy of @angular/core (pnpm installs core's older dev dependency next

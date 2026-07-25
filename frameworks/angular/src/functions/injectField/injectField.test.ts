@@ -1,4 +1,9 @@
-import { provideZonelessChangeDetection } from '@angular/core';
+import {
+  createEnvironmentInjector,
+  EnvironmentInjector,
+  provideZonelessChangeDetection,
+  runInInjectionContext,
+} from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { getFieldStore, INTERNAL } from '@formisch/core/angular';
 import * as v from 'valibot';
@@ -103,6 +108,13 @@ describe('injectField', () => {
     expect(internalFieldStore.elements).not.toContain(element);
   });
 
+  it('ignores a null element passed to the control ref', () => {
+    const { form, field } = setup();
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    expect(field[CONTROL].ref(null)).toBeUndefined();
+    expect(internalFieldStore.elements).toHaveLength(0);
+  });
+
   it('keeps initialElements in sync when unregistering the element', () => {
     const { form, field } = setup();
     const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
@@ -114,6 +126,33 @@ describe('injectField', () => {
     expect(internalFieldStore.elements).toBe(
       internalFieldStore.initialElements
     );
+  });
+
+  it('drops disconnected elements from the field store on destroy', () => {
+    const injector = createEnvironmentInjector(
+      [],
+      TestBed.inject(EnvironmentInjector)
+    );
+    const { form, field } = runInInjectionContext(injector, () => {
+      const form = injectForm({ schema: Schema });
+      return { form, field: injectField(form, { path: ['email'] }) };
+    });
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+
+    const connected = document.createElement('input');
+    document.body.append(connected);
+    const disconnected = document.createElement('input');
+    field[CONTROL].ref(connected);
+    field[CONTROL].ref(disconnected);
+    expect(internalFieldStore.elements).toEqual([connected, disconnected]);
+
+    injector.destroy();
+
+    // Only the element still in the document survives, so resetting a
+    // remounted field restores its live element instead of a stale one
+    expect(internalFieldStore.elements).toEqual([connected]);
+    expect(internalFieldStore.initialElements).toEqual([connected]);
+    connected.remove();
   });
 
   it('does not touch initialElements when a reorder moved the elements', () => {

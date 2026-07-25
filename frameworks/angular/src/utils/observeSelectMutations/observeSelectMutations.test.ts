@@ -24,6 +24,22 @@ describe('observeSelectMutations', () => {
     return { element, option, onMutation };
   }
 
+  it('skips observation when MutationObserver is unavailable', () => {
+    const original = globalThis.MutationObserver;
+    // @ts-expect-error `MutationObserver` is missing in some environments
+    delete globalThis.MutationObserver;
+    try {
+      const onMutation = vi.fn();
+      const cleanup = observeSelectMutations(
+        document.createElement('select'),
+        onMutation
+      );
+      expect(cleanup).toBeUndefined();
+    } finally {
+      globalThis.MutationObserver = original;
+    }
+  });
+
   it('invokes the callback when an option is added', async () => {
     const { element, onMutation } = setup();
     element.append(document.createElement('option'));

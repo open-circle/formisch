@@ -10,6 +10,31 @@ jobs:
     name: Run default CI of repository
     uses: ./.github/workflows/ci.yml
 
+  angular_npm:
+    name: Publish Angular to NPM
+    needs: default_ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Build library
+        run: pnpm build
+        working-directory: frameworks/angular
+      - name: Publish library
+        run: |
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
+          npm publish --access public --tag "$TAG"
+        working-directory: frameworks/angular
+        continue-on-error: true
+
   preact_npm:
     name: Publish Preact to NPM
     needs: default_ci

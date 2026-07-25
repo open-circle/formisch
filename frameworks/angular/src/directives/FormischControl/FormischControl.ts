@@ -28,6 +28,10 @@ import { observeSelectMutations, setElementInput } from '../../utils/index.ts';
  * ```html
  * <input [formischControl]="field" />
  * ```
+ *
+ * The element is written to, so it must not also be bound with `[value]` or
+ * `[checked]`. Radio and checkbox groups bind every element of the group to
+ * the same field, each with its own `value` attribute.
  */
 @Directive({
   selector: '[formischControl]',
@@ -47,17 +51,29 @@ export class FormischControl<
   TFieldPath extends RequiredPath = RequiredPath,
 > {
   /**
-   * The field store to bind to the host element.
+   * The field store to bind to the host element. Both type arguments are
+   * inferred from it, which keeps the field's value type intact — a directive
+   * or component that widens this to the default `FieldStore` cannot accept
+   * any concrete field, because `setInput` makes the store invariant.
    */
   readonly formischControl: InputSignal<FieldStore<TSchema, TFieldPath>> =
     input.required<FieldStore<TSchema, TFieldPath>>();
 
+  /**
+   * The JSON-stringified field path, bound to the element's name attribute.
+   */
   protected readonly fieldName: Signal<string> = computed(() =>
     this.formischControl().name()
   );
+  /**
+   * Whether the field currently has errors, bound to `aria-invalid`.
+   */
   protected readonly fieldInvalid: Signal<boolean> = computed(
     () => !!this.formischControl().errors()
   );
+  /**
+   * The field's element-binding contract, used by the host event handlers.
+   */
   protected readonly control: Signal<FieldControl> = computed(
     () => this.formischControl()[CONTROL]
   );
@@ -66,8 +82,13 @@ export class FormischControl<
   private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
-    // Register the host element with the field, re-registering whenever the
-    // bound field changes and unregistering on cleanup/destroy.
+    // Register the host element with the field and unregister it on cleanup or
+    // destroy. `ref` reads the field's resolved store while this effect runs,
+    // so the effect also re-runs when only the field's path changed and the
+    // bound store object stayed the same — which is what keeps the element
+    // registered on the right store when a field array is reordered. Do not
+    // hoist or memoize the `ref` call out of the effect body: that would drop
+    // the dependency and silently leave the element on the previous store.
     effect((onCleanup) => {
       const cleanup = this.formischControl()[CONTROL].ref(
         this.elementRef.nativeElement

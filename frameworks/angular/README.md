@@ -70,16 +70,18 @@ In addition, Formisch offers several functions (we call them "methods") that can
 
 Formisch maps naturally onto what you already know from Reactive Forms and Signal Forms:
 
-| Reactive Forms           | Signal Forms             | Formisch                            |
-| ------------------------ | ------------------------ | ----------------------------------- |
-| `[formGroup]="form"`     | –                        | `[formischForm]="form"`             |
-| `[formControl]="ctrl"`   | `[formField]="f.email"`  | `[formischControl]="field"`         |
-| `(ngSubmit)="save()"`    | `submit(form, action)`   | `[formischSubmit]="handleSubmit"`   |
-| `new FormControl('')`    | `form(model).email`      | `injectField(form, { path: [...] })`|
-| `form.valid`             | `form().valid()`         | `form.isValid()`                    |
-| `Validators.required`    | schema fn / Zod, Valibot | Valibot schema                      |
+| Reactive Forms         | Signal Forms             | Formisch                             |
+| ---------------------- | ------------------------ | ------------------------------------ |
+| `[formGroup]="form"`   | –                        | `[formischForm]="form"`              |
+| `[formControl]="ctrl"` | `[formField]="f.email"`  | `[formischControl]="field"`          |
+| `(ngSubmit)="save()"`  | `submit(form, action)`   | `[formischSubmit]="handleSubmit"`    |
+| `new FormControl('')`  | `form(model).email`      | `injectField(form, { path: [...] })` |
+| `form.valid`           | `form().valid()`         | `form.isValid()`                     |
+| `Validators.required`  | schema fn / Zod, Valibot | Valibot schema                       |
 
 Like Reactive Forms' `[formControl]` and Signal Forms' `[formField]`, the `[formischControl]` directive writes the field state into the element – there is no manual `[value]` or `[checked]` binding. Validation lives in one place, your Valibot schema, from which all input, output and path types are inferred.
+
+Unlike `(ngSubmit)="save()"`, `[formischSubmit]` takes your handler instead of calling it. This allows Formisch to await it and keep `form.isSubmitting()` up to date while an async submit is pending. Make sure to declare your handler as an arrow function property, like in the example above. A regular class method would lose its `this`.
 
 ## Comparison
 

@@ -40,7 +40,10 @@ export class FormischForm<TSchema extends FormSchema = FormSchema> {
   readonly formischForm: InputSignal<FormStore<TSchema>> =
     input.required<FormStore<TSchema>>();
   /**
-   * The submit handler called when validation succeeds.
+   * The submit handler called when validation succeeds. It is passed as a
+   * function reference rather than invoked in the template, so that the
+   * promise it returns can be awaited to track `isSubmitting`. Declare it as
+   * an arrow function property — a regular method would lose its `this`.
    */
   readonly formischSubmit: InputSignal<SubmitEventHandler<TSchema>> =
     input.required<SubmitEventHandler<TSchema>>();
@@ -62,10 +65,10 @@ export class FormischForm<TSchema extends FormSchema = FormSchema> {
   }
 
   protected handleFormSubmit(event: SubmitEvent): void {
+    // The inputs are read before the task is registered so that a throw while
+    // reading them cannot leave the application permanently unstable
+    const submit = handleSubmit(this.formischForm(), this.formischSubmit());
     const cleanup = this.pendingTasks.add();
-    void handleSubmit(
-      this.formischForm(),
-      this.formischSubmit()
-    )(event).finally(cleanup);
+    void submit(event).finally(cleanup);
   }
 }
