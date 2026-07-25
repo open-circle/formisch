@@ -2,6 +2,6 @@
 
 All notable changes to the library will be documented in this file.
 
-## v0.0.1 (Month DD, YYYY)
+## v0.1.0 (July 25, 2026)
 
 - Initial release
