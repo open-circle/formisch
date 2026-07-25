@@ -1,5 +1,7 @@
 /**
- * Cloudflare Workers configuration for hosting the website as a static site.
+ * Cloudflare Workers configuration for hosting the website as a static site
+ * with a Worker in front of it that makes the documentation easier to consume
+ * for AI agents.
  *
  * https://developers.cloudflare.com/workers/static-assets/
  */
@@ -7,10 +9,38 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "formisch-website",
   "compatibility_date": "2026-06-04",
+  "main": "./worker/index.ts",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page",
+    // Only run the Worker for the routes it actually handles and never for the
+    // Qwik City client navigation data, which is served asset-first
+    "run_worker_first": [
+      "/",
+      "/mcp",
+      "/mcp/",
+      "/preact/*",
+      "/qwik/*",
+      "/react/*",
+      "/solid/*",
+      "/svelte/*",
+      "/vue/*",
+      "/methods/*",
+      "/core/*",
+      "/blog/*",
+      "/.well-known/api-catalog",
+      "!/preact/*q-data.json",
+      "!/qwik/*q-data.json",
+      "!/react/*q-data.json",
+      "!/solid/*q-data.json",
+      "!/svelte/*q-data.json",
+      "!/vue/*q-data.json",
+      "!/methods/*q-data.json",
+      "!/core/*q-data.json",
+      "!/blog/*q-data.json",
+    ],
   },
   // Serve production via the custom domain only, but keep
   // workers.dev preview URLs for branch deployments

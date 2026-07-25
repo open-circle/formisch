@@ -27,12 +27,12 @@ overrides:
   '@qwik.dev/core>rollup': 4.59.0
   semver@7: 7.5.2
   serialize-javascript@6: 7.0.5
-  seroval@1: 1.4.1
+  seroval@1: 1.5.3
   shell-quote@1: 1.8.4
   svgo@3: 3.3.3
-  tar@4: 7.5.11
-  tar@6: 7.5.11
-  tar@7: 7.5.11
+  tar@4: 7.5.19
+  tar@6: 7.5.19
+  tar@7: 7.5.19
   undici@5: 6.24.0
   undici@7: 7.24.0
   vite@6: 6.4.2
@@ -1059,12 +1059,15 @@ importers:
       '@formkit/auto-animate':
         specifier: ^0.9.0
         version: 0.9.0
+      '@valibot/to-json-schema':
+        specifier: ^1.7.1
+        version: 1.7.1(valibot@1.4.2(typescript@5.8.3))
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
       valibot:
-        specifier: ^1.4.1
-        version: 1.4.1(typescript@5.8.3)
+        specifier: ^1.4.2
+        version: 1.4.2(typescript@5.8.3)
     devDependencies:
       '@qwik.dev/core':
         specifier: 2.0.0-beta.9
@@ -5195,6 +5198,11 @@ packages:
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
     deprecated: Potential CWE-502 - Update to 1.3.1 or higher
+
+  '@valibot/to-json-schema@1.7.1':
+    resolution: {integrity: sha512-3qkmU6KXWh8GIThEAW3kuRHPQBMjWkKy+Ppz3WkUucx53DTpOa6siMn4xDGSOhlVyMrDaJTCTMLYPZVAIk1P0A==}
+    peerDependencies:
+      valibot: ^1.4.0
 
   '@vercel/build-utils@7.3.0':
     resolution: {integrity: sha512-RJwqrGYSk75auHZqWmlSL+a5JsWv+4SF1AxNQJ+KpF3XWZ/8yThkN/jHBfNxMmW6VvNczSVtMaXI0/2Sess6Eg==}
@@ -9526,10 +9534,10 @@ packages:
     resolution: {integrity: sha512-16OL3NnUBw8JG1jBLUoZJsLnQq0n5Ua6aHalhJK4fMQkz1lqR7Osz1sA30trBtd9VUDc2NgkuRCn8+/pBwqZ+w==}
     engines: {node: '>=10'}
     peerDependencies:
-      seroval: 1.4.1
+      seroval: 1.5.3
 
-  seroval@1.4.1:
-    resolution: {integrity: sha512-9GOc+8T6LN4aByLN75uRvMbrwY5RDBW6lSlknsY4LEa9ZmWcxKcRe1G/Q3HZXjltxMHTrStnvrwAICxZrhldtg==}
+  seroval@1.5.3:
+    resolution: {integrity: sha512-BXe0x4buEeYiIKaRUnth1WqCILQ3k4O67KP/B4pC3pVz0Mv2c96ngA9QDREUYxWY1sb2RZVRqwI9RcpVMyHCVw==}
     engines: {node: '>=10'}
 
   serve-placeholder@2.0.2:
@@ -9945,8 +9953,8 @@ packages:
   tar-stream@3.1.7:
     resolution: {integrity: sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==}
 
-  tar@7.5.11:
-    resolution: {integrity: sha512-ChjMH33/KetonMTAtpYdgUFr0tbz69Fp2v7zWxQfYZX4g5ZN2nOBXm1R2xyA+lMIKrLKIoKAwFj93jE/avX9cQ==}
+  tar@7.5.19:
+    resolution: {integrity: sha512-4LeEWl96twnS2Q7Bz4MGqgazLqO+hJN63GZxXoIqh1T3VweYD997gbU1ItNsQafqqXTXd5WFyFdReLtwvRBNiw==}
     engines: {node: '>=18'}
 
   terracotta@1.0.6:
@@ -10509,6 +10517,14 @@ packages:
 
   valibot@1.4.1:
     resolution: {integrity: sha512-klCmFTz2jeDluy9RwX+F884TCiogtdBJ/YaxSx1EOBYXa3NXNWj8kR1jjN8rzluwojJVWWaHJ4r1U5LfICnM3g==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  valibot@1.4.2:
+    resolution: {integrity: sha512-gjdCvJ6d3RyHAneqxMYMW9QMCwYMb3jpOO0IyHZV1bnRHFBHrX3VkIILt5XYR0WhwHiH7Mty8ovuPZ/O3gamrg==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -13075,7 +13091,7 @@ snapshots:
       npmlog: 5.0.1
       rimraf: 3.0.2
       semver: 7.5.2
-      tar: 7.5.11
+      tar: 7.5.19
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -13088,7 +13104,7 @@ snapshots:
       node-fetch: 2.7.0
       nopt: 8.1.0
       semver: 7.5.2
-      tar: 7.5.11
+      tar: 7.5.19
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -13986,8 +14002,8 @@ snapshots:
       error-stack-parser: 2.1.4
       html-to-image: 1.11.13
       radix3: 1.1.2
-      seroval: 1.4.1
-      seroval-plugins: 1.3.3(seroval@1.4.1)
+      seroval: 1.5.3
+      seroval-plugins: 1.3.3(seroval@1.5.3)
       shiki: 1.29.2
       source-map-js: 1.2.1
       terracotta: 1.0.6(solid-js@1.9.9)
@@ -15015,6 +15031,10 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
+  '@valibot/to-json-schema@1.7.1(valibot@1.4.2(typescript@5.8.3))':
+    dependencies:
+      valibot: 1.4.2(typescript@5.8.3)
+
   '@vercel/build-utils@7.3.0': {}
 
   '@vercel/error-utils@2.0.2': {}
@@ -15035,7 +15055,7 @@ snapshots:
       semver: 7.5.2
       stat-mode: 0.3.0
       stream-to-promise: 2.2.0
-      tar: 7.5.11
+      tar: 7.5.19
       tree-kill: 1.2.2
       uid-promise: 1.0.0
       uuid: 3.3.2
@@ -20398,11 +20418,11 @@ snapshots:
 
   serialize-javascript@7.0.5: {}
 
-  seroval-plugins@1.3.3(seroval@1.4.1):
+  seroval-plugins@1.3.3(seroval@1.5.3):
     dependencies:
-      seroval: 1.4.1
+      seroval: 1.5.3
 
-  seroval@1.4.1: {}
+  seroval@1.5.3: {}
 
   serve-placeholder@2.0.2:
     dependencies:
@@ -20649,8 +20669,8 @@ snapshots:
   solid-js@1.9.9:
     dependencies:
       csstype: 3.1.3
-      seroval: 1.4.1
-      seroval-plugins: 1.3.3(seroval@1.4.1)
+      seroval: 1.5.3
+      seroval-plugins: 1.3.3(seroval@1.5.3)
 
   solid-refresh@0.6.3(solid-js@1.9.9):
     dependencies:
@@ -20987,7 +21007,7 @@ snapshots:
       - bare-abort-controller
       - react-native-b4a
 
-  tar@7.5.11:
+  tar@7.5.19:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0
@@ -21706,6 +21726,10 @@ snapshots:
   valibot@1.4.1(typescript@6.0.3):
     optionalDependencies:
       typescript: 6.0.3
+
+  valibot@1.4.2(typescript@5.8.3):
+    optionalDependencies:
+      typescript: 5.8.3
 
   validate-html-nesting@1.2.3: {}
 
