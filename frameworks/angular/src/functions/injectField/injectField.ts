@@ -106,7 +106,12 @@ export function injectField(
       ref(element) {
         if (element) {
           const fieldStore = internalFieldStore();
-          fieldStore.elements.push(element);
+          // An array reorder transfers registered elements between the field
+          // stores, so the element may already be present when the directive
+          // re-registers it against the destination store
+          if (!fieldStore.elements.includes(element)) {
+            fieldStore.elements.push(element);
+          }
           return () => {
             const elements = fieldStore.elements.filter(
               (currentElement) => currentElement !== element

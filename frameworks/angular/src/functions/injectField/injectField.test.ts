@@ -108,6 +108,16 @@ describe('injectField', () => {
     expect(internalFieldStore.elements).not.toContain(element);
   });
 
+  it('does not register an element that is already present', () => {
+    const { form, field } = setup();
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    const element = document.createElement('input');
+    // Simulate an array reorder having already transferred the element
+    internalFieldStore.elements.push(element);
+    field[CONTROL].ref(element);
+    expect(internalFieldStore.elements).toEqual([element]);
+  });
+
   it('ignores a null element passed to the control ref', () => {
     const { form, field } = setup();
     const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
