@@ -4,7 +4,12 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { type FieldStore, FormischControl } from '@formisch/angular';
+import {
+  type FieldStore,
+  type FormSchema,
+  FormischControl,
+  type RequiredPath,
+} from '@formisch/angular';
 import clsx from 'clsx';
 import { AngleDownIconComponent } from '../icons/angle-down-icon.component.ts';
 import { InputErrorsComponent } from './input-errors.component.ts';
@@ -69,8 +74,11 @@ interface SelectOption {
     </div>
   `,
 })
-export class SelectComponent {
-  readonly field = input.required<FieldStore>();
+export class SelectComponent<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
+  readonly field = input.required<FieldStore<TSchema, TFieldPath>>();
   readonly label = input<string>();
   readonly options = input.required<SelectOption[]>();
   readonly multiple = input<boolean>(false);

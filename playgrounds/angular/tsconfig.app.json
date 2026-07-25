@@ -26,10 +26,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    "paths": {
-      "@formisch/angular": ["../../frameworks/angular/src/index.ts"]
-    }
+    "noUncheckedSideEffectImports": true
   },
   "angularCompilerOptions": {
     "strictTemplates": true

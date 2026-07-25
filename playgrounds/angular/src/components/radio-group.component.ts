@@ -1,5 +1,9 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import type { FieldStore } from '@formisch/angular';
+import type {
+  FieldStore,
+  FormSchema,
+  RequiredPath,
+} from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
 import { InputLabelComponent } from './input-label.component.ts';
@@ -48,8 +52,11 @@ interface RadioOption {
     </fieldset>
   `,
 })
-export class RadioGroupComponent {
-  readonly field = input.required<FieldStore>();
+export class RadioGroupComponent<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
+  readonly field = input.required<FieldStore<TSchema, TFieldPath>>();
   readonly label = input<string>();
   readonly options = input.required<RadioOption[]>();
   readonly required = input<boolean>(false);

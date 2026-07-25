@@ -4,7 +4,12 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { type FieldStore, FormischControl } from '@formisch/angular';
+import {
+  type FieldStore,
+  type FormSchema,
+  FormischControl,
+  type RequiredPath,
+} from '@formisch/angular';
 import clsx from 'clsx';
 import { InputErrorsComponent } from './input-errors.component.ts';
 import { InputLabelComponent } from './input-label.component.ts';
@@ -38,8 +43,11 @@ import { InputLabelComponent } from './input-label.component.ts';
     <app-input-errors [name]="field().name()" [errors]="field().errors()" />
   `,
 })
-export class TextInputComponent {
-  readonly field = input.required<FieldStore>();
+export class TextInputComponent<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
+  readonly field = input.required<FieldStore<TSchema, TFieldPath>>();
   readonly type = input<string>('text');
   readonly label = input<string>();
   readonly placeholder = input<string>();

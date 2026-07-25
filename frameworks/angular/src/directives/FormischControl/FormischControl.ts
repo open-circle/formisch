@@ -10,7 +10,11 @@ import {
   type InputSignal,
   type Signal,
 } from '@angular/core';
-import type { FieldElement } from '@formisch/core/angular';
+import type {
+  FieldElement,
+  FormSchema,
+  RequiredPath,
+} from '@formisch/core/angular';
 import { CONTROL, type FieldControl } from '../../types/control.ts';
 import type { FieldStore } from '../../types/index.ts';
 import { observeSelectMutations, setElementInput } from '../../utils/index.ts';
@@ -38,12 +42,15 @@ import { observeSelectMutations, setElementInput } from '../../utils/index.ts';
     '(blur)': 'control().onBlur()',
   },
 })
-export class FormischControl {
+export class FormischControl<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
   /**
    * The field store to bind to the host element.
    */
-  readonly formischControl: InputSignal<FieldStore> =
-    input.required<FieldStore>();
+  readonly formischControl: InputSignal<FieldStore<TSchema, TFieldPath>> =
+    input.required<FieldStore<TSchema, TFieldPath>>();
 
   protected readonly fieldName: Signal<string> = computed(() =>
     this.formischControl().name()

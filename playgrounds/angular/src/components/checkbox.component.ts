@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { type FieldStore, FormischControl } from '@formisch/angular';
+import {
+  type FieldStore,
+  type FormSchema,
+  FormischControl,
+  type RequiredPath,
+} from '@formisch/angular';
 import { InputErrorsComponent } from './input-errors.component.ts';
 
 /**
@@ -31,8 +36,11 @@ import { InputErrorsComponent } from './input-errors.component.ts';
     <app-input-errors [name]="field().name()" [errors]="field().errors()" />
   `,
 })
-export class CheckboxComponent {
-  readonly field = input.required<FieldStore>();
+export class CheckboxComponent<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
+  readonly field = input.required<FieldStore<TSchema, TFieldPath>>();
   readonly label = input<string>('');
   readonly value = input<string>();
   readonly required = input<boolean>(false);

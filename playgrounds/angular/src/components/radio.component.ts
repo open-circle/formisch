@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { type FieldStore, FormischControl } from '@formisch/angular';
+import {
+  type FieldStore,
+  type FormSchema,
+  FormischControl,
+  type RequiredPath,
+} from '@formisch/angular';
 
 /**
  * Simple radio button input. Should be used inside a RadioGroup component.
@@ -23,8 +28,11 @@ import { type FieldStore, FormischControl } from '@formisch/angular';
     </label>
   `,
 })
-export class RadioComponent {
-  readonly field = input.required<FieldStore>();
+export class RadioComponent<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
+  readonly field = input.required<FieldStore<TSchema, TFieldPath>>();
   readonly label = input.required<string>();
   readonly value = input.required<string>();
 }
