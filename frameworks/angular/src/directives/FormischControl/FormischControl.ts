@@ -1,6 +1,7 @@
 import {
   afterRenderEffect,
   computed,
+  DestroyRef,
   Directive,
   effect,
   ElementRef,
@@ -12,7 +13,7 @@ import {
 import type { FieldElement } from '@formisch/core/angular';
 import { CONTROL, type FieldControl } from '../../types/control.ts';
 import type { FieldStore } from '../../types/index.ts';
-import { setElementInput } from '../../utils/index.ts';
+import { observeSelectMutations, setElementInput } from '../../utils/index.ts';
 
 /**
  * Binds a native form control to a field. Writes the field input into the
@@ -55,6 +56,7 @@ export class FormischControl {
   );
 
   private readonly elementRef = inject<ElementRef<FieldElement>>(ElementRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
     // Register the host element with the field, re-registering whenever the
@@ -79,5 +81,17 @@ export class FormischControl {
         );
       },
     });
+
+    // A select ignores values written before the matching option exists, so
+    // re-apply the field input when option elements render or change later
+    const element = this.elementRef.nativeElement;
+    if (element.tagName === 'SELECT') {
+      const cleanup = observeSelectMutations(element as HTMLSelectElement, () =>
+        setElementInput(element, this.formischControl().input())
+      );
+      if (cleanup) {
+        this.destroyRef.onDestroy(cleanup);
+      }
+    }
   }
 }

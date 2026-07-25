@@ -164,6 +164,69 @@ describe('FormischControl initial value', () => {
   });
 });
 
+const SelectSchema = v.object({ select: v.optional(v.string()) });
+
+let SelectHost: Type<{
+  form: FormStore<typeof SelectSchema>;
+  field: FieldStore<typeof SelectSchema, ['select']>;
+  options: WritableSignal<string[]>;
+}>;
+
+describe('FormischControl select resync', () => {
+  beforeAll(async () => {
+    const FormischControl = await loadDistComponent('FormischControl');
+
+    @Component({
+      standalone: true,
+      imports: [FormischControl],
+      template: `<select data-testid="select" [formischControl]="field">
+        @for (option of options(); track option) {
+          <option [value]="option"></option>
+        }
+      </select>`,
+    })
+    class SelectHostComponent {
+      readonly form = injectForm({ schema: SelectSchema });
+      readonly field = injectField(this.form, { path: ['select'] });
+      readonly options = signal(['option_1']);
+    }
+
+    SelectHost = SelectHostComponent as Type<{
+      form: FormStore<typeof SelectSchema>;
+      field: FieldStore<typeof SelectSchema, ['select']>;
+      options: WritableSignal<string[]>;
+    }>;
+  });
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [SelectHost],
+      providers: [provideZonelessChangeDetection()],
+    });
+  });
+
+  it('re-applies the selection when the matching option renders later', async () => {
+    const fixture = TestBed.createComponent(SelectHost);
+    fixture.detectChanges();
+    const appRef = TestBed.inject(ApplicationRef);
+    appRef.tick();
+    const select = (
+      fixture.nativeElement as HTMLElement
+    ).querySelector<HTMLSelectElement>('[data-testid="select"]')!;
+
+    // The written value has no matching option yet
+    fixture.componentInstance.field.setInput('option_2');
+    appRef.tick();
+    expect(select.value).toBe('');
+
+    // Rendering the matching option must re-apply the selection
+    fixture.componentInstance.options.set(['option_1', 'option_2']);
+    appRef.tick();
+    await new Promise((resolve) => setTimeout(resolve));
+    expect(select.value).toBe('option_2');
+  });
+});
+
 const SwapSchema = v.object({ a: v.string(), b: v.string() });
 
 let SwapHost: Type<{
