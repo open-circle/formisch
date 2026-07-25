@@ -497,8 +497,8 @@ importers:
   packages/core:
     devDependencies:
       '@angular/core':
-        specifier: ^21.0.0
-        version: 21.2.13(rxjs@7.8.2)(zone.js@0.15.1)
+        specifier: ^22.0.0
+        version: 22.0.7(@angular/compiler@22.0.7)(rxjs@7.8.2)(zone.js@0.15.1)
       '@formisch/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
@@ -582,8 +582,8 @@ importers:
         version: 19.2.1
     devDependencies:
       '@angular/core':
-        specifier: ^21.0.0
-        version: 21.2.13(rxjs@7.8.2)(zone.js@0.15.1)
+        specifier: ^22.0.0
+        version: 22.0.7(@angular/compiler@22.0.7)(rxjs@7.8.2)(zone.js@0.15.1)
       '@formisch/core':
         specifier: workspace:*
         version: link:../core
@@ -1261,19 +1261,6 @@ packages:
   '@angular/compiler@22.0.7':
     resolution: {integrity: sha512-zhFPKYJzpml5bt58DkJq8S6S2bSJBomebgLYtUvZNLdQMicd5qmRGX6I3LO7Jd+HgjB2Flne/sloI+Jcyz1aOQ==}
     engines: {node: ^22.22.3 || ^24.15.0 || >=26.0.0}
-
-  '@angular/core@21.2.13':
-    resolution: {integrity: sha512-23tS4oNL8nvkHcI4l9rbruQs2WS4yqQmBVQxWakqS9cmRpArLGgveR+hKNU5tPXm5EAi8oLO34/Zy7z70jUpCg==}
-    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
-    peerDependencies:
-      '@angular/compiler': 21.2.13
-      rxjs: ^6.5.3 || ^7.4.0
-      zone.js: ~0.15.0 || ~0.16.0
-    peerDependenciesMeta:
-      '@angular/compiler':
-        optional: true
-      zone.js:
-        optional: true
 
   '@angular/core@22.0.7':
     resolution: {integrity: sha512-A5xKJx5wuuZfeJhShyZvbgicYtT3Jpw/5wJd1cfrcKU+i63CagRIg9jSktTW/e+2hxG1tIQrfKQUGeclmsAUUA==}
@@ -11182,13 +11169,6 @@ snapshots:
   '@angular/compiler@22.0.7':
     dependencies:
       tslib: 2.8.1
-
-  '@angular/core@21.2.13(rxjs@7.8.2)(zone.js@0.15.1)':
-    dependencies:
-      rxjs: 7.8.2
-      tslib: 2.8.1
-    optionalDependencies:
-      zone.js: 0.15.1
 
   '@angular/core@22.0.7(@angular/compiler@22.0.7)(rxjs@7.8.2)(zone.js@0.15.1)':
     dependencies:
