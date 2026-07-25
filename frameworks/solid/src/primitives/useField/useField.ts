@@ -108,7 +108,12 @@ export function useField(
       autofocus: !!getInternalFieldStore().errors.value,
       ref: (element) => {
         const internalFieldStore = getInternalFieldStore();
-        internalFieldStore.elements.push(element);
+        // An array reorder transfers registered elements between the field
+        // stores, so the element may already be present when the framework
+        // re-registers it against the destination store
+        if (!internalFieldStore.elements.includes(element)) {
+          internalFieldStore.elements.push(element);
+        }
         onCleanup(() => {
           const elements = internalFieldStore.elements.filter(
             (el) => el !== element

@@ -1,9 +1,13 @@
+import { getFieldStore, INTERNAL } from '@formisch/core/vue';
+import { swap } from '@formisch/methods/vue';
 import { mount } from '@vue/test-utils';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
 import Form from '../../components/Form/Form.vue';
+import type { FormStore } from '../../types/index.ts';
 import { renderHook } from '../../vitest/renderHook.ts';
+import { useFieldArray } from '../useFieldArray/index.ts';
 import { useForm } from '../useForm/index.ts';
 import { useField } from './useField.ts';
 
@@ -377,6 +381,74 @@ describe('useField', () => {
       wrapper.unmount();
 
       expect(document.querySelector('[data-testid="input"]')).toBeNull();
+    });
+
+    test('should not register an element that is already present', () => {
+      const schema = v.object({ name: v.string() });
+      const { result } = renderHook(() => {
+        const form = useForm({ schema });
+        return { form, field: useField(form, { path: ['name'] }) };
+      });
+      const internalFieldStore = getFieldStore(result.current.form[INTERNAL], [
+        'name',
+      ]);
+      const element = document.createElement('input');
+      // Simulate an array reorder having already transferred the element
+      internalFieldStore.elements.push(element);
+      (result.current.field.props.ref as (element: unknown) => void)(element);
+      expect(internalFieldStore.elements).toEqual([element]);
+    });
+
+    test('should not duplicate element registration after an array reorder', async () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
+
+      const Row = defineComponent({
+        props: {
+          form: { type: Object, required: true },
+          index: { type: Number, required: true },
+        },
+        setup(props) {
+          const field = useField(
+            props.form as FormStore<typeof schema>,
+            () => ({ path: ['todos', props.index, 'label'] as const })
+          );
+          return () => h('input', { ...field.props });
+        },
+      });
+
+      const Test = defineComponent({
+        setup() {
+          const form = useForm({
+            schema,
+            initialInput: { todos: [{ label: 'a' }, { label: 'b' }] },
+          });
+          formStore = form;
+          const fieldArray = useFieldArray(form, { path: ['todos'] });
+          return () =>
+            fieldArray.items.map((id, index) =>
+              h(Row, { key: id, form, index })
+            );
+        },
+      });
+
+      mount(Test, { attachTo: document.body });
+      expect(
+        getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+      ).toHaveLength(1);
+
+      swap(formStore!, { path: ['todos'], at: 0, and: 1 });
+
+      await vi.waitFor(() => {
+        expect(
+          getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+        ).toHaveLength(1);
+        expect(
+          getFieldStore(formStore![INTERNAL], ['todos', 1, 'label']).elements
+        ).toHaveLength(1);
+      });
     });
   });
 });
