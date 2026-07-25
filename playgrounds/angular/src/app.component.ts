@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import {
   afterNextRender,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   inject,
