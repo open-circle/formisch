@@ -99,6 +99,7 @@ const form = createForm({ schema });
 | Solid     | `### Primitives`        |
 | Qwik      | `### Hooks`             |
 | Preact    | `### Hooks`             |
+| Angular   | `### Functions` / `### Directives` |
 | Vue       | `### Composables`       |
 | Svelte    | `### Runes`             |
 

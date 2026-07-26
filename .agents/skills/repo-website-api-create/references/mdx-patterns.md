@@ -172,6 +172,7 @@ Do NOT include implementation signatures.
 | Solid | `### Primitives` |
 | Qwik | `### Hooks` |
 | Preact | `### Hooks` |
+| Angular | `### Functions` / `### Directives` |
 | Vue | `### Composables` |
 | Svelte | `### Runes` |
 
