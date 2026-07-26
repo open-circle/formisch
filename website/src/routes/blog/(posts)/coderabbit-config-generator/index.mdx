@@ -19,12 +19,12 @@ This app also received positive feedback from [Santosh](https://x.com/SantoshYad
 
 The tech stack looks like this:
 
-| Area | Choice |
-|---|---|
-| UI | React 19 |
-| Forms | [Formisch (for React)](https://formisch.dev/react/guides/introduction/) |
-| Validation / schema | [Valibot](https://valibot.dev/) |
-| Styling | Tailwind CSS 4 |
+| Area                | Choice                                                                  |
+| ------------------- | ----------------------------------------------------------------------- |
+| UI                  | React 19                                                                |
+| Forms               | [Formisch (for React)](https://formisch.dev/react/guides/introduction/) |
+| Validation / schema | [Valibot](https://valibot.dev/)                                         |
+| Styling             | Tailwind CSS 4                                                          |
 
 ## What is `.coderabbit.yaml`?
 
@@ -136,21 +136,21 @@ For the `.coderabbit.yaml` configuration options, the specification of the optio
 
 ```json
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "type": "object",
-    "properties": {
-        "tone_instructions": {
-            "default": "",
-            "description": "Set the tone of reviews and chat. Example: 'You must talk like Mr. T. I pity the fool who doesn't!'",
-            "type": "string",
-            "maxLength": 250
-        },
-        "early_access": {
-            "default": false,
-            "description": "Enable early-access features.",
-            "type": "boolean"
-        }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "tone_instructions": {
+      "default": "",
+      "description": "Set the tone of reviews and chat. Example: 'You must talk like Mr. T. I pity the fool who doesn't!'",
+      "type": "string",
+      "maxLength": 250
+    },
+    "early_access": {
+      "default": false,
+      "description": "Enable early-access features.",
+      "type": "boolean"
     }
+  }
 }
 ```
 
@@ -166,14 +166,14 @@ Now let's get into the specifics of how the JSON is converted into a Valibot sch
 
 A file called `src/schema/jsonSchemaToValibot.ts` provides a function that takes a JSON Schema node (the definition of a single item) and assembles the corresponding Valibot rule. Based on the `type` field written there, it assembles the matching Valibot schema. The CodeRabbit Config Generator has the following conversion rules.
 
-| JSON Schema `type` | Converted Valibot |
-|---|---|
-| `boolean` | `v.boolean()` |
-| `string` | `v.string()` (if `minLength`/`maxLength`/`pattern` are present, additional rules are added via `pipe`) |
-| `number` / `integer` | `v.number()` (if `minimum`/`maximum` are present, additional rules are added via `pipe`) |
-| `array` | `v.array(schema of the element)` |
-| `object` | `v.object({ key: sub-schema, ... })` |
-| `enum` (fixed set of choices) | `v.picklist([...])` |
+| JSON Schema `type`            | Converted Valibot                                                                                      |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `boolean`                     | `v.boolean()`                                                                                          |
+| `string`                      | `v.string()` (if `minLength`/`maxLength`/`pattern` are present, additional rules are added via `pipe`) |
+| `number` / `integer`          | `v.number()` (if `minimum`/`maximum` are present, additional rules are added via `pipe`)               |
+| `array`                       | `v.array(schema of the element)`                                                                       |
+| `object`                      | `v.object({ key: sub-schema, ... })`                                                                   |
+| `enum` (fixed set of choices) | `v.picklist([...])`                                                                                    |
 
 By calling this recursively, even nested objects can be converted wholesale into a Valibot schema. You can think of it as: instead of hand-writing something like the `LoginSchema` from the Valibot example, this function writes it automatically while reading the JSON Schema.
 
@@ -209,19 +209,19 @@ So, following the same idea as `src/schema/jsonSchemaToValibot.ts`, this app has
 
 The rules for determining the widget are as follows.
 
-| JSON Schema condition | Widget used |
-|---|---|
-| `boolean` | Toggle switch |
-| `enum` (4 or fewer choices) | Radio buttons |
-| `enum` (5–20 choices) | Select box |
-| `enum` (with `enumNames`, more than 20 choices) | Searchable combobox |
-| `string` (short text) | Single-line input |
-| `string` (long text) | Textarea |
-| `number` / `integer` | Number input (with min/max) |
-| `array` (array of strings) | Tag input |
-| `array` (array of objects) | Repeatable group |
-| `object` (record with free-form keys) | Key/value editor |
-| `object` (fixed set of properties) | Section (heading + content) |
+| JSON Schema condition                           | Widget used                 |
+| ----------------------------------------------- | --------------------------- |
+| `boolean`                                       | Toggle switch               |
+| `enum` (4 or fewer choices)                     | Radio buttons               |
+| `enum` (5–20 choices)                           | Select box                  |
+| `enum` (with `enumNames`, more than 20 choices) | Searchable combobox         |
+| `string` (short text)                           | Single-line input           |
+| `string` (long text)                            | Textarea                    |
+| `number` / `integer`                            | Number input (with min/max) |
+| `array` (array of strings)                      | Tag input                   |
+| `array` (array of objects)                      | Repeatable group            |
+| `object` (record with free-form keys)           | Key/value editor            |
+| `object` (fixed set of properties)              | Section (heading + content) |
 
 The actual code looks like this.
 
@@ -244,12 +244,15 @@ function widgetKind(node: JSONSchema, key: string): WidgetKind {
       return isLongText(node, key) ? 'textarea' : 'text';
     case 'array': {
       const item = resolveItemNode(node.items);
-      return item.type === 'object' || item.properties ? 'object-array' : 'string-array';
+      return item.type === 'object' || item.properties
+        ? 'object-array'
+        : 'string-array';
     }
     case 'object':
     default:
       // If additionalProperties is a schema, it's a "record with free-form keys"
-      return node.additionalProperties && typeof node.additionalProperties === 'object'
+      return node.additionalProperties &&
+        typeof node.additionalProperties === 'object'
         ? 'key-value'
         : 'group';
   }
