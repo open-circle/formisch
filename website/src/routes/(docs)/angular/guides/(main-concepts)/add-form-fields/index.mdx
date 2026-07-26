@@ -1,0 +1,176 @@
+---
+title: Add form fields
+description: >-
+  Learn how to add fields to your form using the formischField directive or
+  injectField function. Both are headless and provide access to field state
+  for building your form UI.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Add form fields
+
+To add a field to your form, you can use the <Link href="/angular/api/formischField/">`*formischField`</Link> directive or the <Link href="/angular/api/injectField/">`injectField`</Link> function. Both are headless and provide access to field state for building your form UI.
+
+## Field directive
+
+The <Link href="/angular/api/formischField/">`*formischField`</Link> directive is a structural directive. It takes the path to the field, the form store after the `of` keyword, and exposes the field store as the implicit template context. If you use TypeScript, you get full autocompletion for the path based on your schema.
+
+```ts
+import { Component } from '@angular/core';
+import {
+  FormischControl,
+  FormischField,
+  FormischForm,
+  injectForm,
+} from '@formisch/angular';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+@Component({
+  selector: 'app-login',
+  imports: [FormischForm, FormischField, FormischControl],
+  template: `
+    <form [formischForm]="loginForm" [formischSubmit]="handleSubmit">
+      <input
+        *formischField="['email'] of loginForm; let field"
+        [formischControl]="field"
+        type="email"
+      />
+      <input
+        *formischField="['password'] of loginForm; let field"
+        [formischControl]="field"
+        type="password"
+      />
+      <button type="submit">Login</button>
+    </form>
+  `,
+})
+export class LoginComponent {
+  readonly loginForm = injectForm({ schema: LoginSchema });
+
+  readonly handleSubmit = (output: v.InferOutput<typeof LoginSchema>) => {
+    console.log(output);
+  };
+}
+```
+
+### Control directive
+
+The <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive connects the field store to a native form control. It writes the field input into the element, sets the `name` and `aria-invalid` attributes, registers the element so features like focusing the first invalid field on submit work, and wires the `input`, `change`, `focus` and `blur` handlers.
+
+Because the directive writes to the element, you must not bind `[value]` or `[checked]` to hold the field's state yourself. The exception is a radio or checkbox group, where the `value` of each element identifies its option rather than the state of the field — see the <Link href="/angular/guides/special-inputs/">special inputs</Link> guide.
+
+### Multiple elements per field
+
+When a field spans more than one element — a label, the input and an error message — use an `<ng-container>` as the host of the structural directive:
+
+```ts
+template: `
+  <ng-container *formischField="['email'] of loginForm; let field">
+    <label [for]="field.name()">Email</label>
+    <input [id]="field.name()" [formischControl]="field" type="email" />
+    @if (field.errors(); as errors) {
+      <div>{{ errors[0] }}</div>
+    }
+  </ng-container>
+`;
+```
+
+### Headless design
+
+The <Link href="/angular/api/formischField/">`*formischField`</Link> directive does not render its own UI elements. It is headless and provides only the data layer of the field. This allows you to freely define your user interface. You can use HTML elements, custom components or an external UI library.
+
+### Path array
+
+The path accepts an array of strings and numbers that represents the path to the field in your schema. For top-level fields, it's simply the field name wrapped in an array:
+
+```angular-html
+<input
+  *formischField="['email'] of loginForm; let field"
+  [formischControl]="field"
+/>
+```
+
+For nested fields, the path reflects the structure of your schema:
+
+```angular-html
+<!-- For a schema like: v.object({ user: v.object({ email: v.string() }) }) -->
+<input
+  *formischField="['user', 'email'] of form; let field"
+  [formischControl]="field"
+/>
+```
+
+### Type safety
+
+The API design of the <Link href="/angular/api/formischField/">`*formischField`</Link> directive results in a fully type-safe form. The directive declares a typed template context via `ngTemplateContextGuard`, so with `strictTemplates` enabled TypeScript will immediately alert you if the path is invalid — directly in your template. The field state is also fully typed based on your schema, giving you autocompletion for signals like `field.input()`.
+
+## injectField function
+
+For very complex forms where you create individual components for each form field, Formisch provides the <Link href="/angular/api/injectField/">`injectField`</Link> function. It allows you to access the field state directly within your component class. Like <Link href="/angular/api/injectForm/">`injectForm`</Link>, it must be called in an injection context.
+
+```ts
+import { Component, input } from '@angular/core';
+import {
+  FormischControl,
+  type FormStore,
+  injectField,
+} from '@formisch/angular';
+import * as v from 'valibot';
+
+const EmailSchema = v.object({ email: v.pipe(v.string(), v.email()) });
+
+@Component({
+  selector: 'app-email-input',
+  imports: [FormischControl],
+  template: `
+    <div>
+      <input [formischControl]="field" type="email" />
+      @if (field.errors(); as errors) {
+        <div>{{ errors[0] }}</div>
+      }
+    </div>
+  `,
+})
+export class EmailInputComponent {
+  readonly form = input.required<FormStore<typeof EmailSchema>>();
+
+  protected readonly field = injectField(this.form, { path: ['email'] });
+}
+```
+
+Both the form and the path can be passed as a signal, so the field store follows the input signal of your component or a path that changes over time.
+
+### When to use which
+
+- **Use the `*formischField` directive**: When defining multiple fields in the same component. It ensures you don't accidentally access the wrong field store.
+- **Use the `injectField` function**: When creating field components for single fields. It allows you to access field state in your component class.
+
+The <Link href="/angular/api/formischField/">`*formischField`</Link> directive is essentially a thin wrapper around <Link href="/angular/api/injectField/">`injectField`</Link> that allows you to access the field state within template code.
+
+## Field store
+
+The field store provides access to the following properties:
+
+- `path`: The path to the field within the form.
+- `name`: A signal with the name of the field element (the JSON-stringified path).
+- `input`: A signal with the current input value of the field.
+- `errors`: A signal with an array of error messages if validation fails, otherwise `null`.
+- `isTouched`: A signal with whether the field has been touched.
+- `isEdited`: A signal with whether the field's value has been changed.
+- `isDirty`: A signal with whether the current input differs from the initial input.
+- `isValid`: A signal with whether the field passes all validation rules.
+- `setInput`: Sets the field input value programmatically.
+
+All state is exposed as signals, so you call them like functions in your template (e.g. `field.errors()`). The only exception is `path`, which is a plain value.
+
+## Next steps
+
+Now that you know how to add fields to your form, continue to the <Link href="/angular/guides/input-components/">input components</Link> guide to learn about creating reusable input components for your forms.

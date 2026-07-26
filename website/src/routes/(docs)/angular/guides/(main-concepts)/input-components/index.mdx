@@ -1,0 +1,194 @@
+---
+title: Input components
+description: >-
+  Learn how to create reusable input components to make your form code more
+  readable and maintainable. Encapsulate styling and error display logic.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Input components
+
+To make your code more readable, we recommend that you develop your own input components if you are not using a prebuilt UI library. There you can encapsulate logic to display error messages, for example.
+
+> If you're already a bit more experienced, you can use the input components we developed for our <Link href="/playground/login/">playground</Link> as a starting point. You can find the code in our GitHub repository <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/tree/main/playgrounds/angular/src/components`} target="\_blank" rel="noreferrer">here</a>.
+
+## Why input components?
+
+Currently, your fields might look something like this:
+
+```angular-html
+<ng-container *formischField="['email'] of loginForm; let field">
+  <div>
+    <label [for]="field.name()">Email *</label>
+    <input
+      [id]="field.name()"
+      [formischControl]="field"
+      type="email"
+      required
+    />
+    @if (field.errors(); as errors) {
+      <div>{{ errors[0] }}</div>
+    }
+  </div>
+</ng-container>
+```
+
+If CSS and a few more functionalities are added here, the code quickly becomes confusing. In addition, you have to rewrite the same code for almost every form field.
+
+Our goal is to develop a `TextInputComponent` so that the code ends up looking like this:
+
+```angular-html
+<app-text-input
+  *formischField="['email'] of loginForm; let field"
+  [field]="field"
+  type="email"
+  label="Email"
+  [required]="true"
+/>
+```
+
+## Create an input component
+
+In the first step, you create a new file for the `TextInputComponent`. The component takes the field store as an input and passes it on to the <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive.
+
+Keep the component generic over the schema and the field path. The field store is invariant because of its `setInput` method, so a component that widens the input to the default `FieldStore` cannot accept a concrete field.
+
+```ts
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  type FieldStore,
+  FormischControl,
+  type FormSchema,
+  type RequiredPath,
+} from '@formisch/angular';
+
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-text-input',
+  imports: [FormischControl],
+  template: `…`,
+})
+export class TextInputComponent<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
+  readonly field = input.required<FieldStore<TSchema, TFieldPath>>();
+  readonly type = input<string>('text');
+  readonly label = input<string>();
+  readonly placeholder = input<string>();
+  readonly required = input<boolean>(false);
+}
+```
+
+### Template code
+
+After that, you can add the template code. Use `field().name()` as the `id` so that the label and the error message reference the input element.
+
+```ts
+template: `
+  @if (label(); as label) {
+    <label [for]="field().name()">
+      {{ label }} @if (required()) { <span>*</span> }
+    </label>
+  }
+  <input
+    [id]="field().name()"
+    [type]="type()"
+    [placeholder]="placeholder() ?? ''"
+    [attr.aria-errormessage]="
+      field().errors() ? field().name() + '-error' : null
+    "
+    [formischControl]="field()"
+  />
+  @if (field().errors(); as errors) {
+    <div [id]="field().name() + '-error'">{{ errors[0] }}</div>
+  }
+`;
+```
+
+You don't need to set `aria-invalid` yourself. The <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive keeps it in sync with the field's errors.
+
+### Next steps
+
+You can now build on this code and add CSS, for example. You can also follow the procedure to create other components such as `CheckboxComponent`, `SliderComponent`, `SelectComponent` and `FileInputComponent`.
+
+### Final code
+
+Below is an overview of the entire code of the `TextInputComponent`.
+
+```ts
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  type FieldStore,
+  FormischControl,
+  type FormSchema,
+  type RequiredPath,
+} from '@formisch/angular';
+
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-text-input',
+  imports: [FormischControl],
+  template: `
+    @if (label(); as label) {
+      <label [for]="field().name()">
+        {{ label }}
+        @if (required()) {
+          <span>*</span>
+        }
+      </label>
+    }
+    <input
+      [id]="field().name()"
+      [type]="type()"
+      [placeholder]="placeholder() ?? ''"
+      [attr.aria-errormessage]="
+        field().errors() ? field().name() + '-error' : null
+      "
+      [formischControl]="field()"
+    />
+    @if (field().errors(); as errors) {
+      <div [id]="field().name() + '-error'">{{ errors[0] }}</div>
+    }
+  `,
+})
+export class TextInputComponent<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
+  readonly field = input.required<FieldStore<TSchema, TFieldPath>>();
+  readonly type = input<string>('text');
+  readonly label = input<string>();
+  readonly placeholder = input<string>();
+  readonly required = input<boolean>(false);
+}
+```
+
+## Components without a native element
+
+If your component wraps a UI library that does not expose the underlying native element, you cannot use the <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive. In that case, read the value from `field().input()` and write it back with `field().setInput(value)`:
+
+```ts
+@Component({
+  selector: 'app-custom-input',
+  template: `
+    <ui-library-input
+      [value]="field().input()"
+      (valueChange)="field().setInput($event)"
+    />
+  `,
+})
+export class CustomInputComponent<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
+  readonly field = input.required<FieldStore<TSchema, TFieldPath>>();
+}
+```
+
+## Next steps
+
+Now that you know how to create reusable input components, continue to the <Link href="/angular/guides/handle-submission/">handle submission</Link> guide to learn how to process form data when the user submits the form.

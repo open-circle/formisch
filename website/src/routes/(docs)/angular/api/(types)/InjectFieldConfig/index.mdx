@@ -1,0 +1,28 @@
+---
+title: InjectFieldConfig
+description: Configuration object for creating a field store with injectField.
+source: /frameworks/angular/src/functions/injectField/injectField.ts
+contributors:
+  - fabian-hiller
+---
+
+import { Link, Property } from '~/components';
+import { properties } from './properties';
+
+# InjectFieldConfig
+
+Configuration object for creating a field store with <Link href="../injectField/">`injectField`</Link>.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Definition
+
+- `InjectFieldConfig`
+  - `path` <Property {...properties.path} />
+
+### Explanation
+
+The `path` may be passed as a plain array or as a signal. Passing a signal is useful when the field a component points at changes over time, for example when the index of an item in a field array is bound to an input signal.

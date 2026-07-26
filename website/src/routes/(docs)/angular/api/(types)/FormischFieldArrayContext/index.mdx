@@ -1,0 +1,28 @@
+---
+title: FormischFieldArrayContext
+description: The template context exposed by the formischFieldArray directive.
+source: /frameworks/angular/src/directives/FormischFieldArray/FormischFieldArray.ts
+contributors:
+  - fabian-hiller
+---
+
+import { Link, Property } from '~/components';
+import { properties } from './properties';
+
+# FormischFieldArrayContext
+
+The template context exposed by the <Link href="../formischFieldArray/">`*formischFieldArray`</Link> directive.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldArrayPath` <Property {...properties.TFieldArrayPath} />
+
+## Definition
+
+- `FormischFieldArrayContext`
+  - `$implicit` <Property {...properties.$implicit} />
+
+### Explanation
+
+The directive declares this interface as its template context through `ngTemplateContextGuard`. That is what types `let fieldArray` in your template and turns a path that does not point to an array into a compile error when `strictTemplates` is enabled.

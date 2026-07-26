@@ -1,0 +1,87 @@
+---
+title: Controlled fields
+description: >-
+  Learn how the formischControl directive keeps your fields in sync with the
+  form state, and how to control a field yourself when you cannot bind to a
+  native element.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Controlled fields
+
+In Formisch for Angular, every field bound with the <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive is controlled for you. This is different from our other framework packages, where you have to bind the value of the element yourself.
+
+## How it works
+
+The directive writes the field's input into the element after every render in which the input changed. It knows the quirks of each element type, so it sets `value` on a text input, `checked` on a checkbox or radio, and the selected state of the options of a `<select />`.
+
+```angular-html
+<input
+  *formischField="['firstName'] of form; let field"
+  [formischControl]="field"
+  type="text"
+/>
+```
+
+That single binding is all you need for initial values, for programmatic updates via <Link href="/methods/api/setInput/">`setInput`</Link>, and for <Link href="/methods/api/reset/">`reset`</Link> to be reflected in the UI. There is no `[value]`, `[checked]` or `[(ngModel)]` to add — and you must not add them, because the directive already owns the element's value.
+
+> Writing happens in Angular's render write phase, after sibling DOM such as the options of a `<select />` has been created. That ordering is what makes a select show the right option on first render.
+
+The directive additionally keeps the element's `name` attribute and its `aria-invalid` attribute in sync, and registers the element with the field so that <Link href="/methods/api/focus/">`focus`</Link> and the automatic focus of the first invalid field on submit work.
+
+## Reading the value
+
+To render the current value somewhere else — a character counter, a preview, a summary — read the `input` signal of the field:
+
+```angular-html
+<ng-container *formischField="['bio'] of form; let field">
+  <textarea [formischControl]="field"></textarea>
+  <span>{{ field.input()?.length ?? 0 }} / 500</span>
+</ng-container>
+```
+
+Because it is a signal, only the parts of your template that actually read it update when the value changes.
+
+## Setting the value
+
+To change a field's value from your component class, you have two options:
+
+- `field.setInput(value)` on the field store when you already have the field
+- The <Link href="/methods/api/setInput/">`setInput`</Link> method when you only
+  have the form store
+
+```ts
+readonly form = injectForm({ schema: ProfileSchema });
+
+resetUsername(): void {
+  setInput(this.form, { path: ['username'], input: '' });
+}
+```
+
+Both update the field input and trigger validation according to your `revalidate` config. The bound element follows automatically.
+
+## Fields without a native element
+
+If you use a UI library whose components do not expose their underlying native element, you cannot apply the <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive. In that case, control the field yourself by reading `field.input()` and writing back with `field.setInput(…)`:
+
+```angular-html
+<ng-container *formischField="['country'] of form; let field">
+  <ui-select [value]="field.input()" (valueChange)="field.setInput($event)" />
+  @if (field.errors(); as errors) {
+    <div>{{ errors[0] }}</div>
+  }
+</ng-container>
+```
+
+Note that a field controlled this way is not registered as an element of the form. Features that need a DOM element — focusing the first invalid field on submit, and the <Link href="/methods/api/focus/">`focus`</Link> method — will skip it.
+
+## File inputs
+
+The HTML `<input type="file" />` element is an exception, because browsers do not allow a file selection to be set programmatically. Formisch can only clear it. You can, however, control the UI around it. For inspiration, check out our <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/blob/main/playgrounds/angular/src/components/file-input.component.ts`} target="\_blank" rel="noreferrer">file input</a> component from the <Link href="/playground/login/">playground</Link>.
+
+## Next steps
+
+Now that you understand controlled fields, you can explore more advanced topics like <Link href="/angular/guides/nested-fields/">nested fields</Link> and <Link href="/angular/guides/field-arrays/">field arrays</Link> to handle complex form structures.

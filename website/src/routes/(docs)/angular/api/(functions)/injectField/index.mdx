@@ -1,0 +1,122 @@
+---
+title: injectField
+description: Creates a reactive field store for a specific field within a form store.
+source: /frameworks/angular/src/functions/injectField/injectField.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# injectField
+
+Creates a reactive field store for a specific field within a form store.
+
+```ts
+const field = injectField<TSchema, TFieldPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+With `injectField` you create a field store for a specific field path within your form. The field store exposes the field's input value, validation errors and state as Angular signals, provides a `setInput` method to update the value programmatically, and carries the element-binding contract that the <Link href="../formischControl/">`[formischControl]`</Link> directive consumes.
+
+Like Angular's own `inject`, `injectField` must be called in an injection context. Both the form and the path may be passed as a signal, so the field store follows an input signal of your component or a path that changes over time.
+
+Use `injectField` when you build a component for a single field. To create fields directly in a template, use the <Link href="../formischField/">`*formischField`</Link> directive instead, which is a thin wrapper around this function.
+
+## Returns
+
+- `field` <Property {...properties.FieldStore} />
+
+## Examples
+
+The following examples show how `injectField` can be used.
+
+### Field component
+
+```ts
+import { Component, input } from '@angular/core';
+import {
+  FormischControl,
+  type FormStore,
+  injectField,
+} from '@formisch/angular';
+import * as v from 'valibot';
+
+const EmailSchema = v.object({ email: v.pipe(v.string(), v.email()) });
+
+@Component({
+  selector: 'app-email-input',
+  imports: [FormischControl],
+  template: `
+    <input [formischControl]="field" type="email" />
+    @if (field.errors(); as errors) {
+      <div>{{ errors[0] }}</div>
+    }
+  `,
+})
+export class EmailInputComponent {
+  readonly of = input.required<FormStore<typeof EmailSchema>>();
+
+  protected readonly field = injectField(this.of, { path: ['email'] });
+}
+```
+
+> Type the form input with a concrete schema, as above. A component that is generic over the schema cannot resolve the path type, because `ValidPath` is computed from the inferred input of the schema. To build a field component that works with any schema, take the field store as an input instead and stay generic over `TSchema` and `TFieldPath` — see the <Link href="/angular/guides/typescript/">TypeScript</Link> guide.
+
+### Set the input programmatically
+
+```ts
+protected readonly field = injectField(this.form, { path: ['country'] });
+
+selectCountry(country: string): void {
+  this.field.setInput(country);
+}
+```
+
+## Related
+
+The following APIs can be combined with `injectField`.
+
+### Functions
+
+<ApiList
+  items={[
+    { text: 'injectForm', href: '../injectForm/' },
+    { text: 'injectFieldArray', href: '../injectFieldArray/' },
+  ]}
+/>
+
+### Directives
+
+<ApiList
+  items={[
+    { text: 'formischControl', href: '../formischControl/' },
+    { text: 'formischField', href: '../formischField/' },
+    { text: 'formischForm', href: '../formischForm/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'focus', href: '/methods/api/focus/' },
+    { text: 'getErrors', href: '/methods/api/getErrors/' },
+    { text: 'getInput', href: '/methods/api/getInput/' },
+    { text: 'setErrors', href: '/methods/api/setErrors/' },
+    { text: 'setInput', href: '/methods/api/setInput/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>

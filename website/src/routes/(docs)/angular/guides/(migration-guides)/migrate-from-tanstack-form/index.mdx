@@ -1,0 +1,365 @@
+---
+title: Migrate from TanStack Form
+description: >-
+  Learn how to migrate your Angular forms from TanStack Form to Formisch. This
+  guide compares both APIs side by side, walks you through the migration step
+  by step, and maps TanStack Form APIs to their Formisch equivalents.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from TanStack Form
+
+This guide walks you through migrating a form from [TanStack Form](https://tanstack.com/form/latest) to Formisch. It explains the mental-model differences, shows the same form implemented in both libraries, and maps TanStack Form's APIs, options, and state fields to their Formisch counterparts.
+
+Migrating is a rewrite of your form layer, not a drop-in replacement. That said, the conceptual gap is small: both libraries are headless, both keep form state outside the template, and both support schema validation. The main work is moving your validators into a single root Valibot schema and replacing TanStack's field API with Formisch's directives.
+
+Both libraries can coexist in the same application, so you can migrate one form at a time. Since both export a function named `injectForm`, the import path determines which one a component uses.
+
+## Key differences
+
+The biggest shift is where the form's shape comes from. In TanStack Form, the shape and the types come from `defaultValues`, and validation is configured separately per validator trigger (`onChange`, `onBlur`, `onSubmit`), optionally with a Standard Schema. In Formisch, a single Valibot schema is the one source of truth for the structure, the TypeScript types, and the rules — there is no `defaultValues` object to keep aligned with a schema.
+
+Validation also runs differently:
+
+- **Location**: TanStack Form can validate per field and per form, with a separate schema or function per trigger. Formisch always parses the entire form against one schema in a single pass and distributes the resulting issues to the individual fields.
+- **Timing**: TanStack Form binds validation to the trigger you register it under (`validators: { onChange: … }`). Formisch controls timing form-wide with `validate` (first validation) and `revalidate` (subsequent validations) on <Link href="/angular/api/injectForm/">`injectForm`</Link>.
+- **Field addressing**: TanStack Form identifies fields by dot-notation strings like `'members[0].email'`. Formisch uses path arrays like `['members', 0, 'email']` that are fully type-checked against your schema — including inside templates when `strictTemplates` is enabled.
+- **State access**: TanStack Form exposes state through a store, read in Angular with `injectStore(this.form, (state) => …)`. Formisch exposes each piece of state as its own signal on the form and field stores, so you read `form.isSubmitting()` directly.
+- **Element binding**: With TanStack Form you wire `[value]`, `(input)` and `(blur)` on each element yourself. Formisch's <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive does all of that, including the quirks of checkboxes, radios, selects and file inputs.
+
+## Side-by-side example
+
+The following login form has two validated fields and an async submit handler.
+
+### TanStack Form
+
+```ts
+import { Component } from '@angular/core';
+import { injectForm, injectStore, TanStackField } from '@tanstack/angular-form';
+import { z } from 'zod';
+
+const LoginSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Please enter your email.')
+    .email('The email address is badly formatted.'),
+  password: z
+    .string()
+    .min(1, 'Please enter your password.')
+    .min(8, 'Your password must have 8 characters or more.'),
+});
+
+@Component({
+  selector: 'app-login',
+  imports: [TanStackField],
+  template: `
+    <form (submit)="handleSubmit($event)">
+      <ng-container [tanstackField]="form" name="email" #email="field">
+        <input
+          type="email"
+          [value]="email.api.state.value"
+          (input)="email.api.handleChange($any($event).target.value)"
+          (blur)="email.api.handleBlur()"
+        />
+        @if (email.api.state.meta.errors.length) {
+          <div>{{ email.api.state.meta.errors[0]?.message }}</div>
+        }
+      </ng-container>
+
+      <ng-container [tanstackField]="form" name="password" #password="field">
+        <input
+          type="password"
+          [value]="password.api.state.value"
+          (input)="password.api.handleChange($any($event).target.value)"
+          (blur)="password.api.handleBlur()"
+        />
+        @if (password.api.state.meta.errors.length) {
+          <div>{{ password.api.state.meta.errors[0]?.message }}</div>
+        }
+      </ng-container>
+
+      <button type="submit" [disabled]="isSubmitting()">Login</button>
+    </form>
+  `,
+})
+export class LoginComponent {
+  readonly form = injectForm({
+    defaultValues: { email: '', password: '' },
+    validators: { onChange: LoginSchema },
+    onSubmit: async ({ value }) => {
+      await this.api.login(value);
+    },
+  });
+
+  readonly isSubmitting = injectStore(this.form, (state) => state.isSubmitting);
+
+  handleSubmit(event: SubmitEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    void this.form.handleSubmit();
+  }
+}
+```
+
+### Formisch
+
+```ts
+import { Component } from '@angular/core';
+import {
+  FormischControl,
+  FormischField,
+  FormischForm,
+  injectForm,
+  type SubmitHandler,
+} from '@formisch/angular';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+@Component({
+  selector: 'app-login',
+  imports: [FormischForm, FormischField, FormischControl],
+  template: `
+    <form [formischForm]="loginForm" [formischSubmit]="handleSubmit">
+      <ng-container *formischField="['email'] of loginForm; let field">
+        <input [formischControl]="field" type="email" />
+        @if (field.errors(); as errors) {
+          <div>{{ errors[0] }}</div>
+        }
+      </ng-container>
+
+      <ng-container *formischField="['password'] of loginForm; let field">
+        <input [formischControl]="field" type="password" />
+        @if (field.errors(); as errors) {
+          <div>{{ errors[0] }}</div>
+        }
+      </ng-container>
+
+      <button type="submit" [disabled]="loginForm.isSubmitting()">Login</button>
+    </form>
+  `,
+})
+export class LoginComponent {
+  readonly loginForm = injectForm({
+    schema: LoginSchema,
+    validate: 'change',
+  });
+
+  readonly handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+    await this.api.login(values);
+  };
+}
+```
+
+The Formisch version has no `defaultValues` duplicating the schema, no manual `preventDefault`, no store selector for `isSubmitting`, and no per-element value and event wiring.
+
+## Migration steps
+
+### Install Formisch
+
+```bash
+npm install @formisch/angular valibot
+```
+
+### Move validation into a Valibot schema
+
+If you already validate with a Standard Schema, this is mostly a translation of one schema library into Valibot. Note that Formisch reads the error message from the schema, so make sure every rule carries the message you want to render.
+
+```ts
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+});
+```
+
+Field-level validators registered under `validators` on a single field move into the corresponding property of the root schema. Cross-field rules that lived in the form-level `validators` become a `v.check` on the object, forwarded to the field that should show the message:
+
+```ts
+const SignUpSchema = v.pipe(
+  v.object({
+    password: v.pipe(v.string(), v.minLength(8)),
+    confirmPassword: v.string(),
+  }),
+  v.forward(
+    v.check(
+      (input) => input.password === input.confirmPassword,
+      'The passwords do not match.'
+    ),
+    ['confirmPassword']
+  )
+);
+```
+
+### Replace the form setup
+
+`defaultValues` becomes `initialInput` — but only for the values you actually want to prefill. Fields without an initial value start from the schema's empty input.
+
+```ts
+// Before
+readonly form = injectForm({
+  defaultValues: { email: '', password: '' },
+  validators: { onChange: LoginSchema },
+  onSubmit: async ({ value }) => { await this.api.login(value); },
+});
+
+// After
+readonly loginForm = injectForm({
+  schema: LoginSchema,
+  validate: 'change',
+});
+```
+
+The submit handler moves out of the config and into `[formischSubmit]` on the form element.
+
+### Replace field bindings
+
+The `[tanstackField]` container becomes `*formischField`, and the manual value and event bindings collapse into `[formischControl]`.
+
+```angular-html
+<!-- Before -->
+<ng-container [tanstackField]="form" name="email" #email="field">
+  <input
+    [value]="email.api.state.value"
+    (input)="email.api.handleChange($any($event).target.value)"
+    (blur)="email.api.handleBlur()"
+  />
+</ng-container>
+
+<!-- After -->
+<input
+  *formischField="['email'] of loginForm; let field"
+  [formischControl]="field"
+  type="email"
+/>
+```
+
+### Update submission handling
+
+TanStack Form asks you to intercept the native submit event yourself. Formisch's <Link href="/angular/api/formischForm/">`[formischForm]`</Link> directive handles the event, validates, focuses the first invalid field, and tracks `isSubmitting()` while your handler runs.
+
+```ts
+// Before
+handleSubmit(event: SubmitEvent): void {
+  event.preventDefault();
+  event.stopPropagation();
+  void this.form.handleSubmit();
+}
+
+// After — passed to [formischSubmit], called only when valid
+readonly handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+  await this.api.login(values);
+};
+```
+
+## API mapping
+
+| TanStack Form                               | Formisch                                                                            |
+| ------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `injectForm({ defaultValues, validators })` | <Link href="/angular/api/injectForm/">`injectForm({ schema, initialInput })`</Link> |
+| `defaultValues`                             | `initialInput`                                                                      |
+| `validators: { onChange: schema }`          | `schema` + `validate` / `revalidate`                                                |
+| `[tanstackField]` + `name="email"`          | `*formischField="['email'] of form; let field"`                                     |
+| `field.api.state.value`                     | `field.input()`                                                                     |
+| `field.api.handleChange(value)`             | `field.setInput(value)` (or just `[formischControl]`)                               |
+| `field.api.handleBlur()`                    | Handled by `[formischControl]`                                                      |
+| `field.api.state.meta.errors`               | `field.errors()`                                                                    |
+| `field.api.state.meta.isTouched`            | `field.isTouched()`                                                                 |
+| `field.api.state.meta.isDirty`              | `field.isDirty()`                                                                   |
+| `injectStore(form, (s) => s.isSubmitting)`  | `form.isSubmitting()`                                                               |
+| `injectStore(form, (s) => s.canSubmit)`     | `form.isValid()` / `form.isValidating()`                                            |
+| `injectStore(form, (s) => s.values)`        | <Link href="/methods/api/getInput/">`getInput(form)`</Link>                         |
+| `form.handleSubmit()`                       | <Link href="/methods/api/submit/">`submit(form)`</Link>                             |
+| `onSubmit: async ({ value }) => …`          | `[formischSubmit]="handleSubmit"`                                                   |
+| `form.reset()`                              | <Link href="/methods/api/reset/">`reset(form)`</Link>                               |
+| `form.setFieldValue(name, value)`           | <Link href="/methods/api/setInput/">`setInput(form, { path, input })`</Link>        |
+| `form.validateField(name, cause)`           | <Link href="/methods/api/validate/">`validate(form, { path })`</Link>               |
+| `field.pushValue(item)`                     | <Link href="/methods/api/insert/">`insert(form, { path, initialInput })`</Link>     |
+| `field.removeValue(i)`                      | <Link href="/methods/api/remove/">`remove(form, { path, at: i })`</Link>            |
+| `field.swapValues(a, b)`                    | <Link href="/methods/api/swap/">`swap(form, { path, at, and })`</Link>              |
+| `field.moveValue(from, to)`                 | <Link href="/methods/api/move/">`move(form, { path, from, to })`</Link>             |
+
+## Common patterns
+
+### Form state
+
+No store selectors are needed. Every value is a signal on the form store:
+
+```angular-html
+<!-- Before -->
+<button type="submit" [disabled]="!canSubmit()">Login</button>
+
+<!-- After -->
+<button type="submit" [disabled]="loginForm.isValidating()">Login</button>
+```
+
+### Validation timing
+
+```ts
+// Before: per trigger
+validators: { onChange: Schema, onBlur: Schema }
+
+// After: once per form
+readonly form = injectForm({
+  schema: Schema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+### Field arrays
+
+```ts
+const TodosSchema = v.object({
+  todos: v.array(v.object({ label: v.pipe(v.string(), v.nonEmpty()) })),
+});
+```
+
+```angular-html
+<ng-container *formischFieldArray="['todos'] of form; let fieldArray">
+  @for (item of fieldArray.items(); track item; let index = $index) {
+    <input
+      *formischField="['todos', index, 'label'] of form; let field"
+      [formischControl]="field"
+    />
+  }
+</ng-container>
+```
+
+Where TanStack Form uses `mode="array"` and the field's own `pushValue`/`removeValue` helpers, Formisch uses the standalone <Link href="/methods/api/insert/">`insert`</Link> and <Link href="/methods/api/remove/">`remove`</Link> methods with a path. Track by the item identifier from `fieldArray.items()` rather than by `$index`.
+
+### Reset
+
+```ts
+// Before
+this.form.reset();
+
+// After
+reset(this.form);
+```
+
+Pass `{ initialInput }` to `reset` when new server data should become the baseline for dirty tracking.
+
+### Special inputs
+
+Checkboxes, radio groups, multi-selects and file inputs need no special handling: bind <Link href="/angular/api/formischControl/">`[formischControl]`</Link> and Formisch reads and writes the element correctly. See the <Link href="/angular/guides/special-inputs/">special inputs</Link> guide.
+
+## Next steps
+
+Start with the <Link href="/angular/guides/define-your-form/">define your form</Link> guide to get comfortable with schema-first thinking, then read <Link href="/angular/guides/validation/">validation</Link> for the timing options and <Link href="/angular/guides/field-arrays/">field arrays</Link> if your forms are dynamic.

@@ -1,0 +1,81 @@
+---
+title: formischField
+description: Structural directive that creates a typed field store and exposes it to the template.
+source: /frameworks/angular/src/directives/FormischField/FormischField.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# formischField
+
+Structural directive that creates a typed field store for a path and exposes it as the implicit context of the template. It is exported as the `FormischField` class.
+
+```angular-html
+<input
+  *formischField="['email'] of form; let field"
+  [formischControl]="field"
+/>
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Inputs
+
+- `formischField` <Property {...properties.formischField} />
+- `formischFieldOf` <Property {...properties.formischFieldOf} />
+
+## Context
+
+- `$implicit` <Property {...properties.$implicit} />
+
+### Explanation
+
+The `*formischField` directive is a thin wrapper around <Link href="../injectField/">`injectField`</Link> that lets you create a field directly in your template. The path is the expression before the `of` keyword, and the form store follows it. Passing the form explicitly this way is what allows the context guard to infer the type of the field's value.
+
+The field store is exposed as the implicit context, so `let field` binds it. Bind it to a native element with the <Link href="../formischControl/">`[formischControl]`</Link> directive. When one field spans multiple elements — a label, the input and an error message — use an `<ng-container>` as the host of the directive.
+
+Because the directive declares an `ngTemplateContextGuard`, an invalid path is a compile error in your template as soon as `strictTemplates` is enabled in the `angularCompilerOptions` of your `tsconfig.json`.
+
+To import the directive, add the `FormischField` class to the `imports` array of your component.
+
+## Related
+
+The following APIs can be combined with `formischField`.
+
+### Functions
+
+<ApiList
+  items={[
+    { text: 'injectField', href: '../injectField/' },
+    { text: 'injectForm', href: '../injectForm/' },
+  ]}
+/>
+
+### Directives
+
+<ApiList
+  items={[
+    { text: 'formischControl', href: '../formischControl/' },
+    { text: 'formischForm', href: '../formischForm/' },
+    { text: 'formischFieldArray', href: '../formischFieldArray/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'focus', href: '/methods/api/focus/' },
+    { text: 'getErrors', href: '/methods/api/getErrors/' },
+    { text: 'getInput', href: '/methods/api/getInput/' },
+    { text: 'setErrors', href: '/methods/api/setErrors/' },
+    { text: 'setInput', href: '/methods/api/setInput/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>

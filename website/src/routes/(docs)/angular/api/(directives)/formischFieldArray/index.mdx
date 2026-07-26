@@ -1,0 +1,78 @@
+---
+title: formischFieldArray
+description: Structural directive that creates a typed field array store and exposes it to the template.
+source: /frameworks/angular/src/directives/FormischFieldArray/FormischFieldArray.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# formischFieldArray
+
+Structural directive that creates a typed field array store for a path and exposes it as the implicit context of the template. It is exported as the `FormischFieldArray` class.
+
+```angular-html
+<ng-container *formischFieldArray="['todos'] of form; let fieldArray">
+  <!-- Field array content here -->
+</ng-container>
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldArrayPath` <Property {...properties.TFieldArrayPath} />
+
+## Inputs
+
+- `formischFieldArray` <Property {...properties.formischFieldArray} />
+- `formischFieldArrayOf` <Property {...properties.formischFieldArrayOf} />
+
+## Context
+
+- `$implicit` <Property {...properties.$implicit} />
+
+### Explanation
+
+The `*formischFieldArray` directive is a thin wrapper around <Link href="../injectFieldArray/">`injectFieldArray`</Link> that lets you create a field array directly in your template. The path is the expression before the `of` keyword, and the form store follows it, which allows the context guard to infer the type of the array.
+
+Render the items with an `@for` block over `fieldArray.items()` and use the item identifier as the `track` expression. The identifiers are stable across reorders, so Angular moves the existing DOM instead of recreating it. Combine the index of the `@for` block with <Link href="../formischField/">`*formischField`</Link> to address the fields of an item, and use the <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/replace/">`replace`</Link> and <Link href="/methods/api/swap/">`swap`</Link> methods to change the array.
+
+To import the directive, add the `FormischFieldArray` class to the `imports` array of your component.
+
+## Related
+
+The following APIs can be combined with `formischFieldArray`.
+
+### Functions
+
+<ApiList
+  items={[
+    { text: 'injectFieldArray', href: '../injectFieldArray/' },
+    { text: 'injectForm', href: '../injectForm/' },
+  ]}
+/>
+
+### Directives
+
+<ApiList
+  items={[
+    { text: 'formischField', href: '../formischField/' },
+    { text: 'formischForm', href: '../formischForm/' },
+    { text: 'formischControl', href: '../formischControl/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'insert', href: '/methods/api/insert/' },
+    { text: 'move', href: '/methods/api/move/' },
+    { text: 'remove', href: '/methods/api/remove/' },
+    { text: 'replace', href: '/methods/api/replace/' },
+    { text: 'swap', href: '/methods/api/swap/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>

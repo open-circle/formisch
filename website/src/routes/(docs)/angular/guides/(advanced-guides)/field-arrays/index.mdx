@@ -1,0 +1,318 @@
+---
+title: Field arrays
+description: >-
+  Learn how to create dynamic form fields based on arrays. Field arrays allow
+  users to add, remove, and reorder form fields, making them perfect for
+  complex forms like todo lists or shopping carts.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Field arrays
+
+A somewhat more special case are dynamically generated form fields based on an array. Since adding, removing, swapping and moving items can be a big challenge here, the library provides the <Link href="/angular/api/formischFieldArray/">`*formischFieldArray`</Link> directive which, in combination with various methods, makes it very easy for you to create such forms.
+
+> In our <Link href="/playground/todos/">playground</Link> you can take a look at a form with a field array and test them out.
+
+## Create a field array
+
+### Schema definition
+
+In the following example we create a field array for a todo form with the following schema:
+
+```ts
+import * as v from 'valibot';
+
+const TodoFormSchema = v.object({
+  heading: v.pipe(v.string(), v.nonEmpty()),
+  todos: v.pipe(
+    v.array(
+      v.object({
+        label: v.pipe(v.string(), v.nonEmpty()),
+        deadline: v.pipe(v.string(), v.nonEmpty()),
+      })
+    ),
+    v.nonEmpty(),
+    v.maxLength(10)
+  ),
+});
+```
+
+### FieldArray directive
+
+To dynamically generate the form fields for the todos, you use the <Link href="/angular/api/formischFieldArray/">`*formischFieldArray`</Link> directive in combination with Angular's `@for` block. The field array provides an `items` signal that contains unique string identifiers. Use them as the `track` expression so Angular detects when an item is added, moved, or removed.
+
+```ts
+import { Component } from '@angular/core';
+import {
+  FormischControl,
+  FormischField,
+  FormischFieldArray,
+  FormischForm,
+  injectForm,
+} from '@formisch/angular';
+import * as v from 'valibot';
+
+const TodoFormSchema = v.object({
+  heading: v.pipe(v.string(), v.nonEmpty()),
+  todos: v.pipe(
+    v.array(
+      v.object({
+        label: v.pipe(v.string(), v.nonEmpty()),
+        deadline: v.pipe(v.string(), v.nonEmpty()),
+      })
+    ),
+    v.nonEmpty(),
+    v.maxLength(10)
+  ),
+});
+
+@Component({
+  selector: 'app-todos',
+  imports: [FormischForm, FormischField, FormischFieldArray, FormischControl],
+  template: `
+    <form [formischForm]="todoForm" [formischSubmit]="handleSubmit">
+      <ng-container *formischField="['heading'] of todoForm; let field">
+        <input [formischControl]="field" type="text" />
+        @if (field.errors(); as errors) {
+          <div>{{ errors[0] }}</div>
+        }
+      </ng-container>
+
+      <div *formischFieldArray="['todos'] of todoForm; let fieldArray">
+        @for (item of fieldArray.items(); track item; let index = $index) {
+          <div>
+            <ng-container
+              *formischField="['todos', index, 'label'] of todoForm; let field"
+            >
+              <input [formischControl]="field" type="text" />
+              @if (field.errors(); as errors) {
+                <div>{{ errors[0] }}</div>
+              }
+            </ng-container>
+
+            <ng-container
+              *formischField="
+                ['todos', index, 'deadline'] of todoForm;
+                let field
+              "
+            >
+              <input [formischControl]="field" type="date" />
+              @if (field.errors(); as errors) {
+                <div>{{ errors[0] }}</div>
+              }
+            </ng-container>
+          </div>
+        }
+        @if (fieldArray.errors(); as errors) {
+          <div>{{ errors[0] }}</div>
+        }
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+  `,
+})
+export class TodosComponent {
+  readonly todoForm = injectForm({
+    schema: TodoFormSchema,
+    initialInput: {
+      heading: '',
+      todos: [{ label: '', deadline: '' }],
+    },
+  });
+
+  readonly handleSubmit = (output: v.InferOutput<typeof TodoFormSchema>) => {
+    console.log(output);
+  };
+}
+```
+
+> Track by the item identifier, not by `$index`. The identifiers are stable across reorders, which lets Angular move the existing DOM nodes instead of recreating them — and lets Formisch keep each field's state attached to the right item.
+
+### Path array with index
+
+As with <Link href="/angular/guides/nested-fields/">nested fields</Link>, you use an array as the path. The key difference is that you include the index from the `@for` block to specify which array item you're referencing. This ensures the paths update correctly when items are added, moved, or removed.
+
+```angular-html
+<input
+  *formischField="['todos', index, 'label'] of todoForm; let field"
+  [formischControl]="field"
+  type="text"
+/>
+```
+
+## Use array methods
+
+Now you can use the <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/replace/">`replace`</Link>, and <Link href="/methods/api/swap/">`swap`</Link> methods to make changes to the field array. These methods automatically take care of rearranging all the fields.
+
+Since these methods take the form store as their first argument, call them from a method of your component class rather than inline in the template.
+
+### Insert method
+
+Add a new item to the array:
+
+```ts
+import { insert } from '@formisch/angular';
+
+handleInsert(): void {
+  insert(this.todoForm, {
+    path: ['todos'],
+    initialInput: { label: '', deadline: '' },
+  });
+}
+```
+
+```angular-html
+<button type="button" (click)="handleInsert()">Add todo</button>
+```
+
+The `at` option can be used to specify the index where the item should be inserted. If not provided, the item is added to the end of the array.
+
+### Remove method
+
+Remove an item from the array:
+
+```ts
+import { remove } from '@formisch/angular';
+
+handleRemove(index: number): void {
+  remove(this.todoForm, { path: ['todos'], at: index });
+}
+```
+
+```angular-html
+<button type="button" (click)="handleRemove(index)">Delete</button>
+```
+
+### Move method
+
+Move an item from one position to another:
+
+```ts
+import { move } from '@formisch/angular';
+
+handleMoveFirstToEnd(length: number): void {
+  move(this.todoForm, { path: ['todos'], from: 0, to: length - 1 });
+}
+```
+
+```angular-html
+<button type="button" (click)="handleMoveFirstToEnd(fieldArray.items().length)">
+  Move first to end
+</button>
+```
+
+### Swap method
+
+Swap two items in the array:
+
+```ts
+import { swap } from '@formisch/angular';
+
+handleSwapFirstTwo(): void {
+  swap(this.todoForm, { path: ['todos'], at: 0, and: 1 });
+}
+```
+
+```angular-html
+<button type="button" (click)="handleSwapFirstTwo()">Swap first two</button>
+```
+
+### Replace method
+
+Replace an item with new data:
+
+```ts
+import { replace } from '@formisch/angular';
+
+handleReplaceFirst(): void {
+  replace(this.todoForm, {
+    path: ['todos'],
+    at: 0,
+    initialInput: {
+      label: 'New task',
+      deadline: new Date().toISOString().split('T')[0],
+    },
+  });
+}
+```
+
+```angular-html
+<button type="button" (click)="handleReplaceFirst()">Replace first</button>
+```
+
+## Nested field arrays
+
+If you need to nest multiple field arrays, the path array syntax makes it straightforward. Simply extend the path with additional array indices:
+
+```ts
+import * as v from 'valibot';
+
+const NestedSchema = v.object({
+  categories: v.array(
+    v.object({
+      name: v.string(),
+      items: v.array(v.object({ title: v.string() })),
+    })
+  ),
+});
+```
+
+```angular-html
+<ng-container *formischFieldArray="['categories'] of form; let categoryArray">
+  @for (category of categoryArray.items(); track category; let i = $index) {
+    <div>
+      <input
+        *formischField="['categories', i, 'name'] of form; let field"
+        [formischControl]="field"
+      />
+
+      <ng-container
+        *formischFieldArray="['categories', i, 'items'] of form; let itemArray"
+      >
+        @for (item of itemArray.items(); track item; let j = $index) {
+          <input
+            *formischField="['categories', i, 'items', j, 'title'] of form; let field"
+            [formischControl]="field"
+          />
+        }
+      </ng-container>
+    </div>
+  }
+</ng-container>
+```
+
+You can nest field arrays as deeply as you like. You will also find a suitable example of this in our <Link href="/playground/nested/">playground</Link>.
+
+## Field array store
+
+The field array store exposes the following properties:
+
+- `path`: The path to the array field within the form.
+- `items`: A signal with the item IDs of the array field.
+- `errors`: A signal with the error messages of the field array itself.
+- `isTouched`, `isEdited`, `isDirty`, `isValid`: Signals with the aggregated state of the array and its items.
+
+## Field array validation
+
+As with fields, you can validate field arrays using Valibot's array validation functions. For example, to limit the length of the array:
+
+```ts
+const TodoFormSchema = v.object({
+  todos: v.pipe(
+    v.array(
+      v.object({
+        label: v.string(),
+        deadline: v.string(),
+      })
+    ),
+    v.minLength(1),
+    v.maxLength(10)
+  ),
+});
+```
+
+The validation errors for the field array itself are available in `fieldArray.errors()` and can be displayed alongside the array.

@@ -1,0 +1,65 @@
+---
+title: Comparison
+description: >-
+  A concise comparison of Formisch with Reactive Forms, Signal Forms, and
+  TanStack Form for Angular across TypeScript inference, validation, and
+  reactivity, with a short decision guide.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Comparison
+
+Formisch is one of several form libraries available for Angular. The most common alternatives are Angular's built-in [Reactive Forms](https://angular.dev/guide/forms/reactive-forms), the newer [Signal Forms](https://angular.dev/guide/forms/signals), [ngx-formly](https://formly.dev), and [TanStack Form](https://tanstack.com/form/latest). This page is meant as a quick reference for picking the right tool.
+
+## At a glance
+
+|                        | **Formisch**                                     | Reactive Forms                  | Signal Forms                       | TanStack Form                           |
+| ---------------------- | ------------------------------------------------ | ------------------------------- | ---------------------------------- | --------------------------------------- |
+| Type source            | Inferred from schema                             | Declared manually               | Inferred from model signal         | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                                | Validator functions per control | Schema function or Standard Schema | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`              | Per control (`updateOn`)        | Continuous, signal-driven          | Per-validator trigger                   |
+| Async validation       | Built-in via schema                              | Async validators                | Built-in (`validateAsync`)         | Built-in `isValidating`                 |
+| Reactivity scope       | Per signal subscription                          | RxJS observables                | Per signal subscription            | Per TanStack Store subscription         |
+| Schema libraries       | Valibot                                          | –                               | Standard Schema                    | Standard Schema                         |
+| UI approach            | Headless                                         | Headless                        | Headless                           | Headless                                |
+| Bundle size (min+gzip) | From ~4.5 kB                                     | Bundled with Angular            | Bundled with Angular               | ~15 kB                                  |
+| Framework support      | Angular, React, Preact, Solid, Svelte, Vue, Qwik | Angular                         | Angular                            | React, Vue, Solid, Svelte, Lit, Angular |
+
+The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and reactivity.
+
+Note that Signal Forms is Angular's newer, signal-based forms API. Check the [Angular documentation](https://angular.dev/guide/forms/signals) for its current stability status before adopting it in production.
+
+## Why Formisch?
+
+Three reasons to pick Formisch over the alternatives above:
+
+**One schema, no second source of truth.** A single Valibot schema is everything the form needs: the runtime validator, the source of types, and the description of the form's structure — all at once. There is no `FormGroup` shape to declare next to an interface, no `Validators` list to keep aligned with your model, no resolver to configure. When the schema changes, every part of the form follows — at compile time and at runtime.
+
+**A small, tree-shakable bundle.** A form with the directives and `injectForm` starts at ~4.5 kB min+gzip and grows only as you import additional methods like `focus`, `getInput`, and `reset` — methods you don't import don't end up in your bundle. Angular's built-in form libraries ship with the framework, but compared to other third-party form libraries Formisch is several times smaller.
+
+**Type safety that stays fast.** Types flow from the schema through every API, including deeply nested paths and field arrays — and through your templates, since the structural directives declare a typed template context. With `strictTemplates` enabled, an invalid path or a mistyped field is a compile error. The inference is structured to keep TypeScript editor performance from degrading as schemas grow.
+
+## Which library should you use?
+
+**Reactive Forms** is the battle-tested default that ships with Angular. It has the largest ecosystem, works in every Angular version, and integrates with everything. The trade-offs are that types are declared by hand rather than inferred, validation logic is spread across `Validators` on individual controls, and its state is RxJS-based rather than signal-based.
+
+**Signal Forms** is Angular's signal-native successor to Reactive Forms, deriving a form from a model signal and supporting Standard Schema validation. It's a strong fit if you want to stay entirely within the framework and are comfortable adopting a newer API.
+
+**ngx-formly** is schema-driven in a different sense: you describe your fields as JSON-like configuration and it renders the UI for you, with adapters for Material, PrimeNG, and others. Best when your forms are generated dynamically from server-side definitions rather than written by hand.
+
+**TanStack Form** is a good fit when you need fine-grained control over validation timing and built-in async validation handling without building that infrastructure yourself. It is also the natural choice if your team already uses TanStack libraries and values a consistent mental model across data fetching, routing, and forms.
+
+**Formisch** makes the most sense for new projects in TypeScript-heavy codebases, especially when you expect forms to grow in complexity, and when the same team also writes forms for other frameworks and wants one mental model across all of them. The schema-first design means there is a single source of truth for types, runtime validation, and form structure. Reactivity is fine-grained through signals, so it works naturally with `OnPush` and zoneless change detection. The main consideration is that Formisch currently supports only [Valibot](https://valibot.dev) as the schema library.
+
+## Migrating to Formisch
+
+Migrating to Formisch is not a drop-in replacement, but the libraries can coexist in the same application, so you can migrate one form at a time. The main work is consolidating validation rules into a single root Valibot schema and replacing the previous library's form and field APIs with Formisch's functions and directives.
+
+We provide a dedicated migration guide for each library, with a side-by-side example, step-by-step instructions, and an API mapping table: <Link href="/angular/guides/migrate-from-reactive-forms/">migrate from Reactive Forms</Link> and <Link href="/angular/guides/migrate-from-tanstack-form/">migrate from TanStack Form</Link>.
+
+## Next steps
+
+If you have decided that Formisch is a good fit, install it via the <Link href="/angular/guides/installation/">installation</Link> guide and start building by <Link href="/angular/guides/define-your-form/">defining your form</Link>.

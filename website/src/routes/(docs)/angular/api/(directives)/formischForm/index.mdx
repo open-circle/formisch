@@ -1,0 +1,76 @@
+---
+title: formischForm
+description: Directive that turns a native form element into a Formisch-managed form.
+source: /frameworks/angular/src/directives/FormischForm/FormischForm.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# formischForm
+
+Directive that turns a native `<form>` element into a Formisch-managed form. It is exported as the `FormischForm` class.
+
+```angular-html
+<form [formischForm]="form" [formischSubmit]="handleSubmit">
+  <!-- Form content here -->
+</form>
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+
+## Inputs
+
+- `formischForm` <Property {...properties.formischForm} />
+- `formischSubmit` <Property {...properties.formischSubmit} />
+
+### Explanation
+
+The `[formischForm]` directive attaches a form store to a native `<form>` element. When the form is submitted, it validates the input against your schema, focuses the first invalid field, and calls your submit handler only if validation succeeds. It also adds `novalidate` to the element to disable the browser's own validation, since Formisch handles validation internally, and registers the element so that the <Link href="/methods/api/submit/">`submit`</Link> method can reach it.
+
+The `[formischSubmit]` input receives your handler as a function reference instead of calling it in the template. That way Formisch can await the promise it returns and keep `form.isSubmitting()` up to date, and register the pending submission with Angular's `PendingTasks` so server-side rendering and tests wait for it.
+
+> Declare your handler as an arrow function property. A regular class method would lose its `this` when it is passed as a reference.
+
+To import the directive, add the `FormischForm` class to the `imports` array of your component.
+
+## Related
+
+The following APIs can be combined with `formischForm`.
+
+### Functions
+
+<ApiList
+  items={[
+    { text: 'injectForm', href: '../injectForm/' },
+    { text: 'injectField', href: '../injectField/' },
+    { text: 'injectFieldArray', href: '../injectFieldArray/' },
+  ]}
+/>
+
+### Directives
+
+<ApiList
+  items={[
+    { text: 'formischField', href: '../formischField/' },
+    { text: 'formischFieldArray', href: '../formischFieldArray/' },
+    { text: 'formischControl', href: '../formischControl/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'focus', href: '/methods/api/focus/' },
+    { text: 'getDeepErrors', href: '/methods/api/getDeepErrors/' },
+    { text: 'handleSubmit', href: '/methods/api/handleSubmit/' },
+    { text: 'reset', href: '/methods/api/reset/' },
+    { text: 'submit', href: '/methods/api/submit/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>
