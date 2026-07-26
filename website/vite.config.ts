@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { readFileSync } from 'node:fs';
 import rehypeExternalLinks from 'rehype-external-links';
 import { getSingletonHighlighter } from 'shiki';
+import shikiAngularHtml from 'shiki/langs/angular-html.mjs';
 import shikiBash from 'shiki/langs/bash.mjs';
 import shikiSvelte from 'shiki/langs/svelte.mjs';
 import shikiTypeScript from 'shiki/langs/ts.mjs';
@@ -21,7 +22,8 @@ await Promise.all([
     shikiTypeScriptX,
     shikiBash,
     shikiSvelte,
-    shikiVue
+    shikiVue,
+    shikiAngularHtml
   ),
   highlighter.loadTheme(
     JSON.parse(readFileSync('shiki/pace-theme-light+.json', 'utf8')),

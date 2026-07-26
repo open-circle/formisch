@@ -5,6 +5,7 @@ import { ActionButton, ButtonGroup, Expandable, TextLink } from '~/components';
 import { PlusIcon } from '~/icons';
 import { blurredCodeDarkUrl, blurredCodeLightUrl } from '~/images';
 import {
+  AngularLogo,
   PreactLogo,
   QwikLogo,
   ReactLogo,
@@ -124,6 +125,12 @@ export default component$(() => {
                   url: `${
                     import.meta.env.PUBLIC_STACKBLITZ_PREACT_URL
                   }?file=src%2Froutes%2Flogin%2Findex.tsx`,
+                },
+                {
+                  Logo: AngularLogo,
+                  url: `${
+                    import.meta.env.PUBLIC_STACKBLITZ_ANGULAR_URL
+                  }?file=src%2Froutes%2Flogin%2Flogin.component.ts`,
                 },
               ].map(({ Logo, url }) => (
                 <a

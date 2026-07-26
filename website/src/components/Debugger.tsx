@@ -25,7 +25,9 @@ export const Debugger = component$((props: DebuggerProps) => {
   // Get path to GitHub file
   const gitHubHref = useComputed$(() => {
     const path = location.url.pathname.split('/')[2] || '';
-    if (framework.value === 'vue') {
+    if (framework.value === 'angular') {
+      return `${import.meta.env.PUBLIC_GITHUB_URL}/tree/main/playgrounds/angular/src/routes/${path}/${path}.component.ts`;
+    } else if (framework.value === 'vue') {
       return `${import.meta.env.PUBLIC_GITHUB_URL}/tree/main/playgrounds/vue/src/views/${path.charAt(0).toUpperCase() + path.slice(1)}View.vue`;
     } else if (framework.value === 'svelte') {
       return `${import.meta.env.PUBLIC_GITHUB_URL}/tree/main/playgrounds/svelte/src/routes/${path}/+page.svelte`;
@@ -37,7 +39,9 @@ export const Debugger = component$((props: DebuggerProps) => {
   // Get path to Stackblitz file
   const stackBlitzHref = useComputed$(() => {
     const path = location.url.pathname.split('/')[2] || '';
-    if (framework.value === 'vue') {
+    if (framework.value === 'angular') {
+      return `${import.meta.env.PUBLIC_STACKBLITZ_ANGULAR_URL}?file=src/routes/${path}/${path}.component.ts`;
+    } else if (framework.value === 'vue') {
       return `${import.meta.env.PUBLIC_STACKBLITZ_VUE_URL}?file=src/views/${path.charAt(0).toUpperCase() + path.slice(1)}View.vue`;
     } else if (framework.value === 'svelte') {
       return `${import.meta.env.PUBLIC_STACKBLITZ_SVELTE_URL}?file=src/routes/${path}/+page.svelte`;
