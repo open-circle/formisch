@@ -2,7 +2,16 @@ import { component$, createComputed$, useSignal } from '@qwik.dev/core';
 import { type DocumentHead } from '@qwik.dev/router';
 import clsx from 'clsx';
 import { ActionButton, ButtonGroup, Expandable, TextLink } from '~/components';
-import { PlusIcon } from '~/icons';
+import {
+  AngularIcon,
+  PlusIcon,
+  PreactIcon,
+  QwikIcon,
+  ReactIcon,
+  SolidIcon,
+  SvelteIcon,
+  VueIcon,
+} from '~/icons';
 import { blurredCodeDarkUrl, blurredCodeLightUrl } from '~/images';
 import {
   AngularLogo,
@@ -84,63 +93,71 @@ export default component$(() => {
               alt="Blurred TypeScript JSX code"
             />
           ))}
-          <div class="flex w-full flex-col items-center gap-8 px-8">
+          <div class="flex w-full flex-col items-center gap-8 px-8 py-12">
             <p class="text-center leading-loose md:text-lg md:leading-loose lg:text-xl lg:leading-loose">
               Select your framework to open a StackBlitz example project
             </p>
-            <div class="flex flex-wrap justify-center gap-4 md:gap-8">
+            <div class="flex max-w-2xl flex-wrap justify-center gap-4 md:gap-8">
               {[
                 {
+                  Icon: ReactIcon,
                   Logo: ReactLogo,
                   url: `${
                     import.meta.env.PUBLIC_STACKBLITZ_REACT_URL
                   }?file=src%2Froutes%2Flogin%2Findex.tsx`,
                 },
                 {
+                  Icon: SolidIcon,
                   Logo: SolidLogo,
                   url: `${
                     import.meta.env.PUBLIC_STACKBLITZ_SOLID_URL
                   }?file=src%2Froutes%2Flogin%2Findex.tsx`,
                 },
                 {
+                  Icon: VueIcon,
                   Logo: VueLogo,
                   url: `${
                     import.meta.env.PUBLIC_STACKBLITZ_VUE_URL
                   }?file=src%2Fviews%2FLoginView.vue`,
                 },
                 {
+                  Icon: SvelteIcon,
                   Logo: SvelteLogo,
                   url: `${
                     import.meta.env.PUBLIC_STACKBLITZ_SVELTE_URL
                   }?file=src%2Froutes%2Flogin%2F%2Bpage.svelte`,
                 },
                 {
+                  Icon: QwikIcon,
                   Logo: QwikLogo,
                   url: `${
                     import.meta.env.PUBLIC_STACKBLITZ_QWIK_URL
                   }?file=src%2Froutes%2Flogin%2Findex.tsx`,
                 },
                 {
+                  Icon: PreactIcon,
                   Logo: PreactLogo,
                   url: `${
                     import.meta.env.PUBLIC_STACKBLITZ_PREACT_URL
                   }?file=src%2Froutes%2Flogin%2Findex.tsx`,
                 },
                 {
+                  Icon: AngularIcon,
                   Logo: AngularLogo,
                   url: `${
                     import.meta.env.PUBLIC_STACKBLITZ_ANGULAR_URL
                   }?file=src%2Froutes%2Flogin%2Flogin.component.ts`,
                 },
-              ].map(({ Logo, url }) => (
+              ].map(({ Icon, Logo, url }) => (
                 <a
                   key={url}
-                  class="focus-ring group flex h-14 w-32 items-center justify-center rounded-xl border-2 border-slate-200 bg-white hover:border-sky-600/20 md:h-16 md:w-36 md:rounded-2xl md:border-[3px] dark:border-slate-800 dark:bg-gray-900 hover:dark:border-sky-400/20"
+                  class="focus-ring group flex h-14 w-14 items-center justify-center rounded-xl border-2 border-slate-200 bg-white hover:border-sky-600/20 md:h-16 md:w-36 md:rounded-2xl md:border-[3px] dark:border-slate-800 dark:bg-gray-900 hover:dark:border-sky-400/20"
                   target="_blank"
                   rel="noopener noreferrer"
                   href={url}
                 >
-                  <Logo class="h-9 text-slate-900 opacity-75 transition-opacity group-hover:opacity-100 md:h-12 dark:text-slate-200" />
+                  <Icon class="h-7 opacity-75 transition-opacity group-hover:opacity-100 md:hidden" />
+                  <Logo class="hidden h-9 text-slate-900 opacity-75 transition-opacity group-hover:opacity-100 md:block md:h-12 dark:text-slate-200" />
                 </a>
               ))}
             </div>
