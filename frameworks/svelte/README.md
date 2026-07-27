@@ -2,7 +2,7 @@
 
 Formisch is a schema-based, headless form library for Svelte. It manages form state and validation. It is type-safe, fast by default and its bundle size is small due to its modular design. Try it out in our [playground](https://stackblitz.com/edit/formisch-playground-svelte)!
 
-Formisch is also available for [Preact][formisch-preact], [Qwik][formisch-qwik], [React][formisch-react], [SolidJS][formisch-solid], and [Vue][formisch-vue].
+Formisch is also available for [Angular][formisch-angular], [Preact][formisch-preact], [Qwik][formisch-qwik], [React][formisch-react], [SolidJS][formisch-solid], and [Vue][formisch-vue].
 
 ## Highlights
 
@@ -56,7 +56,7 @@ Every form starts with the `createForm` function. It initializes your form's sto
 </Form>
 ```
 
-In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include `focus`, `getErrors`, `getAllErrors`, `getInput`, `insert`, `move`, `remove`, `replace`, `reset`, `setErrors`, `setInput`, `submit`, `swap` and `validate`. These methods allow you to control the form programmatically.
+In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include `focus`, `getDeepErrorEntries`, `getDeepErrors`, `getDirtyInput`, `getDirtyPaths`, `getErrors`, `getInput`, `handleSubmit`, `insert`, `isDirty`, `isEdited`, `isTouched`, `isValid`, `move`, `pickDirty`, `remove`, `replace`, `reset`, `setErrors`, `setInput`, `submit`, `swap` and `validate`. These methods allow you to control the form programmatically.
 
 ## Comparison
 
@@ -82,6 +82,7 @@ Find a bug or have an idea how to improve the library? Please fill out an [issue
 
 This project is available free of charge and licensed under the [MIT license](https://github.com/open-circle/formisch/blob/main/LICENSE.md).
 
+[formisch-angular]: https://github.com/open-circle/formisch/tree/main/frameworks/angular
 [formisch-preact]: https://github.com/open-circle/formisch/tree/main/frameworks/preact
 [formisch-qwik]: https://github.com/open-circle/formisch/tree/main/frameworks/qwik
 [formisch-react]: https://github.com/open-circle/formisch/tree/main/frameworks/react

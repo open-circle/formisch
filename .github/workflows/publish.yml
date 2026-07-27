@@ -10,8 +10,8 @@ jobs:
     name: Run default CI of repository
     uses: ./.github/workflows/ci.yml
 
-  preact_npm:
-    name: Publish Preact to NPM
+  angular_npm:
+    name: Publish Angular to NPM
     needs: default_ci
     runs-on: ubuntu-latest
     permissions:
@@ -24,9 +24,39 @@ jobs:
         uses: ./.github/actions/environment
       - name: Build library
         run: pnpm build
+        working-directory: frameworks/angular
+      - name: Publish library
+        run: |
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
+          npm publish --access public --tag "$TAG"
+        working-directory: frameworks/angular
+        continue-on-error: true
+
+  preact_npm:
+    name: Publish Preact to NPM
+    needs: default_ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Build library
+        run: pnpm build
         working-directory: frameworks/preact
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/preact
         continue-on-error: true
 
@@ -39,14 +69,19 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup environment
         uses: ./.github/actions/environment
       - name: Build library
         run: pnpm build
         working-directory: frameworks/qwik
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/qwik
         continue-on-error: true
 
@@ -59,14 +94,19 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup environment
         uses: ./.github/actions/environment
       - name: Build library
         run: pnpm build
         working-directory: frameworks/react
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/react
         continue-on-error: true
 
@@ -79,14 +119,19 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup environment
         uses: ./.github/actions/environment
       - name: Build library
         run: pnpm build
         working-directory: frameworks/solid
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/solid
         continue-on-error: true
 
@@ -99,14 +144,19 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup environment
         uses: ./.github/actions/environment
       - name: Build library
         run: pnpm build
         working-directory: frameworks/svelte
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/svelte
         continue-on-error: true
 
@@ -119,13 +169,18 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup environment
         uses: ./.github/actions/environment
       - name: Build library
         run: pnpm build
         working-directory: frameworks/vue
       - name: Publish library
-        run: npm publish --access public
+        run: |
+          # Resolve dist-tag from version: stable releases and the v1.0.0 release
+          # candidates go to "latest"; all other prereleases (e.g. later rc, beta,
+          # next) publish under their own tag so they never override a stable.
+          TAG=$(node -p "(() => { const [b, p] = require('./package.json').version.split('-'); const id = p?.split('.')[0]; return !id || (b === '1.0.0' && id === 'rc') ? 'latest' : id; })()")
+          npm publish --access public --tag "$TAG"
         working-directory: frameworks/vue
         continue-on-error: true

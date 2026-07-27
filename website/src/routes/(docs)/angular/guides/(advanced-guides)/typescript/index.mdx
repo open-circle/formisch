@@ -1,0 +1,271 @@
+---
+title: TypeScript
+description: >-
+  Learn how to leverage TypeScript with Formisch for maximum type safety.
+  Formisch is built with TypeScript and provides full type inference from
+  your Valibot schemas — in your component classes and in your templates.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# TypeScript
+
+Since the library is written in TypeScript and we put a lot of emphasis on the development experience, you can expect maximum TypeScript support. Types are automatically inferred from your <Link href="/angular/guides/define-your-form/">Valibot schemas</Link>, providing type safety throughout your forms.
+
+## Strict templates
+
+Formisch's structural directives declare a typed template context through Angular's `ngTemplateContextGuard`. To benefit from that in your templates, enable `strictTemplates` in the `angularCompilerOptions` of your `tsconfig.json`:
+
+```ts
+{
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  }
+}
+```
+
+With strict templates, an invalid field path is a compile error in the template itself, and the field store bound with `let field` is typed with the value at that path.
+
+## Type inference
+
+Formisch uses Valibot's type inference to automatically derive TypeScript types from your schemas. You don't need to define separate types — they're inferred automatically.
+
+```ts
+import { Component } from '@angular/core';
+import { FormischForm, injectForm } from '@formisch/angular';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+@Component({
+  selector: 'app-login',
+  imports: [FormischForm],
+  template: `
+    <form [formischForm]="loginForm" [formischSubmit]="handleSubmit">
+      <!-- Form fields -->
+    </form>
+  `,
+})
+export class LoginComponent {
+  // TypeScript knows the form structure from the schema
+  // loginForm is of type FormStore<typeof LoginSchema>
+  readonly loginForm = injectForm({ schema: LoginSchema });
+
+  readonly handleSubmit = (output: v.InferOutput<typeof LoginSchema>) => {
+    console.log(output.email); // ✓ Type-safe
+    // console.log(output.username); // ✗ TypeScript error
+  };
+}
+```
+
+### Input and output types
+
+Valibot schemas can have different input and output types when using transformations. Formisch provides proper typing for both: the field input keeps the input type that the HTML element holds, while your submit handler receives the transformed output.
+
+```ts
+const ProfileSchema = v.object({
+  age: v.pipe(
+    v.string(), // Input type: string (from HTML input)
+    v.transform((input) => Number(input)), // Output type: number
+    v.number()
+  ),
+  birthDate: v.pipe(
+    v.string(), // Input type: string (ISO date string)
+    v.transform((input) => new Date(input)), // Output type: Date
+    v.date()
+  ),
+});
+```
+
+```ts
+@Component({
+  selector: 'app-profile',
+  imports: [FormischForm, FormischField, FormischControl],
+  template: `
+    <form [formischForm]="profileForm" [formischSubmit]="handleSubmit">
+      <!-- field.input() is string -->
+      <input
+        *formischField="['age'] of profileForm; let field"
+        [formischControl]="field"
+        type="text"
+      />
+      <!-- field.input() is string -->
+      <input
+        *formischField="['birthDate'] of profileForm; let field"
+        [formischControl]="field"
+        type="date"
+      />
+      <button type="submit">Submit</button>
+    </form>
+  `,
+})
+export class ProfileComponent {
+  readonly profileForm = injectForm({ schema: ProfileSchema });
+
+  readonly handleSubmit = (output: v.InferOutput<typeof ProfileSchema>) => {
+    // output is: { age: number; birthDate: Date }
+    console.log(output.age); // number
+    console.log(output.birthDate); // Date
+  };
+}
+```
+
+### Type-safe paths
+
+Field paths are fully type-checked. TypeScript will provide autocompletion and catch invalid paths at compile time — in your class and, with `strictTemplates`, in your templates.
+
+```ts
+const UserSchema = v.object({
+  profile: v.object({
+    name: v.object({
+      first: v.string(),
+      last: v.string(),
+    }),
+    email: v.string(),
+  }),
+});
+```
+
+```angular-html
+<!-- ✓ Valid paths -->
+<input
+  *formischField="['profile', 'name', 'first'] of userForm; let field"
+  [formischControl]="field"
+/>
+<input
+  *formischField="['profile', 'email'] of userForm; let field"
+  [formischControl]="field"
+/>
+
+<!-- ✗ Invalid paths - TypeScript error -->
+<input
+  *formischField="['profile', 'age'] of userForm; let field"
+  [formischControl]="field"
+/>
+<input
+  *formischField="['username'] of userForm; let field"
+  [formischControl]="field"
+/>
+```
+
+## Type-safe inputs
+
+To pass your form to another component, use the <Link href="/angular/api/FormStore/">`FormStore`</Link> type along with your schema type to get full type safety.
+
+```ts
+import { Component, input } from '@angular/core';
+import { FormischForm, type FormStore } from '@formisch/angular';
+
+@Component({
+  selector: 'app-form-content',
+  imports: [FormischForm],
+  template: `
+    <form [formischForm]="of()" [formischSubmit]="handleSubmit">
+      <!-- Form fields -->
+    </form>
+  `,
+})
+export class FormContentComponent {
+  readonly of = input.required<FormStore<typeof LoginSchema>>();
+
+  readonly handleSubmit = (output: v.InferOutput<typeof LoginSchema>) => {
+    console.log(output);
+  };
+}
+```
+
+## Generic field components
+
+A component that owns a single field takes the form as an input and creates the field with <Link href="/angular/api/injectField/">`injectField`</Link>. Type the input with <Link href="/angular/api/FormStore/">`FormStore`</Link> and the concrete schema the component belongs to.
+
+```ts
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  FormischControl,
+  type FormStore,
+  injectField,
+} from '@formisch/angular';
+import * as v from 'valibot';
+
+const EmailSchema = v.object({ email: v.pipe(v.string(), v.email()) });
+
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-email-input',
+  imports: [FormischControl],
+  template: `
+    <label>
+      Email
+      <input [formischControl]="field" type="email" />
+    </label>
+    @if (field.errors(); as errors) {
+      <div>{{ errors[0] }}</div>
+    }
+  `,
+})
+export class EmailInputComponent {
+  readonly of = input.required<FormStore<typeof EmailSchema>>();
+
+  protected readonly field = injectField(this.of, { path: ['email'] });
+}
+```
+
+Passing a form whose schema has no `email` field of type `string` is a compile error, and `field.input()` is typed as `string | undefined` inside the component.
+
+> Do not make such a component generic over the schema (for example with `TSchema extends v.GenericSchema<{ email: string }>`). <Link href="/core/api/ValidPath/">`ValidPath`</Link> is computed from the inferred input of the schema, so it cannot be resolved while `TSchema` is still an unresolved type parameter, and the path is rejected. Use a concrete schema as above, or take the field store as an input as shown next.
+
+### Keep components generic over the field
+
+When a component takes a **field store** as an input instead of the form, make it generic over the schema and the path. The field store is invariant, because `setInput` accepts the field's value type. A component that declares a bare `FieldStore` input therefore cannot accept a concrete field store.
+
+```ts
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  type FieldStore,
+  FormischControl,
+  type FormSchema,
+  type RequiredPath,
+} from '@formisch/angular';
+
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-text-input',
+  imports: [FormischControl],
+  template: `<input [formischControl]="field()" [type]="type()" />`,
+})
+export class TextInputComponent<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
+  readonly field = input.required<FieldStore<TSchema, TFieldPath>>();
+  readonly type = input<string>('text');
+}
+```
+
+## Available types
+
+Most types you need can be imported from `@formisch/angular`. You can find all available types in our <Link href="/angular/api/">API reference</Link>.
+
+- <Link href="/angular/api/FormStore/">`FormStore`</Link> - The form store type
+- <Link href="/angular/api/FieldStore/">`FieldStore`</Link> - The field store
+  type
+- <Link href="/angular/api/FieldArrayStore/">`FieldArrayStore`</Link> - The
+  field array store type
+- <Link href="/angular/api/SignalOrValue/">`SignalOrValue`</Link> - Type for a
+  value that may be a signal
+- <Link href="/core/api/ValidPath/">`ValidPath`</Link> - Type for valid field
+  paths
+- <Link href="/core/api/ValidArrayPath/">`ValidArrayPath`</Link> - Type for
+  valid array field paths
+- <Link href="/core/api/FormSchema/">`FormSchema`</Link> - Form schema type
+  required at the root
+- <Link href="/core/api/Schema/">`Schema`</Link> - Base schema type from Valibot
+- <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link> - Type for submit
+  handlers without the event
+- <Link href="/core/api/SubmitEventHandler/">`SubmitEventHandler`</Link> - Type
+  for submit handlers with the event

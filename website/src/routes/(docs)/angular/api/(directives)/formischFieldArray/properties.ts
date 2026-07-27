@@ -1,0 +1,74 @@
+import type { PropertyProps } from '~/components';
+
+export const properties: Record<string, PropertyProps> = {
+  TSchema: {
+    modifier: 'extends',
+    type: {
+      type: 'custom',
+      name: 'FormSchema',
+      href: '/core/api/FormSchema/',
+    },
+  },
+  TFieldArrayPath: {
+    modifier: 'extends',
+    type: {
+      type: 'custom',
+      name: 'RequiredPath',
+      href: '/core/api/RequiredPath/',
+    },
+  },
+  formischFieldArray: {
+    type: {
+      type: 'custom',
+      name: 'ValidArrayPath',
+      href: '/core/api/ValidArrayPath/',
+      generics: [
+        {
+          type: 'custom',
+          name: 'v.InferInput',
+          href: 'https://valibot.dev/api/InferInput/',
+          generics: [
+            {
+              type: 'custom',
+              name: 'TSchema',
+            },
+          ],
+        },
+        {
+          type: 'custom',
+          name: 'TFieldArrayPath',
+        },
+      ],
+    },
+  },
+  formischFieldArrayOf: {
+    type: {
+      type: 'custom',
+      name: 'FormStore',
+      href: '../FormStore/',
+      generics: [
+        {
+          type: 'custom',
+          name: 'TSchema',
+        },
+      ],
+    },
+  },
+  $implicit: {
+    type: {
+      type: 'custom',
+      name: 'FieldArrayStore',
+      href: '../FieldArrayStore/',
+      generics: [
+        {
+          type: 'custom',
+          name: 'TSchema',
+        },
+        {
+          type: 'custom',
+          name: 'TFieldArrayPath',
+        },
+      ],
+    },
+  },
+};

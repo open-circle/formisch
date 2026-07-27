@@ -1,0 +1,25 @@
+---
+title: IsFormValidConfig
+description: Configuration interface for checking whether the entire form is valid.
+source: /packages/methods/src/isValid/isValid.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# IsFormValidConfig
+
+Configuration interface for checking whether the entire form is valid. Used by the `isValid` method when no specific field path is provided.
+
+## Definition
+
+- `IsFormValidConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'isValid', href: '../isValid/' }]} />

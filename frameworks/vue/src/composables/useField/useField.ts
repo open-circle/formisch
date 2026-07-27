@@ -76,6 +76,9 @@ export function useField(
   const isTouched = computed(() =>
     getFieldBool(internalFieldStore.value, 'isTouched')
   );
+  const isEdited = computed(() =>
+    getFieldBool(internalFieldStore.value, 'isEdited')
+  );
   const isDirty = computed(() =>
     getFieldBool(internalFieldStore.value, 'isDirty')
   );
@@ -103,6 +106,9 @@ export function useField(
     },
     get isTouched() {
       return isTouched.value;
+    },
+    get isEdited() {
+      return isEdited.value;
     },
     get isDirty() {
       return isDirty.value;

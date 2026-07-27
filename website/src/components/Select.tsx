@@ -1,5 +1,5 @@
-import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type Signal, useComputed$ } from '@qwik.dev/core';
+import type { FieldElementProps, ReadonlySignal } from '@formisch/qwik';
+import { component$, useComputed$ } from '@qwik.dev/core';
 import clsx from 'clsx';
 import { AngleDownIcon } from '~/icons';
 import { InputErrors } from './InputErrors';
@@ -13,8 +13,8 @@ interface SelectProps extends FieldElementProps {
   size?: number;
   placeholder?: string;
   required?: boolean;
-  input: Readonly<Signal<string | string[] | null | undefined>>;
-  errors: Readonly<Signal<[string, ...string[]] | null>>;
+  input: ReadonlySignal<string | string[] | null | undefined>;
+  errors: ReadonlySignal<[string, ...string[]] | null>;
 }
 
 /**

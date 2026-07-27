@@ -2,6 +2,30 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Change Qwik peer dependency to v2.0.0-beta.38
+- Add `ReadonlySignal` type as temporary replacement for `Readonly<Signal<TValue>>` to work around a false positive in eslint-plugin-qwik's `valid-lexical-scope` rule
+- Change `FormStore`, `FieldStore`, `FieldArrayStore` and `usePathSignal` to use new `ReadonlySignal` type
+
+## v1.0.0-rc.0 (June 23, 2026)
+
+- Release candidate for v1.0.0
+- Change `@formisch/core` to v1.0.0-rc.0
+- Change `@formisch/methods` to v1.0.0-rc.0
+
+## v0.14.0 (June 22, 2026)
+
+- Change `@formisch/core` to v0.10.0
+- Change `@formisch/methods` to v0.11.0
+- Add `emptyInput` config to define the value a required field of a given type starts at when no initial input is provided
+
+## v0.13.0 (June 21, 2026)
+
+- Change `@formisch/core` to v0.9.0
+- Change `@formisch/methods` to v0.10.0
+- Add `isEdited` property to the field, field array and form stores
+
 ## v0.12.0 (June 15, 2026)
 
 - Change `@formisch/core` to v0.8.0

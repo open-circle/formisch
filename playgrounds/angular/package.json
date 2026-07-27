@@ -1,0 +1,33 @@
+{
+  "name": "formisch-playground-angular",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@angular/common": "^22.0.0",
+    "@angular/compiler": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/platform-browser": "^22.0.0",
+    "@angular/router": "^22.0.0",
+    "@formisch/angular": "workspace:*",
+    "@formkit/auto-animate": "^0.8.4",
+    "@tailwindcss/vite": "^4.1.17",
+    "clsx": "^2.1.1",
+    "rxjs": "^7.8.2",
+    "valibot": "^1.4.1"
+  },
+  "devDependencies": {
+    "@analogjs/vite-plugin-angular": "^2.5.2",
+    "@angular/build": "^22.0.0",
+    "@angular/compiler-cli": "^22.0.0",
+    "@types/node": "^24.10.1",
+    "tailwindcss": "^4.1.17",
+    "typescript": "~6.0.3",
+    "vite": "^7.2.4"
+  }
+}

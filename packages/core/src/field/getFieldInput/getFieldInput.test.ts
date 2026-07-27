@@ -20,8 +20,8 @@ describe('getFieldInput', () => {
     });
 
     test('should return undefined for uninitialized field', () => {
-      const store = createTestStore(v.object({ name: v.string() }));
-      expect(getFieldInput(store.children.name)).toBeUndefined();
+      const store = createTestStore(v.object({ age: v.number() }));
+      expect(getFieldInput(store.children.age)).toBeUndefined();
     });
   });
 

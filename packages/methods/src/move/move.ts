@@ -77,6 +77,7 @@ export function move<
       // Create temporary internal field store
       const tempInternalFieldStore = {} as InternalFieldStore;
       initializeFieldStore(
+        internalFormStore,
         tempInternalFieldStore,
         // @ts-expect-error
         internalArrayStore.schema.item,
@@ -86,6 +87,7 @@ export function move<
 
       // Copy item state that gets overwritten to temporary store
       copyItemState(
+        internalFormStore,
         internalArrayStore.children[config.from],
         tempInternalFieldStore
       );
@@ -94,6 +96,7 @@ export function move<
         // Move child stores between 'from' and 'to' one index down
         for (let index = config.from; index < config.to; index++) {
           copyItemState(
+            internalFormStore,
             internalArrayStore.children[index + 1],
             internalArrayStore.children[index]
           );
@@ -102,6 +105,7 @@ export function move<
         // Move child stores between 'to' and 'from' one index up
         for (let index = config.from; index > config.to; index--) {
           copyItemState(
+            internalFormStore,
             internalArrayStore.children[index - 1],
             internalArrayStore.children[index]
           );
@@ -110,12 +114,14 @@ export function move<
 
       // Copy item state from temporary store to new position
       copyItemState(
+        internalFormStore,
         tempInternalFieldStore,
         internalArrayStore.children[config.to]
       );
 
-      // Mark field array as touched and update dirty state
+      // Mark field array as touched and edited and update dirty state
       internalArrayStore.isTouched.value = true;
+      internalArrayStore.isEdited.value = true;
       internalArrayStore.isDirty.value =
         internalArrayStore.startItems.value.join() !== newItems.join();
 

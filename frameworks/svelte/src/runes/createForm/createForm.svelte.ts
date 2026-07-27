@@ -35,6 +35,7 @@ export function createForm(config: FormConfig): FormStore {
   });
 
   const isTouched = $derived(getFieldBool(internalFormStore, 'isTouched'));
+  const isEdited = $derived(getFieldBool(internalFormStore, 'isEdited'));
   const isDirty = $derived(getFieldBool(internalFormStore, 'isDirty'));
   const isValid = $derived(!getFieldBool(internalFormStore, 'errors'));
 
@@ -51,6 +52,9 @@ export function createForm(config: FormConfig): FormStore {
     },
     get isTouched() {
       return isTouched;
+    },
+    get isEdited() {
+      return isEdited;
     },
     get isDirty() {
       return isDirty;

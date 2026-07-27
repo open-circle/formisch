@@ -4,8 +4,8 @@
 
 - [Introduction](/react/guides/introduction/)
 - [Installation](/react/guides/installation/)
+- [Coding agents](/react/guides/coding-agents/)
 - [Comparison](/react/guides/comparison/)
-- [LLMs.txt](/react/guides/llms-txt/)
 
 ## Main concepts
 
@@ -18,6 +18,7 @@
 
 ## Advanced guides
 
+- [Validation](/react/guides/validation/)
 - [Special inputs](/react/guides/special-inputs/)
 - [Controlled fields](/react/guides/controlled-fields/)
 - [Nested fields](/react/guides/nested-fields/)
@@ -25,3 +26,9 @@
 - [Field arrays](/react/guides/field-arrays/)
 - [TypeScript](/react/guides/typescript/)
 - [Architecture](/react/guides/architecture/)
+
+## Migration guides
+
+- [From React Hook Form](/react/guides/migrate-from-react-hook-form/)
+- [From TanStack Form](/react/guides/migrate-from-tanstack-form/)
+- [From Formik](/react/guides/migrate-from-formik/)

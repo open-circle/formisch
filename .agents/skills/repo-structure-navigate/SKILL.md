@@ -12,7 +12,7 @@ Quick reference for understanding and navigating the Formisch repository structu
 
 ## Overview
 
-**Formisch** is a schema-based, headless form library with a framework-agnostic core supporting multiple frameworks (Preact, Qwik, React, Solid, Svelte, Vue). Framework-specific reactivity is injected at build time for native performance.
+**Formisch** is a schema-based, headless form library with a framework-agnostic core supporting multiple frameworks (Angular, Preact, Qwik, React, Solid, Svelte, Vue). Framework-specific reactivity is injected at build time for native performance.
 
 **Architecture:**
 
@@ -27,7 +27,7 @@ formisch/
 ├── packages/         # Core packages
 │   ├── core/         # Framework-agnostic form logic
 │   └── methods/      # Form manipulation methods
-├── frameworks/       # Framework-specific wrappers (preact, qwik, react, solid, svelte, vue)
+├── frameworks/       # Framework-specific wrappers (angular, preact, qwik, react, solid, svelte, vue)
 ├── playgrounds/      # Testing environments per framework
 ├── scripts/          # Automation scripts
 ├── website/          # Documentation site
@@ -53,7 +53,7 @@ Framework-agnostic form logic. Builds to framework-specific outputs via `tsdown.
 
 Form manipulation utilities. Each method in its own directory (`src/{method-name}/`).
 
-**Available methods:** focus, getAllErrors, getErrors, getInput, handleSubmit, insert, move, remove, replace, reset, setErrors, setInput, submit, swap, validate
+**Available methods:** focus, getDeepErrorEntries, getDeepErrors, getDirtyInput, getDirtyPaths, getErrors, getInput, handleSubmit, insert, move, pickDirty, remove, replace, reset, setErrors, setInput, submit, swap, validate
 
 ## Framework Packages
 

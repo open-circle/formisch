@@ -59,6 +59,9 @@ export function useFieldArray(
     isTouched: createComputed$(() =>
       getFieldBool(internalFieldStore.value, 'isTouched')
     ),
+    isEdited: createComputed$(() =>
+      getFieldBool(internalFieldStore.value, 'isEdited')
+    ),
     isDirty: createComputed$(() =>
       getFieldBool(internalFieldStore.value, 'isDirty')
     ),

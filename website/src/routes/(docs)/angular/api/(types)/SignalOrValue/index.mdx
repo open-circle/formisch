@@ -1,0 +1,26 @@
+---
+title: SignalOrValue
+description: A type that can be either a value or an Angular signal that returns that value.
+source: /frameworks/angular/src/types/utils.ts
+contributors:
+  - fabian-hiller
+---
+
+import { Property } from '~/components';
+import { properties } from './properties';
+
+# SignalOrValue
+
+A type that can be either a value or an Angular signal that returns that value.
+
+## Generics
+
+- `TValue` <Property {...properties.TValue} />
+
+## Definition
+
+- `SignalOrValue` <Property {...properties.SignalOrValue} />
+
+### Explanation
+
+Formisch accepts both plain values and signals wherever a form store or a field path is passed. This allows you to forward an input signal of your component directly, without unwrapping it first.

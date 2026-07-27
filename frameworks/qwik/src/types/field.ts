@@ -7,8 +7,9 @@ import type {
   ValidArrayPath,
   ValidPath,
 } from '@formisch/core/qwik';
-import type { QRL, Signal } from '@qwik.dev/core';
+import type { QRL } from '@qwik.dev/core';
 import type * as v from 'valibot';
+import type { ReadonlySignal } from './signal.ts';
 
 /**
  * Field element props interface.
@@ -54,29 +55,33 @@ export interface FieldStore<
   /**
    * The path to the field within the form.
    */
-  readonly path: Readonly<Signal<ValidPath<v.InferInput<TSchema>, TFieldPath>>>;
+  readonly path: ReadonlySignal<ValidPath<v.InferInput<TSchema>, TFieldPath>>;
   /**
    * The current input value of the field.
    */
-  readonly input: Readonly<
-    Signal<PartialValues<PathValue<v.InferInput<TSchema>, TFieldPath>>>
+  readonly input: ReadonlySignal<
+    PartialValues<PathValue<v.InferInput<TSchema>, TFieldPath>>
   >;
   /**
    * The current error messages of the field.
    */
-  readonly errors: Readonly<Signal<[string, ...string[]] | null>>;
+  readonly errors: ReadonlySignal<[string, ...string[]] | null>;
   /**
    * Whether the field has been touched.
    */
-  readonly isTouched: Readonly<Signal<boolean>>;
+  readonly isTouched: ReadonlySignal<boolean>;
+  /**
+   * Whether the field value has been edited.
+   */
+  readonly isEdited: ReadonlySignal<boolean>;
   /**
    * Whether the field input differs from its initial value.
    */
-  readonly isDirty: Readonly<Signal<boolean>>;
+  readonly isDirty: ReadonlySignal<boolean>;
   /**
    * Whether the field is valid according to the schema.
    */
-  readonly isValid: Readonly<Signal<boolean>>;
+  readonly isValid: ReadonlySignal<boolean>;
   /**
    * Sets the field input value programmatically.
    */
@@ -99,27 +104,31 @@ export interface FieldArrayStore<
   /**
    * The path to the array field within the form.
    */
-  readonly path: Readonly<
-    Signal<ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>>
+  readonly path: ReadonlySignal<
+    ValidArrayPath<v.InferInput<TSchema>, TFieldArrayPath>
   >;
   /**
    * The item IDs of the array field.
    */
-  readonly items: Readonly<Signal<string[]>>;
+  readonly items: ReadonlySignal<string[]>;
   /**
    * The current error messages of the field array.
    */
-  readonly errors: Readonly<Signal<[string, ...string[]] | null>>;
+  readonly errors: ReadonlySignal<[string, ...string[]] | null>;
   /**
    * Whether the field array has been touched.
    */
-  readonly isTouched: Readonly<Signal<boolean>>;
+  readonly isTouched: ReadonlySignal<boolean>;
+  /**
+   * Whether the field array value has been edited.
+   */
+  readonly isEdited: ReadonlySignal<boolean>;
   /**
    * Whether the field array input differs from its initial value.
    */
-  readonly isDirty: Readonly<Signal<boolean>>;
+  readonly isDirty: ReadonlySignal<boolean>;
   /**
    * Whether the field array is valid according to the schema.
    */
-  readonly isValid: Readonly<Signal<boolean>>;
+  readonly isValid: ReadonlySignal<boolean>;
 }

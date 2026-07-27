@@ -4,7 +4,7 @@
 
 - [Introduction](/preact/guides/introduction/)
 - [Installation](/preact/guides/installation/)
-- [LLMs.txt](/preact/guides/llms-txt/)
+- [Coding agents](/preact/guides/coding-agents/)
 
 ## Main concepts
 
@@ -17,6 +17,7 @@
 
 ## Advanced guides
 
+- [Validation](/preact/guides/validation/)
 - [Special inputs](/preact/guides/special-inputs/)
 - [Controlled fields](/preact/guides/controlled-fields/)
 - [Nested fields](/preact/guides/nested-fields/)

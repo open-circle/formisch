@@ -1,17 +1,22 @@
 import { initializeFieldStore } from '../../field/initializeFieldStore/index.ts';
 import { batch, untrack } from '../../framework/index.ts';
-import type { InternalFieldStore, PathKey } from '../../types/index.ts';
+import type {
+  InternalFieldStore,
+  InternalFormStore,
+} from '../../types/index.ts';
 
 /**
  * Swaps the deeply nested state (signal values) between two field stores. This
  * includes the `elements`, `errors`, `startInput`, `input`, `isTouched`,
- * `isDirty`, and for arrays `startItems` and `items` properties. Recursively
- * walks through the field stores and swaps all signal values.
+ * `isEdited`, `isDirty`, and for arrays `startItems` and `items` properties.
+ * Recursively walks through the field stores and swaps all signal values.
  *
+ * @param internalFormStore The form store providing the empty input config.
  * @param firstInternalFieldStore The first field store to swap.
  * @param secondInternalFieldStore The second field store to swap.
  */
 export function swapItemState(
+  internalFormStore: InternalFormStore,
   firstInternalFieldStore: InternalFieldStore,
   secondInternalFieldStore: InternalFieldStore
 ): void {
@@ -48,6 +53,12 @@ export function swapItemState(
         secondInternalFieldStore.isTouched.value;
       secondInternalFieldStore.isTouched.value = tempIsTouched;
 
+      // Swap edited state
+      const tempIsEdited = firstInternalFieldStore.isEdited.value;
+      firstInternalFieldStore.isEdited.value =
+        secondInternalFieldStore.isEdited.value;
+      secondInternalFieldStore.isEdited.value = tempIsEdited;
+
       // Swap dirty state
       const tempIsDirty = firstInternalFieldStore.isDirty.value;
       firstInternalFieldStore.isDirty.value =
@@ -76,66 +87,45 @@ export function swapItemState(
         // Calculate maximum length to ensure all children are swapped
         const maxLength = Math.max(firstItems.length, secondItems.length);
 
-        // Initialize path variables for lazy parsing
-        let firstPath: PathKey[] | undefined;
-        let secondPath: PathKey[] | undefined;
-
         // Swap state for each array item
         for (let index = 0; index < maxLength; index++) {
           // If first store child doesn't exist, initialize it
           if (!firstInternalFieldStore.children[index]) {
-            // Parse path only when needed
-            firstPath ??= JSON.parse(firstInternalFieldStore.name) as PathKey[];
-
             // Create empty child object
             // @ts-expect-error
             firstInternalFieldStore.children[index] = {};
 
-            // Add current index to path
-            firstPath.push(index);
-
             // Initialize field store for new child
             initializeFieldStore(
+              internalFormStore,
               firstInternalFieldStore.children[index],
               // @ts-expect-error
               firstInternalFieldStore.schema.item,
               undefined,
-              firstPath
+              [...firstInternalFieldStore.path, index]
             );
-
-            // Remove index from path for next iteration
-            firstPath.pop();
           }
 
           // If second store child doesn't exist, initialize it
           if (!secondInternalFieldStore.children[index]) {
-            // Parse path only when needed
-            secondPath ??= JSON.parse(
-              secondInternalFieldStore.name
-            ) as PathKey[];
-
             // Create empty child object
             // @ts-expect-error
             secondInternalFieldStore.children[index] = {};
 
-            // Add current index to path
-            secondPath.push(index);
-
             // Initialize field store for new child
             initializeFieldStore(
+              internalFormStore,
               secondInternalFieldStore.children[index],
               // @ts-expect-error
               secondInternalFieldStore.schema.item,
               undefined,
-              secondPath
+              [...secondInternalFieldStore.path, index]
             );
-
-            // Remove index from path for next iteration
-            secondPath.pop();
           }
 
           // Recursively swap children
           swapItemState(
+            internalFormStore,
             firstInternalFieldStore.children[index],
             secondInternalFieldStore.children[index]
           );
@@ -150,6 +140,7 @@ export function swapItemState(
         for (const key in firstInternalFieldStore.children) {
           // Recursively swap children
           swapItemState(
+            internalFormStore,
             firstInternalFieldStore.children[key],
             secondInternalFieldStore.children[key]
           );

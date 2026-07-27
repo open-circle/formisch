@@ -19,13 +19,14 @@ Formisch is a schema-based, headless form library for Qwik. It manages form stat
 - Small bundle size starting at 2.5 kB
 - Schema-based validation with Valibot
 - Type safety with autocompletion in editor
+- Open source and fully tested with 100 % coverage
 - It's fast – DOM updates are fine-grained
 - Minimal, readable and well thought out API
 - Supports all native HTML form fields
 
 ## Example
 
-Every form starts with the <Link href="/qwik/api/useForm$/">`useForm$`</Link> hook. It initializes your form's store based on the provided Valibot schema and infers its types. Next, wrap your form in the <Link href="/qwik/api/Form/">`<Form />`</Link> component. It's a thin layer around the native `<form />` element that handles form validation and submission. Then, you can access the state of a field with the <Link href="/qwik/api/useField/">`useField$`</Link> hook or the <Link href="/qwik/api/Field/">`<Field />`</Link> component to connect your inputs.
+Every form starts with the <Link href="/qwik/api/useForm$/">`useForm$`</Link> hook. It initializes your form's store based on the provided Valibot schema and infers its types. Next, wrap your form in the <Link href="/qwik/api/Form/">`<Form />`</Link> component. It's a thin layer around the native `<form />` element that handles form validation and submission. Then, you can access the state of a field with the <Link href="/qwik/api/useField/">`useField`</Link> hook or the <Link href="/qwik/api/Field/">`<Field />`</Link> component to connect your inputs.
 
 ```tsx
 import { Field, Form, useForm$ } from '@formisch/qwik';
@@ -70,7 +71,7 @@ export default component$(() => {
 });
 ```
 
-In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include <Link href="/methods/api/focus/">`focus`</Link>, <Link href="/methods/api/getAllErrors/">`getAllErrors`</Link>, <Link href="/methods/api/getErrors/">`getErrors`</Link>, <Link href="/methods/api/getInput/">`getInput`</Link>, <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link>, <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/replace/">`replace`</Link>, <Link href="/methods/api/reset/">`reset`</Link>, <Link href="/methods/api/setErrors/">`setErrors`</Link>, <Link href="/methods/api/setInput/">`setInput`</Link>, <Link href="/methods/api/submit/">`submit`</Link>, <Link href="/methods/api/swap/">`swap`</Link> and <Link href="/methods/api/validate/">`validate`</Link>. These methods allow you to control the form programmatically.
+In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include <Link href="/methods/api/focus/">`focus`</Link>, <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>, <Link href="/methods/api/getErrors/">`getErrors`</Link>, <Link href="/methods/api/getInput/">`getInput`</Link>, <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link>, <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/replace/">`replace`</Link>, <Link href="/methods/api/reset/">`reset`</Link>, <Link href="/methods/api/setErrors/">`setErrors`</Link>, <Link href="/methods/api/setInput/">`setInput`</Link>, <Link href="/methods/api/submit/">`submit`</Link>, <Link href="/methods/api/swap/">`swap`</Link> and <Link href="/methods/api/validate/">`validate`</Link>. These methods allow you to control the form programmatically.
 
 ## Comparison
 

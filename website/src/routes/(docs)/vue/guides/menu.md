@@ -4,8 +4,8 @@
 
 - [Introduction](/vue/guides/introduction/)
 - [Installation](/vue/guides/installation/)
+- [Coding agents](/vue/guides/coding-agents/)
 - [Comparison](/vue/guides/comparison/)
-- [LLMs.txt](/vue/guides/llms-txt/)
 
 ## Main concepts
 
@@ -18,6 +18,7 @@
 
 ## Advanced guides
 
+- [Validation](/vue/guides/validation/)
 - [Special inputs](/vue/guides/special-inputs/)
 - [Controlled fields](/vue/guides/controlled-fields/)
 - [Nested fields](/vue/guides/nested-fields/)
@@ -25,3 +26,9 @@
 - [Field arrays](/vue/guides/field-arrays/)
 - [TypeScript](/vue/guides/typescript/)
 - [Architecture](/vue/guides/architecture/)
+
+## Migration guides
+
+- [From VeeValidate](/vue/guides/migrate-from-vee-validate/)
+- [From FormKit](/vue/guides/migrate-from-formkit/)
+- [From TanStack Form](/vue/guides/migrate-from-tanstack-form/)

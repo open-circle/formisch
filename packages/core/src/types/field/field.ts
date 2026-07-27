@@ -1,3 +1,4 @@
+import type { Path } from '../path/index.ts';
 import type { Schema } from '../schema/index.ts';
 import type { Signal } from '../signal/index.ts';
 
@@ -22,9 +23,22 @@ export interface InternalBaseStore {
    */
   name: string;
   /**
+   * The path to the field.
+   */
+  path: Path;
+  /**
    * The schema of the field.
    */
   schema: Schema;
+  /**
+   * Whether the schema is wrapped in a nullish schema.
+   *
+   * Hint: This indicates whether a missing input should be represented as the
+   * nullish value (`null`/`undefined`) instead of a present empty fallback
+   * (`true` for arrays and objects, or the empty input for values). It keeps
+   * resetting consistent with the initial state.
+   */
+  isNullish: boolean;
   /**
    * The initial elements of the field.
    *
@@ -49,6 +63,15 @@ export interface InternalBaseStore {
    */
   isTouched: Signal<boolean>;
   /**
+   * The edited state of the field.
+   *
+   * Hint: Unlike `isTouched`, which is also set when a field is focused, this
+   * is only set when the field's value is changed. Unlike `isDirty`, it stays
+   * `true` even if the value is changed back to its initial value. It is only
+   * reset when the field is reset.
+   */
+  isEdited: Signal<boolean>;
+  /**
    * The dirty state of the field.
    */
   isDirty: Signal<boolean>;
@@ -62,6 +85,7 @@ export interface InternalArrayStore extends InternalBaseStore {
    * The kind of field store.
    */
   kind: 'array';
+
   /**
    * The children of the array field.
    */

@@ -16,17 +16,17 @@ Formisch is one of several form libraries available for Vue. The three most comm
 
 ## At a glance
 
-|                        | **Formisch**                            | VeeValidate                   | FormKit                               | TanStack Form                           |
-| ---------------------- | --------------------------------------- | ----------------------------- | ------------------------------------- | --------------------------------------- |
-| Type source            | Inferred from schema                    | Inferred from schema          | Declared manually                     | Inferred from `defaultValues`           |
-| Validation location    | Defined in schema                       | Validator rules or schema     | Per-input prop or form schema         | Per-validator config                    |
-| Validation timing      | Form-wide `validate` / `revalidate`     | Per field, configurable       | Per input (`validation-visibility`)   | Per-validator trigger                   |
-| Async validation       | Built-in via schema                     | Built-in                      | Built-in                              | Built-in `isValidating`                 |
-| Reactivity scope       | Per Vue ref subscription                | Per Vue ref subscription      | Per Vue ref subscription              | Per TanStack Store subscription         |
-| Schema libraries       | Valibot                                 | Zod, Yup, Valibot, ArkType, … | Built-in rules; schemas via plugins   | Standard Schema                         |
-| UI approach            | Headless                                | Headless                      | Component-driven (batteries included) | Headless                                |
-| Bundle size (min+gzip) | From ~2.5 kB                            | ~12 kB                        | ~25 kB+                               | ~15 kB                                  |
-| Framework support      | React, Preact, Solid, Svelte, Vue, Qwik | Vue 3 (Vue 2 via legacy)      | Vue 3                                 | React, Vue, Solid, Svelte, Lit, Angular |
+|                        | **Formisch**                                     | VeeValidate                   | FormKit                               | TanStack Form                           |
+| ---------------------- | ------------------------------------------------ | ----------------------------- | ------------------------------------- | --------------------------------------- |
+| Type source            | Inferred from schema                             | Inferred from schema          | Declared manually                     | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                                | Validator rules or schema     | Per-input prop or form schema         | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`              | Per field, configurable       | Per input (`validation-visibility`)   | Per-validator trigger                   |
+| Async validation       | Built-in via schema                              | Built-in                      | Built-in                              | Built-in `isValidating`                 |
+| Reactivity scope       | Per Vue ref subscription                         | Per Vue ref subscription      | Per Vue ref subscription              | Per TanStack Store subscription         |
+| Schema libraries       | Valibot                                          | Zod, Yup, Valibot, ArkType, … | Built-in rules; schemas via plugins   | Standard Schema                         |
+| UI approach            | Headless                                         | Headless                      | Component-driven (batteries included) | Headless                                |
+| Bundle size (min+gzip) | From ~2.5 kB                                     | ~12 kB                        | ~25 kB+                               | ~15 kB                                  |
+| Framework support      | Angular, React, Preact, Solid, Svelte, Vue, Qwik | Vue 3 (Vue 2 via legacy)      | Vue 3                                 | React, Vue, Solid, Svelte, Lit, Angular |
 
 The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and reactivity.
 
@@ -50,9 +50,11 @@ Three reasons to pick Formisch over the alternatives above:
 
 **Formisch** makes the most sense for new projects in TypeScript-heavy codebases, especially when you expect forms to grow in complexity. The schema-first design means there is a single source of truth for types, runtime validation, and form structure, so there is less to keep aligned over time. Reactivity is fine-grained through Vue 3's composition API. The main consideration is that Formisch currently supports only [Valibot](https://valibot.dev) as the schema library.
 
-## Migrating from VeeValidate
+## Migrating to Formisch
 
-Migrating from VeeValidate to Formisch is not a drop-in replacement, but the conceptual gap is smaller than with a component-driven library. Both are headless and schema-friendly, so the main work is consolidating per-field validator rules into a single root Valibot schema and replacing VeeValidate's `useForm` / `useField` composables with Formisch's equivalents. The two libraries can coexist in the same application, so you can migrate one form at a time.
+Migrating to Formisch is not a drop-in replacement, but the libraries can coexist in the same application, so you can migrate one form at a time. The main work is consolidating validation rules into a single root Valibot schema and replacing the previous library's form and field APIs with Formisch's composables.
+
+We provide a dedicated migration guide for each library, with a side-by-side example, step-by-step instructions, and an API mapping table: <Link href="/vue/guides/migrate-from-vee-validate/">migrate from VeeValidate</Link>, <Link href="/vue/guides/migrate-from-formkit/">migrate from FormKit</Link>, and <Link href="/vue/guides/migrate-from-tanstack-form/">migrate from TanStack Form</Link>.
 
 ## Next steps
 

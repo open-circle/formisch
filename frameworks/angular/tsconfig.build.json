@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": false,
+    "noEmit": false,
+    "outDir": "tmp",
+    "rootDir": "src",
+    "sourceMap": false,
+    "rewriteRelativeImportExtensions": true
+  },
+  "angularCompilerOptions": {
+    "compilationMode": "partial",
+    "strictTemplates": true
+  },
+  "exclude": ["src/**/*.test.ts", "src/**/*.test-d.ts", "src/vitest"]
+}

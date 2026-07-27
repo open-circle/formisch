@@ -1,5 +1,5 @@
-import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type Signal } from '@qwik.dev/core';
+import type { FieldElementProps, ReadonlySignal } from '@formisch/qwik';
+import { component$ } from '@qwik.dev/core';
 import clsx from 'clsx';
 import { InputErrors } from './InputErrors';
 import { InputLabel } from './InputLabel';
@@ -10,8 +10,8 @@ interface RadioGroupProps extends FieldElementProps {
   label?: string;
   options: { label: string; value: string }[];
   required?: boolean;
-  input: Readonly<Signal<string | undefined>>;
-  errors: Readonly<Signal<[string, ...string[]] | null>>;
+  input: ReadonlySignal<string | undefined>;
+  errors: ReadonlySignal<[string, ...string[]] | null>;
 }
 
 /**

@@ -41,10 +41,10 @@ const UserSchema = v.object({
 });
 
 export default function EditProfile({ user }) {
-  const profileForm = useForm$({
+  const profileForm = useForm$(() => ({
     schema: UserSchema,
     initialInput: user,
-  });
+  }));
 
   const onSubmit: SubmitHandler<typeof UserSchema> = async () => {
     const dirty = getDirtyInput(profileForm);

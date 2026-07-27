@@ -1,0 +1,101 @@
+---
+title: Form methods
+description: >-
+  Learn about the methods available to read and manipulate your form state.
+  Formisch provides methods for getting values, setting values, validation,
+  and more.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Form methods
+
+To retrieve the values of your form or to make changes to the form, Formisch provides you with several methods. These apply either to the entire form or to individual fields.
+
+## Reading values
+
+To retrieve values from your form, you can use:
+
+- <Link href="/methods/api/getInput/">`getInput`</Link>: Get the current value
+  of a specific field
+- <Link href="/methods/api/getErrors/">`getErrors`</Link>: Get error messages
+  for a specific field
+- <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>: Get all error
+  messages across the entire form
+
+Formisch uses Angular Signals internally which means that reading values with these methods is reactive. When you call them inside a `computed`, an `effect` or a template expression, they re-run automatically as soon as the form state changes — including in `OnPush` and zoneless components.
+
+## Dirty state
+
+To work with the dirty state of your form, Formisch provides three methods:
+
+- <Link href="/methods/api/getDirtyInput/">`getDirtyInput`</Link>: Get the dirty
+  parts of the form input
+- <Link href="/methods/api/getDirtyPaths/">`getDirtyPaths`</Link>: Get the paths
+  of dirty fields
+- <Link href="/methods/api/pickDirty/">`pickDirty`</Link>: Filter an
+  externally-supplied value down to its dirty parts using the form's dirty mask
+
+See the <Link href="/angular/guides/dirty-fields/">dirty fields</Link> guide for when to reach for each.
+
+## Setting values
+
+To manually update form values or errors, use:
+
+- <Link href="/methods/api/setInput/">`setInput`</Link>: Manually update the
+  value of a specific field
+- <Link href="/methods/api/setErrors/">`setErrors`</Link>: Manually set error
+  messages for a specific field
+
+> If you need to update the form because the initial data has changed (e.g., remote data was refreshed), use <Link href="/methods/api/reset/">`reset`</Link> with a new `initialInput` instead of `setInput`. The `reset` method properly reinitializes the form state, while `setInput` only changes the current input values without updating the initial state.
+
+## Form control
+
+To control the form programmatically, use:
+
+- <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link>: Create a submit
+  event handler that validates the form and calls your handler on success
+- <Link href="/methods/api/reset/">`reset`</Link>: Reset the form to its initial
+  state or update initial values
+- <Link href="/methods/api/validate/">`validate`</Link>: Manually trigger
+  validation of the entire form
+- <Link href="/methods/api/submit/">`submit`</Link>: Programmatically trigger
+  form submission
+- <Link href="/methods/api/focus/">`focus`</Link>: Focus on a specific field
+
+## Array operations
+
+For working with field arrays, Formisch provides:
+
+- <Link href="/methods/api/insert/">`insert`</Link>: Insert a new item into a
+  field array
+- <Link href="/methods/api/remove/">`remove`</Link>: Remove an item from a field
+  array
+- <Link href="/methods/api/move/">`move`</Link>: Move an item to a different
+  position in a field array
+- <Link href="/methods/api/swap/">`swap`</Link>: Swap two items in a field array
+- <Link href="/methods/api/replace/">`replace`</Link>: Replace an item in a
+  field array
+
+## API design
+
+All methods in Formisch follow a consistent API pattern: the first parameter is always the form store, and the second parameter (if necessary) is always a config object. This design makes the API flexible and consistent across all methods. Once you understand this pattern, you basically understand the entire API design.
+
+Here are some examples:
+
+```ts
+// Get the value of a field
+const emailInput = getInput(this.loginForm, { path: ['email'] });
+
+// Reset the form with new initial values
+reset(this.loginForm, { initialInput: { email: '', password: '' } });
+
+// Move an item in a field array
+move(this.loginForm, { path: ['items'], from: 0, to: 3 });
+```
+
+## API reference
+
+You can find detailed documentation for each method in our <Link href="/angular/api/">API reference</Link>.

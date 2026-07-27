@@ -28,6 +28,7 @@ website/src/routes/{framework}/guides/
 - `(get-started)` - Introductory content
 - `(main-concepts)` - Core library concepts
 - `(advanced-guides)` - Advanced features
+- `(migration-guides)` - Migration from other form libraries
 
 ## Step-by-Step Process
 
@@ -38,6 +39,7 @@ Determine the appropriate category:
 - **(get-started)**: Introduction, Installation, LLMs.txt
 - **(main-concepts)**: Define form, Create form, Add fields, Handle submission
 - **(advanced-guides)**: Controlled fields, Field arrays, TypeScript
+- **(migration-guides)**: Migrate from React Hook Form, Migrate from TanStack Form
 
 ### Step 2: Create Guide Directory
 
@@ -45,7 +47,7 @@ Determine the appropriate category:
 mkdir -p website/src/routes/{framework}/guides/(category-name)/guide-slug/
 ```
 
-- `{framework}` = solid, qwik, preact, svelte, or vue
+- `{framework}` = angular, solid, qwik, preact, svelte, or vue
 - Use kebab-case for guide-slug
 
 ### Step 3: Create index.mdx
@@ -145,6 +147,7 @@ See <Link href="/solid/api/createForm/">`createForm`</Link>.
 | Solid     | "primitive"  |
 | Qwik      | "hook"       |
 | Preact    | "hook"       |
+| Angular   | "function" / "directive" |
 | Vue       | "composable" |
 | Svelte    | "rune"       |
 
@@ -154,6 +157,7 @@ See <Link href="/solid/api/createForm/">`createForm`</Link>.
 - `inline code` for API names, variables, files
 - Proper heading hierarchy (h1 → h2 → h3)
 - Concise, focused paragraphs
+- No em-dash pairs (`… — aside — …`); use commas, parentheses, or two sentences. A single trailing em dash is fine.
 
 ## Guide Structure Patterns
 

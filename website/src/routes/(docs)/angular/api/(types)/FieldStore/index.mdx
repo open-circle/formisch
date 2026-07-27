@@ -1,0 +1,42 @@
+---
+title: FieldStore
+description: Reactive field store interface with signals, a setInput method and the element-binding contract.
+source: /frameworks/angular/src/types/field.ts
+contributors:
+  - fabian-hiller
+---
+
+import { Link, Property } from '~/components';
+import { properties } from './properties';
+
+# FieldStore
+
+Field store interface that provides reactive access to the state of a field created with <Link href="../injectField/">`injectField`</Link> or the <Link href="../formischField/">`*formischField`</Link> directive.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Definition
+
+- `FieldStore`
+  - `path` <Property {...properties.path} />
+  - `name` <Property {...properties.name} />
+  - `input` <Property {...properties.input} />
+  - `errors` <Property {...properties.errors} />
+  - `isTouched` <Property {...properties.isTouched} />
+  - `isEdited` <Property {...properties.isEdited} />
+  - `isDirty` <Property {...properties.isDirty} />
+  - `isValid` <Property {...properties.isValid} />
+  - `setInput` <Property {...properties.setInput} />
+
+### Explanation
+
+Every reactive property of the field store is an Angular signal, so you call it as a function. The only exception is `path`, which is a plain value.
+
+The `name` signal contains the JSON-stringified path of the field, which the <Link href="../formischControl/">`[formischControl]`</Link> directive writes to the `name` attribute of the element. It is also useful as the `id` of an input so that a label and an error message can reference it.
+
+Use `setInput` to change the value of the field programmatically. It updates the input and validates it like an `input` event would, so whether validation runs is controlled by the `validate` and `revalidate` config of your form — see the <Link href="/angular/guides/validation/">validation</Link> guide.
+
+The field store additionally carries an internal element-binding contract that the <Link href="../formischControl/">`[formischControl]`</Link> directive consumes. It is not part of the public API.

@@ -1,0 +1,115 @@
+---
+title: injectFieldArray
+description: Creates a reactive field array store for a specific array field within a form store.
+source: /frameworks/angular/src/functions/injectFieldArray/injectFieldArray.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# injectFieldArray
+
+Creates a reactive field array store for a specific array field within a form store.
+
+```ts
+const fieldArray = injectFieldArray<TSchema, TFieldArrayPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldArrayPath` <Property {...properties.TFieldArrayPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+With `injectFieldArray` you create a field array store for a specific array path within your form. The store exposes the item identifiers of the array as a signal, together with the errors and state of the array itself.
+
+Use the item identifiers as the `track` expression of your `@for` block. They are stable across reorders, which lets Angular move the existing DOM instead of recreating it, and keeps each field's state attached to the right item.
+
+Like Angular's own `inject`, `injectFieldArray` must be called in an injection context. To create a field array directly in a template, use the <Link href="../formischFieldArray/">`*formischFieldArray`</Link> directive instead, which is a thin wrapper around this function.
+
+## Returns
+
+- `fieldArray` <Property {...properties.FieldArrayStore} />
+
+## Examples
+
+The following examples show how `injectFieldArray` can be used.
+
+### Field array component
+
+```ts
+import { Component, input } from '@angular/core';
+import { type FormStore, injectFieldArray, remove } from '@formisch/angular';
+import * as v from 'valibot';
+
+const TodoListSchema = v.object({
+  todos: v.array(v.object({ label: v.pipe(v.string(), v.nonEmpty()) })),
+});
+
+@Component({
+  selector: 'app-todo-list',
+  template: `
+    @for (item of fieldArray.items(); track item; let index = $index) {
+      <button type="button" (click)="handleRemove(index)">Delete</button>
+    }
+    @if (fieldArray.errors(); as errors) {
+      <div>{{ errors[0] }}</div>
+    }
+  `,
+})
+export class TodoListComponent {
+  readonly of = input.required<FormStore<typeof TodoListSchema>>();
+
+  protected readonly fieldArray = injectFieldArray(this.of, {
+    path: ['todos'],
+  });
+
+  handleRemove(index: number): void {
+    remove(this.of(), { path: ['todos'], at: index });
+  }
+}
+```
+
+## Related
+
+The following APIs can be combined with `injectFieldArray`.
+
+### Functions
+
+<ApiList
+  items={[
+    { text: 'injectForm', href: '../injectForm/' },
+    { text: 'injectField', href: '../injectField/' },
+  ]}
+/>
+
+### Directives
+
+<ApiList
+  items={[
+    { text: 'formischFieldArray', href: '../formischFieldArray/' },
+    { text: 'formischField', href: '../formischField/' },
+    { text: 'formischForm', href: '../formischForm/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'insert', href: '/methods/api/insert/' },
+    { text: 'move', href: '/methods/api/move/' },
+    { text: 'remove', href: '/methods/api/remove/' },
+    { text: 'replace', href: '/methods/api/replace/' },
+    { text: 'swap', href: '/methods/api/swap/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>

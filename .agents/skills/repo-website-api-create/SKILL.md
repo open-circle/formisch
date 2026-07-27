@@ -59,6 +59,9 @@ Create folder in the appropriate category:
 - `solid/api/(types)` - SolidJS-specific types
 - `qwik/api/(hooks)` - Qwik hooks (useForm$, useField)
 - `preact/api/(hooks)` - Preact hooks
+- `angular/api/(functions)` - Angular functions (injectForm, injectField)
+- `angular/api/(directives)` - Angular directives (formischForm, formischField)
+- `angular/api/(types)` - Angular-specific types (FormStore, FieldStore, SignalOrValue)
 - `svelte/api/(runes)` - Svelte 5 runes
 - `vue/api/(composables)` - Vue composables
 
@@ -239,13 +242,14 @@ Parentheses folders don't appear in URLs:
 
 ### Framework-Specific Terminology
 
-| Framework | Category Term | Example API          |
-| --------- | ------------- | -------------------- |
-| Solid     | Primitives    | createForm, useField |
-| Qwik      | Hooks         | useForm$, useField   |
-| Preact    | Hooks         | useForm, useField    |
-| Vue       | Composables   | useForm, useField    |
-| Svelte    | Runes         | createForm, useField |
+| Framework | Category Term          | Example API               |
+| --------- | ---------------------- | ------------------------- |
+| Solid     | Primitives             | createForm, useField      |
+| Qwik      | Hooks                  | useForm$, useField        |
+| Preact    | Hooks                  | useForm, useField         |
+| Angular   | Functions / Directives | injectForm, formischField |
+| Vue       | Composables            | useForm, useField         |
+| Svelte    | Runes                  | createForm, useField      |
 
 ## References
 

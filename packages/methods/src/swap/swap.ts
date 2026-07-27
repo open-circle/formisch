@@ -75,12 +75,14 @@ export function swap<
 
       // Swap child stores directly
       swapItemState(
+        internalFormStore,
         internalArrayStore.children[config.at],
         internalArrayStore.children[config.and]
       );
 
-      // Mark field array as touched and update dirty state
+      // Mark field array as touched and edited and update dirty state
       internalArrayStore.isTouched.value = true;
+      internalArrayStore.isEdited.value = true;
       internalArrayStore.isDirty.value =
         internalArrayStore.startItems.value.join() !== newItems.join();
 

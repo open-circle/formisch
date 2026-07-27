@@ -66,6 +66,9 @@ export function useFieldArray(
       get isTouched() {
         return getFieldBool(internalFieldStore, 'isTouched');
       },
+      get isEdited() {
+        return getFieldBool(internalFieldStore, 'isEdited');
+      },
       get isDirty() {
         return getFieldBool(internalFieldStore, 'isDirty');
       },

@@ -1,0 +1,68 @@
+---
+title: Coding agents
+description: >-
+  Formisch is built to be consumed by AI coding agents. Use our agent skill,
+  MCP server and Markdown documentation to generate correct Formisch code.
+contributors:
+  - fabian-hiller
+  - flySewa
+---
+
+# Coding agents
+
+Formisch is built to be consumed by AI coding agents. This page describes the agent skill, MCP server and Markdown documentation we provide so that your AI tools generate correct SolidJS code with Formisch.
+
+## Agent skill
+
+Formisch defines form values and validation with [Valibot](https://valibot.dev/) schemas, so an agent needs two skills: our [Formisch SKILL.md](https://github.com/open-circle/agent-skills/blob/main/skills/formisch/SKILL.md) for building forms and managing form state, and the [Valibot SKILL.md](https://github.com/open-circle/agent-skills/blob/main/skills/valibot/SKILL.md) for writing the schemas. Install both with the [Agent Skills CLI](https://agentskills.io/):
+
+```bash
+npx skills add open-circle/agent-skills --skill formisch valibot
+```
+
+The Formisch skill is also published at [`/.well-known/agent-skills/formisch/SKILL.md`](/.well-known/agent-skills/formisch/SKILL.md) and listed in our [discovery index](/.well-known/agent-skills/index.json). For Valibot's MCP server and llms.txt files, see [Valibot's coding agents guide](https://valibot.dev/guides/coding-agents/).
+
+## MCP server
+
+We host a [Model Context Protocol](https://modelcontextprotocol.io/) server at `https://formisch.dev/mcp` that gives coding agents first-class tools to search and read the documentation instead of crawling pages. It is free and requires no authentication.
+
+The server provides three tools:
+
+- `search_docs` searches the documentation and returns the most relevant pages
+- `get_doc` reads a documentation page or blog post as Markdown
+- `list_docs` lists all pages grouped by framework and area
+
+Add it to Claude Code with:
+
+```bash
+claude mcp add --transport http formisch https://formisch.dev/mcp
+```
+
+Or add it to the MCP configuration of your tool:
+
+```json
+{
+  "mcpServers": {
+    "formisch": {
+      "url": "https://formisch.dev/mcp"
+    }
+  }
+}
+```
+
+The server metadata is available at [`/.well-known/mcp/server-card.json`](/.well-known/mcp/server-card.json).
+
+## LLMs.txt
+
+We provide several [LLMs.txt](https://llmstxt.org/) files. Use the one that works best with your AI tool.
+
+- [`llms.txt`](/llms.txt) contains a table of contents with links to all Markdown files
+- [`llms-solid.txt`](/llms-solid.txt) contains a table of contents with links to SolidJS-related files
+- [`llms-solid-full.txt`](/llms-solid-full.txt) contains the Markdown content of the entire SolidJS docs
+- [`llms-solid-guides.txt`](/llms-solid-guides.txt) contains the Markdown content of the SolidJS guides
+- [`llms-solid-api.txt`](/llms-solid-api.txt) contains the Markdown content of the SolidJS API reference
+- [`llms-blog.txt`](/llms-blog.txt) contains the Markdown content of all blog posts
+
+## Markdown for agents
+
+Every documentation page is available as Markdown. Append `.md` to the URL of a page (e.g. `/solid/guides/installation/` becomes [`/solid/guides/installation.md`](/solid/guides/installation.md)) or request the page with an `Accept: text/markdown` header to receive its Markdown version.

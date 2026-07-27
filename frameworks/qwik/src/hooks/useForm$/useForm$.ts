@@ -53,6 +53,9 @@ export function useFormQrl(configQrl: QRL<() => FormConfig>): FormStore {
       isTouched: createComputed$(() =>
         getFieldBool(internalFormStore, 'isTouched')
       ),
+      isEdited: createComputed$(() =>
+        getFieldBool(internalFormStore, 'isEdited')
+      ),
       isDirty: createComputed$(() =>
         getFieldBool(internalFormStore, 'isDirty')
       ),

@@ -1,0 +1,434 @@
+---
+title: Migrate from FormKit
+description: >-
+  Learn how to migrate your Vue forms from FormKit to Formisch. This guide
+  covers the key differences, a side-by-side example, step-by-step migration
+  instructions, and an API mapping.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from FormKit
+
+This guide walks you through migrating your Vue forms from [FormKit](https://formkit.com) (`@formkit/vue`) to Formisch. It covers the differences in mental model, shows the same form in both libraries side by side, and maps FormKit's APIs to their Formisch equivalents.
+
+Migrating is a rewrite of your form layer, not a drop-in replacement. FormKit is component-driven and renders your inputs for you, while Formisch is headless and only provides the data layer. The migration therefore replaces both the form logic and the input markup that FormKit generated for you.
+
+The good news: both libraries can coexist in the same application. Formisch does not require an app-level plugin, so you can leave FormKit's plugin registered in `main.ts` and migrate one form at a time. Once the last FormKit form is gone, remove the plugin and the dependency.
+
+## Key differences
+
+FormKit is a batteries-included form framework. A single globally registered `<FormKit>` component renders the entire input scaffolding, including the label, help text, validation messages, and styling. The form's structure emerges at runtime from the `name` props of the inputs nested inside `<FormKit type="form">`, validation rules are co-located with each input as string props like `validation="required|email"`, and TypeScript types for the submitted data are declared manually (or derived via the optional Zod plugin).
+
+Formisch flips this around with a schema-first approach. A single Valibot schema is the form: it defines the structure, the TypeScript types, and all validation rules at once. The `useForm` composable turns the schema into a reactive form store, and headless components like `Field` connect your own markup to it via type-safe path arrays. When the schema changes, every path and every inferred type follows at compile time.
+
+The main differences at a glance:
+
+- **UI ownership**: FormKit renders inputs, labels, and messages for you. Formisch renders nothing; you write the markup (or your own reusable <Link href="/vue/guides/input-components/">input components</Link>) and get full control over it.
+- **Source of truth**: In FormKit, structure lives in the template, validation lives on each input, and types live in your TypeScript code. In Formisch, all three live in one Valibot schema.
+- **Validation location and timing**: FormKit validates each input against its `validation` prop and controls message display per input via `validation-visibility`. Formisch validates the whole form against the schema and controls timing form-wide via the `validate` and `revalidate` config. When errors are shown is up to your markup.
+- **Reactivity**: FormKit keeps state in its own framework-agnostic core node tree that you access through `getNode`, node contexts, or slot props. Formisch stores state directly in Vue's reactivity system, so you read `form.isSubmitting` or `field.errors` like any other reactive value.
+- **Bundle size**: FormKit starts at roughly 25 kB (min+gzip). Formisch starts at about 2.5 kB and only grows with the methods you import, since it is fully tree-shakable.
+
+## Side-by-side example
+
+The following login form has two required fields with validation messages and an async submit handler, implemented once with each library.
+
+### FormKit
+
+```vue
+<script setup lang="ts">
+// The <FormKit> component is registered globally via
+// app.use(plugin, defaultConfig) in main.ts
+const handleSubmit = async (data: { email: string; password: string }) => {
+  console.log(data);
+};
+</script>
+
+<template>
+  <FormKit type="form" submit-label="Login" @submit="handleSubmit">
+    <FormKit
+      type="email"
+      name="email"
+      label="Email"
+      validation="required|email"
+      :validation-messages="{
+        required: 'Please enter your email.',
+        email: 'The email address is badly formatted.',
+      }"
+    />
+    <FormKit
+      type="password"
+      name="password"
+      label="Password"
+      validation="required|length:8"
+      :validation-messages="{
+        required: 'Please enter your password.',
+        length: 'Your password must have 8 characters or more.',
+      }"
+    />
+  </FormKit>
+</template>
+```
+
+### Formisch
+
+```vue
+<script setup lang="ts">
+import { Field, Form, useForm } from '@formisch/vue';
+import type { SubmitHandler } from '@formisch/vue';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+const loginForm = useForm({
+  schema: LoginSchema,
+});
+
+const handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+  console.log(values); // { email: string, password: string }
+};
+</script>
+
+<template>
+  <Form :of="loginForm" @submit="handleSubmit">
+    <Field :of="loginForm" :path="['email']" v-slot="field">
+      <input v-bind="field.props" v-model="field.input" type="email" />
+      <div v-if="field.errors">{{ field.errors[0] }}</div>
+    </Field>
+    <Field :of="loginForm" :path="['password']" v-slot="field">
+      <input v-bind="field.props" v-model="field.input" type="password" />
+      <div v-if="field.errors">{{ field.errors[0] }}</div>
+    </Field>
+    <button type="submit" :disabled="loginForm.isSubmitting">Login</button>
+  </Form>
+</template>
+```
+
+The Formisch version renders plain HTML instead of FormKit's prebuilt scaffolding, so the label, help text, and error markup that FormKit generated is now yours to write. In a real app you would move it into a reusable `TextInput` component, as shown in the <Link href="/vue/guides/input-components/">input components</Link> guide. In return, the submit handler receives values that are validated and fully typed by the schema, without a manually declared type.
+
+## Migration steps
+
+### Install Formisch
+
+Install Formisch and Valibot alongside FormKit. See the <Link href="/vue/guides/installation/">installation</Link> guide for details.
+
+```bash
+npm install @formisch/vue valibot
+```
+
+Since Formisch requires no `app.use(...)` call, nothing changes in `main.ts` yet. Keep FormKit's plugin registered until the last FormKit form is migrated.
+
+### Move validation into a Valibot schema
+
+Collect the `validation` and `:validation-messages` props of each input in the form and translate them into one Valibot schema. The nesting of `name` props (including `type="group"` wrappers) becomes the nesting of the object schema, and each validation rule becomes a Valibot action with its message as the first argument.
+
+```ts
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  // FormKit: validation="required|email"
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+});
+```
+
+Common rule mappings: `required` becomes `v.nonEmpty(...)` for strings, `email` becomes `v.email(...)`, `length:8` becomes `v.minLength(8, ...)`, `between:1,10` becomes `v.minValue(1, ...)` and `v.maxValue(10, ...)`, and custom rules become `v.check(...)` or `v.checkAsync(...)`. Define the fields in the same order they appear in your form, since Formisch focuses the first invalid field on submit based on the schema order. See the <Link href="/vue/guides/define-your-form/">define your form</Link> guide for more details.
+
+### Replace the form setup
+
+Replace `<FormKit type="form">` with the <Link href="/vue/api/useForm/">`useForm`</Link> composable and the <Link href="/vue/api/Form/">`Form`</Link> component. If your FormKit form was prefilled via the `:value` prop or `v-model`, pass that data as `initialInput` instead.
+
+```vue
+<script setup lang="ts">
+import { Form, useForm } from '@formisch/vue';
+
+const loginForm = useForm({
+  schema: LoginSchema,
+  initialInput: { email: 'jane@example.com' },
+});
+</script>
+
+<template>
+  <Form :of="loginForm" @submit="handleSubmit">
+    <!-- Fields will go here -->
+    <button type="submit">Login</button>
+  </Form>
+</template>
+```
+
+Note that FormKit automatically renders a submit button at the bottom of every form. Formisch does not, so add your own `<button type="submit">`.
+
+### Replace field bindings
+
+Each `<FormKit>` input becomes a <Link href="/vue/api/Field/">`Field`</Link> component wrapping your own markup. The `name` prop becomes a type-safe `path` array, and nested `type="group"` structures become longer paths like `['address', 'street']`. The `v-slot` directive exposes the field store with `props` to spread onto the element, `input` for `v-model`, and `errors` for display.
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <label :for="field.props.name">Email</label>
+    <input
+      v-bind="field.props"
+      :id="field.props.name"
+      v-model="field.input"
+      type="email"
+    />
+    <div v-if="field.errors">{{ field.errors[0] }}</div>
+  </Field>
+</template>
+```
+
+For field components that encapsulate a single field, the <Link href="/vue/api/useField/">`useField`</Link> composable provides the same field store in the script block. See the <Link href="/vue/guides/add-form-fields/">add form fields</Link> guide for both approaches.
+
+### Update submission handling
+
+FormKit's `@submit` handler receives the collected form data and the form's core node, which is also used to set backend errors via `node.setErrors(...)`. In Formisch, the `@submit` handler on the `Form` component receives the schema-validated output, typed by <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link>, and backend errors are set with the <Link href="/methods/api/setErrors/">`setErrors`</Link> method.
+
+```ts
+import { setErrors } from '@formisch/vue';
+import type { SubmitHandler } from '@formisch/vue';
+
+const handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+  const response = await login(values);
+  if (!response.ok) {
+    setErrors(loginForm, {
+      path: ['email'],
+      errors: ['This email is not registered.'],
+    });
+  }
+};
+```
+
+Leaving out the `path` sets form-level errors, which you can display via `loginForm.errors`.
+
+## API mapping
+
+| FormKit                              | Formisch                                                                                                                                                        |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plugin` + `defaultConfig`           | Not needed, just import from `@formisch/vue`                                                                                                                    |
+| `<FormKit type="form">`              | <Link href="/vue/api/useForm/">`useForm`</Link> + <Link href="/vue/api/Form/">`Form`</Link>                                                                     |
+| `<FormKit name="…" />`               | <Link href="/vue/api/Field/">`Field`</Link> component or <Link href="/vue/api/useField/">`useField`</Link> composable                                           |
+| `<FormKit type="group">`             | Nested object schema + path arrays                                                                                                                              |
+| `validation` prop                    | Valibot schema passed to `useForm`                                                                                                                              |
+| `:validation-messages` prop          | Messages in the schema actions                                                                                                                                  |
+| `validation-visibility` prop         | `validate` / `revalidate` config + your markup                                                                                                                  |
+| `:value` / `v-model` on the form     | `initialInput` config                                                                                                                                           |
+| `@submit`                            | `@submit` on <Link href="/vue/api/Form/">`Form`</Link>                                                                                                          |
+| `state.valid`                        | `form.isValid` / `field.isValid`                                                                                                                                |
+| `state.dirty`                        | `form.isDirty` / `field.isDirty`                                                                                                                                |
+| `state.loading`                      | `form.isSubmitting`                                                                                                                                             |
+| `state.submitted`                    | `form.isSubmitted`                                                                                                                                              |
+| `node.setErrors()`                   | <Link href="/methods/api/setErrors/">`setErrors`</Link>                                                                                                         |
+| `reset()`                            | <Link href="/methods/api/reset/">`reset`</Link>                                                                                                                 |
+| `submitForm()`                       | <Link href="/methods/api/submit/">`submit`</Link>                                                                                                               |
+| `getNode()` + `node.value`           | <Link href="/methods/api/getInput/">`getInput`</Link>                                                                                                           |
+| `<FormKit type="repeater">` / `list` | <Link href="/vue/api/FieldArray/">`FieldArray`</Link> + <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, … |
+| `<FormKitSchema>`                    | No equivalent                                                                                                                                                   |
+| `@formkit/zod` plugin                | Built in, the Valibot schema is the form definition                                                                                                             |
+
+A few entries have no direct equivalent. `<FormKitSchema>` generates entire forms from JSON, which has no counterpart in a headless library; with Formisch you write the template yourself. The same applies to FormKit's rendered UI scaffolding, themes, and icons: in Formisch you own the markup, so labels, help text, and message rendering move into your own <Link href="/vue/guides/input-components/">input components</Link>. And where FormKit configures validation display per input, Formisch configures validation timing once per form and leaves error display to your template.
+
+## Common patterns
+
+### Form state
+
+In FormKit, form state lives on the core node and is accessed through the form's slot props or via `getNode('id').context.state`:
+
+```vue
+<template>
+  <FormKit
+    type="form"
+    :actions="false"
+    @submit="handleSubmit"
+    v-slot="{ state }"
+  >
+    <!-- Fields -->
+    <FormKit type="submit" label="Login" :disabled="!state.valid" />
+  </FormKit>
+</template>
+```
+
+In Formisch, the form store returned by `useForm` is reactive, so you read state directly in script or template. The form store exposes `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors`, and each field store offers per-field `isTouched`, `isEdited`, `isDirty`, and `isValid` counterparts.
+
+```vue
+<template>
+  <Form :of="loginForm" @submit="handleSubmit">
+    <!-- Fields -->
+    <button type="submit" :disabled="loginForm.isSubmitting">
+      {{ loginForm.isSubmitting ? 'Submitting...' : 'Login' }}
+    </button>
+  </Form>
+</template>
+```
+
+### Validation timing
+
+FormKit validates continuously and uses `validation-visibility` (with values like `blur`, `live`, `dirty`, and `submit`) to decide per input when messages appear. Formisch splits this into two parts. The `validate` and `revalidate` config control when validation runs for the whole form:
+
+```ts
+const loginForm = useForm({
+  schema: LoginSchema,
+  validate: 'blur', // First validation on blur (default: 'submit')
+  revalidate: 'input', // Revalidation on every keystroke (default: 'input')
+});
+```
+
+When errors are displayed is decided in your markup. To approximate FormKit's default behavior of revealing messages once a field was interacted with, guard the error output with field state:
+
+```vue
+<Field :of="loginForm" :path="['email']" v-slot="field">
+  <input v-bind="field.props" v-model="field.input" type="email" />
+  <div v-if="(field.isEdited || loginForm.isSubmitted) && field.errors">
+    {{ field.errors[0] }}
+  </div>
+</Field>
+```
+
+See the <Link href="/vue/guides/validation/">validation</Link> guide for the full picture, including async validation with `isValidating`.
+
+### Field arrays
+
+FormKit handles repeating groups with the `repeater` input (a free Pro input from `@formkit/pro` that must be registered separately) or a dynamic `list`, and the repeater brings its own UI for adding, removing, and shifting items:
+
+```vue
+<template>
+  <FormKit type="form" @submit="saveTeam">
+    <FormKit type="repeater" name="members" label="Team members">
+      <FormKit type="text" name="name" label="Name" validation="required" />
+    </FormKit>
+  </FormKit>
+</template>
+```
+
+In Formisch, the array is part of the schema, the <Link href="/vue/api/FieldArray/">`FieldArray`</Link> component provides stable `items` keys for `v-for`, and methods like <Link href="/methods/api/insert/">`insert`</Link> and <Link href="/methods/api/remove/">`remove`</Link> mutate the array:
+
+```vue
+<script setup lang="ts">
+import {
+  Field,
+  FieldArray,
+  Form,
+  insert,
+  remove,
+  useForm,
+} from '@formisch/vue';
+import * as v from 'valibot';
+
+const TeamSchema = v.object({
+  members: v.array(
+    v.object({
+      name: v.pipe(v.string(), v.nonEmpty('Please enter a name.')),
+    })
+  ),
+});
+
+const teamForm = useForm({
+  schema: TeamSchema,
+  initialInput: { members: [{ name: '' }] },
+});
+</script>
+
+<template>
+  <Form :of="teamForm" @submit="(output) => console.log(output)">
+    <FieldArray :of="teamForm" :path="['members']" v-slot="fieldArray">
+      <div v-for="(item, index) in fieldArray.items" :key="item">
+        <Field :of="teamForm" :path="['members', index, 'name']" v-slot="field">
+          <input v-bind="field.props" v-model="field.input" type="text" />
+          <div v-if="field.errors">{{ field.errors[0] }}</div>
+        </Field>
+        <button
+          type="button"
+          @click="remove(teamForm, { path: ['members'], at: index })"
+        >
+          Remove
+        </button>
+      </div>
+    </FieldArray>
+    <button
+      type="button"
+      @click="
+        insert(teamForm, { path: ['members'], initialInput: { name: '' } })
+      "
+    >
+      Add member
+    </button>
+    <button type="submit">Save</button>
+  </Form>
+</template>
+```
+
+The <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/swap/">`swap`</Link>, and <Link href="/methods/api/replace/">`replace`</Link> methods cover reordering. See the <Link href="/vue/guides/field-arrays/">field arrays</Link> guide for nested arrays and array-level validation.
+
+### Reset
+
+FormKit resets a form through its `id` with the `reset` helper, for example `reset('login-form')` imported from `@formkit/core`. In Formisch, the <Link href="/methods/api/reset/">`reset`</Link> method takes the form store directly:
+
+```vue
+<script setup lang="ts">
+import { reset } from '@formisch/vue';
+</script>
+
+<template>
+  <button type="button" @click="reset(loginForm)">Reset</button>
+</template>
+```
+
+Like FormKit's optional second argument to `reset`, Formisch accepts new initial values. Calling `reset(loginForm, { initialInput: ... })` updates the baseline that dirty tracking compares against, which is the right tool when refreshed server data should become the new initial state.
+
+### Special inputs
+
+FormKit ships dedicated input types like `select`, `checkbox`, and `radio` that render their options from a prop:
+
+```vue
+<template>
+  <FormKit
+    type="select"
+    name="framework"
+    label="Framework"
+    :options="{ vue: 'Vue', react: 'React' }"
+  />
+</template>
+```
+
+Formisch works with the native HTML elements instead. You render the options yourself and bind the field with `v-bind` and `v-model`:
+
+```vue
+<template>
+  <Field :of="form" :path="['framework']" v-slot="field">
+    <select v-bind="field.props" v-model="field.input">
+      <option
+        v-for="option in [
+          { label: 'Vue', value: 'vue' },
+          { label: 'React', value: 'react' },
+        ]"
+        :key="option.value"
+        :value="option.value"
+      >
+        {{ option.label }}
+      </option>
+    </select>
+  </Field>
+</template>
+```
+
+Checkboxes, radio groups, and multi-selects follow the same pattern. File inputs are the exception: Vue does not allow `v-model` on them, so instead add an `input` handler that writes the selected file to `field.input` yourself. The <Link href="/vue/guides/special-inputs/">special inputs</Link> guide covers each of them, including checkbox groups that represent an array of strings.
+
+## Next steps
+
+With your first form migrated, work through the main concepts to deepen your understanding: <Link href="/vue/guides/define-your-form/">define your form</Link>, <Link href="/vue/guides/add-form-fields/">add form fields</Link>, and <Link href="/vue/guides/handle-submission/">handle submission</Link>. To rebuild the input scaffolding that FormKit provided, follow the <Link href="/vue/guides/input-components/">input components</Link> guide, and for programmatic control over your forms, explore the <Link href="/vue/guides/form-methods/">form methods</Link> guide.

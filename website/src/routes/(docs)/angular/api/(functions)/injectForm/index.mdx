@@ -1,0 +1,130 @@
+---
+title: injectForm
+description: Creates a reactive form store from a form configuration.
+source: /frameworks/angular/src/functions/injectForm/injectForm.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# injectForm
+
+Creates a reactive form store from a form configuration.
+
+```ts
+const form = injectForm<TSchema>(config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+
+## Parameters
+
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+With `injectForm` you create the store of your form based on a Valibot schema. The store manages the form state and exposes it as Angular signals, so you can call properties like `form.isValid()` directly in your template — including in `OnPush` and zoneless components.
+
+Like Angular's own `inject`, `injectForm` must be called in an injection context, which means in a field initializer or the constructor of your component. Pass the returned store to the <Link href="../formischForm/">`[formischForm]`</Link> directive to connect it to your `<form>` element.
+
+## Returns
+
+- `form` <Property {...properties.FormStore} />
+
+## Examples
+
+The following examples show how `injectForm` can be used.
+
+### Basic form
+
+```ts
+import { Component } from '@angular/core';
+import { FormischForm, injectForm } from '@formisch/angular';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+@Component({
+  selector: 'app-login',
+  imports: [FormischForm],
+  template: `
+    <form [formischForm]="loginForm" [formischSubmit]="handleSubmit">
+      <!-- Form fields -->
+    </form>
+  `,
+})
+export class LoginComponent {
+  readonly loginForm = injectForm({ schema: LoginSchema });
+
+  readonly handleSubmit = (output: v.InferOutput<typeof LoginSchema>) => {
+    console.log(output);
+  };
+}
+```
+
+### Initial input
+
+```ts
+readonly profileForm = injectForm({
+  schema: ProfileSchema,
+  initialInput: {
+    name: 'Jane Doe',
+    email: 'jane@example.com',
+  },
+});
+```
+
+### Validation timing
+
+```ts
+readonly signUpForm = injectForm({
+  schema: SignUpSchema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+## Related
+
+The following APIs can be combined with `injectForm`.
+
+### Functions
+
+<ApiList
+  items={[
+    { text: 'injectField', href: '../injectField/' },
+    { text: 'injectFieldArray', href: '../injectFieldArray/' },
+  ]}
+/>
+
+### Directives
+
+<ApiList
+  items={[
+    { text: 'formischForm', href: '../formischForm/' },
+    { text: 'formischField', href: '../formischField/' },
+    { text: 'formischFieldArray', href: '../formischFieldArray/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'focus', href: '/methods/api/focus/' },
+    { text: 'getDeepErrors', href: '/methods/api/getDeepErrors/' },
+    { text: 'getInput', href: '/methods/api/getInput/' },
+    { text: 'handleSubmit', href: '/methods/api/handleSubmit/' },
+    { text: 'reset', href: '/methods/api/reset/' },
+    { text: 'setInput', href: '/methods/api/setInput/' },
+    { text: 'submit', href: '/methods/api/submit/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>

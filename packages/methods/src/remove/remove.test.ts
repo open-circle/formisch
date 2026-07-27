@@ -64,6 +64,16 @@ describe('remove', () => {
     expect(store.children.items.isDirty.value).toBe(true);
   });
 
+  test('should mark array as edited after removal', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: ['a', 'b', 'c'] },
+    });
+
+    remove(store, { path: ['items'], at: 1 });
+
+    expect(store.children.items.isEdited.value).toBe(true);
+  });
+
   test('should remove item from nested array', () => {
     const store = createTestStore(
       v.object({ outer: v.object({ items: v.array(v.string()) }) }),

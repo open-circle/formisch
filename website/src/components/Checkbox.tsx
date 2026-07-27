@@ -1,5 +1,4 @@
-import type { FieldElementProps } from '@formisch/qwik';
-import type { Signal } from '@qwik.dev/core';
+import type { FieldElementProps, ReadonlySignal } from '@formisch/qwik';
 import { component$ } from '@qwik.dev/core';
 import clsx from 'clsx';
 import { InputErrors } from './InputErrors';
@@ -8,9 +7,9 @@ interface CheckboxProps extends FieldElementProps {
   class?: string;
   label?: string;
   value?: string;
-  input: Readonly<Signal<boolean | undefined>>;
+  input: ReadonlySignal<boolean | undefined>;
   required?: boolean;
-  errors: Readonly<Signal<[string, ...string[]] | null>>;
+  errors: ReadonlySignal<[string, ...string[]] | null>;
 }
 
 /**

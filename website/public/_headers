@@ -1,5 +1,10 @@
 # https://developers.cloudflare.com/workers/static-assets/headers/
 
+# Advertise the API catalog and the Markdown documentation index to AI agents.
+# The Worker sets the same links on Worker-generated responses, where they are
+# deduplicated against these values.
+/
+  Link: </.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="service-doc"; type="text/markdown"
 /build/*
   Cache-Control: public, max-age=31536000, s-maxage=31536000, immutable
 /assets/*

@@ -22,7 +22,7 @@ To retrieve values from your form, you can use:
   of a specific field
 - <Link href="/methods/api/getErrors/">`getErrors`</Link>: Get error messages
   for a specific field
-- <Link href="/methods/api/getAllErrors/">`getAllErrors`</Link>: Get all error
+- <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>: Get all error
   messages across the entire form
 
 Formisch plugs into React's render cycle, so reading values with these methods inside components stays reactive. When the form state changes, components that rely on these values automatically re-render without manual subscriptions.
@@ -62,7 +62,7 @@ To control the form programmatically, use:
 - <Link href="/methods/api/reset/">`reset`</Link>: Reset the form to its initial
   state or update initial values
 - <Link href="/methods/api/validate/">`validate`</Link>: Manually trigger
-  validation for the entire form or specific fields
+  validation of the entire form
 - <Link href="/methods/api/submit/">`submit`</Link>: Programmatically trigger
   form submission
 - <Link href="/methods/api/focus/">`focus`</Link>: Focus on a specific field

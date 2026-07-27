@@ -12,3 +12,5 @@ server
 *.spec.ts
 .netlify
 .vercel
+# Vendored agent skill synced from open-circle/agent-skills at build time
+public/.well-known/agent-skills/formisch/SKILL.md

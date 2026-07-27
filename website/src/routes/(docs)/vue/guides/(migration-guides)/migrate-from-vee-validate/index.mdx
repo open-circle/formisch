@@ -1,0 +1,381 @@
+---
+title: Migrate from VeeValidate
+description: >-
+  Learn how to migrate your Vue forms from VeeValidate to Formisch. This guide
+  compares both APIs side by side, walks you through the migration step by
+  step, and maps VeeValidate APIs to their Formisch equivalents.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from VeeValidate
+
+This guide walks you through migrating a form from [VeeValidate](https://vee-validate.logaretm.com) to Formisch. It explains the mental-model differences, shows the same form implemented in both libraries, and maps VeeValidate's APIs, options, and state fields to their Formisch counterparts.
+
+Migrating is a rewrite of your form layer, not a drop-in replacement. That said, the conceptual gap is small: both libraries are headless, composables-based, and schema-friendly. The main work is consolidating your validation into a single root Valibot schema and replacing VeeValidate's `useForm` and `defineField` with Formisch's composables and components.
+
+Both libraries can coexist in the same application, so you can migrate one form at a time instead of doing everything in a single step. Since both libraries export a composable named `useForm`, the import path determines which one a component uses.
+
+## Key differences
+
+The biggest shift is that Formisch is strictly schema-first. In VeeValidate, validation can come from several places: validator functions, globally registered rules, or a schema from Yup, Zod, or Valibot passed as `validationSchema` (usually wrapped in `toTypedSchema` for type inference). The form's shape is implied by whatever fields you register. In Formisch, a single Valibot schema is the one source of truth for the form's structure, its TypeScript types, and its validation rules. There is no resolver or wrapper to configure: you pass the schema to <Link href="/vue/api/useForm/">`useForm`</Link> and every path, input value, and submit handler is typed from it.
+
+Validation also runs differently:
+
+- **Location**: VeeValidate attaches rules per field (or resolves them from a schema per field). Formisch always parses the entire form against the schema in a single pass and distributes the resulting issues to the individual fields, so cross-field rules work without extra wiring.
+- **Timing**: VeeValidate configures triggers per field or globally via `configure()` with flags like `validateOnBlur`, `validateOnChange`, and `validateOnModelUpdate`. Formisch controls timing form-wide with two options on `useForm`: `validate` (first validation, defaults to `'submit'`) and `revalidate` (subsequent validations, defaults to `'input'`).
+- **Field addressing**: VeeValidate identifies fields by string paths like `'members[0].email'`. Formisch uses path arrays like `['members', 0, 'email']` that are fully type-checked against your schema.
+- **Form state**: VeeValidate spreads state across the values returned by `useForm` (`values`, `errors`, `meta`, `isSubmitting`, …) plus helper composables like `useIsFormDirty`. Formisch returns one form store with flat reactive properties such as `isDirty`, `isValid`, and `isSubmitting`.
+
+Reactivity is comparable: both libraries build on Vue's reactivity system, so components only re-render when the state they read changes. The trade-offs to be aware of are that Formisch currently supports only Valibot as the schema library, while its bundle size starts at about 2.5 kB compared to VeeValidate's roughly 12 kB. See the <Link href="/vue/guides/comparison/">comparison</Link> guide for a broader overview.
+
+## Side-by-side example
+
+The following login form has two validated fields and an async submit handler. The VeeValidate version uses the composition API with a Zod schema, which is one of the most common setups. The Formisch version implements the exact same behavior.
+
+### VeeValidate
+
+```vue
+<script setup lang="ts">
+import { toTypedSchema } from '@vee-validate/zod';
+import { useForm } from 'vee-validate';
+import { z } from 'zod';
+
+const validationSchema = toTypedSchema(
+  z.object({
+    email: z
+      .string()
+      .min(1, 'Please enter your email.')
+      .email('The email address is badly formatted.'),
+    password: z
+      .string()
+      .min(1, 'Please enter your password.')
+      .min(8, 'Your password must have 8 characters or more.'),
+  })
+);
+
+const { defineField, errors, handleSubmit, isSubmitting } = useForm({
+  validationSchema,
+});
+
+const [email, emailProps] = defineField('email');
+const [password, passwordProps] = defineField('password');
+
+const onSubmit = handleSubmit(async (values) => {
+  await fetch('/api/login', {
+    method: 'POST',
+    body: JSON.stringify(values),
+  });
+});
+</script>
+
+<template>
+  <form @submit="onSubmit">
+    <div>
+      <input v-model="email" v-bind="emailProps" type="email" />
+      <div v-if="errors.email">{{ errors.email }}</div>
+    </div>
+    <div>
+      <input v-model="password" v-bind="passwordProps" type="password" />
+      <div v-if="errors.password">{{ errors.password }}</div>
+    </div>
+    <button type="submit" :disabled="isSubmitting">Login</button>
+  </form>
+</template>
+```
+
+### Formisch
+
+```vue
+<script setup lang="ts">
+import { Field, Form, useForm } from '@formisch/vue';
+import type { SubmitHandler } from '@formisch/vue';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+const loginForm = useForm({
+  schema: LoginSchema,
+});
+
+const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+  await fetch('/api/login', {
+    method: 'POST',
+    body: JSON.stringify(values),
+  });
+};
+</script>
+
+<template>
+  <Form :of="loginForm" @submit="submitForm">
+    <Field :of="loginForm" :path="['email']" v-slot="field">
+      <div>
+        <input v-model="field.input" v-bind="field.props" type="email" />
+        <div v-if="field.errors">{{ field.errors[0] }}</div>
+      </div>
+    </Field>
+    <Field :of="loginForm" :path="['password']" v-slot="field">
+      <div>
+        <input v-model="field.input" v-bind="field.props" type="password" />
+        <div v-if="field.errors">{{ field.errors[0] }}</div>
+      </div>
+    </Field>
+    <button type="submit" :disabled="loginForm.isSubmitting">Login</button>
+  </Form>
+</template>
+```
+
+Instead of destructuring `useForm` and defining a model tuple per field, you keep the single `loginForm` store and connect each input through the <Link href="/vue/api/Field/">`Field`</Link> component. Errors live on the field store as an array, and the submit handler receives values that are already validated and typed by the schema.
+
+## Migration steps
+
+### Install Formisch
+
+Add Formisch and Valibot to your project. Keep `vee-validate` installed until the last form is migrated, then remove it together with its schema adapter packages like `@vee-validate/zod`.
+
+```bash
+npm install @formisch/vue valibot
+```
+
+### Move validation into a Valibot schema
+
+Formisch validates exclusively against a Valibot schema. If you used Zod or Yup with VeeValidate, translate the schema; the structure usually maps one to one. If you already used Valibot through `@vee-validate/valibot`, you can reuse your schema unchanged and simply drop the `toTypedSchema` wrapper.
+
+```ts
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+```
+
+If some of your validation lives in validator functions or globally registered rules instead of a schema, consolidate it into the schema now. Custom logic translates to `v.check()`, and async rules (for example a server-side uniqueness check) translate to `v.checkAsync()` with `v.objectAsync()` and `v.pipeAsync()`. Define the fields in the same order they appear in your form, since Formisch focuses the first invalid field on submit based on the schema order. See the <Link href="/vue/guides/define-your-form/">define your form</Link> guide for details.
+
+### Replace the form setup
+
+Replace VeeValidate's `useForm` with Formisch's <Link href="/vue/api/useForm/">`useForm`</Link> composable. Instead of destructuring individual helpers, you keep the returned form store and pass it to Formisch's components and methods. The `initialValues` option becomes `initialInput`.
+
+```ts
+// VeeValidate
+const { defineField, errors, handleSubmit } = useForm({
+  validationSchema,
+  initialValues: { email: 'jane@example.com' },
+});
+
+// Formisch
+const loginForm = useForm({
+  schema: LoginSchema,
+  initialInput: { email: 'jane@example.com' },
+});
+```
+
+### Replace field bindings
+
+Each `defineField` tuple (or `useField` call, or `<Field name="…">` component) becomes a <Link href="/vue/api/Field/">`Field`</Link> component with a type-safe path array. The `v-slot` directive exposes the field store with `input`, `props`, `errors`, and state flags.
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <input v-model="field.input" v-bind="field.props" type="email" />
+    <div v-if="field.errors">{{ field.errors[0] }}</div>
+  </Field>
+</template>
+```
+
+Note that errors move with the field: instead of looking up `errors.email` on the form, you read `field.errors` inside the field's slot. This also replaces VeeValidate's `<ErrorMessage />` component. For dedicated field components, use the <Link href="/vue/api/useField/">`useField`</Link> composable as described in the <Link href="/vue/guides/add-form-fields/">add form fields</Link> guide.
+
+### Update submission handling
+
+VeeValidate wraps your handler with `handleSubmit` and binds the result to a native `<form>` element. In Formisch, you wrap your fields in the <Link href="/vue/api/Form/">`Form`</Link> component and pass your handler to its `@submit` event. The handler only runs when the schema parses successfully and receives the fully typed output.
+
+```vue
+<script setup lang="ts">
+import type { SubmitHandler } from '@formisch/vue';
+
+const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+  console.log(values); // { email: string, password: string }
+};
+</script>
+
+<template>
+  <Form :of="loginForm" @submit="submitForm">
+    <!-- fields -->
+  </Form>
+</template>
+```
+
+If you cannot render a `<form>` element, for example inside another form, use the <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method instead, as shown in the <Link href="/vue/guides/handle-submission/">handle submission</Link> guide.
+
+## API mapping
+
+| VeeValidate                        | Formisch                                                                                                                       |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `useForm({ validationSchema })`    | <Link href="/vue/api/useForm/">`useForm`</Link> with `schema`                                                                  |
+| `initialValues`                    | `initialInput`                                                                                                                 |
+| `configure({ validateOnBlur, … })` | `validate` / `revalidate` config of <Link href="/vue/api/useForm/">`useForm`</Link>                                            |
+| `defineField('email')`             | <Link href="/vue/api/Field/">`Field`</Link> component with `:path="['email']"`                                                 |
+| `useField('email')`                | <Link href="/vue/api/useField/">`useField`</Link> composable                                                                   |
+| `<Field name="email" />`           | <Link href="/vue/api/Field/">`Field`</Link> component                                                                          |
+| `<ErrorMessage name="email" />`    | `field.errors` inside the <Link href="/vue/api/Field/">`Field`</Link> slot                                                     |
+| `handleSubmit(onSuccess)`          | `@submit` of <Link href="/vue/api/Form/">`Form`</Link> or <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link>        |
+| `values`                           | `field.input` or <Link href="/methods/api/getInput/">`getInput`</Link>                                                         |
+| `errors.email`                     | `field.errors` or <Link href="/methods/api/getErrors/">`getErrors`</Link>                                                      |
+| `meta.dirty` / `meta.touched`      | `form.isDirty` / `form.isTouched`                                                                                              |
+| `meta.valid`                       | `form.isValid`                                                                                                                 |
+| `meta.pending`                     | `form.isValidating`                                                                                                            |
+| `isSubmitting`                     | `form.isSubmitting`                                                                                                            |
+| `submitCount`                      | `form.isSubmitted`                                                                                                             |
+| `setFieldValue` / `setValues`      | <Link href="/methods/api/setInput/">`setInput`</Link>                                                                          |
+| `setFieldError` / `setErrors`      | <Link href="/methods/api/setErrors/">`setErrors`</Link>                                                                        |
+| `resetForm` / `resetField`         | <Link href="/methods/api/reset/">`reset`</Link>                                                                                |
+| `validate` / `validateField`       | <Link href="/methods/api/validate/">`validate`</Link>                                                                          |
+| `useFieldArray('list')`            | <Link href="/vue/api/FieldArray/">`FieldArray`</Link> component or <Link href="/vue/api/useFieldArray/">`useFieldArray`</Link> |
+| `push` / `prepend` / `insert`      | <Link href="/methods/api/insert/">`insert`</Link>                                                                              |
+| `remove`                           | <Link href="/methods/api/remove/">`remove`</Link>                                                                              |
+| `swap`                             | <Link href="/methods/api/swap/">`swap`</Link>                                                                                  |
+| `move`                             | <Link href="/methods/api/move/">`move`</Link>                                                                                  |
+| `update`                           | <Link href="/methods/api/replace/">`replace`</Link>                                                                            |
+
+A few entries deserve a note. `submitCount` has no direct equivalent: Formisch tracks the boolean `isSubmitted`, which is `true` after the first submit attempt. The touched flag behaves slightly differently: Formisch marks a field as touched when it receives focus, while VeeValidate marks it on blur, so touched-based logic reacts one event earlier. Similarly, `validateField` has no per-field counterpart, because Formisch's <Link href="/methods/api/validate/">`validate`</Link> always parses the whole form and distributes the resulting issues to the fields. VeeValidate's `replace(items)`, which swaps out the entire array, maps to calling <Link href="/methods/api/setInput/">`setInput`</Link> with the array's path. Globally registered rules via `defineRule` and the `@vee-validate/rules` package have no equivalent, since all validation lives in the Valibot schema. The same applies to `toTypedSchema`: it is simply no longer needed, because types are inferred from the schema directly. Helper composables like `useIsFormDirty` or `useFormValues` are also unnecessary, as the form store itself is reactive and can be passed around freely.
+
+## Common patterns
+
+### Form state
+
+In VeeValidate, aggregated form state lives on the `meta` computed ref and separate refs like `isSubmitting`, or is accessed through helper composables. In Formisch, everything is a flat reactive property on the form store, so you read it directly in your template or component logic.
+
+```vue
+<template>
+  <button
+    type="submit"
+    :disabled="!loginForm.isDirty || loginForm.isSubmitting"
+  >
+    {{ loginForm.isSubmitting ? 'Submitting...' : 'Login' }}
+  </button>
+</template>
+```
+
+The available properties are `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors`. The same flags exist per field on the field store.
+
+### Validation timing
+
+VeeValidate validates each field aggressively by default (on model updates, change, and blur) and lets you tune this per field, for example with `validateOnModelUpdate: false` on `defineField`, or globally via `configure()`. Formisch replaces this per-field event configuration with two form-wide options:
+
+```ts
+const loginForm = useForm({
+  schema: LoginSchema,
+  validate: 'blur', // first validation per field, defaults to 'submit'
+  revalidate: 'input', // subsequent validations, defaults to 'input'
+});
+```
+
+With the defaults, a field stays quiet until the form is submitted and then corrects itself on every keystroke. Unlike VeeValidate, Formisch also decouples running validation from showing errors: after a validation pass you decide which errors to render, typically guarded by `field.isEdited || form.isSubmitted`. The <Link href="/vue/guides/validation/">validation</Link> guide covers this pattern in depth.
+
+### Field arrays
+
+VeeValidate's `useFieldArray` returns a `fields` ref whose entries carry a `key` for the `v-for` directive, plus bound methods like `push` and `remove`. Formisch provides the <Link href="/vue/api/FieldArray/">`FieldArray`</Link> component, whose store exposes an `items` array of unique string identifiers to use as keys, and standalone array methods that take the form store and a path.
+
+```vue
+<script setup lang="ts">
+import { Field, FieldArray, insert, remove } from '@formisch/vue';
+</script>
+
+<template>
+  <FieldArray :of="todoForm" :path="['todos']" v-slot="fieldArray">
+    <div v-for="(item, index) in fieldArray.items" :key="item">
+      <Field :of="todoForm" :path="['todos', index, 'label']" v-slot="field">
+        <input v-model="field.input" v-bind="field.props" type="text" />
+      </Field>
+      <button
+        type="button"
+        @click="remove(todoForm, { path: ['todos'], at: index })"
+      >
+        Delete
+      </button>
+    </div>
+    <button
+      type="button"
+      @click="
+        insert(todoForm, { path: ['todos'], initialInput: { label: '' } })
+      "
+    >
+      Add todo
+    </button>
+  </FieldArray>
+</template>
+```
+
+Rules on the array itself, like VeeValidate's `.min(1)` on a Yup array, move into the schema with `v.nonEmpty()` or `v.minLength()` on `v.array()`, and their errors appear on `fieldArray.errors`. See the <Link href="/vue/guides/field-arrays/">field arrays</Link> guide for the complete picture, including `move`, `swap`, and `replace`.
+
+### Reset
+
+VeeValidate's `resetForm()` restores initial values, and `resetForm({ values })` establishes new ones. The Formisch equivalent is the <Link href="/methods/api/reset/">`reset`</Link> method, which also accepts a new `initialInput` as the new baseline for dirty tracking, for example after refreshed server data.
+
+```ts
+import { reset } from '@formisch/vue';
+
+// Reset the form to its initial state
+reset(loginForm);
+
+// Reset with new initial values
+reset(loginForm, { initialInput: { email: 'jane@example.com', password: '' } });
+```
+
+Note that resetting to programmatically set values requires controlled fields, so make sure your inputs use `v-model` as shown in the <Link href="/vue/guides/controlled-fields/">controlled fields</Link> guide.
+
+### Special inputs
+
+In VeeValidate, checkboxes and radio buttons need extra configuration such as `type: 'checkbox'` and `checkedValue` on `useField`. With Formisch, you spread `field.props` onto the native element and add `v-model`, and Vue's `v-model` semantics handle single checkboxes, checkbox groups, radio buttons, and selects without further setup:
+
+```vue
+<template>
+  <Field :of="form" :path="['cookies']" v-slot="field">
+    <label>
+      <input type="checkbox" v-bind="field.props" v-model="field.input" />
+      Yes, I want cookies
+    </label>
+  </Field>
+</template>
+```
+
+File inputs are the exception: Vue does not allow `v-model` on them, and spreading `field.props` alone does not capture the selected file. Add an `input` handler that writes the file to `field.input` yourself:
+
+```vue
+<template>
+  <Field :of="form" :path="['document']" v-slot="field">
+    <input
+      v-bind="field.props"
+      type="file"
+      @input="field.input = ($event.target as HTMLInputElement).files?.[0]"
+    />
+  </Field>
+</template>
+```
+
+The <Link href="/vue/guides/special-inputs/">special inputs</Link> guide shows the full set of supported input types.
+
+## Next steps
+
+You now have everything you need to migrate your forms one at a time. To deepen your understanding of the Formisch APIs used in this guide, work through the <Link href="/vue/guides/add-form-fields/">add form fields</Link> and <Link href="/vue/guides/handle-submission/">handle submission</Link> guides, build reusable <Link href="/vue/guides/input-components/">input components</Link>, and explore the <Link href="/vue/guides/form-methods/">form methods</Link> guide for programmatic control of your forms.

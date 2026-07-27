@@ -4,8 +4,8 @@
 
 - [Introduction](/solid/guides/introduction/)
 - [Installation](/solid/guides/installation/)
+- [Coding agents](/solid/guides/coding-agents/)
 - [Comparison](/solid/guides/comparison/)
-- [LLMs.txt](/solid/guides/llms-txt/)
 
 ## Main concepts
 
@@ -18,6 +18,7 @@
 
 ## Advanced guides
 
+- [Validation](/solid/guides/validation/)
 - [Special inputs](/solid/guides/special-inputs/)
 - [Controlled fields](/solid/guides/controlled-fields/)
 - [Nested fields](/solid/guides/nested-fields/)
@@ -25,3 +26,8 @@
 - [Field arrays](/solid/guides/field-arrays/)
 - [TypeScript](/solid/guides/typescript/)
 - [Architecture](/solid/guides/architecture/)
+
+## Migration guides
+
+- [From Felte](/solid/guides/migrate-from-felte/)
+- [From TanStack Form](/solid/guides/migrate-from-tanstack-form/)

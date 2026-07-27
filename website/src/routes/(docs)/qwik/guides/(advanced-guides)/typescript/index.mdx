@@ -177,7 +177,7 @@ export const FormContent = component$<FormContentProps>((props) => {
 You can create generic field components with proper TypeScript typing using the <Link href="/qwik/api/FormStore/">`FormStore`</Link> type with Valibot's `GenericSchema`.
 
 ```tsx
-import { type FormStore, useField$ } from '@formisch/qwik';
+import { type FormStore, useField } from '@formisch/qwik';
 import { component$ } from '@qwik.dev/core';
 import * as v from 'valibot';
 
@@ -186,7 +186,7 @@ type EmailInputProps = {
 };
 
 export const EmailInput = component$<EmailInputProps>((props) => {
-  const field = useField$(props.of, { path: ['email'] });
+  const field = useField(props.of, { path: ['email'] });
 
   return (
     <div>

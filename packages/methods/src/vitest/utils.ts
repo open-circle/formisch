@@ -1,12 +1,12 @@
 import {
   type BaseFormStore,
   createFormStore,
+  type EmptyInput,
   type FormSchema,
   initializeFieldStore,
   INTERNAL,
   type InternalArrayStore,
   type InternalFormStore,
-  type PathKey,
   type ValidationMode,
 } from '@formisch/core';
 import type * as v from 'valibot';
@@ -19,6 +19,7 @@ interface CreateTestStoreConfig<TSchema extends FormSchema> {
   validate?: ValidationMode | undefined;
   revalidate?: Exclude<ValidationMode, 'initial'> | undefined;
   initialInput?: v.InferInput<TSchema> | undefined;
+  emptyInput?: EmptyInput | undefined;
   issues?: [v.BaseIssue<unknown>, ...v.BaseIssue<unknown>[]] | undefined;
 }
 
@@ -38,6 +39,7 @@ export function createTestStore<TSchema extends FormSchema>(
     validate = 'submit',
     revalidate = 'input',
     initialInput,
+    emptyInput,
     issues,
   } = config;
 
@@ -62,6 +64,7 @@ export function createTestStore<TSchema extends FormSchema>(
     {
       schema,
       initialInput,
+      emptyInput,
       validate,
       revalidate,
     },
@@ -159,24 +162,25 @@ export function schemaIssue(message: string): v.BaseIssue<unknown> {
  * Pre-initializes a child slot in an array store to enable testing
  * of insert operations at specific indices.
  *
+ * @param internalFormStore The internal form store.
  * @param arrayStore The internal array store.
  * @param index The index to initialize.
  */
 export function initializeChildSlot(
+  internalFormStore: InternalFormStore,
   arrayStore: InternalArrayStore,
   index: number
 ): void {
   if (!arrayStore.children[index]) {
-    const path = JSON.parse(arrayStore.name) as PathKey[];
-    path.push(index);
     // @ts-expect-error - Creating empty object to be initialized
     arrayStore.children[index] = {};
     initializeFieldStore(
+      internalFormStore,
       arrayStore.children[index],
       // @ts-expect-error - Accessing schema item
       arrayStore.schema.item,
       undefined,
-      path
+      [...arrayStore.path, index]
     );
   }
 }

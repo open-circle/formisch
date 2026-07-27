@@ -1,0 +1,73 @@
+---
+title: formischControl
+description: Directive that binds a native form control to a field of your form.
+source: /frameworks/angular/src/directives/FormischControl/FormischControl.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# formischControl
+
+Directive that binds a native form control to a field of your form. It is exported as the `FormischControl` class.
+
+```angular-html
+<input [formischControl]="field" />
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Inputs
+
+- `formischControl` <Property {...properties.formischControl} />
+
+### Explanation
+
+The `[formischControl]` directive connects a field store to a native form control. It writes the current input of the field into the element, keeps the `name` and `aria-invalid` attributes in sync, wires the `input`, `change`, `focus` and `blur` events that drive validation, and registers the element so that focusing the first invalid field on submit and the <Link href="/methods/api/focus/">`focus`</Link> method work.
+
+Because the directive owns the value of the element, you must not bind `[value]` or `[checked]` to hold the state of the field yourself. Radio and checkbox groups are an exception: bind every element of the group to the same field and give each its own `value` attribute, which identifies the option rather than the state of the field.
+
+The directive knows the quirks of each element type. It sets `value` on text inputs, `checked` on checkboxes and radios, and the selected state of the options of a `<select />`. Since a `<select />` ignores a value for which no matching option exists yet, the directive also observes the options and re-applies the input when they render later. A file input can only be cleared, because browsers do not allow a file selection to be set programmatically.
+
+Both type arguments are inferred from the field store you pass. Keep components that take a field store as an input generic over `TSchema` and `TFieldPath` — the store is invariant, so a component that widens it to the default `FieldStore` cannot accept a concrete field.
+
+To import the directive, add the `FormischControl` class to the `imports` array of your component.
+
+## Related
+
+The following APIs can be combined with `formischControl`.
+
+### Functions
+
+<ApiList
+  items={[
+    { text: 'injectField', href: '../injectField/' },
+    { text: 'injectForm', href: '../injectForm/' },
+  ]}
+/>
+
+### Directives
+
+<ApiList
+  items={[
+    { text: 'formischField', href: '../formischField/' },
+    { text: 'formischFieldArray', href: '../formischFieldArray/' },
+    { text: 'formischForm', href: '../formischForm/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'focus', href: '/methods/api/focus/' },
+    { text: 'getInput', href: '/methods/api/getInput/' },
+    { text: 'reset', href: '/methods/api/reset/' },
+    { text: 'setInput', href: '/methods/api/setInput/' },
+  ]}
+/>

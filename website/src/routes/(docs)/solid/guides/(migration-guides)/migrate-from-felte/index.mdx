@@ -1,0 +1,415 @@
+---
+title: Migrate from Felte
+description: >-
+  Learn how to migrate your forms from Felte to Formisch. This guide maps
+  Felte's directive-based API and stores to Formisch's schema-first
+  primitives, components and methods.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from Felte
+
+This guide walks you through migrating a form from [Felte](https://felte.dev) (`@felte/solid`) to Formisch. It compares the mental models of both libraries, shows the same form implemented in each, and maps Felte's APIs, helpers and stores to their Formisch equivalents.
+
+Migrating is a rewrite of your form layer, not a drop-in replacement. Felte attaches its behavior to a native `<form>` element through a directive, while Formisch starts from a Valibot schema and builds the fields around it. The good news: your input elements, styling and business logic carry over unchanged, and the rewrite is mostly mechanical.
+
+Both libraries can coexist in the same application without conflicts. You can migrate one form at a time and remove Felte once the last form is converted.
+
+## Key differences
+
+Felte's core idea is to stay close to the platform. You call `createForm`, spread the returned `form` action onto a `<form>` element via `use:form`, and Felte picks up every input by its `name` attribute. Validation is added separately, either as a `validate` function or through a validator adapter package passed to `extend`, and form state is exposed as Solid accessors like `data`, `errors` and `isSubmitting` returned by `createForm`.
+
+Formisch is schema-first. A single Valibot schema provides everything at once: the TypeScript types, the runtime validation rules, and the structure of the form. There is no separate `validate` function, no validator adapter, and no generic type parameter to declare. When the schema changes, every field path, every validation message and every inferred type follows automatically.
+
+The main differences in practice:
+
+- **Field registration**: Felte discovers fields through their `name` attribute. Formisch connects fields explicitly with the <Link href="/solid/api/Field/">`Field`</Link> component and a type-safe `path` array.
+- **Validation location**: Felte configures validation on the form (`validate`, `warn`, `extend`). Formisch defines validation in the Valibot schema, next to the types it produces.
+- **Validation timing**: Felte validates fields it considers touched as you type and validates everything on submit. Formisch gives you explicit `validate` and `revalidate` config options that control when validation first runs and when it re-runs.
+- **State access**: Felte returns accessors from `createForm` that you call as functions, like `isSubmitting()`. Formisch exposes reactive properties on the form store, like `form.isSubmitting`, and per-field state on the field store, like `field.errors`.
+- **Methods**: Felte's helpers are destructured from `createForm`. Formisch's methods are standalone imports like `reset` and `setInput` that take the form store as their first argument, so unused methods are tree-shaken from your bundle.
+
+## Side-by-side example
+
+The following login form has two validated fields and an async submit handler, implemented once with Felte and once with Formisch.
+
+### Felte
+
+```tsx
+import { createForm } from '@felte/solid';
+
+interface LoginValues {
+  email: string;
+  password: string;
+}
+
+export default function LoginPage() {
+  const { form, errors, isSubmitting } = createForm<LoginValues>({
+    initialValues: { email: '', password: '' },
+    validate(values) {
+      const errors: Partial<LoginValues> = {};
+      if (!values.email) {
+        errors.email = 'Please enter your email.';
+      } else if (!/^\S+@\S+\.\S+$/.test(values.email)) {
+        errors.email = 'The email address is badly formatted.';
+      }
+      if (!values.password) {
+        errors.password = 'Please enter your password.';
+      } else if (values.password.length < 8) {
+        errors.password = 'Your password must have 8 characters or more.';
+      }
+      return errors;
+    },
+    async onSubmit(values) {
+      await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
+    },
+  });
+
+  return (
+    <form use:form>
+      <input name="email" type="email" />
+      {errors('email') && <div>{errors('email')?.[0]}</div>}
+      <input name="password" type="password" />
+      {errors('password') && <div>{errors('password')?.[0]}</div>}
+      <button type="submit" disabled={isSubmitting()}>
+        Login
+      </button>
+    </form>
+  );
+}
+```
+
+In TypeScript, this snippet assumes the ambient `JSX.Directives` declaration for `use:form` that Felte projects already include.
+
+### Formisch
+
+```tsx
+import { createForm, Field, Form } from '@formisch/solid';
+import type { SubmitHandler } from '@formisch/solid';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+export default function LoginPage() {
+  const loginForm = createForm({
+    schema: LoginSchema,
+  });
+
+  const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+    await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+  };
+
+  return (
+    <Form of={loginForm} onSubmit={submitForm}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="email" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="password" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit" disabled={loginForm.isSubmitting}>
+        Login
+      </button>
+    </Form>
+  );
+}
+```
+
+Note that the manual `LoginValues` interface and the hand-written `validate` function are gone. The schema provides both, and the types flow from it into `path`, `field.input` and the values of your submit handler.
+
+## Migration steps
+
+### Install Formisch
+
+Formisch requires Valibot as a peer dependency. Install both packages alongside Felte, so you can migrate form by form:
+
+```bash
+npm install @formisch/solid valibot
+```
+
+See the <Link href="/solid/guides/installation/">installation</Link> guide for other package managers and TypeScript requirements.
+
+### Move validation into a Valibot schema
+
+Translate your Felte validation into a Valibot schema. If you used a validator adapter like `@felte/validator-zod`, this is a rule-by-rule translation. If you used a hand-written `validate` function, each `if` branch becomes a schema action with its error message:
+
+```ts
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+```
+
+Custom checks that don't map to a built-in action can use `v.check`, and async rules (which you may have placed in Felte's `debounced.validate`) can use `v.checkAsync`. Define the fields in the same order they appear in your form, since Formisch focuses the first invalid field on submit based on the schema order. See the <Link href="/solid/guides/define-your-form/">define your form</Link> guide for details.
+
+### Replace the form setup
+
+Replace Felte's destructured `createForm` result with a single form store, and replace the `use:form` directive with the <Link href="/solid/api/Form/">`Form`</Link> component. Felte's `initialValues` option becomes `initialInput`, which is optional because required string fields start as an empty string by default:
+
+```tsx
+import { createForm, Form } from '@formisch/solid';
+
+const loginForm = createForm({
+  schema: LoginSchema,
+});
+
+<Form of={loginForm} onSubmit={(values) => console.log(values)}>
+  {/* Fields will go here */}
+  <button type="submit">Login</button>
+</Form>;
+```
+
+There is no generic type parameter to pass. The <Link href="/solid/api/createForm/">`createForm`</Link> primitive infers all types from the schema.
+
+### Replace field bindings
+
+Felte registers inputs through their `name` attribute. In Formisch, you wrap each input in a <Link href="/solid/api/Field/">`Field`</Link> component and spread `field.props` onto it, which wires up the name attribute, event handlers and ref. Felte's dotted names become path arrays, so `name="account.email"` turns into `path={['account', 'email']}`:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <div>
+      <input {...field.props} value={field.input} type="email" />
+      {field.errors && <div>{field.errors[0]}</div>}
+    </div>
+  )}
+</Field>
+```
+
+If you used `@felte/reporter-solid` and its `ValidationMessage` component, you no longer need a reporter package. The field's errors are available directly as `field.errors` inside the render function. See the <Link href="/solid/guides/add-form-fields/">add form fields</Link> guide for more on the field store, and the <Link href="/solid/guides/input-components/">input components</Link> guide for extracting this markup into reusable components.
+
+### Update submission handling
+
+Felte's `onSubmit`, `onSuccess` and `onError` config options collapse into a single submit handler passed to the `onSubmit` property of the <Link href="/solid/api/Form/">`Form`</Link> component. It only runs after successful validation and receives the fully typed output of your schema. What Felte split into `onSuccess` and `onError` becomes regular control flow inside your async handler:
+
+```tsx
+const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+    if (!response.ok) {
+      // Felte: onError
+    }
+    // Felte: onSuccess
+  } catch {
+    // Felte: onError
+  }
+};
+```
+
+Note that Formisch does not replicate Felte's default submit handler, which posts to the form's `action` attribute when no `onSubmit` is given. In Formisch, you always write the request yourself. See the <Link href="/solid/guides/handle-submission/">handle submission</Link> guide for details.
+
+## API mapping
+
+| Felte (`@felte/solid`)               | Formisch (`@formisch/solid`)                                                                                        |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `createForm({ onSubmit, … })`        | <Link href="/solid/api/createForm/">`createForm`</Link> + `onSubmit` on <Link href="/solid/api/Form/">`Form`</Link> |
+| `use:form` directive                 | <Link href="/solid/api/Form/">`Form`</Link> component                                                               |
+| `<input name="email" />`             | <Link href="/solid/api/Field/">`Field`</Link> component with `path={['email']}`                                     |
+| `initialValues`                      | `initialInput` config option                                                                                        |
+| `extend: validator({ schema })`      | `schema` config option (Valibot)                                                                                    |
+| `validate` config function           | Valibot schema actions, `v.check`                                                                                   |
+| `debounced.validate`                 | Async schema actions, `v.checkAsync`                                                                                |
+| `warn` config / `warnings`           | No equivalent                                                                                                       |
+| `data('email')`                      | `field.input` / <Link href="/methods/api/getInput/">`getInput`</Link>                                               |
+| `errors('email')`                    | `field.errors` / <Link href="/methods/api/getErrors/">`getErrors`</Link>                                            |
+| `<ValidationMessage>` (reporter)     | `field.errors` in the render function                                                                               |
+| `touched('email')`                   | `field.isTouched` / <Link href="/methods/api/isTouched/">`isTouched`</Link>                                         |
+| `interacted()`                       | No equivalent (`field.isEdited` covers most cases)                                                                  |
+| `isValid()`                          | `form.isValid`                                                                                                      |
+| `isSubmitting()`                     | `form.isSubmitting`                                                                                                 |
+| `isValidating()`                     | `form.isValidating`                                                                                                 |
+| `isDirty()`                          | `form.isDirty`                                                                                                      |
+| `setFields(path, value)` / `setData` | <Link href="/methods/api/setInput/">`setInput`</Link>                                                               |
+| `setErrors(path, errors)`            | <Link href="/methods/api/setErrors/">`setErrors`</Link>                                                             |
+| `setTouched(path, true)`             | Not needed (touched state is managed automatically)                                                                 |
+| `validate()` helper                  | <Link href="/methods/api/validate/">`validate`</Link>                                                               |
+| `reset()` / `resetField(path)`       | <Link href="/methods/api/reset/">`reset`</Link>                                                                     |
+| `setInitialValues(values)`           | <Link href="/methods/api/reset/">`reset`</Link> with `initialInput`                                                 |
+| `addField(path, value, index)`       | <Link href="/methods/api/insert/">`insert`</Link>                                                                   |
+| `unsetField(path)`                   | <Link href="/methods/api/remove/">`remove`</Link>                                                                   |
+| `moveField(path, from, to)`          | <Link href="/methods/api/move/">`move`</Link>                                                                       |
+| `swapFields(path, a, b)`             | <Link href="/methods/api/swap/">`swap`</Link>                                                                       |
+| `createSubmitHandler(config)`        | <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link>                                                       |
+| `onSuccess` / `onError`              | Control flow inside your async submit handler                                                                       |
+
+A few entries have no direct equivalent. Felte's `warn` and `warnings` produce non-blocking messages next to errors; Formisch only tracks errors, so warnings need to be modeled outside the form state. The `debounced` config has no counterpart because Formisch controls validation frequency through the `validate` and `revalidate` config instead of debouncing individual functions. And `interacted`, which reports the name of the last field the user interacted with, has no equivalent, although the per-field `isEdited` flag covers the common use cases.
+
+## Common patterns
+
+### Form state
+
+Felte returns Solid accessors from `createForm` that you call as functions. In Formisch, form-level state consists of reactive properties on the form store, and values are read with the <Link href="/methods/api/getInput/">`getInput`</Link> method, which is reactive as well:
+
+```tsx
+import { createForm } from '@felte/solid';
+
+const { data, isValid, isSubmitting } = createForm<LoginValues>({
+  /* … */
+});
+data('email'); // string
+isValid(); // boolean
+```
+
+```tsx
+import { createForm, getInput } from '@formisch/solid';
+
+const loginForm = createForm({ schema: LoginSchema });
+getInput(loginForm, { path: ['email'] }); // string | undefined
+loginForm.isValid; // boolean
+```
+
+One difference to Felte's `data`, which is typed after your `initialValues`: Formisch input values are partial because not every field may have been set, so `getInput` returns `string | undefined` here.
+
+Field-level state like `field.input`, `field.errors` and `field.isTouched` is available on the field store inside <Link href="/solid/api/Field/">`Field`</Link> or via the <Link href="/solid/api/useField/">`useField`</Link> primitive.
+
+### Validation timing
+
+Felte validates the fields it considers touched as you fill the form and validates everything on submit, so errors for a field typically appear once you interact with it. Formisch makes this timing explicit: `validate` controls when a field is first validated (default `'submit'`) and `revalidate` controls when it is checked again (default `'input'`). To get behavior close to Felte's, validate on blur and revalidate on input:
+
+```tsx
+const loginForm = createForm({
+  schema: LoginSchema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+Also note that Formisch populates `field.errors` for every invalid field as soon as validation runs, without filtering by touched state. You decide when to render them, for example only after the user edited the field or attempted to submit:
+
+```tsx
+{
+  (field.isEdited || loginForm.isSubmitted) && field.errors && (
+    <div>{field.errors[0]}</div>
+  );
+}
+```
+
+The <Link href="/solid/guides/validation/">validation</Link> guide covers these options and patterns in depth.
+
+### Field arrays
+
+In Felte, arrays are driven by indexed `name` attributes like `interests.0.value` together with the `addField` and `unsetField` helpers. In Formisch, the schema declares the array with `v.array`, and the <Link href="/solid/api/FieldArray/">`FieldArray`</Link> component provides stable `items` keys for SolidJS's `<For>` component. Items are added and removed with the <Link href="/methods/api/insert/">`insert`</Link> and <Link href="/methods/api/remove/">`remove`</Link> methods:
+
+```tsx
+import { Field, FieldArray, insert, remove } from '@formisch/solid';
+import { For } from 'solid-js';
+
+<FieldArray of={interestsForm} path={['interests']}>
+  {(fieldArray) => (
+    <For each={fieldArray.items}>
+      {(_, getIndex) => (
+        <div>
+          <Field of={interestsForm} path={['interests', getIndex(), 'value']}>
+            {(field) => (
+              <input {...field.props} value={field.input} type="text" />
+            )}
+          </Field>
+          <button
+            type="button"
+            onClick={() =>
+              remove(interestsForm, { path: ['interests'], at: getIndex() })
+            }
+          >
+            Remove
+          </button>
+        </div>
+      )}
+    </For>
+  )}
+</FieldArray>;
+
+<button
+  type="button"
+  onClick={() =>
+    insert(interestsForm, { path: ['interests'], initialInput: { value: '' } })
+  }
+>
+  Add interest
+</button>;
+```
+
+Felte's `moveField` and `swapFields` map to the <Link href="/methods/api/move/">`move`</Link> and <Link href="/methods/api/swap/">`swap`</Link> methods. See the <Link href="/solid/guides/field-arrays/">field arrays</Link> guide for a complete example including reordering, nesting and array-level validation.
+
+### Reset
+
+Felte's `reset` helper restores the initial values, and `setInitialValues` updates the baseline used by the next reset. Formisch combines both into the <Link href="/methods/api/reset/">`reset`</Link> method, which can also reset a single field via `path`:
+
+```tsx
+import { reset } from '@formisch/solid';
+
+// Reset the entire form to its initial input
+reset(loginForm);
+
+// Reset a single field (Felte: resetField('email'))
+reset(loginForm, { path: ['email'] });
+
+// Update the initial input and reset (Felte: setInitialValues + reset)
+reset(loginForm, { initialInput: { email: 'new@example.com' } });
+```
+
+### Special inputs
+
+Felte reads checkboxes, radio buttons, selects and file inputs automatically from the DOM based on their `name` attribute. Formisch supports all of these too, but since fields are connected through `field.props`, you set the appropriate controlled attribute yourself, like `checked` for checkboxes:
+
+```tsx
+<Field of={form} path={['cookies']}>
+  {(field) => (
+    <label>
+      <input {...field.props} type="checkbox" checked={!!field.input} />
+      Yes, I want cookies
+    </label>
+  )}
+</Field>
+```
+
+The <Link href="/solid/guides/special-inputs/">special inputs</Link> guide shows the equivalent patterns for radio groups, single and multiple selects, and file inputs.
+
+## Next steps
+
+With your first form migrated, work through the <Link href="/solid/guides/define-your-form/">define your form</Link>, <Link href="/solid/guides/add-form-fields/">add form fields</Link> and <Link href="/solid/guides/handle-submission/">handle submission</Link> guides to deepen the concepts this guide touched on. The <Link href="/solid/guides/controlled-fields/">controlled fields</Link> and <Link href="/solid/guides/form-methods/">form methods</Link> guides are useful next reads once your migrated forms grow more dynamic.

@@ -73,6 +73,10 @@ export const properties: Record<string, PropertyProps> = {
     },
     default: 'undefined',
   },
+  keepEdited: {
+    type: 'boolean',
+    default: { type: 'boolean', value: false },
+  },
   keepErrors: {
     type: 'boolean',
     default: { type: 'boolean', value: false },

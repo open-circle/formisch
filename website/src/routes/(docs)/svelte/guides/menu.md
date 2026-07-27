@@ -4,8 +4,8 @@
 
 - [Introduction](/svelte/guides/introduction/)
 - [Installation](/svelte/guides/installation/)
+- [Coding agents](/svelte/guides/coding-agents/)
 - [Comparison](/svelte/guides/comparison/)
-- [LLMs.txt](/svelte/guides/llms-txt/)
 
 ## Main concepts
 
@@ -18,6 +18,7 @@
 
 ## Advanced guides
 
+- [Validation](/svelte/guides/validation/)
 - [Special inputs](/svelte/guides/special-inputs/)
 - [Controlled fields](/svelte/guides/controlled-fields/)
 - [Nested fields](/svelte/guides/nested-fields/)
@@ -25,3 +26,8 @@
 - [Field arrays](/svelte/guides/field-arrays/)
 - [TypeScript](/svelte/guides/typescript/)
 - [Architecture](/svelte/guides/architecture/)
+
+## Migration guides
+
+- [From Superforms](/svelte/guides/migrate-from-superforms/)
+- [From TanStack Form](/svelte/guides/migrate-from-tanstack-form/)

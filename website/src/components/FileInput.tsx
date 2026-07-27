@@ -1,6 +1,5 @@
 /* eslint-disable qwik/valid-lexical-scope */
-import type { FieldElementProps } from '@formisch/qwik';
-import type { Signal } from '@qwik.dev/core';
+import type { FieldElementProps, ReadonlySignal } from '@formisch/qwik';
 import { component$, useComputed$ } from '@qwik.dev/core';
 import clsx from 'clsx';
 import { InputErrors } from './InputErrors';
@@ -12,8 +11,8 @@ interface FileInputProps extends FieldElementProps {
   accept?: string;
   required?: boolean;
   multiple?: boolean;
-  input: Readonly<Signal<File | File[] | null | undefined>>;
-  errors: Readonly<Signal<[string, ...string[]] | null>>;
+  input: ReadonlySignal<File | File[] | null | undefined>;
+  errors: ReadonlySignal<[string, ...string[]] | null>;
 }
 
 /**
