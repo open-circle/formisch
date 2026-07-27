@@ -1,5 +1,5 @@
 import type { BaseFormStore, FormSchema } from '@formisch/core/qwik';
-import type { ReadonlySignal } from '@qwik.dev/core';
+import type { ReadonlySignal } from './signal.ts';
 
 /**
  * Form store interface.

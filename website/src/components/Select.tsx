@@ -1,5 +1,5 @@
-import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type ReadonlySignal, useComputed$ } from '@qwik.dev/core';
+import type { FieldElementProps, ReadonlySignal } from '@formisch/qwik';
+import { component$, useComputed$ } from '@qwik.dev/core';
 import clsx from 'clsx';
 import { AngleDownIcon } from '~/icons';
 import { InputErrors } from './InputErrors';

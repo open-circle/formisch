@@ -2,7 +2,7 @@ import {
   $,
   component$,
   type QRL,
-  type ReadonlySignal,
+  type Signal,
   Slot,
   useComputed$,
 } from '@qwik.dev/core';
@@ -199,7 +199,7 @@ type NavButtonsProps = {
   markdownPath: string | undefined;
   prevPage: ContentMenu | undefined;
   nextPage: ContentMenu | undefined;
-  chapters?: ReadonlySignal<boolean>;
+  chapters?: Signal<boolean>;
   chaptersToggle?: QRL<() => void>;
 };
 

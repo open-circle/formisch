@@ -7,8 +7,9 @@ import type {
   ValidArrayPath,
   ValidPath,
 } from '@formisch/core/qwik';
-import type { QRL, ReadonlySignal } from '@qwik.dev/core';
+import type { QRL } from '@qwik.dev/core';
 import type * as v from 'valibot';
+import type { ReadonlySignal } from './signal.ts';
 
 /**
  * Field element props interface.

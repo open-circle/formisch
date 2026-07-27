@@ -65,8 +65,8 @@ Our goal is to develop a `TextInput` component so that the code ends up looking 
 In the first step, you create a new file for the `TextInput` component and, if you use TypeScript, define its properties.
 
 ```tsx
-import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type ReadonlySignal } from '@qwik.dev/core';
+import type { FieldElementProps, ReadonlySignal } from '@formisch/qwik';
+import { component$ } from '@qwik.dev/core';
 
 interface TextInputProps extends FieldElementProps {
   type: 'text' | 'email' | 'tel' | 'password' | 'url' | 'date';
@@ -83,8 +83,8 @@ interface TextInputProps extends FieldElementProps {
 In the next step, add the component function to the file. We can destructure the props directly.
 
 ```tsx
-import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type ReadonlySignal } from '@qwik.dev/core';
+import type { FieldElementProps, ReadonlySignal } from '@formisch/qwik';
+import { component$ } from '@qwik.dev/core';
 
 interface TextInputProps extends FieldElementProps {
   /* ... */
@@ -101,8 +101,8 @@ export const TextInput = component$<TextInputProps>(
 After that, you can add the JSX code to the return statement.
 
 ```tsx
-import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type ReadonlySignal } from '@qwik.dev/core';
+import type { FieldElementProps, ReadonlySignal } from '@formisch/qwik';
+import { component$ } from '@qwik.dev/core';
 
 interface TextInputProps extends FieldElementProps {
   /* ... */
@@ -141,8 +141,8 @@ You can now build on this code and add CSS, for example. You can also follow the
 Below is an overview of the entire code of the `TextInput` component.
 
 ```tsx
-import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type ReadonlySignal } from '@qwik.dev/core';
+import type { FieldElementProps, ReadonlySignal } from '@formisch/qwik';
+import { component$ } from '@qwik.dev/core';
 
 interface TextInputProps extends FieldElementProps {
   type: 'text' | 'email' | 'tel' | 'password' | 'url' | 'date';

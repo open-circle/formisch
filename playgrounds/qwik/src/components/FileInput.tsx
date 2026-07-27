@@ -1,6 +1,6 @@
 /* eslint-disable qwik/valid-lexical-scope */
-import type { FieldElementProps } from '@formisch/qwik';
-import { component$, ReadonlySignal, useComputed$ } from '@qwik.dev/core';
+import type { FieldElementProps, ReadonlySignal } from '@formisch/qwik';
+import { component$, useComputed$ } from '@qwik.dev/core';
 import clsx from 'clsx';
 import { InputErrors } from './InputErrors';
 import { InputLabel } from './InputLabel';

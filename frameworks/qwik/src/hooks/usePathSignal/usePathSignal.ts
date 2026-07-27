@@ -1,5 +1,6 @@
 import type { Path } from '@formisch/core/qwik';
-import { type ReadonlySignal, useSignal } from '@qwik.dev/core';
+import { useSignal } from '@qwik.dev/core';
+import type { ReadonlySignal } from '../../types/index.ts';
 
 // @__NO_SIDE_EFFECTS__
 function isEqual(a: Path, b: Path): boolean {

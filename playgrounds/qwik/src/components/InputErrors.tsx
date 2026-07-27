@@ -1,9 +1,5 @@
-import {
-  component$,
-  ReadonlySignal,
-  useSignal,
-  useTask$,
-} from '@qwik.dev/core';
+import type { ReadonlySignal } from '@formisch/qwik';
+import { component$, useSignal, useTask$ } from '@qwik.dev/core';
 import { isBrowser } from '@qwik.dev/core/build';
 import { Expandable } from './Expandable';
 
