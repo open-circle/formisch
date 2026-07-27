@@ -61,6 +61,7 @@ Create folder in the appropriate category:
 - `preact/api/(hooks)` - Preact hooks
 - `angular/api/(functions)` - Angular functions (injectForm, injectField)
 - `angular/api/(directives)` - Angular directives (formischForm, formischField)
+- `angular/api/(types)` - Angular-specific types (FormStore, FieldStore, SignalOrValue)
 - `svelte/api/(runes)` - Svelte 5 runes
 - `vue/api/(composables)` - Vue composables
 

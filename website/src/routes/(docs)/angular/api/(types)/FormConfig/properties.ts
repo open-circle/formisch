@@ -160,8 +160,18 @@ export const properties: Record<string, PropertyProps> = {
       options: [
         {
           type: 'custom',
-          name: 'ValidationMode',
-          href: '/core/api/ValidationMode/',
+          name: 'Exclude',
+          generics: [
+            {
+              type: 'custom',
+              name: 'ValidationMode',
+              href: '/core/api/ValidationMode/',
+            },
+            {
+              type: 'string',
+              value: 'initial',
+            },
+          ],
         },
         'undefined',
       ],

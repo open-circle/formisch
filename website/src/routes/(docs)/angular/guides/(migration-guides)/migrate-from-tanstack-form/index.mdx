@@ -306,8 +306,15 @@ No store selectors are needed. Every value is a signal on the form store:
 <button type="submit" [disabled]="!canSubmit()">Login</button>
 
 <!-- After -->
-<button type="submit" [disabled]="loginForm.isValidating()">Login</button>
+<button
+  type="submit"
+  [disabled]="!loginForm.isValid() || loginForm.isValidating()"
+>
+  Login
+</button>
 ```
+
+Note that you rarely need to disable the button on invalid with Formisch: submitting an invalid form runs validation, shows the errors, and focuses the first invalid field, which is friendlier than a permanently disabled button. If you adopt that behavior, `[disabled]="loginForm.isValidating()"` is all that remains.
 
 ### Validation timing
 
