@@ -242,14 +242,14 @@ Parentheses folders don't appear in URLs:
 
 ### Framework-Specific Terminology
 
-| Framework | Category Term | Example API          |
-| --------- | ------------- | -------------------- |
-| Solid     | Primitives    | createForm, useField |
-| Qwik      | Hooks         | useForm$, useField   |
-| Preact    | Hooks         | useForm, useField    |
+| Framework | Category Term          | Example API               |
+| --------- | ---------------------- | ------------------------- |
+| Solid     | Primitives             | createForm, useField      |
+| Qwik      | Hooks                  | useForm$, useField        |
+| Preact    | Hooks                  | useForm, useField         |
 | Angular   | Functions / Directives | injectForm, formischField |
-| Vue       | Composables   | useForm, useField    |
-| Svelte    | Runes         | createForm, useField |
+| Vue       | Composables            | useForm, useField         |
+| Svelte    | Runes                  | createForm, useField      |
 
 ## References
 
