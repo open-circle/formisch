@@ -68,7 +68,7 @@ export function FileInput<TMultiple extends boolean = false>({
 
           // Open the document picker and update the field value
           const result = await DocumentPicker.getDocumentAsync({ multiple });
-          if (!result.canceled) {
+          if (!result.canceled && result.assets.length > 0) {
             const assets = result.assets.map(
               ({ uri, name, mimeType, size }) => ({
                 uri,

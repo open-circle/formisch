@@ -1,3 +1,4 @@
+import { getFieldStore, INTERNAL } from '@formisch/core/react-native';
 import { handleSubmit, reset } from '@formisch/methods/react-native';
 import {
   act,
@@ -7,7 +8,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { type ReactElement, useState } from 'react';
+import { type ReactElement, useEffect, useState } from 'react';
 import { Pressable, Text, TextInput } from 'react-native';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
@@ -433,6 +434,70 @@ describe('useField', () => {
       // Focus must land on the live remounted input, not a detached baseline
       await waitFor(() => {
         expect(document.activeElement).toBe(screen.getByTestId('input'));
+      });
+    });
+
+    test('should focus a swapped element while the field stays mounted', async () => {
+      const schema = v.object({
+        email: v.pipe(v.string(), v.nonEmpty('Required')),
+      });
+
+      let capturedForm: FormStore<typeof schema> | undefined;
+
+      function Test(): ReactElement {
+        const form = useForm({ schema, initialInput: { email: '' } });
+        useEffect(() => {
+          capturedForm = form;
+        }, [form]);
+        const field = useField(form, { path: ['email'] });
+        const [swapped, setSwapped] = useState(false);
+        return (
+          <>
+            {swapped ? (
+              <TextInput
+                key="second"
+                testID="input-second"
+                {...field.props}
+                value={field.input ?? ''}
+              />
+            ) : (
+              <TextInput
+                key="first"
+                testID="input-first"
+                {...field.props}
+                value={field.input ?? ''}
+              />
+            )}
+            <Pressable onPress={() => setSwapped(true)}>
+              <Text>swap</Text>
+            </Pressable>
+            <Pressable onPress={handleSubmit(form, vi.fn())}>
+              <Text>Submit</Text>
+            </Pressable>
+          </>
+        );
+      }
+
+      render(<Test />);
+
+      // Replace the element while the field stays mounted so the ref callback
+      // unregisters the detached element and registers the new one
+      act(() => {
+        fireEvent.click(screen.getByText('swap'));
+      });
+      expect(screen.queryByTestId('input-first')).toBeNull();
+
+      // Only the live element must remain registered
+      expect(
+        getFieldStore(capturedForm![INTERNAL], ['email']).elements
+      ).toHaveLength(1);
+
+      // Submit so validation focuses the first error field
+      fireEvent.click(screen.getByText('Submit'));
+
+      // Focus must land on the live swapped input, not the detached one
+      await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByTestId('input-second'));
       });
     });
 

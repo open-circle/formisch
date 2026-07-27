@@ -11,7 +11,7 @@ import {
   validateIfRequired,
   type ValidPath,
 } from '@formisch/core/react-native';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import type * as v from 'valibot';
 import type { FieldStore, FormStore } from '../../types/index.ts';
 import { useSignals } from '../useSignals/index.ts';
@@ -53,23 +53,9 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
   const internalFieldStore = getFieldStore(internalFormStore, config.path);
 
   // Track the registered element instance so it can be identified and
-  // removed on unmount, since native elements have no `isConnected` check
+  // removed once it detaches, since native elements have no `isConnected`
+  // check
   const instanceRef = useRef<FieldElement | null>(null);
-
-  useEffect(() => {
-    return () => {
-      const instance = instanceRef.current;
-      const elements = internalFieldStore.elements.filter(
-        (element) => element !== instance
-      );
-      // Keep `initialElements` in sync unless a reorder has moved the elements,
-      // so resetting a remounted field restores its live element, not a stale one
-      if (internalFieldStore.elements === internalFieldStore.initialElements) {
-        internalFieldStore.initialElements = elements;
-      }
-      internalFieldStore.elements = elements;
-    };
-  }, [internalFieldStore]);
 
   return useMemo(
     () => ({
@@ -99,12 +85,27 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
       },
       props: {
         ref(element) {
-          // React nulls the ref before running the effect cleanup below, so
-          // only the non-null call is recorded and the last known instance
-          // is what gets filtered out on unmount
           if (element) {
             instanceRef.current = element;
             internalFieldStore.elements.push(element);
+          } else {
+            // Hint: React nulls the ref when the element detaches, whether
+            // the field unmounts or the element is swapped while the field
+            // stays mounted, so the last known instance is removed here
+            const instance = instanceRef.current;
+            instanceRef.current = null;
+            const elements = internalFieldStore.elements.filter(
+              (element) => element !== instance
+            );
+            // Keep `initialElements` in sync unless a reorder has moved the
+            // elements, so resetting a remounted field restores its live
+            // element, not a stale one
+            if (
+              internalFieldStore.elements === internalFieldStore.initialElements
+            ) {
+              internalFieldStore.initialElements = elements;
+            }
+            internalFieldStore.elements = elements;
           }
         },
         onFocus() {
