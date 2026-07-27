@@ -2,6 +2,13 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Add React Native framework adapter and `@formisch/core/react-native` build output that reuses the React signal implementation (issue #117)
+- Add React Native specific `FieldElement` type, internal form store types and `focusFieldElement` function that work without DOM APIs (issue #117)
+- Remove `getElementInput` and `decodeFormData` from the React Native build output as they depend on DOM APIs (issue #117)
+- Add missing `createSignal` overload without an initial value to the React framework adapter
+
 ## v1.0.0-rc.0 (June 23, 2026)
 
 - Release candidate for v1.0.0

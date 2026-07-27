@@ -1,4 +1,5 @@
 import type {
+  FieldElement,
   FormSchema,
   PartialValues,
   PathValue,
@@ -6,7 +7,6 @@ import type {
   ValidArrayPath,
   ValidPath,
 } from '@formisch/core/react-native';
-import type { TextInput } from 'react-native';
 import type * as v from 'valibot';
 
 /**
@@ -15,8 +15,12 @@ import type * as v from 'valibot';
 export interface FieldElementProps {
   /**
    * The ref callback to register the field element.
+   *
+   * Hint: `FieldElement` is a structural subset of the imperative methods of
+   * React Native host component instances, so refs of `TextInput` and other
+   * focusable native components are accepted.
    */
-  readonly ref: (instance: TextInput | null) => void;
+  readonly ref: (element: FieldElement | null) => void;
   /**
    * The focus event handler of the field element.
    */

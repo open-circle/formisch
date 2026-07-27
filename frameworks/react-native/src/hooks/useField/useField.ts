@@ -12,7 +12,6 @@ import {
   type ValidPath,
 } from '@formisch/core/react-native';
 import { useEffect, useMemo, useRef } from 'react';
-import type { TextInput } from 'react-native';
 import type * as v from 'valibot';
 import type { FieldStore, FormStore } from '../../types/index.ts';
 import { useSignals } from '../useSignals/index.ts';
@@ -53,13 +52,13 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
   const internalFormStore = form[INTERNAL];
   const internalFieldStore = getFieldStore(internalFormStore, config.path);
 
-  // Track the registered `TextInput` instance so it can be identified and
+  // Track the registered element instance so it can be identified and
   // removed on unmount, since native elements have no `isConnected` check
-  const instanceRef = useRef<TextInput | null>(null);
+  const instanceRef = useRef<FieldElement | null>(null);
 
   useEffect(() => {
     return () => {
-      const instance = instanceRef.current as unknown as FieldElement | null;
+      const instance = instanceRef.current;
       const elements = internalFieldStore.elements.filter(
         (element) => element !== instance
       );
@@ -99,15 +98,13 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
         validateIfRequired(internalFormStore, internalFieldStore, 'change');
       },
       props: {
-        ref(instance) {
+        ref(element) {
           // React nulls the ref before running the effect cleanup below, so
           // only the non-null call is recorded and the last known instance
           // is what gets filtered out on unmount
-          if (instance) {
-            instanceRef.current = instance;
-            internalFieldStore.elements.push(
-              instance as unknown as FieldElement
-            );
+          if (element) {
+            instanceRef.current = element;
+            internalFieldStore.elements.push(element);
           }
         },
         onFocus() {

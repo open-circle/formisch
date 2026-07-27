@@ -16,7 +16,7 @@ set -euo pipefail
 DEVICE="${QA_IOS_DEVICE:-iPhone 17 Pro}"
 SESSION="rn-playground-qa"
 PLAYGROUND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-EXPO_LOG="$(mktemp -t formisch-qa-ios-expo).log"
+EXPO_LOG="$(mktemp -t formisch-qa-ios-expo)"
 
 cleanup() {
   agent-device close --session "$SESSION" >/dev/null 2>&1 || true
@@ -28,23 +28,31 @@ cleanup() {
 }
 trap cleanup EXIT
 
-DEVICE_UDID="$(xcrun simctl list devices -j | node -e '
+# The node helper prints every matching UDID and always exits 0, so `set -e`
+# cannot abort the command substitution before the diagnostics below run.
+DEVICE_UDIDS="$(xcrun simctl list devices -j | node -e '
   const data = JSON.parse(require("fs").readFileSync(0, "utf8"));
   const name = process.argv[1];
   for (const runtime of Object.values(data.devices)) {
     for (const device of runtime) {
       if (device.name === name && device.isAvailable) {
         console.log(device.udid);
-        process.exit(0);
       }
     }
   }
-  process.exit(1);
 ' "$DEVICE")"
-[[ -n "$DEVICE_UDID" ]] || {
+[[ -n "$DEVICE_UDIDS" ]] || {
   echo "No available iOS Simulator named '$DEVICE' (see: xcrun simctl list devices available)" >&2
   exit 1
 }
+# A unique name is required because the later `agent-device open` selects by
+# name, so an ambiguous name could attach QA to a different simulator than
+# the one the deep link targets.
+[[ "$(wc -l <<<"$DEVICE_UDIDS")" -eq 1 ]] || {
+  echo "Multiple available iOS Simulators named '$DEVICE'; set QA_IOS_DEVICE to a unique name (see: xcrun simctl list devices available)" >&2
+  exit 1
+}
+DEVICE_UDID="$DEVICE_UDIDS"
 
 echo "==> Booting $DEVICE ($DEVICE_UDID)"
 BOOT_OUTPUT="$(xcrun simctl boot "$DEVICE_UDID" 2>&1)" && BOOT_STATUS=0 || BOOT_STATUS=$?

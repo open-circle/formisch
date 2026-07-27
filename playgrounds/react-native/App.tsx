@@ -1,18 +1,20 @@
-import { Field, Form, handleSubmit, useForm } from '@formisch/react-native';
+import { Field, Form, submit, useForm } from '@formisch/react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import {
-  Button,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
-  email: v.pipe(v.string(), v.nonEmpty('Please enter your email.'), v.email('The email is badly formatted.')),
-  password: v.pipe(v.string(), v.nonEmpty('Please enter your password.'), v.minLength(8, 'Your password must have 8 characters or more.')),
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
 });
 
 export default function App() {
@@ -24,7 +26,13 @@ export default function App() {
       <StatusBar style="auto" />
       <Text style={styles.title}>Login</Text>
 
-      <Form of={loginForm} style={styles.form}>
+      <Form
+        of={loginForm}
+        style={styles.form}
+        onSubmit={(output) => {
+          setSubmittedEmail(output.email);
+        }}
+      >
         <Field of={loginForm} path={['email']}>
           {(field) => (
             <View style={styles.field}>
@@ -69,9 +77,7 @@ export default function App() {
         <Button
           testID="submit-button"
           title="Login"
-          onPress={handleSubmit(loginForm, (output) => {
-            setSubmittedEmail(output.email);
-          })}
+          onPress={() => submit(loginForm)}
         />
       </Form>
 

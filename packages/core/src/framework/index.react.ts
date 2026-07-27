@@ -46,14 +46,23 @@ export function setListener(newListener: Listener | undefined): void {
 let batchSubscribers: Set<Listener> | undefined;
 
 /**
+ * Creates a reactive signal without an initial value.
+ *
+ * @returns The created signal.
+ */
+export function createSignal<T>(): Signal<T | undefined>;
+
+/**
  * Creates a reactive signal with an initial value.
  *
  * @param value The initial value.
  *
  * @returns The created signal.
  */
+export function createSignal<T>(value: T): Signal<T>;
+
 // @__NO_SIDE_EFFECTS__
-export function createSignal<T>(value: T): Signal<T> {
+export function createSignal(value?: unknown): Signal<unknown> {
   const subscribers = new Set<Listener>();
   return {
     get value() {
@@ -63,7 +72,7 @@ export function createSignal<T>(value: T): Signal<T> {
       }
       return value;
     },
-    set value(newValue: T) {
+    set value(newValue: unknown) {
       if (newValue !== value) {
         value = newValue;
         const localSubscribers: Listener[] = [];

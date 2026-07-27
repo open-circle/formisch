@@ -1,6 +1,6 @@
 # Formisch for React Native
 
-Formisch is a schema-based, headless form library for React Native. It manages form state and validation. It is type-safe, fast by default and its bundle size is small due to its modular design.
+Formisch is a schema-based, headless form library for React Native. It manages form state and validation. It is type-safe, fast by default and its bundle size is small due to its modular design. Try it out in our [playground](https://stackblitz.com/edit/formisch-playground-react-native)!
 
 Formisch is also available for [Preact][formisch-preact], [Qwik][formisch-qwik], [React][formisch-react], [SolidJS][formisch-solid], [Svelte][formisch-svelte] and [Vue][formisch-vue].
 
@@ -16,12 +16,11 @@ Formisch is also available for [Preact][formisch-preact], [Qwik][formisch-qwik],
 
 ## Example
 
-Every form starts with the `useForm` hook. It initializes your form's store based on the provided Valibot schema and infers its types. Next, wrap your fields in the `<Form />` component. Unlike the DOM frameworks, React Native has no native form element or submit event, so submission is triggered explicitly with `handleSubmit` from a button's `onPress` handler. Then, you can access the state of a field with the `useField` hook or the `<Field />` component to connect your `TextInput`.
+Every form starts with the `useForm` hook. It initializes your form's store based on the provided Valibot schema and infers its types. Unlike the DOM frameworks, React Native has no native form element or submit event, so there is no `<Form />` component and submission is triggered explicitly with `handleSubmit`, for example from a button's `onPress` or a text input's `onSubmitEditing` handler. You can access the state of a field with the `useField` hook or the `<Field />` component to connect your `TextInput`.
 
 ```tsx
-import { Field, Form, useForm } from '@formisch/react-native';
-import { handleSubmit } from '@formisch/methods/react-native';
-import { Button, Text, TextInput } from 'react-native';
+import { Field, handleSubmit, useForm } from '@formisch/react-native';
+import { Button, Text, TextInput, View } from 'react-native';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -34,38 +33,33 @@ export default function LoginScreen() {
     schema: LoginSchema,
   });
 
+  const submitForm = handleSubmit(loginForm, (output) => console.log(output));
+
   return (
-    <Form of={loginForm}>
+    <View>
       <Field of={loginForm} path={['email']}>
         {(field) => (
-          <>
+          <View>
             <TextInput
               {...field.props}
-              value={field.input ?? ''}
+              value={field.input}
               autoCapitalize="none"
               keyboardType="email-address"
             />
             {field.errors && <Text>{field.errors[0]}</Text>}
-          </>
+          </View>
         )}
       </Field>
       <Field of={loginForm} path={['password']}>
         {(field) => (
-          <>
-            <TextInput
-              {...field.props}
-              value={field.input ?? ''}
-              secureTextEntry
-            />
+          <View>
+            <TextInput {...field.props} value={field.input} secureTextEntry />
             {field.errors && <Text>{field.errors[0]}</Text>}
-          </>
+          </View>
         )}
       </Field>
-      <Button
-        title="Login"
-        onPress={handleSubmit(loginForm, (output) => console.log(output))}
-      />
-    </Form>
+      <Button title="Login" onPress={submitForm} />
+    </View>
   );
 }
 ```
