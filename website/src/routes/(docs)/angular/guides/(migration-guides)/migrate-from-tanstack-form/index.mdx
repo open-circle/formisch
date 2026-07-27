@@ -270,30 +270,30 @@ readonly handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
 
 ## API mapping
 
-| TanStack Form                               | Formisch                                                                            |
-| ------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `injectForm({ defaultValues, validators })` | <Link href="/angular/api/injectForm/">`injectForm({ schema, initialInput })`</Link> |
-| `defaultValues`                             | `initialInput`                                                                      |
-| `validators: { onChange: schema }`          | `schema` + `validate` / `revalidate`                                                |
-| `[tanstackField]` + `name="email"`          | `*formischField="['email'] of form; let field"`                                     |
-| `field.api.state.value`                     | `field.input()`                                                                     |
-| `field.api.handleChange(value)`             | `field.setInput(value)` (or just `[formischControl]`)                               |
-| `field.api.handleBlur()`                    | Handled by `[formischControl]`                                                      |
-| `field.api.state.meta.errors`               | `field.errors()`                                                                    |
-| `field.api.state.meta.isTouched`            | `field.isTouched()`                                                                 |
-| `field.api.state.meta.isDirty`              | `field.isDirty()`                                                                   |
-| `injectStore(form, (s) => s.isSubmitting)`  | `form.isSubmitting()`                                                               |
-| `injectStore(form, (s) => s.canSubmit)`     | `form.isValid()` / `form.isValidating()`                                            |
-| `injectStore(form, (s) => s.values)`        | <Link href="/methods/api/getInput/">`getInput(form)`</Link>                         |
-| `form.handleSubmit()`                       | <Link href="/methods/api/submit/">`submit(form)`</Link>                             |
-| `onSubmit: async ({ value }) => …`          | `[formischSubmit]="handleSubmit"`                                                   |
-| `form.reset()`                              | <Link href="/methods/api/reset/">`reset(form)`</Link>                               |
-| `form.setFieldValue(name, value)`           | <Link href="/methods/api/setInput/">`setInput(form, { path, input })`</Link>        |
-| `form.validateField(name, cause)`           | <Link href="/methods/api/validate/">`validate(form, { path })`</Link>               |
-| `field.pushValue(item)`                     | <Link href="/methods/api/insert/">`insert(form, { path, initialInput })`</Link>     |
-| `field.removeValue(i)`                      | <Link href="/methods/api/remove/">`remove(form, { path, at: i })`</Link>            |
-| `field.swapValues(a, b)`                    | <Link href="/methods/api/swap/">`swap(form, { path, at, and })`</Link>              |
-| `field.moveValue(from, to)`                 | <Link href="/methods/api/move/">`move(form, { path, from, to })`</Link>             |
+| TanStack Form                               | Formisch                                                                               |
+| ------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `injectForm({ defaultValues, validators })` | <Link href="/angular/api/injectForm/">`injectForm({ schema, initialInput })`</Link>    |
+| `defaultValues`                             | `initialInput`                                                                         |
+| `validators: { onChange: schema }`          | `schema` + `validate` / `revalidate`                                                   |
+| `[tanstackField]` + `name="email"`          | `*formischField="['email'] of form; let field"`                                        |
+| `field.api.state.value`                     | `field.input()`                                                                        |
+| `field.api.handleChange(value)`             | `field.setInput(value)` (or just `[formischControl]`)                                  |
+| `field.api.handleBlur()`                    | Handled by `[formischControl]`                                                         |
+| `field.api.state.meta.errors`               | `field.errors()`                                                                       |
+| `field.api.state.meta.isTouched`            | `field.isTouched()`                                                                    |
+| `field.api.state.meta.isDirty`              | `field.isDirty()`                                                                      |
+| `injectStore(form, (s) => s.isSubmitting)`  | `form.isSubmitting()`                                                                  |
+| `injectStore(form, (s) => s.canSubmit)`     | `form.isValid()` / `form.isValidating()`                                               |
+| `injectStore(form, (s) => s.values)`        | <Link href="/methods/api/getInput/">`getInput(form)`</Link>                            |
+| `form.handleSubmit()`                       | <Link href="/methods/api/submit/">`submit(form)`</Link>                                |
+| `onSubmit: async ({ value }) => …`          | `[formischSubmit]="handleSubmit"`                                                      |
+| `form.reset()`                              | <Link href="/methods/api/reset/">`reset(form)`</Link>                                  |
+| `form.setFieldValue(name, value)`           | <Link href="/methods/api/setInput/">`setInput(form, { path, input })`</Link>           |
+| `form.validateField(name, cause)`           | <Link href="/methods/api/validate/">`validate(form)`</Link> (validates the whole form) |
+| `field.pushValue(item)`                     | <Link href="/methods/api/insert/">`insert(form, { path, initialInput })`</Link>        |
+| `field.removeValue(i)`                      | <Link href="/methods/api/remove/">`remove(form, { path, at: i })`</Link>               |
+| `field.swapValues(a, b)`                    | <Link href="/methods/api/swap/">`swap(form, { path, at, and })`</Link>                 |
+| `field.moveValue(from, to)`                 | <Link href="/methods/api/move/">`move(form, { path, from, to })`</Link>                |
 
 ## Common patterns
 
