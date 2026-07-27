@@ -37,6 +37,6 @@ Every reactive property of the field store is an Angular signal, so you call it 
 
 The `name` signal contains the JSON-stringified path of the field, which the <Link href="../formischControl/">`[formischControl]`</Link> directive writes to the `name` attribute of the element. It is also useful as the `id` of an input so that a label and an error message can reference it.
 
-Use `setInput` to change the value of the field programmatically. It updates the input and triggers validation according to the `revalidate` config of your form.
+Use `setInput` to change the value of the field programmatically. It updates the input and validates it like an `input` event would, so whether validation runs is controlled by the `validate` and `revalidate` config of your form — see the <Link href="/angular/guides/validation/">validation</Link> guide.
 
 The field store additionally carries an internal element-binding contract that the <Link href="../formischControl/">`[formischControl]`</Link> directive consumes. It is not part of the public API.
