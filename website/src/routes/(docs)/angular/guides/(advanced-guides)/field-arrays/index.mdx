@@ -287,15 +287,6 @@ const NestedSchema = v.object({
 
 You can nest field arrays as deeply as you like. You will also find a suitable example of this in our <Link href="/playground/nested/">playground</Link>.
 
-## Field array store
-
-The field array store exposes the following properties:
-
-- `path`: The path to the array field within the form.
-- `items`: A signal with the item IDs of the array field.
-- `errors`: A signal with the error messages of the field array itself.
-- `isTouched`, `isEdited`, `isDirty`, `isValid`: Signals with the aggregated state of the array and its items.
-
 ## Field array validation
 
 As with fields, you can validate field arrays using Valibot's array validation functions. For example, to limit the length of the array:

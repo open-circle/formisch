@@ -135,7 +135,7 @@ export class FieldErrorComponent {
 }
 ```
 
-Each field then stays focused on its input:
+Add `FieldErrorComponent` to the `imports` array of the components that use it. Each field then stays focused on its input:
 
 ```angular-html
 <ng-container *formischField="['email'] of loginForm; let field">
@@ -191,10 +191,6 @@ export class SignUpComponent {
 ```
 
 `isValidating()` and `isSubmitting()` overlap but are not the same. `isValidating()` is `true` whenever validation runs — triggered by a field event or as part of a submit. `isSubmitting()` is `true` for the entire submission, which covers both validating the form and running your submit handler. So during a submit both are `true` while the form validates, and once validation passes only `isSubmitting()` stays `true` while your handler runs.
-
-## Native browser validation
-
-The <Link href="/angular/api/formischForm/">`[formischForm]`</Link> directive adds the `novalidate` attribute to your `<form>` element, so the browser's own validation bubbles never compete with your schema's error messages. Attributes like `required` on your inputs stay useful for accessibility and styling.
 
 ## Further reading
 

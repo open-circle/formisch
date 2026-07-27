@@ -67,8 +67,6 @@ The <Link href="/angular/api/formischControl/">`[formischControl]`</Link> direct
 
 Because the directive writes to the element, you must not bind `[value]` or `[checked]` to hold the field's state yourself. The exception is a radio or checkbox group, where the `value` of each element identifies its option rather than the state of the field — see the <Link href="/angular/guides/special-inputs/">special inputs</Link> guide.
 
-### Multiple elements per field
-
 When a field spans more than one element — a label, the input and an error message — use an `<ng-container>` as the host of the structural directive:
 
 ```ts

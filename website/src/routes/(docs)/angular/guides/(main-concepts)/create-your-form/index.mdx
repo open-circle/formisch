@@ -48,11 +48,7 @@ export class LoginComponent {
 }
 ```
 
-### Form directive
-
-The <Link href="/angular/api/formischForm/">`[formischForm]`</Link> directive is a thin layer around the native `<form>` element. It validates the input on submit, focuses the first invalid field, registers the form element for the <Link href="/methods/api/submit/">`submit`</Link> method, and disables native browser validation by adding `novalidate`.
-
-Its companion input `[formischSubmit]` receives your submit handler as a function reference instead of calling it in the template. That way Formisch can await the returned promise and keep `loginForm.isSubmitting()` up to date. Declare the handler as an arrow function property — a regular class method would lose its `this`.
+The <Link href="/angular/api/formischForm/">`[formischForm]`</Link> directive is a thin layer around the native `<form>` element. It validates the input on submit, focuses the first invalid field, registers the form element for the <Link href="/methods/api/submit/">`submit`</Link> method, and disables native browser validation by adding `novalidate`. Its companion input `[formischSubmit]` receives your submit handler as a function reference instead of calling it in the template, so that Formisch can await the returned promise and keep `loginForm.isSubmitting()` up to date. Declare the handler as an arrow function property — a regular class method would lose its `this`.
 
 ### Configuration options
 
@@ -97,31 +93,6 @@ readonly loginForm = injectForm({
 ```
 
 Optional and nullable fields are never affected and keep starting as `undefined`, since they accept it. The supported types are `string`, `number`, `boolean` and `date`, and the default is `{ string: '' }`.
-
-## Form state
-
-The form store exposes its state as signals, so you can call them directly in your template and they work with `OnPush` and zoneless change detection:
-
-```ts
-@Component({
-  selector: 'app-login',
-  imports: [FormischForm],
-  template: `
-    <form [formischForm]="loginForm" [formischSubmit]="handleSubmit">
-      <!-- Form fields -->
-      <button type="submit" [disabled]="loginForm.isSubmitting()">
-        {{ loginForm.isSubmitting() ? 'Submitting…' : 'Login' }}
-      </button>
-    </form>
-  `,
-})
-export class LoginComponent {
-  readonly loginForm = injectForm({ schema: LoginSchema });
-  // …
-}
-```
-
-Available signals are `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid` and `errors`. Note that `errors()` only contains validation errors at the root level of the form — to get all errors from all fields, use the <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link> method.
 
 ## Multiple forms
 

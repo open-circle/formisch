@@ -147,23 +147,3 @@ With the `multiple` attribute, users can select multiple files:
 ```
 
 Browsers do not allow a file selection to be set programmatically, so a file input is the one element Formisch cannot write into. It can only clear it: when the field input becomes empty — for example through <Link href="/methods/api/reset/">`reset`</Link> — the directive resets the element as well.
-
-## Numbers and dates
-
-An `<input type="number" />` and an `<input type="date" />` both expose their value as a string, and that string is what Formisch stores. Let your schema do the conversion so the validated output has the type you want:
-
-```ts
-const ProfileSchema = v.object({
-  // Input: string from the number input, output: number
-  age: v.pipe(
-    v.string(),
-    v.nonEmpty('Please enter your age.'),
-    v.transform(Number),
-    v.minValue(18)
-  ),
-  // Input and output: 'yyyy-mm-dd' string from the date input
-  birthday: v.pipe(v.string(), v.nonEmpty('Please enter your birthday.')),
-});
-```
-
-This keeps the field input a plain string that the element can hold, while <Link href="/angular/guides/handle-submission/">your submit handler</Link> receives the transformed value.

@@ -78,6 +78,26 @@ If you use a UI library whose components do not expose their underlying native e
 
 Note that a field controlled this way is not registered as an element of the form. Features that need a DOM element — focusing the first invalid field on submit, and the <Link href="/methods/api/focus/">`focus`</Link> method — will skip it.
 
+## Numbers and dates
+
+An `<input type="number" />` and an `<input type="date" />` both expose their value as a string, and that string is what Formisch stores. Let your schema do the conversion so the validated output has the type you want:
+
+```ts
+const ProfileSchema = v.object({
+  // Input: string from the number input, output: number
+  age: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your age.'),
+    v.transform(Number),
+    v.minValue(18)
+  ),
+  // Input and output: 'yyyy-mm-dd' string from the date input
+  birthday: v.pipe(v.string(), v.nonEmpty('Please enter your birthday.')),
+});
+```
+
+This keeps the field input a plain string that the element can hold, while <Link href="/angular/guides/handle-submission/">your submit handler</Link> receives the transformed value.
+
 ## File inputs
 
 The HTML `<input type="file" />` element is an exception, because browsers do not allow a file selection to be set programmatically. Formisch can only clear it. You can, however, control the UI around it. For inspiration, check out our <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/blob/main/playgrounds/angular/src/components/file-input.component.ts`} target="\_blank" rel="noreferrer">file input</a> component from the <Link href="/playground/login/">playground</Link>.

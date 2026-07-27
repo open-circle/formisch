@@ -167,28 +167,6 @@ export class TextInputComponent<
 }
 ```
 
-## Components without a native element
-
-If your component wraps a UI library that does not expose the underlying native element, you cannot use the <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive. In that case, read the value from `field().input()` and write it back with `field().setInput(value)`:
-
-```ts
-@Component({
-  selector: 'app-custom-input',
-  template: `
-    <ui-library-input
-      [value]="field().input()"
-      (valueChange)="field().setInput($event)"
-    />
-  `,
-})
-export class CustomInputComponent<
-  TSchema extends FormSchema = FormSchema,
-  TFieldPath extends RequiredPath = RequiredPath,
-> {
-  readonly field = input.required<FieldStore<TSchema, TFieldPath>>();
-}
-```
-
 ## Next steps
 
 Now that you know how to create reusable input components, continue to the <Link href="/angular/guides/handle-submission/">handle submission</Link> guide to learn how to process form data when the user submits the form.

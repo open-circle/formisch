@@ -66,28 +66,9 @@ Then you can import it into any JavaScript or TypeScript file.
 import { … } from '@formisch/angular';
 ```
 
+Formisch ships standalone directives. Add the ones you use, such as `FormischForm` and `FormischField`, to the `imports` array of your component — there is no `NgModule` to import.
+
 > Formisch requires Angular v19 or later, since it is built on top of signals, `input.required` and `afterRenderEffect`.
-
-## Import the directives
-
-Formisch ships standalone directives. Add the ones you use to the `imports` array of your component — there is no `NgModule` to import.
-
-```ts
-import { Component } from '@angular/core';
-import {
-  FormischControl,
-  FormischField,
-  FormischFieldArray,
-  FormischForm,
-} from '@formisch/angular';
-
-@Component({
-  selector: 'app-login',
-  imports: [FormischForm, FormischField, FormischFieldArray, FormischControl],
-  template: `…`,
-})
-export class LoginComponent {}
-```
 
 ## For AI Agents
 
