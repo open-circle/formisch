@@ -1,6 +1,6 @@
 import {
   component$,
-  type ReadonlySignal,
+  type Signal,
   useSignal,
   useVisibleTask$,
 } from '@qwik.dev/core';
@@ -42,7 +42,7 @@ export const Navigation = component$<NavigationProps>((props) => {
 });
 
 export type NavItemProps = {
-  navElement: ReadonlySignal<HTMLElement | undefined>;
+  navElement: Readonly<Signal<HTMLElement | undefined>>;
   text: string;
   items?: ContentMenu[];
 };

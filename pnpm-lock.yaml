@@ -136,8 +136,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/methods
       '@qwik.dev/core':
-        specifier: 2.0.0-beta.37
-        version: 2.0.0-beta.37(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        specifier: 2.0.0-beta.38
+        version: 2.0.0-beta.38(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@types/node':
         specifier: 24.0.13
         version: 24.0.13
@@ -145,8 +145,8 @@ importers:
         specifier: 9.31.0
         version: 9.31.0(jiti@2.7.0)
       eslint-plugin-qwik:
-        specifier: 2.0.0-beta.37
-        version: 2.0.0-beta.37(eslint@9.31.0(jiti@2.7.0))(typescript@5.8.3)
+        specifier: 2.0.0-beta.38
+        version: 2.0.0-beta.38(eslint@9.31.0(jiti@2.7.0))(typescript@5.8.3)
       globals:
         specifier: 16.3.0
         version: 16.3.0
@@ -446,8 +446,8 @@ importers:
         specifier: ^2.9.0
         version: 2.9.1(preact@10.29.2)
       '@qwik.dev/core':
-        specifier: 2.0.0-beta.37
-        version: 2.0.0-beta.37(prettier@3.6.2)(vite@6.4.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@4.1.7)
+        specifier: 2.0.0-beta.38
+        version: 2.0.0-beta.38(prettier@3.6.2)(vite@6.4.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@4.1.7)
       '@types/node':
         specifier: 24.0.13
         version: 24.0.13
@@ -629,11 +629,11 @@ importers:
         specifier: workspace:*
         version: link:../../frameworks/qwik
       '@qwik.dev/core':
-        specifier: 2.0.0-beta.37
-        version: 2.0.0-beta.37(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        specifier: 2.0.0-beta.38
+        version: 2.0.0-beta.38(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@qwik.dev/router':
-        specifier: 2.0.0-beta.37
-        version: 2.0.0-beta.37(@qwik.dev/core@2.0.0-beta.37(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(rollup@4.59.0)(typescript@5.8.3)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        specifier: 2.0.0-beta.38
+        version: 2.0.0-beta.38(@qwik.dev/core@2.0.0-beta.38(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(rollup@4.59.0)(typescript@5.8.3)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.3.1(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
@@ -644,8 +644,8 @@ importers:
         specifier: 9.31.0
         version: 9.31.0(jiti@2.7.0)
       eslint-plugin-qwik:
-        specifier: 2.0.0-beta.37
-        version: 2.0.0-beta.37(eslint@9.31.0(jiti@2.7.0))(typescript@5.8.3)
+        specifier: 2.0.0-beta.38
+        version: 2.0.0-beta.38(eslint@9.31.0(jiti@2.7.0))(typescript@5.8.3)
       globals:
         specifier: 16.3.0
         version: 16.3.0
@@ -949,11 +949,11 @@ importers:
         version: 1.4.1(typescript@5.9.3)
     devDependencies:
       '@qwik.dev/core':
-        specifier: 2.0.0-beta.37
-        version: 2.0.0-beta.37(prettier@3.6.2)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        specifier: 2.0.0-beta.38
+        version: 2.0.0-beta.38(prettier@3.6.2)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@qwik.dev/router':
-        specifier: 2.0.0-beta.37
-        version: 2.0.0-beta.37(@qwik.dev/core@2.0.0-beta.37(prettier@3.6.2)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        specifier: 2.0.0-beta.38
+        version: 2.0.0-beta.38(@qwik.dev/core@2.0.0-beta.38(prettier@3.6.2)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@shikijs/rehype':
         specifier: ^3.13.0
         version: 3.23.0
@@ -985,8 +985,8 @@ importers:
         specifier: ^8.57.1
         version: 8.57.1
       eslint-plugin-qwik:
-        specifier: 2.0.0-beta.37
-        version: 2.0.0-beta.37(eslint@8.57.1)(typescript@5.9.3)
+        specifier: 2.0.0-beta.38
+        version: 2.0.0-beta.38(eslint@8.57.1)(typescript@5.9.3)
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
@@ -3104,8 +3104,8 @@ packages:
   '@quansync/fs@1.0.0':
     resolution: {integrity: sha512-4TJ3DFtlf1L5LDMaM6CanJ/0lckGNtJcMjQ1NAV6zDmA0tEHKZtxNKin8EgPaVX1YzljbxckyT2tJrpQKAtngQ==}
 
-  '@qwik.dev/core@2.0.0-beta.37':
-    resolution: {integrity: sha512-8BAe/70kjUNmt6CCGGFHuqcmSUb8o9s5R9LhzhW2rcVDMbkVxtKByVGFVPQnTrZFU584UJDVwb8Tdaz6hrtQew==}
+  '@qwik.dev/core@2.0.0-beta.38':
+    resolution: {integrity: sha512-+tOWhOzHugMnNMoZ1hWSXJpakXvzdZRXlIL92DLjJM0e6EJiQVdVAd59HRazoKhCdyKa8Lhv43VX5synTgEJQQ==}
     engines: {node: ^20.3.0 || >=21.0.0}
     hasBin: true
     peerDependencies:
@@ -3122,11 +3122,11 @@ packages:
     resolution: {integrity: sha512-ygrROBg8/lqyvfig78lAEtxHLmLJLNcncMWLguIK4vmruuYpYXQVMMHklsbcTDj9tEvhL1B/MfclDsiG5E4XOA==}
     engines: {node: ^20.3.0 || >=21.0.0}
 
-  '@qwik.dev/router@2.0.0-beta.37':
-    resolution: {integrity: sha512-YIF4GjdghEaTbL0bTPnhHngAITbDlc7K19R1UbGfGjhKFkA1cLrmZp2xaFPwKUDXUVyu+LTAvBkTx8nLgwIebQ==}
+  '@qwik.dev/router@2.0.0-beta.38':
+    resolution: {integrity: sha512-Ml4XFiCnKZEbrAIi8AbF2Hyda1QZj93ORLmj98AmAd9eQ8EEeSkKYkg5v8m8M6roA5BQMsI4zWdbXW217nWzUA==}
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
     peerDependencies:
-      '@qwik.dev/core': ^2.0.0-beta.37
+      '@qwik.dev/core': ^2.0.0-beta.38
       vite: 6.4.2
 
   '@resvg/resvg-wasm@2.4.0':
@@ -5981,8 +5981,8 @@ packages:
     peerDependencies:
       eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
 
-  eslint-plugin-qwik@2.0.0-beta.37:
-    resolution: {integrity: sha512-rDqlR0oWuie4D7iDEYOszv4+n4hs6cH8ASImV8CwtfBc1oI2Kbj2d46eGjcicZWiZicMCItEbsvB7j4vvqtazQ==}
+  eslint-plugin-qwik@2.0.0-beta.38:
+    resolution: {integrity: sha512-RgUjAZ2SSMOMYDUgGaG/T8Z0wbuhy/OisXCLMEm1EYeLmX87Qzpr2RMqIPcP3uKuyG30ADq12hEOpk/rv1y93w==}
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
@@ -8793,6 +8793,7 @@ packages:
 
   stream-to-promise@2.2.0:
     resolution: {integrity: sha512-HAGUASw8NT0k8JvIVutB2Y/9iBk7gpgEyAudXwNJmZERdMITGdajOa4VJfD/kNiA3TppQpTP4J+CtcHwdzKBAw==}
+    deprecated: Deprecated. Use node:stream/promises and node:stream/consumers instead.
 
   streamx@2.28.0:
     resolution: {integrity: sha512-1Yowhzjf0ivGMrTIkY9hav5TxobO9qIVqUE41fiCGMGgc3CLlf4MY+9AHmZqBWgDTue0fY9zWjYFVyf6Diuobw==}
@@ -11979,7 +11980,7 @@ snapshots:
     dependencies:
       quansync: 1.0.0
 
-  '@qwik.dev/core@2.0.0-beta.37(prettier@3.6.2)(vite@6.4.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@4.1.7)':
+  '@qwik.dev/core@2.0.0-beta.38(prettier@3.6.2)(vite@6.4.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@4.1.7)':
     dependencies:
       '@qwik.dev/optimizer': 2.1.0-beta.5
       csstype: 3.2.3
@@ -11991,7 +11992,7 @@ snapshots:
       prettier: 3.6.2
       vitest: 4.1.7(@edge-runtime/vm@3.1.7)(@types/node@24.0.13)(@vitest/coverage-v8@4.1.9)(jsdom@26.1.0)(vite@6.4.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
 
-  '@qwik.dev/core@2.0.0-beta.37(prettier@3.6.2)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@qwik.dev/core@2.0.0-beta.38(prettier@3.6.2)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@qwik.dev/optimizer': 2.1.0-beta.5
       csstype: 3.2.3
@@ -12002,7 +12003,7 @@ snapshots:
     optionalDependencies:
       prettier: 3.6.2
 
-  '@qwik.dev/core@2.0.0-beta.37(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@qwik.dev/core@2.0.0-beta.38(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@qwik.dev/optimizer': 2.1.0-beta.5
       csstype: 3.2.3
@@ -12015,12 +12016,12 @@ snapshots:
 
   '@qwik.dev/optimizer@2.1.0-beta.5': {}
 
-  '@qwik.dev/router@2.0.0-beta.37(@qwik.dev/core@2.0.0-beta.37(prettier@3.6.2)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@qwik.dev/router@2.0.0-beta.38(@qwik.dev/core@2.0.0-beta.38(prettier@3.6.2)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@azure/functions': 3.5.1
       '@mdx-js/mdx': 3.1.1
       '@netlify/edge-functions': 3.0.8
-      '@qwik.dev/core': 2.0.0-beta.37(prettier@3.6.2)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@qwik.dev/core': 2.0.0-beta.38(prettier@3.6.2)(vite@7.3.2(@types/node@22.19.21)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@types/mdx': 2.0.14
       estree-util-value-to-estree: 3.5.0
       github-slugger: 2.0.0
@@ -12029,6 +12030,7 @@ snapshots:
       kleur: 4.1.5
       marked: 12.0.2
       mdast-util-mdx: 3.0.0
+      mlly: 1.8.2
       refractor: 4.9.0
       rehype-autolink-headings: 7.1.0
       remark-frontmatter: 5.0.0
@@ -12049,12 +12051,12 @@ snapshots:
       - supports-color
       - typescript
 
-  '@qwik.dev/router@2.0.0-beta.37(@qwik.dev/core@2.0.0-beta.37(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(rollup@4.59.0)(typescript@5.8.3)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@qwik.dev/router@2.0.0-beta.38(@qwik.dev/core@2.0.0-beta.38(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(rollup@4.59.0)(typescript@5.8.3)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@azure/functions': 3.5.1
       '@mdx-js/mdx': 3.1.1
       '@netlify/edge-functions': 3.0.8
-      '@qwik.dev/core': 2.0.0-beta.37(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@qwik.dev/core': 2.0.0-beta.38(prettier@3.6.2)(vite@7.3.2(@types/node@24.0.13)(jiti@2.7.0)(less@4.6.6)(lightningcss@1.32.0)(sass@1.101.0)(stylus@0.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@types/mdx': 2.0.14
       estree-util-value-to-estree: 3.5.0
       github-slugger: 2.0.0
@@ -12063,6 +12065,7 @@ snapshots:
       kleur: 4.1.5
       marked: 12.0.2
       mdast-util-mdx: 3.0.0
+      mlly: 1.8.2
       refractor: 4.9.0
       rehype-autolink-headings: 7.1.0
       remark-frontmatter: 5.0.0
@@ -15359,7 +15362,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-qwik@2.0.0-beta.37(eslint@8.57.1)(typescript@5.9.3):
+  eslint-plugin-qwik@2.0.0-beta.38(eslint@8.57.1)(typescript@5.9.3):
     dependencies:
       '@typescript-eslint/utils': 8.61.1(eslint@8.57.1)(typescript@5.9.3)
       eslint: 8.57.1
@@ -15368,7 +15371,7 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-plugin-qwik@2.0.0-beta.37(eslint@9.31.0(jiti@2.7.0))(typescript@5.8.3):
+  eslint-plugin-qwik@2.0.0-beta.38(eslint@9.31.0(jiti@2.7.0))(typescript@5.8.3):
     dependencies:
       '@typescript-eslint/utils': 8.61.1(eslint@9.31.0(jiti@2.7.0))(typescript@5.8.3)
       eslint: 9.31.0(jiti@2.7.0)
