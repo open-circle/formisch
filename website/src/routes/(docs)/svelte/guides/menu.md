@@ -4,8 +4,8 @@
 
 - [Introduction](/svelte/guides/introduction/)
 - [Installation](/svelte/guides/installation/)
+- [Coding agents](/svelte/guides/coding-agents/)
 - [Comparison](/svelte/guides/comparison/)
-- [LLMs.txt](/svelte/guides/llms-txt/)
 
 ## Main concepts
 

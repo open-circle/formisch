@@ -13,7 +13,7 @@
   "scripts": {
     "build": "qwik build",
     "build.client": "vite build",
-    "build.cloudflare": "pnpm --filter @formisch/core --filter @formisch/methods --filter @formisch/qwik build && pnpm sitemap && pnpm llms && pnpm og && pnpm build",
+    "build.cloudflare": "pnpm --filter @formisch/core --filter @formisch/methods --filter @formisch/qwik build && pnpm sitemap && pnpm llms && pnpm agents && pnpm og && pnpm build",
     "build.preview": "vite build --ssr src/entry.preview.tsx",
     "build.server": "vite build -c adapters/static/vite.config.ts",
     "build.types": "tsc --incremental --noEmit",
@@ -24,8 +24,9 @@
     "dev.debug": "node --inspect-brk ./node_modules/vite/bin/vite.js --mode ssr --force",
     "format": "prettier --write .",
     "format.check": "prettier --check .",
-    "lint": "eslint \"src/**/*.ts*\"",
+    "lint": "eslint \"src/**/*.ts*\" \"worker/**/*.ts\"",
     "llms": "tsm ./scripts/llms.ts",
+    "agents": "tsm ./scripts/agents.ts",
     "og": "tsm ./scripts/og-images.ts",
     "preview": "qwik build preview && vite preview --open",
     "sitemap": "tsm ./scripts/sitemap.ts",
@@ -65,8 +66,9 @@
   "dependencies": {
     "@formisch/qwik": "workspace:*",
     "@formkit/auto-animate": "^0.9.0",
+    "@valibot/to-json-schema": "^1.7.1",
     "clsx": "^2.1.1",
-    "valibot": "^1.4.1"
+    "valibot": "^1.4.2"
   },
   "engines": {
     "node": ">=22.0.0"

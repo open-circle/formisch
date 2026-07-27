@@ -4,8 +4,8 @@
 
 - [Introduction](/react/guides/introduction/)
 - [Installation](/react/guides/installation/)
+- [Coding agents](/react/guides/coding-agents/)
 - [Comparison](/react/guides/comparison/)
-- [LLMs.txt](/react/guides/llms-txt/)
 
 ## Main concepts
 

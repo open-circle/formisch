@@ -21,4 +21,5 @@ export default {
   importOrder: ['^\w', '^[./]'],
   importOrderSortSpecifiers: true,
   importOrderCaseInsensitive: true,
+  importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
 };

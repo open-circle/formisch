@@ -17,11 +17,11 @@
     "@react-native-community/slider": "5.2.0",
     "clsx": "^2.1.1",
     "expo": "^57.0.7",
-    "expo-constants": "~57.0.7",
+    "expo-constants": "~57.0.0",
     "expo-document-picker": "~57.0.1",
     "expo-font": "~57.0.1",
-    "expo-linking": "~57.0.4",
-    "expo-router": "~57.0.8",
+    "expo-linking": "~57.0.0",
+    "expo-router": "~57.0.0",
     "expo-status-bar": "^57.0.1",
     "nativewind": "5.0.0-preview.4",
     "react": "^19.2.5",
@@ -41,7 +41,7 @@
     "@types/react": "^19.2.5",
     "eslint": "^9.39.1",
     "eslint-config-expo": "^57.0.0",
-    "postcss": "^8.5.23",
+    "postcss": "^8.5.0",
     "tailwindcss": "^4.1.17",
     "typescript": "~5.9.3"
   }

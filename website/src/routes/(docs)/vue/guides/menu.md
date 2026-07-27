@@ -4,8 +4,8 @@
 
 - [Introduction](/vue/guides/introduction/)
 - [Installation](/vue/guides/installation/)
+- [Coding agents](/vue/guides/coding-agents/)
 - [Comparison](/vue/guides/comparison/)
-- [LLMs.txt](/vue/guides/llms-txt/)
 
 ## Main concepts
 

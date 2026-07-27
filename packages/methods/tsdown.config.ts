@@ -5,6 +5,7 @@ import type { RolldownPluginOption } from 'rolldown';
 import { defineConfig, type UserConfig, type UserConfigFn } from 'tsdown';
 
 type Framework =
+  | 'angular'
   | 'preact'
   | 'qwik'
   | 'react'
@@ -96,6 +97,7 @@ function defineFrameworkConfig(
   return defineConfig({
     entry: ['./src/index.ts'],
     external: [
+      '@angular/core',
       '@formisch/core',
       `@formisch/core/${framework}`,
       '@preact/signals',
@@ -120,6 +122,7 @@ function defineFrameworkConfig(
 }
 
 const config: (UserConfig | UserConfigFn)[] = [
+  defineFrameworkConfig('angular'),
   defineFrameworkConfig('preact'),
   defineFrameworkConfig('qwik'),
   defineFrameworkConfig('react'),

@@ -2,8 +2,14 @@ public/og/
 public/sitemap.xml
 public/llms.txt
 public/llms-*.txt
+public/search-index.json
+public/skill.md
+public/.well-known/agent-skills/index.json
+public/.well-known/mcp/
 public/guides/
 public/api/
+public/blog/
+public/angular/
 public/preact/
 public/qwik/
 public/react/

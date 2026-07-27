@@ -1,0 +1,45 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://formisch.dev/",
+      "service-doc": [
+        {
+          "href": "https://formisch.dev/react/guides/introduction/",
+          "type": "text/html",
+          "title": "Formisch documentation"
+        }
+      ],
+      "service-desc": [
+        {
+          "href": "https://formisch.dev/llms.txt",
+          "type": "text/markdown",
+          "title": "Formisch documentation index as Markdown for LLMs"
+        }
+      ],
+      "describedby": [
+        {
+          "href": "https://formisch.dev/llms.txt",
+          "type": "text/markdown",
+          "title": "Documentation index for AI agents and LLMs"
+        }
+      ]
+    },
+    {
+      "anchor": "https://formisch.dev/mcp",
+      "service-desc": [
+        {
+          "href": "https://formisch.dev/.well-known/mcp/server-card.json",
+          "type": "application/json",
+          "title": "Formisch MCP server card"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://formisch.dev/react/guides/coding-agents/",
+          "type": "text/html",
+          "title": "Coding agents guide"
+        }
+      ]
+    }
+  ]
+}

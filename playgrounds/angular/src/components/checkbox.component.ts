@@ -1,0 +1,47 @@
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  type FieldStore,
+  type FormSchema,
+  FormischControl,
+  type RequiredPath,
+} from '@formisch/angular';
+import { InputErrorsComponent } from './input-errors.component.ts';
+
+/**
+ * Checkbox that allows users to select an option. The label next to the
+ * checkbox describes the selection option.
+ */
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-checkbox',
+  standalone: true,
+  imports: [InputErrorsComponent, FormischControl],
+  host: { class: 'block px-8 lg:px-10' },
+  template: `
+    <label class="flex select-none space-x-4 font-medium md:text-lg lg:text-xl">
+      <input
+        class="mt-1 h-4 w-4 cursor-pointer lg:mt-1 lg:h-5 lg:w-5"
+        type="checkbox"
+        [value]="value()"
+        [attr.aria-errormessage]="
+          field().errors() ? field().name() + '-error' : null
+        "
+        [formischControl]="field()"
+      />
+      <span>{{ label() }}</span>
+      @if (required()) {
+        <span class="ml-1 text-red-600 dark:text-red-400">*</span>
+      }
+    </label>
+    <app-input-errors [name]="field().name()" [errors]="field().errors()" />
+  `,
+})
+export class CheckboxComponent<
+  TSchema extends FormSchema = FormSchema,
+  TFieldPath extends RequiredPath = RequiredPath,
+> {
+  readonly field = input.required<FieldStore<TSchema, TFieldPath>>();
+  readonly label = input<string>('');
+  readonly value = input<string>();
+  readonly required = input<boolean>(false);
+}
