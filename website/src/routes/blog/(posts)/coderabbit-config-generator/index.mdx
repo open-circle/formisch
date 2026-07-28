@@ -1,11 +1,11 @@
 ---
 cover: Practical Example ＃1
-title: 'Practical Example of a Web App Using Valibot and Formisch: An App for Generating `.coderabbit.yaml` Configuration Files'
+title: 'Generating a 400-Field `.coderabbit.yaml` Form from a JSON Schema'
 description: >-
-  A practical example of using Valibot and Formisch together, turning a
-  400+ property JSON Schema into a fully validated GUI for generating
-  .coderabbit.yaml configuration files.
-published: 2026-07-26
+  How I combined Valibot and Formisch to turn a 400+ property JSON Schema
+  into a fully validated GUI for generating .coderabbit.yaml configuration
+  files, without hand-writing a single field.
+published: 2026-07-28
 authors:
   - ysknsid25
 ---
@@ -44,50 +44,15 @@ That's the problem this application solves: it lists all the configuration optio
 
 ## What is Valibot
 
-Valibot is a schema validation library for TypeScript. You write rules like "this data should have this shape" as code, and it validates values against those rules.
+[Valibot](https://valibot.dev/) is a schema validation library for TypeScript. You describe a data's shape once, as a schema, and Valibot both validates values against it and infers the matching TypeScript types from it — the schema is the single source of truth for both. In this app, I wrote code that **converts each item of CodeRabbit's JSON Schema into Valibot schema calls like `v.object({...})` and `v.string()`, at runtime** (more on this below), instead of hand-writing a schema for each option.
 
-```typescript
-import * as v from 'valibot';
-
-// "email must be a string in email format, password must be a string of 8+ characters"
-const LoginSchema = v.object({
-  email: v.pipe(v.string(), v.email()),
-  password: v.pipe(v.string(), v.minLength(8)),
-});
-
-v.parse(LoginSchema, { email: 'a@b.com', password: '12345678' }); // OK
-v.parse(LoginSchema, { email: 'not-an-email', password: '123' }); // Error
-```
-
-The key point is that this `LoginSchema`, a "bundle of rules," carries not just validation but the information about what shape the data has, in and of itself. By passing this to Formisch, described below, the form's types, initial values, and input checks are all determined automatically.
-
-In this app, I wrote code that **converts each item of CodeRabbit's JSON Schema into `v.object({...})` and `v.string()` calls like the ones above, at runtime** (more on this later). Instead of hand-writing something like `LoginSchema`, the idea is to read the JSON Schema and have the program write it for you.
+If you're new to Valibot, the [introduction guide](https://valibot.dev/guides/introduction/) is a good place to start.
 
 ## What is Formisch
 
-Formisch is a form state management library for React. It supports not only React but also Vue, Svelte, and others.
+[Formisch](https://formisch.dev/) is a schema-first, headless form library built on top of Valibot (and other Standard Schema libraries). Instead of managing field values with `useState` and writing a separate `validate` function by hand, you pass a schema straight to `useForm`, and the form's input values, initial values, and validation errors are all derived from it automatically. Formisch supports seven frameworks on equal footing — Angular, Preact, Qwik, React, Solid, Svelte, and Vue.
 
-First, let's see what it looks like to write a login form roughly equivalent to the `LoginSchema` above, without using Formisch.
-
-```typescript
-const [email, setEmail] = useState('');
-const [password, setPassword] = useState('');
-const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-
-const validate = () => {
-  const next: typeof errors = {};
-  if (!/.+@.+/.test(email)) next.email = 'Invalid email format';
-  if (password.length < 8) next.password = 'Must be at least 8 characters';
-  setErrors(next);
-  return Object.keys(next).length === 0;
-};
-```
-
-That's already this much code for just two fields. And "where the value lives" (`useState`) and "the validation rules" (`validate`) are written in completely separate places, in completely different styles. Every time you add one more field, you need to add one line to `useState` and one line inside `validate`, and if you forget to update one of them, it's easy not to notice.
-
-Formisch's defining feature is that it connects directly to Valibot: **just by passing a Valibot schema, you get the form's input values, initial values, and validation errors all at once.** You no longer need to write "where the value lives" and "the validation rules" separately; writing a single schema gives you both.
-
-Just like with Valibot, it's easiest to see this by looking at the official sample code, also based on a login form.
+Here's the official sample code, based on a login form.
 
 ```typescript
 import { Field, Form, useForm } from '@formisch/react';
@@ -128,7 +93,7 @@ export default function LoginPage() {
 }
 ```
 
-Compared to the naive implementation, neither `useState` nor a `validate` function shows up. Both the value management and the validation are entirely bundled inside the `LoginSchema` schema.
+Neither `useState` nor a `validate` function shows up here, both the value management and the validation are entirely bundled inside the `LoginSchema` schema. If you're new to Formisch, the [introduction guide](https://formisch.dev/react/guides/introduction/) covers this in more depth.
 
 ## What Combining Valibot and Formisch Makes Possible
 
