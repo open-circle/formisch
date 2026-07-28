@@ -5,6 +5,7 @@
 
 // Frameworks that Formisch supports, each with its own guides and API reference
 export const FRAMEWORKS = [
+  'angular',
   'preact',
   'qwik',
   'react',
@@ -20,6 +21,7 @@ export const DEFAULT_FRAMEWORK: Framework = 'react';
 
 // Display names of the frameworks as used in tool outputs
 export const FRAMEWORK_TITLES: Record<Framework, string> = {
+  angular: 'Angular',
   preact: 'Preact',
   qwik: 'Qwik',
   react: 'React',

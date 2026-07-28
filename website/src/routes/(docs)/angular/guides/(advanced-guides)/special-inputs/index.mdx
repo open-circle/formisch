@@ -1,0 +1,149 @@
+---
+title: Special inputs
+description: >-
+  Learn how to use special HTML form inputs like checkboxes, radio buttons, select elements,
+  and file inputs with Formisch. This guide covers both single and multiple
+  value scenarios for each input type.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Special inputs
+
+As listed in our features, the library supports all native HTML form fields. This includes the HTML `<select />` element as well as special cases of the `<input />` element.
+
+> In our <Link href="/playground/special/">playground</Link> you can take a look at such fields and test them out.
+
+The <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive knows how to read from and write to each of these element types, so in every example below you only bind the directive — never `[value]`, `[checked]` or `[selected]`.
+
+## Checkbox
+
+A simple checkbox represents a boolean and is `true` when checked or `false` otherwise.
+
+```angular-html
+<label *formischField="['cookies'] of form; let field">
+  <input [formischControl]="field" type="checkbox" />
+  Yes, I want cookies
+</label>
+```
+
+However, you can also use multiple checkboxes to represent an array of strings. For this you simply have to add the `value` attribute to each HTML `<input />` element. All checkboxes of the group are bound to the same field.
+
+```angular-html
+<ng-container *formischField="['fruits'] of form; let field">
+  @for (fruit of fruits; track fruit.value) {
+    <label>
+      <input [formischControl]="field" type="checkbox" [value]="fruit.value" />
+      {{ fruit.label }}
+    </label>
+  }
+</ng-container>
+```
+
+```ts
+protected readonly fruits = [
+  { label: 'Bananas', value: 'bananas' },
+  { label: 'Apples', value: 'apples' },
+  { label: 'Grapes', value: 'grapes' },
+];
+```
+
+> The `value` attribute is the one binding you do set yourself, since it identifies the option rather than holding the field's state.
+
+## Radio
+
+A group of radio buttons, while similar to an array of checkboxes, will only allow you to select one of the options based on which button is checked.
+
+```angular-html
+<ng-container *formischField="['color'] of form; let field">
+  @for (color of colors; track color.value) {
+    <label>
+      <input [formischControl]="field" type="radio" [value]="color.value" />
+      {{ color.label }}
+    </label>
+  }
+</ng-container>
+```
+
+```ts
+protected readonly colors = [
+  { label: 'Red', value: 'red' },
+  { label: 'Green', value: 'green' },
+  { label: 'Blue', value: 'blue' },
+];
+```
+
+## Select
+
+An HTML `<select />` element allows you to select a string from a predefined list of options.
+
+```angular-html
+<select
+  *formischField="['framework'] of form; let field"
+  [formischControl]="field"
+>
+  @for (option of options; track option.value) {
+    <option [value]="option.value">{{ option.label }}</option>
+  }
+</select>
+```
+
+However, if you set the `multiple` attribute, multiple options can be selected making the field represent an array of strings.
+
+```angular-html
+<select
+  *formischField="['frameworks'] of form; let field"
+  [formischControl]="field"
+  multiple
+>
+  @for (option of options; track option.value) {
+    <option [value]="option.value">{{ option.label }}</option>
+  }
+</select>
+```
+
+A `<select />` silently ignores a value for which no matching `<option />` exists yet. This happens when the options are rendered asynchronously, for example after a `resource` or an HTTP request resolves. Formisch handles this for you: the directive observes the option elements and re-applies the field input as soon as a matching option appears, so a value set via `initialInput` or <Link href="/methods/api/setInput/">`setInput`</Link> is not lost.
+
+### Placeholder option
+
+To show a placeholder while the field is empty, add a disabled option with an empty value. Because the directive writes an empty string for a nullish input, the browser selects that option instead of falling back to the first real one.
+
+```angular-html
+<select
+  *formischField="['framework'] of form; let field"
+  [formischControl]="field"
+>
+  <option value="" disabled hidden>Select a framework</option>
+  @for (option of options; track option.value) {
+    <option [value]="option.value">{{ option.label }}</option>
+  }
+</select>
+```
+
+## File
+
+For the HTML `<input type="file" />` element it works similar to the HTML `<select />` element. Without the `multiple` attribute it represents a single file and with, a list of files.
+
+```angular-html
+<input
+  *formischField="['avatar'] of form; let field"
+  [formischControl]="field"
+  type="file"
+  accept="image/*"
+/>
+```
+
+With the `multiple` attribute, users can select multiple files:
+
+```angular-html
+<input
+  *formischField="['documents'] of form; let field"
+  [formischControl]="field"
+  type="file"
+  multiple
+/>
+```
+
+Browsers do not allow a file selection to be set programmatically, so a file input is the one element Formisch cannot write into. It can only clear it: when the field input becomes empty — for example through <Link href="/methods/api/reset/">`reset`</Link> — the directive resets the element as well.

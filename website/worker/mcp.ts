@@ -72,7 +72,7 @@ const TOOL_DEFINITIONS = [
     name: 'search_docs',
     title: 'Search documentation',
     description:
-      'Searches the Formisch documentation (framework guides, API reference and blog posts) and returns the most relevant pages with links to their Markdown version. Best for finding the right primitive, component, method or core type by name or topic. Set "framework" (preact, qwik, react, solid, svelte or vue) to scope the search to one framework plus the shared form methods and core types.',
+      'Searches the Formisch documentation (framework guides, API reference and blog posts) and returns the most relevant pages with links to their Markdown version. Best for finding the right primitive, component, method or core type by name or topic. Set "framework" (angular, preact, qwik, react, solid, svelte or vue) to scope the search to one framework plus the shared form methods and core types.',
     inputSchema: toInputSchema(SearchDocsSchema),
   },
   {

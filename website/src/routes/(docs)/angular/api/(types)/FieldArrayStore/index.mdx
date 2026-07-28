@@ -1,0 +1,36 @@
+---
+title: FieldArrayStore
+description: Reactive field array store interface for managing dynamic arrays of fields.
+source: /frameworks/angular/src/types/field.ts
+contributors:
+  - fabian-hiller
+---
+
+import { Link, Property } from '~/components';
+import { properties } from './properties';
+
+# FieldArrayStore
+
+Field array store interface that provides reactive access to the state of an array field created with <Link href="../injectFieldArray/">`injectFieldArray`</Link> or the <Link href="../formischFieldArray/">`*formischFieldArray`</Link> directive.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldArrayPath` <Property {...properties.TFieldArrayPath} />
+
+## Definition
+
+- `FieldArrayStore`
+  - `path` <Property {...properties.path} />
+  - `items` <Property {...properties.items} />
+  - `errors` <Property {...properties.errors} />
+  - `isTouched` <Property {...properties.isTouched} />
+  - `isEdited` <Property {...properties.isEdited} />
+  - `isDirty` <Property {...properties.isDirty} />
+  - `isValid` <Property {...properties.isValid} />
+
+### Explanation
+
+The `items` signal contains a unique identifier for every item of the array. Use it as the `track` expression of your `@for` block: the identifiers are stable across reorders, so Angular moves the existing DOM instead of recreating it, and the state of each field stays attached to the right item.
+
+The `errors` signal contains the validation errors of the array itself, for example from `v.nonEmpty()` or `v.maxLength()`, not the errors of the fields inside the array.

@@ -1,0 +1,434 @@
+---
+title: Migrate from Reactive Forms
+description: >-
+  Learn how to migrate your Angular forms from Reactive Forms to Formisch. This
+  guide compares both APIs side by side, walks you through the migration step
+  by step, and maps Reactive Forms APIs to their Formisch equivalents.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from Reactive Forms
+
+This guide walks you through migrating a form from Angular's built-in [Reactive Forms](https://angular.dev/guide/forms/reactive-forms) to Formisch. It explains the mental-model differences, shows the same form implemented in both libraries, and maps Reactive Forms' APIs, options, and state fields to their Formisch counterparts.
+
+Migrating is a rewrite of your form layer, not a drop-in replacement. That said, the conceptual gap is small: both are headless and keep the form's state outside of the template. The main work is consolidating your validators into a single root Valibot schema and replacing `FormGroup`/`FormControl` with Formisch's functions and directives.
+
+Both libraries can coexist in the same application, so you can migrate one form at a time instead of doing everything in a single step. Because Formisch's directives are standalone, a component that still imports `ReactiveFormsModule` is unaffected by a component next to it that imports `FormischForm`.
+
+## Key differences
+
+The biggest shift is that Formisch is strictly schema-first. In Reactive Forms, the shape of the form is declared as a tree of `FormGroup`, `FormArray` and `FormControl` instances, its TypeScript types come from that tree (or from an interface you maintain alongside it), and its validation lives in `Validators` attached to each control. In Formisch, a single Valibot schema is the one source of truth for all three: the structure, the types, and the rules.
+
+Validation also runs differently:
+
+- **Location**: Reactive Forms attaches validator functions per control, plus group-level validators for cross-field rules. Formisch always parses the entire form against the schema in a single pass and distributes the resulting issues to the individual fields, so cross-field rules work without extra wiring.
+- **Timing**: Reactive Forms validates on every value change by default and is configured per control with `updateOn: 'change' | 'blur' | 'submit'`. Formisch controls timing form-wide with two options on <Link href="/angular/api/injectForm/">`injectForm`</Link>: `validate` (first validation, defaults to `'submit'`) and `revalidate` (subsequent validations, defaults to `'input'`).
+- **Field addressing**: Reactive Forms identifies fields by control name strings or dotted paths like `'members.0.email'`. Formisch uses path arrays like `['members', 0, 'email']` that are fully type-checked against your schema — including inside your templates when `strictTemplates` is enabled.
+- **Form state**: Reactive Forms exposes state as plain properties (`valid`, `dirty`, `touched`, `pending`) that are read during change detection, and as RxJS streams (`valueChanges`, `statusChanges`). Formisch exposes everything as Angular signals, so `form.isValid()` can be read directly in an `OnPush` or zoneless template without subscriptions.
+- **Errors**: Reactive Forms produces `ValidationErrors` objects keyed by validator name (`{ required: true }`) that you translate into messages in the template. In Formisch, the message is part of the schema, and `field.errors()` is a ready-to-render array of strings.
+
+## Side-by-side example
+
+The following login form has two validated fields and an async submit handler. The Formisch version implements the exact same behavior.
+
+### Reactive Forms
+
+```ts
+import { Component, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-login',
+  imports: [ReactiveFormsModule],
+  template: `
+    <form [formGroup]="loginForm" (ngSubmit)="handleSubmit()">
+      <input formControlName="email" type="email" />
+      @if (email.touched && email.errors) {
+        <div>
+          @if (email.errors['required']) {
+            <span>Please enter your email.</span>
+          }
+          @if (email.errors['email']) {
+            <span>The email address is badly formatted.</span>
+          }
+        </div>
+      }
+
+      <input formControlName="password" type="password" />
+      @if (password.touched && password.errors) {
+        <div>
+          @if (password.errors['required']) {
+            <span>Please enter your password.</span>
+          }
+          @if (password.errors['minlength']) {
+            <span>Your password must have 8 characters or more.</span>
+          }
+        </div>
+      }
+
+      <button type="submit" [disabled]="isSubmitting()">Login</button>
+    </form>
+  `,
+})
+export class LoginComponent {
+  private readonly formBuilder = inject(FormBuilder);
+
+  readonly isSubmitting = signal(false);
+
+  readonly loginForm = this.formBuilder.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
+  });
+
+  get email() {
+    return this.loginForm.controls.email;
+  }
+
+  get password() {
+    return this.loginForm.controls.password;
+  }
+
+  async handleSubmit(): Promise<void> {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+    this.isSubmitting.set(true);
+    try {
+      await this.api.login(this.loginForm.getRawValue());
+    } finally {
+      this.isSubmitting.set(false);
+    }
+  }
+}
+```
+
+### Formisch
+
+```ts
+import { Component } from '@angular/core';
+import {
+  FormischControl,
+  FormischField,
+  FormischForm,
+  injectForm,
+  type SubmitHandler,
+} from '@formisch/angular';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+@Component({
+  selector: 'app-login',
+  imports: [FormischForm, FormischField, FormischControl],
+  template: `
+    <form [formischForm]="loginForm" [formischSubmit]="handleSubmit">
+      <ng-container *formischField="['email'] of loginForm; let field">
+        <input [formischControl]="field" type="email" />
+        @if (field.errors(); as errors) {
+          <div>{{ errors[0] }}</div>
+        }
+      </ng-container>
+
+      <ng-container *formischField="['password'] of loginForm; let field">
+        <input [formischControl]="field" type="password" />
+        @if (field.errors(); as errors) {
+          <div>{{ errors[0] }}</div>
+        }
+      </ng-container>
+
+      <button type="submit" [disabled]="loginForm.isSubmitting()">Login</button>
+    </form>
+  `,
+})
+export class LoginComponent {
+  readonly loginForm = injectForm({ schema: LoginSchema });
+
+  readonly handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+    await this.api.login(values);
+  };
+}
+```
+
+The Formisch version needs no `isSubmitting` signal of its own, no manual `invalid` check before submitting, and no per-validator error translation in the template: the submit handler only runs when the form is valid, `isSubmitting()` is tracked for you while the returned promise is pending, and the messages come from the schema.
+
+## Migration steps
+
+### Install Formisch
+
+```bash
+npm install @formisch/angular valibot
+```
+
+Formisch's directives are standalone, so there is no module to add to your `AppModule`. You can leave `ReactiveFormsModule` imported in the components you have not migrated yet.
+
+### Move validation into a Valibot schema
+
+Collect the validators of every control into one schema. Each `Validators` entry has a direct Valibot counterpart, and this is where you attach the error message that Reactive Forms would have kept in the template.
+
+```ts
+const LoginSchema = v.object({
+  // Validators.required + Validators.email
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  // Validators.required + Validators.minLength(8)
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+```
+
+Group-level validators — the classic "passwords must match" — become a check on the object instead of a `ValidatorFn` on the `FormGroup`:
+
+```ts
+const SignUpSchema = v.pipe(
+  v.object({
+    password: v.pipe(v.string(), v.minLength(8)),
+    confirmPassword: v.string(),
+  }),
+  v.forward(
+    v.check(
+      (input) => input.password === input.confirmPassword,
+      'The passwords do not match.'
+    ),
+    ['confirmPassword']
+  )
+);
+```
+
+Async validators map onto Valibot's async API (`v.objectAsync`, `v.pipeAsync`, `v.checkAsync`), which Formisch parses with `safeParseAsync` out of the box.
+
+### Replace the form setup
+
+Replace the `FormBuilder` tree with a single <Link href="/angular/api/injectForm/">`injectForm`</Link> call. Initial values move from the control definitions to `initialInput`.
+
+```ts
+// Before
+readonly loginForm = this.formBuilder.nonNullable.group({
+  email: ['user@example.com', [Validators.required, Validators.email]],
+  password: ['', [Validators.required]],
+});
+
+// After
+readonly loginForm = injectForm({
+  schema: LoginSchema,
+  initialInput: { email: 'user@example.com' },
+});
+```
+
+Like `inject`, <Link href="/angular/api/injectForm/">`injectForm`</Link> must be called in an injection context — a field initializer or the constructor.
+
+### Replace field bindings
+
+`[formGroup]` on the form element becomes `[formischForm]`, and each `formControlName` becomes a `*formischField` that provides the field store plus a `[formischControl]` that binds it to the element.
+
+```angular-html
+<!-- Before -->
+<form [formGroup]="loginForm" (ngSubmit)="handleSubmit()">
+  <input formControlName="email" type="email" />
+</form>
+
+<!-- After -->
+<form [formischForm]="loginForm" [formischSubmit]="handleSubmit">
+  <input
+    *formischField="['email'] of loginForm; let field"
+    [formischControl]="field"
+    type="email"
+  />
+</form>
+```
+
+Nested groups do not need `formGroupName` wrappers. Address the nested field with its full path instead: `['address', 'city']`.
+
+### Update submission handling
+
+`(ngSubmit)` calls your method; `[formischSubmit]` receives it. Formisch validates first, focuses the first invalid field, awaits your handler, and tracks `isSubmitting()` for you — so the guard clause and the manual flag both disappear.
+
+```ts
+// Before
+async handleSubmit(): Promise<void> {
+  if (this.loginForm.invalid) {
+    this.loginForm.markAllAsTouched();
+    return;
+  }
+  this.isSubmitting.set(true);
+  try {
+    await this.api.login(this.loginForm.getRawValue());
+  } finally {
+    this.isSubmitting.set(false);
+  }
+}
+
+// After
+readonly handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+  await this.api.login(values);
+};
+```
+
+> Declare the handler as an arrow function property. A regular class method passed as a reference would lose its `this`.
+
+## API mapping
+
+| Reactive Forms                         | Formisch                                                                                           |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `ReactiveFormsModule`                  | `FormischForm`, `FormischField`, `FormischFieldArray`, `FormischControl`                           |
+| `formBuilder.group({ … })`             | <Link href="/angular/api/injectForm/">`injectForm({ schema })`</Link>                              |
+| `new FormControl('')`                  | A field of the schema, read via <Link href="/angular/api/injectField/">`injectField`</Link>        |
+| `new FormArray([])`                    | `v.array(…)` in the schema + <Link href="/angular/api/injectFieldArray/">`injectFieldArray`</Link> |
+| `[formGroup]="form"`                   | `[formischForm]="form"`                                                                            |
+| `formControlName="email"`              | `*formischField="['email'] of form; let field"` + `[formischControl]="field"`                      |
+| `formGroupName` / `formArrayName`      | A longer path array, e.g. `['address', 'city']`                                                    |
+| `(ngSubmit)="save()"`                  | `[formischSubmit]="save"`                                                                          |
+| `Validators.required`                  | `v.nonEmpty()`                                                                                     |
+| `Validators.email`                     | `v.email()`                                                                                        |
+| `Validators.minLength(n)`              | `v.minLength(n)`                                                                                   |
+| `Validators.min(n)` / `max(n)`         | `v.minValue(n)` / `v.maxValue(n)`                                                                  |
+| `Validators.pattern(re)`               | `v.regex(re)`                                                                                      |
+| `updateOn: 'blur'`                     | `validate: 'blur'` on `injectForm`                                                                 |
+| `form.value` / `form.getRawValue()`    | <Link href="/methods/api/getInput/">`getInput(form)`</Link>                                        |
+| `form.patchValue({ … })`               | <Link href="/methods/api/setInput/">`setInput(form, { path, input })`</Link>                       |
+| `form.reset()` / `form.reset(value)`   | <Link href="/methods/api/reset/">`reset(form)`</Link> / `reset(form, { initialInput })`            |
+| `form.valid` / `form.invalid`          | `form.isValid()`                                                                                   |
+| `form.dirty`                           | `form.isDirty()`                                                                                   |
+| `form.touched`                         | `form.isTouched()`                                                                                 |
+| `form.pending`                         | `form.isValidating()`                                                                              |
+| `control.errors`                       | `field.errors()` (array of messages, or `null`)                                                    |
+| `form.updateValueAndValidity()`        | <Link href="/methods/api/validate/">`validate(form)`</Link>                                        |
+| `form.markAllAsTouched()`              | Not needed — errors appear after the first submit                                                  |
+| `form.valueChanges` (RxJS)             | `field.input()` / `getInput(form)` read in a `computed` or `effect`                                |
+| `form.statusChanges` (RxJS)            | `form.isValid()` / `form.isValidating()`                                                           |
+| `form.controls.email.setErrors({ … })` | <Link href="/methods/api/setErrors/">`setErrors(form, { path, errors })`</Link>                    |
+| `formArray.push(control)`              | <Link href="/methods/api/insert/">`insert(form, { path, initialInput })`</Link>                    |
+| `formArray.removeAt(i)`                | <Link href="/methods/api/remove/">`remove(form, { path, at: i })`</Link>                           |
+
+## Common patterns
+
+### Form state
+
+Every piece of form state is a signal, so it is read as a function call and works without `async` pipes or subscriptions.
+
+```angular-html
+<!-- Before -->
+<button type="submit" [disabled]="loginForm.invalid || loginForm.pending">
+  Login
+</button>
+
+<!-- After -->
+<button type="submit" [disabled]="loginForm.isValidating()">Login</button>
+```
+
+Note that you rarely need to disable the button on `invalid` with Formisch: submitting an invalid form runs validation, shows the errors, and focuses the first invalid field, which is friendlier than a permanently disabled button.
+
+To react to value changes in code, read the value inside an `effect` instead of subscribing to `valueChanges`:
+
+```ts
+constructor() {
+  effect(() => {
+    const country = getInput(this.form, { path: ['country'] });
+    // runs whenever the country field changes
+  });
+}
+```
+
+### Validation timing
+
+```ts
+// Before: per control
+new FormControl('', { validators: [Validators.required], updateOn: 'blur' });
+
+// After: once per form
+readonly form = injectForm({
+  schema: Schema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+### Field arrays
+
+A `FormArray` becomes a `v.array(…)` in the schema, rendered with <Link href="/angular/api/formischFieldArray/">`*formischFieldArray`</Link>. Instead of pushing control instances, you call the array methods with a path.
+
+```ts
+const TodosSchema = v.object({
+  todos: v.pipe(
+    v.array(v.object({ label: v.pipe(v.string(), v.nonEmpty()) })),
+    v.nonEmpty('Please add at least one todo.')
+  ),
+});
+```
+
+```angular-html
+<ng-container *formischFieldArray="['todos'] of form; let fieldArray">
+  @for (item of fieldArray.items(); track item; let index = $index) {
+    <input
+      *formischField="['todos', index, 'label'] of form; let field"
+      [formischControl]="field"
+    />
+    <button type="button" (click)="handleRemove(index)">Delete</button>
+  }
+</ng-container>
+```
+
+```ts
+handleInsert(): void {
+  insert(this.form, { path: ['todos'], initialInput: { label: '' } });
+}
+
+handleRemove(index: number): void {
+  remove(this.form, { path: ['todos'], at: index });
+}
+```
+
+Track by the item identifier from `fieldArray.items()`, not by `$index`, so reordering moves the existing DOM instead of recreating it. See the <Link href="/angular/guides/field-arrays/">field arrays</Link> guide for `move`, `swap` and `replace`.
+
+### Reset
+
+```ts
+// Before
+this.loginForm.reset({ email: '', password: '' });
+
+// After
+reset(this.loginForm, { initialInput: { email: '', password: '' } });
+```
+
+As in Reactive Forms, resetting also clears the touched and dirty state. Passing `initialInput` additionally makes the new values the baseline for dirty tracking.
+
+### Special inputs
+
+Reactive Forms needs a `ControlValueAccessor` for anything that is not a plain input, and community directives for checkbox groups. Formisch's <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive handles every native element type directly, including checkbox and radio groups, multi-selects and file inputs:
+
+```angular-html
+<ng-container *formischField="['fruits'] of form; let field">
+  @for (fruit of fruits; track fruit.value) {
+    <label>
+      <input [formischControl]="field" type="checkbox" [value]="fruit.value" />
+      {{ fruit.label }}
+    </label>
+  }
+</ng-container>
+```
+
+If you have a component that implements `ControlValueAccessor` today, you don't need that interface anymore. Take the field store as an input and use `field.input()` and `field.setInput(…)` — see the <Link href="/angular/guides/controlled-fields/">controlled fields</Link> guide.
+
+## Next steps
+
+Start with the <Link href="/angular/guides/define-your-form/">define your form</Link> guide to get comfortable with schema-first thinking, then read <Link href="/angular/guides/validation/">validation</Link> for the timing options and <Link href="/angular/guides/field-arrays/">field arrays</Link> if your forms are dynamic.

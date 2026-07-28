@@ -4,8 +4,8 @@
 
 - [Introduction](/solid/guides/introduction/)
 - [Installation](/solid/guides/installation/)
-- [Comparison](/solid/guides/comparison/)
 - [Coding agents](/solid/guides/coding-agents/)
+- [Comparison](/solid/guides/comparison/)
 
 ## Main concepts
 

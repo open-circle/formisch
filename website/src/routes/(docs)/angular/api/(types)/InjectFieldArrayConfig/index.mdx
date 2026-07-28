@@ -1,0 +1,28 @@
+---
+title: InjectFieldArrayConfig
+description: Configuration object for creating a field array store with injectFieldArray.
+source: /frameworks/angular/src/functions/injectFieldArray/injectFieldArray.ts
+contributors:
+  - fabian-hiller
+---
+
+import { Link, Property } from '~/components';
+import { properties } from './properties';
+
+# InjectFieldArrayConfig
+
+Configuration object for creating a field array store with <Link href="../injectFieldArray/">`injectFieldArray`</Link>.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldArrayPath` <Property {...properties.TFieldArrayPath} />
+
+## Definition
+
+- `InjectFieldArrayConfig`
+  - `path` <Property {...properties.path} />
+
+### Explanation
+
+The `path` may be passed as a plain array or as a signal, and must point to an array field of your schema.

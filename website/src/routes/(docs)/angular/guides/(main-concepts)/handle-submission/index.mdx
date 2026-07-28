@@ -1,0 +1,170 @@
+---
+title: Handle submission
+description: >-
+  Learn how to handle form submission in Formisch. Process validated form
+  data when the user submits the form using the formischSubmit input.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Handle submission
+
+Now your first form is almost ready. There is only one little thing missing and that is the data processing when the form is submitted.
+
+## Submit event
+
+To process the values on submission, you pass a function to the `[formischSubmit]` input of the <Link href="/angular/api/formischForm/">`[formischForm]`</Link> directive. The first parameter passed to the function contains the validated form values.
+
+```ts
+import { Component } from '@angular/core';
+import {
+  FormischForm,
+  injectForm,
+  type SubmitHandler,
+} from '@formisch/angular';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+@Component({
+  selector: 'app-login',
+  imports: [FormischForm],
+  template: `
+    <form [formischForm]="loginForm" [formischSubmit]="handleSubmit">
+      <!-- Form fields will go here -->
+    </form>
+  `,
+})
+export class LoginComponent {
+  readonly loginForm = injectForm({ schema: LoginSchema });
+
+  readonly handleSubmit: SubmitHandler<typeof LoginSchema> = (values) => {
+    // Process the validated form values
+    console.log(values); // { email: string, password: string }
+  };
+}
+```
+
+The <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link> type ensures type safety for your submission handler, automatically inferring the types of validated values from your schema. If you need access to the submit event, use <Link href="/core/api/SubmitEventHandler/">`SubmitEventHandler`</Link> instead.
+
+> **Important:** Declare the handler as an arrow function property, not as a regular class method. Formisch receives it as a function reference, so a method would lose its `this` binding.
+
+### Prevent default
+
+When the form is submitted, `event.preventDefault()` is executed by default to prevent the window from reloading so that the values can be processed directly in the browser and the state of the form is preserved.
+
+### Loading state
+
+While the form is being submitted, you can use `loginForm.isSubmitting()` to display a loading animation and disable the submit button:
+
+```angular-html
+<button type="submit" [disabled]="loginForm.isSubmitting()">
+  {{ loginForm.isSubmitting() ? 'Submitting...' : 'Login' }}
+</button>
+```
+
+The form store also provides other signals like `isSubmitted`, `isValidating`, `isTouched`, `isDirty`, `isValid`, and `errors` for tracking form state. Note that `errors()` only contains validation errors at the root level of the form — to get all errors from all fields, use the <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link> method.
+
+### Async submission
+
+The submit handler can be asynchronous, allowing you to perform API calls or other async operations. Formisch awaits the returned promise, so `isSubmitting()` stays `true` until it settles:
+
+```ts
+readonly handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+
+    if (response.ok) {
+      // Handle successful login
+      console.log('Login successful!');
+    } else {
+      // Handle error
+      console.error('Login failed');
+    }
+  } catch (error) {
+    console.error('Error during submission:', error);
+  }
+};
+```
+
+The directive also registers the pending submission with Angular's `PendingTasks`, so server-side rendering waits for it and tests remain stable.
+
+### Trigger submission
+
+If you want to trigger submission programmatically from outside the form, you can use the <Link href="/methods/api/submit/">`submit`</Link> method. It calls `requestSubmit()` on the underlying form element:
+
+```ts
+import { submit } from '@formisch/angular';
+
+@Component({
+  selector: 'app-login',
+  imports: [FormischForm],
+  template: `
+    <form [formischForm]="loginForm" [formischSubmit]="handleSubmit">
+      <!-- … -->
+    </form>
+    <button type="button" (click)="handleExternalSubmit()">
+      Submit from outside
+    </button>
+  `,
+})
+export class LoginComponent {
+  readonly loginForm = injectForm({ schema: LoginSchema });
+
+  readonly handleSubmit: SubmitHandler<typeof LoginSchema> = (values) => {
+    console.log(values);
+  };
+
+  handleExternalSubmit(): void {
+    submit(this.loginForm);
+  }
+}
+```
+
+## Submit without \<form /\>
+
+In some cases, you may not be able to wrap your fields in a `<form>` element — for example, when your form is rendered inside another form, since nesting `<form>` elements is invalid HTML. In these situations, you can use the <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method directly to submit the form programmatically without the <Link href="/angular/api/formischForm/">`[formischForm]`</Link> directive.
+
+The returned function accepts no arguments and can be called from anywhere — for example, from a button's `(click)` handler:
+
+```ts
+import { Component } from '@angular/core';
+import { handleSubmit, injectForm } from '@formisch/angular';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+@Component({
+  selector: 'app-login',
+  template: `
+    <div>
+      <!-- Form fields without a <form> wrapper -->
+      <button type="button" (click)="submitForm()">Login</button>
+    </div>
+  `,
+})
+export class LoginComponent {
+  readonly loginForm = injectForm({ schema: LoginSchema });
+
+  readonly submitForm = handleSubmit(this.loginForm, (values) => {
+    // Process the validated form values
+    console.log(values);
+  });
+}
+```
+
+## Next steps
+
+Congratulations! You've learned the core concepts of building forms with Formisch. To learn more about advanced features, check out the <Link href="/angular/guides/form-methods/">form methods</Link> guide to discover how to programmatically control your forms.

@@ -4,8 +4,8 @@
 
 - [Introduction](/vue/guides/introduction/)
 - [Installation](/vue/guides/installation/)
-- [Comparison](/vue/guides/comparison/)
 - [Coding agents](/vue/guides/coding-agents/)
+- [Comparison](/vue/guides/comparison/)
 
 ## Main concepts
 
