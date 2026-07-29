@@ -4,6 +4,4 @@
 // there, as React Native's global `FormData` is a partial network polyfill
 // without iteration support and its types (`FormData`, `File`) are not part
 // of React Native TypeScript configs.
-export * from './createFormStore/index.ts';
-export * from './validateFormInput/index.ts';
-export * from './validateIfRequired/index.ts';
+export {};
