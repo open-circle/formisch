@@ -26,6 +26,13 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    settings: {
+      // Hint: The `react-native` package ships Flow-typed JavaScript that the
+      // TypeScript parser cannot parse, so the import plugin must not analyze
+      // its module exports (see the `import/ignore` docs, which use React
+      // Native as their example)
+      'import/ignore': ['react-native'],
+    },
     rules: commonRules,
   },
   {
