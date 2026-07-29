@@ -20,6 +20,9 @@ updates:
       prefix: "dependabot"
     groups:
       npm-deps:
+        update-types:
+          - "patch"
+          - "minor"
         patterns:
           - "*"
     ignore:
@@ -38,10 +41,12 @@ updates:
       prefix: "dependabot"
     groups:
       github-actions:
+        update-types:
+          - "patch"
+          - "minor"
         patterns:
           - '*'
     ignore:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
-          
