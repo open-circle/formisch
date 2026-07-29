@@ -98,7 +98,7 @@ export function TextInput({
 
 ### JSX code
 
-After that, you can add the JSX code to the return statement. Since React Native has no input types, we map the `type` prop to the matching `keyboardType` and use `secureTextEntry` for passwords.
+After that, you can add the JSX code to the return statement. Since React Native has no input types, we map the `type` prop to the matching `keyboardType` and use `secureTextEntry` for passwords. React Native has no equivalent of the `aria-invalid` attribute, so the visible error message below the input is what communicates the invalid state.
 
 ```tsx
 import type { FieldElementProps } from '@formisch/react-native';
@@ -142,7 +142,6 @@ export function TextInput({
         keyboardType={KEYBOARD_TYPES[type]}
         autoCapitalize={type === 'email' ? 'none' : undefined}
         secureTextEntry={type === 'password'}
-        aria-invalid={!!errors}
       />
       {errors && <Text>{errors[0]}</Text>}
     </View>
@@ -205,7 +204,6 @@ export function TextInput({
         keyboardType={KEYBOARD_TYPES[type]}
         autoCapitalize={type === 'email' ? 'none' : undefined}
         secureTextEntry={type === 'password'}
-        aria-invalid={!!errors}
       />
       {errors && <Text>{errors[0]}</Text>}
     </View>

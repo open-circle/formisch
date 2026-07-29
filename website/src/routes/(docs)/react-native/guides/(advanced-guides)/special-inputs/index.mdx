@@ -159,7 +159,7 @@ A multi-select stores an array of strings. Toggle the pressed value in or out of
 
 ## File
 
-React Native has no `File` class and no file input element. Instead, document and image pickers such as `expo-document-picker` or `expo-image-picker` return plain asset objects that describe the selected file by its URI. You store these objects directly in the form and describe their shape in your schema:
+React Native has no `File` class and no file input element. Instead, document and image pickers such as `expo-document-picker` or `expo-image-picker` return plain asset objects that describe the selected file by its URI. You store these objects directly in the form and describe their shape in your schema. The schema below matches the assets of `expo-document-picker`; other pickers report different metadata — `expo-image-picker`, for example, returns `fileName` and `fileSize` instead of `name` and `size` — so map their assets to the shape your schema expects:
 
 ```tsx
 import * as v from 'valibot';
