@@ -1,0 +1,125 @@
+---
+title: Handle submission
+description: >-
+  Learn how to handle form submission in Formisch. Process validated form
+  data when the user submits the form using the handleSubmit method.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Handle submission
+
+Now your first form is almost ready. There is only one little thing missing and that is the data processing when the form is submitted.
+
+## Submit function
+
+React Native has no native form element or submit event. Instead, you create a submit function with the <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method and call it explicitly — for example, from the `onPress` handler of a `Button` or `Pressable`. The <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method takes your form store and a handler that receives the validated form values.
+
+```tsx
+import { handleSubmit, useForm } from '@formisch/react-native';
+import { Button, View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function LoginScreen() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+  });
+
+  const submitForm = handleSubmit(loginForm, (values) => {
+    // Process the validated form values
+    console.log(values); // { email: string, password: string }
+  });
+
+  return (
+    <View>
+      {/* Form fields will go here */}
+      <Button title="Login" onPress={submitForm} />
+    </View>
+  );
+}
+```
+
+When called, the returned function validates the form and only invokes your handler if validation succeeds. Since it accepts no arguments and returns a promise, you can also call it from anywhere to trigger submission programmatically.
+
+If you define your handler separately, you can use the <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link> type to ensure type safety. It automatically infers the types of the validated values from your schema. Since React Native has no submit event, the handler receives only the validated values — there is no event object.
+
+```tsx
+import type { SubmitHandler } from '@formisch/react-native';
+
+const submitHandler: SubmitHandler<typeof LoginSchema> = (values) => {
+  // Process the validated form values
+  console.log(values);
+};
+
+const submitForm = handleSubmit(loginForm, submitHandler);
+```
+
+### Submit on editing
+
+Besides a button, you can also trigger submission from the keyboard's submit key by passing the submit function to the `onSubmitEditing` prop of your last `TextInput`:
+
+```tsx
+<Field of={loginForm} path={['password']}>
+  {(field) => (
+    <TextInput
+      {...field.props}
+      value={field.input}
+      secureTextEntry
+      onSubmitEditing={submitForm}
+    />
+  )}
+</Field>
+```
+
+### Loading state
+
+While the form is being submitted, you can use `loginForm.isSubmitting` to display a loading animation and disable the submit button:
+
+```tsx
+<Button
+  title={loginForm.isSubmitting ? 'Submitting...' : 'Login'}
+  disabled={loginForm.isSubmitting}
+  onPress={submitForm}
+/>
+```
+
+The form store also provides other reactive properties like `isSubmitted`, `isValidating`, `isTouched`, `isDirty`, `isValid`, and `errors` for tracking form state. Note that `errors` only contains validation errors at the root level of the form — to get all errors from all fields, use the <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link> method.
+
+### Async submission
+
+The submit handler can be asynchronous, allowing you to perform API calls or other async operations:
+
+```tsx
+const submitForm = handleSubmit(loginForm, async (values) => {
+  try {
+    const response = await fetch('https://example.com/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+
+    if (response.ok) {
+      // Handle successful login
+      console.log('Login successful!');
+    } else {
+      // Handle error
+      console.error('Login failed');
+    }
+  } catch (error) {
+    console.error('Error during submission:', error);
+  }
+});
+```
+
+While the promise returned by your handler is pending, `loginForm.isSubmitting` stays `true`.
+
+## Next steps
+
+Congratulations! You've learned the core concepts of building forms with Formisch. To learn more about advanced features, check out the <Link href="/react-native/guides/form-methods/">form methods</Link> guide to discover how to programmatically control your forms.

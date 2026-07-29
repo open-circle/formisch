@@ -1,0 +1,472 @@
+---
+title: Migrate from Formik
+description: >-
+  Learn how to migrate your React Native forms from Formik to Formisch. This
+  guide maps Formik APIs to their Formisch equivalents and walks through the
+  migration step by step.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from Formik
+
+This guide walks you through migrating your React Native forms from [Formik](https://formik.org) to Formisch. It covers the mental-model shift, a complete side-by-side example, a step-by-step migration path, and a mapping of Formik APIs to their Formisch equivalents.
+
+Migrating is a rewrite of the form layer, not a drop-in replacement. The mental model shifts: instead of starting from an `initialValues` object and attaching validation to it, you start from a Valibot schema that provides values, types, and validation at once. The good news is that forms are naturally isolated units, so the rewrite happens one form at a time.
+
+Both libraries can coexist in the same application without conflicts. You can install Formisch next to Formik, migrate a single form, and remove Formik once the last one is converted. Since both libraries export `Field`, `FieldArray`, and `useField`, the import path determines which ones a component uses.
+
+## Key differences
+
+Formik is values-first. You declare an `initialValues` object, TypeScript infers your form's types from it, and validation is attached separately through a `validationSchema` written with [Yup](https://github.com/jquense/yup), a `validate` function, or `validate` props on individual fields. All form state lives in a single React state object and reaches your inputs through render props or context.
+
+Formisch is schema-first: a single Valibot schema is the source of types, validation rules, and form structure all at once. There is no separate `initialValues` object to keep aligned with your validation, and state is read directly from a signal-based form store.
+
+The most important differences at a glance:
+
+- **Type source**: Formik infers types from `initialValues`, and your Yup schema is typed separately. Formisch infers all types, including field paths and the validated output, from the schema.
+- **Validation location**: Formik spreads validation across `validationSchema`, the `validate` function, and field-level `validate` props. Formisch defines all validation in the schema, next to the structure it validates.
+- **Validation timing**: Formik has two boolean switches, `validateOnChange` and `validateOnBlur`, both `true` by default, so validation runs on every keystroke from the start. Formisch uses the `validate` and `revalidate` options with event-based modes and by default stays quiet until the first submit.
+- **Error display**: Formik computes `errors` eagerly and expects you to gate their display with the `touched` object. In Formisch, errors appear on a field only once validation has run, so no gating is needed in the default configuration.
+- **Reactivity**: Formik stores all form state in React state, so every keystroke re-renders the entire `<Formik>` subtree, which is why `<FastField>` exists. Formisch is built on fine-grained signals, so each field only re-renders when its own state changes.
+- **Field binding**: In React Native, Formik connects a `TextInput` manually by string name through `handleChange('email')`, `handleBlur('email')`, and `values.email`. Formisch connects fields through the headless <Link href="/react-native/api/Field/">`Field`</Link> component with a type-safe path array (`path={['user', 'email']}`) and a single spread of `field.props`.
+
+If your forms already use `validationSchema`, the structure of your Yup schemas translates almost one-to-one to Valibot.
+
+## Side-by-side example
+
+The following login form has two validated fields, displays error messages, disables the submit button while submitting, and processes the values on submission.
+
+### Formik
+
+```tsx
+import { Formik } from 'formik';
+import { Button, Text, TextInput, View } from 'react-native';
+import * as Yup from 'yup';
+
+const LoginSchema = Yup.object({
+  email: Yup.string()
+    .required('Please enter your email.')
+    .email('The email address is badly formatted.'),
+  password: Yup.string()
+    .required('Please enter your password.')
+    .min(8, 'Your password must have 8 characters or more.'),
+});
+
+export default function LoginScreen() {
+  return (
+    <Formik
+      initialValues={{ email: '', password: '' }}
+      validationSchema={LoginSchema}
+      onSubmit={async (values) => {
+        // Process the validated form values
+        console.log(values);
+      }}
+    >
+      {({
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        values,
+        errors,
+        touched,
+        isSubmitting,
+      }) => (
+        <View>
+          <TextInput
+            value={values.email}
+            onChangeText={handleChange('email')}
+            onBlur={handleBlur('email')}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+          {touched.email && errors.email && <Text>{errors.email}</Text>}
+          <TextInput
+            value={values.password}
+            onChangeText={handleChange('password')}
+            onBlur={handleBlur('password')}
+            secureTextEntry
+          />
+          {touched.password && errors.password && (
+            <Text>{errors.password}</Text>
+          )}
+          <Button
+            title="Login"
+            onPress={() => handleSubmit()}
+            disabled={isSubmitting}
+          />
+        </View>
+      )}
+    </Formik>
+  );
+}
+```
+
+### Formisch
+
+```tsx
+import {
+  Field,
+  handleSubmit,
+  type SubmitHandler,
+  useForm,
+} from '@formisch/react-native';
+import { Button, Text, TextInput, View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+export default function LoginScreen() {
+  const loginForm = useForm({ schema: LoginSchema });
+
+  const onSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+    // Process the validated form values
+    console.log(values);
+  };
+
+  const submitForm = handleSubmit(loginForm, onSubmit);
+
+  return (
+    <View>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <View>
+            <TextInput
+              {...field.props}
+              value={field.input}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            {field.errors && <Text>{field.errors[0]}</Text>}
+          </View>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <View>
+            <TextInput {...field.props} value={field.input} secureTextEntry />
+            {field.errors && <Text>{field.errors[0]}</Text>}
+          </View>
+        )}
+      </Field>
+      <Button
+        title="Login"
+        onPress={submitForm}
+        disabled={loginForm.isSubmitting}
+      />
+    </View>
+  );
+}
+```
+
+Notice how the Yup schema became a Valibot schema that now also provides the form's types, and how `initialValues` disappeared because required string fields start as an empty string automatically. The `onSubmit` handler moved from the `Formik` component to the <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method, which returns a ready-to-use press handler and passes the validated output of the schema to your callback. The render prop disappeared entirely: instead of wiring `handleChange`, `handleBlur`, and `values` to each `TextInput`, each field spreads `field.props` and renders its `field.errors` directly, without a `touched` gate. One timing difference: Formik validates on every keystroke from the start and hides the messages behind its `touched` gate, while Formisch by default validates on the first submit and then revalidates on every input. The <Link href="#validation-timing">validation timing</Link> section below shows how to align the two.
+
+## Migration steps
+
+### Install Formisch
+
+Add Formisch and Valibot alongside Formik. Both form libraries can run in parallel during the migration.
+
+```bash
+npm install @formisch/react-native valibot
+```
+
+See the <Link href="/react-native/guides/installation/">installation</Link> guide for other package managers.
+
+### Move validation into a Valibot schema
+
+Translate your Yup schema, `validate` function, or field-level `validate` props into a single Valibot schema. Most Yup rules have a direct counterpart: `.required()` becomes `v.nonEmpty()`, `.min()` becomes `v.minLength()`, `.email()` becomes `v.email()`, and `.matches()` becomes `v.regex()`.
+
+```ts
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+```
+
+Cross-field rules that you built with `Yup.ref`, such as a password confirmation, become schema-level checks with `v.forward` and `v.partialCheck`. Define the fields in the same order they appear in your form, since Formisch focuses the first invalid field on submit based on the schema order. The <Link href="/react-native/guides/define-your-form/">define your form</Link> guide covers schema design in detail.
+
+### Replace the form setup
+
+Whether your forms use the `useFormik` hook, the `<Formik>` component, or the `withFormik` higher-order component, they all become the same <Link href="/react-native/api/useForm/">`useForm`</Link> hook. There is no render-prop or HOC variant because you read state directly from the returned form store.
+
+```tsx
+// Before
+import { useFormik } from 'formik';
+
+const formik = useFormik({
+  initialValues: { email: '', password: '' },
+  validationSchema: LoginSchema,
+  onSubmit: async (values) => {
+    console.log(values);
+  },
+});
+```
+
+```tsx
+// After
+import { useForm } from '@formisch/react-native';
+
+const loginForm = useForm({ schema: LoginSchema });
+```
+
+`initialValues` is replaced by the optional `initialInput`: required string fields start as an empty string automatically, so you only pass it when you have real data, such as a profile loaded from the server. The `onSubmit` option moves to the `handleSubmit` method (see below), and the `validateOnChange` and `validateOnBlur` switches map to the `validate` and `revalidate` options. See the <Link href="/react-native/guides/create-your-form/">create your form</Link> guide for all configuration options.
+
+### Replace field bindings
+
+Replace the manual wiring of `handleChange('email')`, `handleBlur('email')`, and `values.email` with the Formisch <Link href="/react-native/api/Field/">`Field`</Link> component. It is headless: it never renders an input itself, and its render function spreads `field.props` onto your `TextInput` and binds `field.input` as its value, so one spread replaces all three handlers at once.
+
+```tsx
+// Before
+<>
+  <TextInput
+    value={values.email}
+    onChangeText={handleChange('email')}
+    onBlur={handleBlur('email')}
+  />
+  {touched.email && errors.email && <Text>{errors.email}</Text>}
+</>
+```
+
+```tsx
+// After
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <View>
+      <TextInput {...field.props} value={field.input} />
+      {field.errors && <Text>{field.errors[0]}</Text>}
+    </View>
+  )}
+</Field>
+```
+
+String names become type-safe path arrays: `handleChange('user.email')` turns into `path={['user', 'email']}` and ``handleChange(`todos.${index}.label`)`` turns into `path={['todos', index, 'label']}`. The `touched` gate disappears: `field.errors` is either `null` or a non-empty array of strings that is only populated once validation has run, so you render it right next to the input. Custom inputs built on Formik's `useField` map to the Formisch <Link href="/react-native/api/useField/">`useField`</Link> hook, which returns a single field store instead of a `[field, meta, helpers]` tuple: `meta.error` becomes `field.errors`, `meta.touched` becomes `field.isTouched`, and `helpers.setValue` becomes `field.onChange`. The <Link href="/react-native/guides/add-form-fields/">add form fields</Link> guide explains both in detail.
+
+### Update submission handling
+
+Replace the call to Formik's `handleSubmit` with the function returned by the Formisch <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method, and move the handler from the form config to its second argument. The handler only runs after validation succeeds and receives the validated values, typed as the schema's output.
+
+```tsx
+// Before
+<Button title="Login" onPress={() => formik.handleSubmit()} />
+```
+
+```tsx
+// After
+const submitForm = handleSubmit(loginForm, async (values) => {
+  console.log(values);
+});
+
+<Button title="Login" onPress={submitForm} />;
+```
+
+You can pass the returned function to any trigger, for example a `TextInput`'s `onSubmitEditing` to submit from the keyboard. `setSubmitting` disappears. Formik resets `isSubmitting` automatically only when your handler returns a promise and expects a manual `setSubmitting(false)` otherwise, while Formisch manages `loginForm.isSubmitting` in both cases. The same applies to the rest of Formik's submission bag: helpers like `resetForm` and `setFieldError` that Formik passes as the second argument are standalone methods in Formisch, such as <Link href="/methods/api/reset/">`reset`</Link> and <Link href="/methods/api/setErrors/">`setErrors`</Link>, which you call with the form store from anywhere. See the <Link href="/react-native/guides/handle-submission/">handle submission</Link> guide for details.
+
+## API mapping
+
+| Formik                                    | Formisch                                                                                                                                              |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useFormik` / `<Formik>` / `withFormik`   | <Link href="/react-native/api/useForm/">`useForm`</Link> with `schema` (types are inferred)                                                           |
+| `initialValues`                           | `initialInput` option (optional)                                                                                                                      |
+| `validationSchema` / `validate`           | `schema` option                                                                                                                                       |
+| `validate` prop of `Field`                | Validation rules in the schema                                                                                                                        |
+| `validateOnChange` / `validateOnBlur`     | `validate` / `revalidate` options (see notes)                                                                                                         |
+| `handleChange('email')` / `values.email`  | <Link href="/react-native/api/Field/">`Field`</Link> with `path={['email']}`, spread `field.props` and bind `value={field.input}`                     |
+| `touched.email && errors.email && <Text>` | `field.errors` rendered next to the input (see notes)                                                                                                 |
+| `useField('email')`                       | <Link href="/react-native/api/useField/">`useField`</Link> hook with `path: ['email']`                                                                |
+| `values`                                  | `field.input`, <Link href="/methods/api/getInput/">`getInput`</Link>                                                                                  |
+| `errors`                                  | `field.errors` per field, <Link href="/methods/api/getErrors/">`getErrors`</Link>, <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>    |
+| `touched`                                 | `field.isTouched` (see notes)                                                                                                                         |
+| `dirty`                                   | `form.isDirty` (see notes)                                                                                                                            |
+| `isValid`                                 | `form.isValid` (see notes)                                                                                                                            |
+| `isSubmitting`                            | `form.isSubmitting`                                                                                                                                   |
+| `isValidating`                            | `form.isValidating`                                                                                                                                   |
+| `submitCount`                             | No direct equivalent (see notes)                                                                                                                      |
+| `handleSubmit` / `submitForm`             | <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method, its returned function passed to `onPress`                                       |
+| `handleReset` / `resetForm`               | <Link href="/methods/api/reset/">`reset`</Link>                                                                                                       |
+| `enableReinitialize`                      | <Link href="/methods/api/reset/">`reset`</Link> with `initialInput` (see notes)                                                                       |
+| `setFieldValue` / `setValues`             | <Link href="/methods/api/setInput/">`setInput`</Link>                                                                                                 |
+| `setFieldError` / `setErrors`             | <Link href="/methods/api/setErrors/">`setErrors`</Link>                                                                                               |
+| `setFieldTouched` / `setTouched`          | No direct equivalent (see notes)                                                                                                                      |
+| `validateField` / `validateForm`          | <Link href="/methods/api/validate/">`validate`</Link> (see notes)                                                                                     |
+| `<FieldArray name="todos">`               | <Link href="/react-native/api/FieldArray/">`FieldArray`</Link> component or <Link href="/react-native/api/useFieldArray/">`useFieldArray`</Link> hook |
+| `push` / `unshift` / `insert`             | <Link href="/methods/api/insert/">`insert`</Link>                                                                                                     |
+| `remove` / `pop`                          | <Link href="/methods/api/remove/">`remove`</Link>                                                                                                     |
+| `swap` / `move` / `replace`               | <Link href="/methods/api/swap/">`swap`</Link>, <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/replace/">`replace`</Link>     |
+| `<FastField>`                             | Not needed (see notes)                                                                                                                                |
+| `useFormikContext` / `connect`            | Not needed (see notes)                                                                                                                                |
+| `status` / `setStatus`                    | No equivalent (see notes)                                                                                                                             |
+
+A few entries deserve extra context:
+
+- **The `touched` gate**: Formik validates eagerly and computes `errors` for every field, so their display must be gated behind `touched`. Formisch populates `field.errors` only once validation has actually run for a field. With the default `validate: 'submit'` timing there is nothing to gate, and if you validate earlier, guard the display with field state like `isEdited`, as shown in the <Link href="/react-native/guides/validation/">validation</Link> guide.
+- **`touched`**: Formisch marks a field as touched when it receives focus, while Formik marks it on blur. Logic that shows errors based on touched state therefore reacts one event earlier.
+- **`dirty`**: Formik's `dirty` is comparison-based: it is `true` while `values` differs from `initialValues` and flips back off when the user reverts their changes. That matches `form.isDirty` exactly. Formisch's `form.isEdited` is the sticky variant that stays `true` once anything was edited, even after the value is changed back.
+- **`isValid`**: In Formisch, `form.isValid` reflects the result of the last validation run. With the default `validate: 'submit'` timing it stays `true` until the first submit, unlike Formik's `isValid`, which is recomputed on every change. If you rely on it before the first submit, for example to disable the submit button, set `validate: 'initial'`.
+- **`submitCount`**: Formisch tracks whether the form has been submitted as the boolean `form.isSubmitted` instead of a counter. If you used `submitCount > 0` to reveal errors after the first submit attempt, `form.isSubmitted` covers that. An actual attempt count requires your own state.
+- **`validateField`**: The <Link href="/methods/api/validate/">`validate`</Link> method always validates the entire form against the schema. The results are still distributed per field, so field-level triggering is not necessary.
+- **`setFieldTouched` / `setTouched`**: There is no imperative touched setter. Fields become touched automatically when they receive focus, and the custom blur handlers these helpers are typically used in are replaced by spreading `field.props`.
+- **`<FastField>`**: `FastField` exists to cut down Formik's subtree re-renders. Formisch's signal-based store already re-renders each field only when its own state changes, so an opt-out component is not needed.
+- **`useFormikContext` / `connect`**: The Formisch form store is a plain object. Pass it down as a prop, as our <Link href="/react-native/guides/input-components/">input components</Link> do, or share it through your own React context if you prefer.
+- **`status` / `setStatus`**: Form-adjacent state like a submission error message is regular component state in Formisch. For errors that should live on the form itself, <Link href="/methods/api/setErrors/">`setErrors`</Link> sets root-level errors that appear in `form.errors`.
+
+## Common patterns
+
+### Form state
+
+Formik hands you form state through the object returned by `useFormik` or through render props, and updating any part of it re-renders everything below the form. In Formisch, you read state directly from the form store. Reads are tracked through signals, so components re-render automatically and only when the state they read changes.
+
+```tsx
+// Before
+const formik = useFormik({ initialValues, onSubmit });
+<Button
+  title="Save"
+  onPress={() => formik.handleSubmit()}
+  disabled={!formik.dirty || formik.isSubmitting}
+/>;
+
+// After
+const profileForm = useForm({ schema: ProfileSchema });
+const submitForm = handleSubmit(profileForm, onSubmit);
+<Button
+  title="Save"
+  onPress={submitForm}
+  disabled={!profileForm.isDirty || profileForm.isSubmitting}
+/>;
+```
+
+The form store exposes `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors`. To read field values in component logic, use the <Link href="/methods/api/getInput/">`getInput`</Link> method, which also stays reactive inside components.
+
+### Validation timing
+
+Formik's timing options are boolean switches: `validateOnChange` and `validateOnBlur` turn whole trigger types on or off, and `validateOnMount` validates once on mount. Formisch instead distinguishes between the first validation of a field and every following one:
+
+```tsx
+// Closest match to Formik's default behavior
+const loginForm = useForm({
+  schema: LoginSchema,
+  validate: 'input',
+});
+```
+
+The `validate` option controls when a field is first validated (`'initial'`, `'touch'`, `'input'`, `'change'`, `'blur'`, or `'submit'`), and `revalidate` controls when it is checked again once it has an error or the form was submitted. With `validate: 'input'`, each field is validated from the first keystroke, like Formik's default. In practice, the behavior your users saw is closer to `validate: 'blur'` with `revalidate: 'input'`, because Formik's `touched` gate delays the first visible error until the field is left. If you disabled both switches to validate only on submit, use `validate: 'submit'` with `revalidate: 'submit'` for the same behavior. The Formisch defaults (`validate: 'submit'`, `revalidate: 'input'`) also stay quiet until the first submit, but afterwards they re-check fields on every keystroke instead of leaving stale errors until the next submit. Finally, `validateOnMount` maps to `validate: 'initial'`. The <Link href="/react-native/guides/validation/">validation</Link> guide covers all modes and how to show errors at the right time.
+
+### Field arrays
+
+Formik's `FieldArray` provides its mutation helpers through a render prop, you map over the corresponding value from `values`, and the docs key items by index:
+
+```tsx
+// Before, inside the <Formik> render prop
+<FieldArray name="todos">
+  {({ push, remove }) => (
+    <View>
+      {values.todos.map((_, index) => (
+        <View key={index}>
+          <TextInput
+            value={values.todos[index].label}
+            onChangeText={handleChange(`todos.${index}.label`)}
+          />
+          <Button title="Delete" onPress={() => remove(index)} />
+        </View>
+      ))}
+      <Button title="Add" onPress={() => push({ label: '' })} />
+    </View>
+  )}
+</FieldArray>
+```
+
+In Formisch you use the <Link href="/react-native/api/FieldArray/">`FieldArray`</Link> component and standalone methods. The `items` array contains stable unique IDs to use as keys, so React correctly tracks items when they are added, moved, or removed:
+
+```tsx
+// After
+import { Field, FieldArray, insert, remove } from '@formisch/react-native';
+
+<FieldArray of={todoForm} path={['todos']}>
+  {(fieldArray) => (
+    <View>
+      {fieldArray.items.map((item, index) => (
+        <View key={item}>
+          <Field of={todoForm} path={['todos', index, 'label']}>
+            {(field) => <TextInput {...field.props} value={field.input} />}
+          </Field>
+          <Button
+            title="Delete"
+            onPress={() => remove(todoForm, { path: ['todos'], at: index })}
+          />
+        </View>
+      ))}
+      <Button
+        title="Add"
+        onPress={() =>
+          insert(todoForm, { path: ['todos'], initialInput: { label: '' } })
+        }
+      />
+    </View>
+  )}
+</FieldArray>;
+```
+
+The helpers map as follows: `push` becomes <Link href="/methods/api/insert/">`insert`</Link>, which appends by default, `unshift` becomes `insert` with `at: 0`, and `insert(index, value)` becomes `insert` with the `at` option. `remove(index)` and `pop` become <Link href="/methods/api/remove/">`remove`</Link> with the `at` option, while `swap`, `move`, and `replace` map one-to-one. Unlike Formik's helpers, the Formisch methods are not bound to a render prop: they work anywhere you have access to the form store. Rules like a minimum or maximum number of items move into the schema, for example `v.pipe(v.array(…), v.maxLength(10))`. See the <Link href="/react-native/guides/field-arrays/">field arrays</Link> guide for the full picture.
+
+### Reset
+
+Formik's `resetForm()` restores `initialValues`, and `resetForm({ values })` replaces them. The Formisch <Link href="/methods/api/reset/">`reset`</Link> method covers both through its config object and additionally resets individual fields through the `path` option.
+
+```tsx
+import { reset } from '@formisch/react-native';
+
+// Reset the entire form to its initial input
+reset(profileForm);
+
+// Reset with new initial input, e.g. after refetching server data
+reset(profileForm, { initialInput: { name: 'Jane' } });
+
+// Reset a single field
+reset(profileForm, { path: ['email'] });
+```
+
+`reset` with `initialInput` also replaces `enableReinitialize`: instead of a flag that watches `initialValues` with deep equality, you call `reset` with the fresh data when it arrives, for example in an effect after a refetch. As in Formik, resetting updates the baseline for dirty tracking. Text inputs in Formisch are always controlled through `value={field.input}`, so programmatic resets are reflected immediately; the same applies to non-text components that bind `field.input`, as described in the <Link href="/react-native/guides/controlled-fields/">controlled fields</Link> guide.
+
+### Non-text components
+
+Formik wires non-text components like `Switch` manually, typically with `setFieldValue` inside the component's change handler. In Formisch, text inputs are covered by spreading `field.props`, while non-text components bind `field.input` and set their value with `field.onChange`:
+
+```tsx
+<Field of={form} path={['cookies']}>
+  {(field) => (
+    <View>
+      <Text>Yes, I want cookies</Text>
+      <Switch value={field.input} onValueChange={field.onChange} />
+    </View>
+  )}
+</Field>
+```
+
+Because native components emit typed values, a `Switch` passes booleans and a slider passes real numbers straight to `field.onChange`, so no string parsing is needed. The <Link href="/react-native/guides/special-inputs/">special inputs</Link> guide covers switches, sliders, radio groups, selects, and file pickers in detail.
+
+## Next steps
+
+You now have everything you need to migrate your forms one at a time. Start with the <Link href="/react-native/guides/define-your-form/">define your form</Link> and <Link href="/react-native/guides/create-your-form/">create your form</Link> guides to deepen the schema-first workflow, build reusable <Link href="/react-native/guides/input-components/">input components</Link> to replace your Formik field components, and explore the <Link href="/react-native/guides/form-methods/">form methods</Link> guide for everything that replaces Formik's imperative helpers.

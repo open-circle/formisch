@@ -1,0 +1,232 @@
+---
+title: Input components
+description: >-
+  Learn how to create reusable input components to make your form code more
+  readable and maintainable. Encapsulate styling and error display logic.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Input components
+
+To make your code more readable, we recommend that you develop your own input components if you are not using a prebuilt UI library. There you can encapsulate logic to display error messages, for example.
+
+> If you're already a bit more experienced, you can use the input components we developed for our <Link href="/playground/login/">playground</Link> as a starting point. You can find the code in our GitHub repository <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/tree/main/playgrounds/react-native/components`} target="\_blank" rel="noreferrer">here</a>.
+
+## Why input components?
+
+Currently, your fields might look something like this:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <View>
+      <Text>Email</Text>
+      <TextInput
+        {...field.props}
+        value={field.input}
+        autoCapitalize="none"
+        keyboardType="email-address"
+      />
+      {field.errors && <Text>{field.errors[0]}</Text>}
+    </View>
+  )}
+</Field>
+```
+
+If styling and a few more functionalities are added here, the code quickly becomes confusing. In addition, you have to rewrite the same code for almost every form field.
+
+Our goal is to develop a `TextInput` component so that the code ends up looking like this:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <TextInput
+      {...field.props}
+      type="email"
+      label="Email"
+      input={field.input}
+      errors={field.errors}
+      required
+    />
+  )}
+</Field>
+```
+
+## Create an input component
+
+In the first step, you create a new file for the `TextInput` component and, if you use TypeScript, define its properties. By extending `FieldElementProps`, your component accepts the props of the field store, which include the event handlers and the ref callback.
+
+```tsx
+import type { FieldElementProps } from '@formisch/react-native';
+
+interface TextInputProps extends FieldElementProps {
+  type: 'text' | 'email' | 'tel' | 'password' | 'url';
+  label?: string;
+  placeholder?: string;
+  input: string | undefined;
+  errors: [string, ...string[]] | null;
+  required?: boolean;
+}
+```
+
+### Component function
+
+In the next step, add the component function to the file. We can destructure props directly and spread the remaining props. Since the component wraps React Native's own `TextInput`, we import it under the alias `RNTextInput`.
+
+```tsx
+import type { FieldElementProps } from '@formisch/react-native';
+import { TextInput as RNTextInput, Text, View } from 'react-native';
+
+interface TextInputProps extends FieldElementProps {
+  /* ... */
+}
+
+export function TextInput({
+  label,
+  input,
+  errors,
+  type,
+  required,
+  ...props
+}: TextInputProps) {
+  // Component implementation
+}
+```
+
+### JSX code
+
+After that, you can add the JSX code to the return statement. Since React Native has no input types, we map the `type` prop to the matching `keyboardType` and use `secureTextEntry` for passwords.
+
+```tsx
+import type { FieldElementProps } from '@formisch/react-native';
+import {
+  type KeyboardTypeOptions,
+  TextInput as RNTextInput,
+  Text,
+  View,
+} from 'react-native';
+
+interface TextInputProps extends FieldElementProps {
+  /* ... */
+}
+
+const KEYBOARD_TYPES: Record<TextInputProps['type'], KeyboardTypeOptions> = {
+  text: 'default',
+  email: 'email-address',
+  tel: 'phone-pad',
+  password: 'default',
+  url: 'url',
+};
+
+export function TextInput({
+  label,
+  input,
+  errors,
+  type,
+  required,
+  ...props
+}: TextInputProps) {
+  return (
+    <View>
+      {label && (
+        <Text>
+          {label} {required && <Text>*</Text>}
+        </Text>
+      )}
+      <RNTextInput
+        {...props}
+        value={input ?? ''}
+        keyboardType={KEYBOARD_TYPES[type]}
+        autoCapitalize={type === 'email' ? 'none' : undefined}
+        secureTextEntry={type === 'password'}
+        aria-invalid={!!errors}
+      />
+      {errors && <Text>{errors[0]}</Text>}
+    </View>
+  );
+}
+```
+
+### Next steps
+
+You can now build on this code and add styling, for example. You can also follow the procedure to create other components such as a `Switch` or a picker component.
+
+### Final code
+
+Below is an overview of the entire code of the `TextInput` component.
+
+```tsx
+import type { FieldElementProps } from '@formisch/react-native';
+import {
+  type KeyboardTypeOptions,
+  TextInput as RNTextInput,
+  Text,
+  View,
+} from 'react-native';
+
+interface TextInputProps extends FieldElementProps {
+  type: 'text' | 'email' | 'tel' | 'password' | 'url';
+  label?: string;
+  placeholder?: string;
+  input: string | undefined;
+  errors: [string, ...string[]] | null;
+  required?: boolean;
+}
+
+const KEYBOARD_TYPES: Record<TextInputProps['type'], KeyboardTypeOptions> = {
+  text: 'default',
+  email: 'email-address',
+  tel: 'phone-pad',
+  password: 'default',
+  url: 'url',
+};
+
+export function TextInput({
+  label,
+  input,
+  errors,
+  type,
+  required,
+  ...props
+}: TextInputProps) {
+  return (
+    <View>
+      {label && (
+        <Text>
+          {label} {required && <Text>*</Text>}
+        </Text>
+      )}
+      <RNTextInput
+        {...props}
+        value={input ?? ''}
+        keyboardType={KEYBOARD_TYPES[type]}
+        autoCapitalize={type === 'email' ? 'none' : undefined}
+        secureTextEntry={type === 'password'}
+        aria-invalid={!!errors}
+      />
+      {errors && <Text>{errors[0]}</Text>}
+    </View>
+  );
+}
+```
+
+## Non-text components
+
+The props of the field store are designed for text inputs. React Native's own non-text components — such as `Switch`, sliders or picker components — do not accept an `onChangeText` handler, so you cannot spread `field.props` onto them. Use `field.onChange` to update the value instead:
+
+```tsx
+import { Switch } from 'react-native';
+
+<Field of={form} path={['newsletter']}>
+  {(field) => <Switch value={field.input} onValueChange={field.onChange} />}
+</Field>;
+```
+
+The `field.onChange` method updates the field value and triggers validation. Your own components can still extend `FieldElementProps` as shown above: forward the `ref` to the pressable part of the component and call the `onFocus` and `onBlur` handlers when the interaction starts and ends, so that <Link href="/methods/api/focus/">`focus`</Link>, `isTouched` and blur validation keep working. For more details, see the <Link href="/react-native/guides/controlled-fields/">controlled fields</Link> guide.
+
+## Next steps
+
+Now that you know how to create reusable input components, continue to the <Link href="/react-native/guides/handle-submission/">handle submission</Link> guide to learn how to process form data when the user submits the form.

@@ -1,0 +1,204 @@
+---
+title: Special inputs
+description: >-
+  Learn how to connect special React Native inputs like switches, sliders,
+  selects and file pickers to Formisch. This guide covers booleans, numbers,
+  arrays of strings, and file assets.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Special inputs
+
+React Native has no built-in form elements beyond text entry — there are no native checkboxes, dropdown selects or file inputs. Text is entered through `TextInput`, which connects to a field by spreading `field.props`. Every other kind of input — switches, sliders, selection lists, pickers — is wired up manually: read the current value from `field.input` and write it back with `field.onChange`. This guide covers the most common cases.
+
+> In our <Link href="/playground/special/">playground</Link> you can take a look at such fields and test them out.
+
+Because `field.onChange` accepts whatever type your schema defines for the field, this pattern is not limited to strings. A switch stores a boolean, a slider stores a number, and a multi-select stores an array — no string conversion involved.
+
+## Switch
+
+A boolean field is represented by React Native's `Switch` component. Pass the field's input as `value` and forward `onValueChange` to `field.onChange`:
+
+```tsx
+<Field of={form} path={['cookies']}>
+  {(field) => (
+    <View>
+      <Text>Yes, I want cookies</Text>
+      <Switch value={field.input} onValueChange={field.onChange} />
+    </View>
+  )}
+</Field>
+```
+
+The corresponding schema entry is a plain boolean, for example `v.optional(v.boolean(), false)`.
+
+## Slider
+
+Sliders such as the community package `@react-native-community/slider` emit real numbers. Unlike a DOM range input, which reports its value as a string, no conversion is needed — define the field as `v.number()` and pass the emitted value straight to `field.onChange`:
+
+```tsx
+import Slider from '@react-native-community/slider';
+
+<Field of={form} path={['volume']}>
+  {(field) => (
+    <Slider
+      value={field.input}
+      minimumValue={0}
+      maximumValue={100}
+      step={1}
+      onValueChange={field.onChange}
+    />
+  )}
+</Field>;
+```
+
+## Checkbox group
+
+A group of checkboxes represents an array of strings. Since React Native has no native checkbox, you build one yourself — typically a `Pressable` that toggles its state — or use one from a component library. The wiring is always the same: a checkbox is checked when its value is included in `field.input`, and toggling it calls `field.onChange` with a new array that adds or removes the value.
+
+```tsx
+<View>
+  {[
+    { label: 'Bananas', value: 'bananas' },
+    { label: 'Apples', value: 'apples' },
+    { label: 'Grapes', value: 'grapes' },
+  ].map(({ label, value }) => (
+    <Field key={value} of={form} path={['fruits']}>
+      {(field) => (
+        <Checkbox
+          label={label}
+          checked={field.input.includes(value)}
+          onValueChange={(checked) =>
+            field.onChange(
+              checked
+                ? [...field.input, value]
+                : field.input.filter((item) => item !== value)
+            )
+          }
+        />
+      )}
+    </Field>
+  ))}
+</View>
+```
+
+For a single boolean checkbox, skip the array logic and pass `field.onChange` directly, exactly like the `Switch` example above.
+
+## Radio group
+
+A group of radio buttons stores a single string. Each option is selected when it equals `field.input`, and pressing an option simply calls `field.onChange` with its value:
+
+```tsx
+<Field of={form} path={['color']}>
+  {(field) => (
+    <View>
+      {[
+        { label: 'Red', value: 'red' },
+        { label: 'Green', value: 'green' },
+        { label: 'Blue', value: 'blue' },
+      ].map(({ label, value }) => (
+        <Radio
+          key={value}
+          label={label}
+          selected={field.input === value}
+          onPress={() => field.onChange(value)}
+        />
+      ))}
+    </View>
+  )}
+</Field>
+```
+
+## Select
+
+Selection lists — whether you build them with a modal, a bottom sheet, or a picker component — follow the same two patterns. A single select stores a string:
+
+```tsx
+<Field of={form} path={['framework']}>
+  {(field) => (
+    <Select
+      value={field.input}
+      options={[
+        { label: 'React Native', value: 'react-native' },
+        { label: 'React', value: 'react' },
+        { label: 'Solid', value: 'solid' },
+      ]}
+      onValueChange={field.onChange}
+    />
+  )}
+</Field>
+```
+
+A multi-select stores an array of strings. Toggle the pressed value in or out of the array, just like the checkbox group:
+
+```tsx
+<Field of={form} path={['frameworks']}>
+  {(field) => (
+    <Select
+      value={field.input}
+      options={[
+        { label: 'React Native', value: 'react-native' },
+        { label: 'React', value: 'react' },
+        { label: 'Solid', value: 'solid' },
+      ]}
+      multiple
+      onValueChange={(value) =>
+        field.onChange(
+          field.input.includes(value)
+            ? field.input.filter((item) => item !== value)
+            : [...field.input, value]
+        )
+      }
+    />
+  )}
+</Field>
+```
+
+## File
+
+React Native has no `File` class and no file input element. Instead, document and image pickers such as `expo-document-picker` or `expo-image-picker` return plain asset objects that describe the selected file by its URI. You store these objects directly in the form and describe their shape in your schema:
+
+```tsx
+import * as v from 'valibot';
+
+const FileAssetSchema = v.object({
+  uri: v.string(),
+  name: v.string(),
+  mimeType: v.optional(v.string()),
+  size: v.optional(v.number()),
+});
+
+const FormSchema = v.object({
+  avatar: v.optional(FileAssetSchema),
+  documents: v.array(FileAssetSchema),
+});
+```
+
+To connect a picker, open it from a press handler and pass the resulting asset to `field.onChange`:
+
+```tsx
+import * as DocumentPicker from 'expo-document-picker';
+
+<Field of={form} path={['avatar']}>
+  {(field) => (
+    <Pressable
+      onPress={async () => {
+        const result = await DocumentPicker.getDocumentAsync();
+        if (!result.canceled) {
+          const { uri, name, mimeType, size } = result.assets[0];
+          field.onChange({ uri, name, mimeType, size });
+        }
+      }}
+    >
+      <Text>{field.input?.name ?? 'Select file'}</Text>
+    </Pressable>
+  )}
+</Field>;
+```
+
+For multiple files, open the picker with `multiple: true` and pass the mapped array of assets to `field.onChange`. The field then holds `FileAsset[]`, and your submit handler can upload the selected files by their URIs.
+
+> Components like these never focus or blur on their own. When you extract them into reusable input components as described in the <Link href="/react-native/guides/input-components/">input components</Link> guide, accept `field.props` and call its `onFocus` handler on the first interaction so that `isTouched` and the `'touch'` validation mode keep working. If you also validate on `'blur'`, call its `onBlur` handler when the interaction ends.

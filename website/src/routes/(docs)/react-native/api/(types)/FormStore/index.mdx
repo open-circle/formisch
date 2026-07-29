@@ -1,0 +1,34 @@
+---
+title: FormStore
+description: Reactive form store interface that provides access to form state, field state, and validation information.
+source: /frameworks/react-native/src/types/form.ts
+contributors:
+  - fabian-hiller
+---
+
+import { Link, Property } from '~/components';
+import { properties } from './properties';
+
+# FormStore
+
+Form store interface that provides reactive access to the state of a form created with <Link href="../useForm/">`useForm`</Link>.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+
+## Definition
+
+- `FormStore`
+  - `isSubmitting` <Property {...properties.isSubmitting} />
+  - `isSubmitted` <Property {...properties.isSubmitted} />
+  - `isValidating` <Property {...properties.isValidating} />
+  - `isTouched` <Property {...properties.isTouched} />
+  - `isEdited` <Property {...properties.isEdited} />
+  - `isDirty` <Property {...properties.isDirty} />
+  - `isValid` <Property {...properties.isValid} />
+  - `errors` <Property {...properties.errors} />
+
+### Explanation
+
+The `errors` property only contains validation errors at the root level of the form. These are errors from the root object schema validation itself, not errors from nested fields. To retrieve all validation errors from all fields across the entire form, use the <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link> method instead.

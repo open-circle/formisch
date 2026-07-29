@@ -1,0 +1,98 @@
+---
+title: Controlled fields
+description: >-
+  Learn how controlled form fields work in React Native. Every field is
+  driven by the form store, with field.input as the single source of truth
+  and field.onChange for setting values programmatically.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Controlled fields
+
+In React Native, all form fields are controlled. There is no browser that keeps its own input state on a DOM element — a `TextInput` displays exactly what you pass as `value` and reports changes through `onChangeText`. Formisch embraces this: the form store holds every field value, and `field.input` is the single source of truth.
+
+## Why controlled?
+
+Because the value lives in the form store, everything Formisch does is immediately reflected in the UI: initial values appear on the first render, <Link href="/methods/api/setInput/">`setInput`</Link> and <Link href="/methods/api/reset/">`reset`</Link> update the visible text, and array operations like <Link href="/methods/api/insert/">`insert`</Link> or <Link href="/methods/api/move/">`move`</Link> rearrange the displayed values automatically. There is no extra wiring to opt in to — you get it by always passing `value`.
+
+### Text input example
+
+For a text field, spread `field.props` and pass the field's input as `value`:
+
+```tsx
+<Field of={loginForm} path={['firstName']}>
+  {(field) => <TextInput {...field.props} value={field.input} />}
+</Field>
+```
+
+Spreading `field.props` registers the `TextInput` instance via `ref` (which is what makes <Link href="/methods/api/focus/">`focus`</Link> work) and connects the `onFocus`, `onBlur` and `onChangeText` handlers that keep the store in sync and trigger validation. Passing `value={field.input}` closes the loop: the input always displays the store's current value.
+
+### Setting values programmatically
+
+To change a field's value from outside the input — for example from a button press or after a network request — use <Link href="/methods/api/setInput/">`setInput`</Link>, or call `field.onChange` when you are inside the field's render function. Both update the store and trigger validation, and the controlled `TextInput` re-renders with the new value automatically.
+
+### No exception for files
+
+Unlike the web, where a file input cannot be controlled, file fields in React Native are controlled like any other field. Document and image pickers return plain asset objects that you store with `field.onChange`. See the <Link href="/react-native/guides/special-inputs/">special inputs</Link> guide for a full example.
+
+## Numbers and dates
+
+A `TextInput` only reads and writes strings. If a field should end up as a number or a `Date`, you have two options.
+
+### Transform in the schema
+
+Keep the field a string in the form and let your schema transform it during validation. The user types into a regular `TextInput`, `field.input` stays a string, and the validated output has the transformed type:
+
+```tsx
+import * as v from 'valibot';
+
+const ProfileSchema = v.object({
+  age: v.pipe(v.string(), v.decimal(), v.transform(Number)),
+});
+
+<Field of={profileForm} path={['age']}>
+  {(field) => (
+    <TextInput {...field.props} value={field.input} keyboardType="numeric" />
+  )}
+</Field>;
+```
+
+### Use a component that emits the right type
+
+Components that are not text-based emit real values, so no conversion is needed. A slider emits numbers and a date picker emits `Date` objects — define the schema with `v.number()` or `v.date()` and store the emitted value with `field.onChange`:
+
+```tsx
+import DateTimePicker from '@react-native-community/datetimepicker';
+
+<Field of={profileForm} path={['birthday']}>
+  {(field) => (
+    <DateTimePicker
+      value={field.input ?? new Date()}
+      onChange={(event, date) => field.onChange(date)}
+    />
+  )}
+</Field>;
+```
+
+## Custom inputs and component libraries
+
+The `onChangeText` handler in `field.props` is designed for text inputs. For components that report changes differently — sliders, switches, pickers, rich text editors, or components from a UI library — use `field.onChange` to set the value:
+
+```tsx
+import { ColorPicker } from 'some-component-library';
+
+<Field of={form} path={['color']}>
+  {(field) => (
+    <ColorPicker value={field.input} onColorChange={field.onChange} />
+  )}
+</Field>;
+```
+
+The `field.onChange` method updates the field value and triggers validation, just like typing into a connected `TextInput` would.
+
+## Next steps
+
+Now that you understand controlled fields, you can explore more advanced topics like <Link href="/react-native/guides/nested-fields/">nested fields</Link> and <Link href="/react-native/guides/field-arrays/">field arrays</Link> to handle complex form structures.
