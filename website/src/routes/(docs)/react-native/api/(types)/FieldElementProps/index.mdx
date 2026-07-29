@@ -6,7 +6,7 @@ contributors:
   - fabian-hiller
 ---
 
-import { Property } from '~/components';
+import { Link, Property } from '~/components';
 import { properties } from './properties';
 
 # FieldElementProps
@@ -25,4 +25,4 @@ Props to spread onto a field element for integration with React Native form hand
 
 The props are spread onto a `TextInput` or another focusable native component to connect it to the form. Since React Native has no native form elements, inputs are controlled. Therefore, always pass `value={field.input}` alongside the spread props. The `onChangeText` handler updates the field input whenever the text changes.
 
-The `ref` callback registers the native component instance. `FieldElement` is a structural subset of the imperative methods of React Native host component instances, so refs of `TextInput` and other focusable native components are accepted. On React 19 the callback returns a cleanup function that unregisters the exact element, while React 18 calls the callback with `null` instead.
+The `ref` callback registers the native component instance. <Link href="../FieldElement/">`FieldElement`</Link> is a structural subset of the imperative methods of React Native host component instances, so refs of `TextInput` and other focusable native components are accepted. On React 19 the callback returns a cleanup function that unregisters the exact element, while React 18 calls the callback with `null` instead.

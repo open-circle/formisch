@@ -42,7 +42,7 @@
 - [DeepPartial](/core/api/DeepPartial/)
 - [EmptyInput](/core/api/EmptyInput/)
 - [FieldArrayStore](/react-native/api/FieldArrayStore/)
-- [FieldElement](/core/api/FieldElement/)
+- [FieldElement](/react-native/api/FieldElement/)
 - [FieldElementProps](/react-native/api/FieldElementProps/)
 - [FieldStore](/react-native/api/FieldStore/)
 - [FocusFieldConfig](/methods/api/FocusFieldConfig/)

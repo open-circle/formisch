@@ -18,7 +18,7 @@ export const properties: Record<string, PropertyProps> = {
                     {
                       type: 'custom',
                       name: 'FieldElement',
-                      href: '/core/api/FieldElement/',
+                      href: '../FieldElement/',
                     },
                     'null',
                   ],
@@ -82,7 +82,7 @@ export const properties: Record<string, PropertyProps> = {
               {
                 type: 'custom',
                 name: 'FieldElement',
-                href: '/core/api/FieldElement/',
+                href: '../FieldElement/',
               },
               'null',
             ],
