@@ -87,6 +87,8 @@ Unlike `(ngSubmit)="save()"`, `[formischSubmit]` takes your handler instead of c
 
 What makes Formisch unique is its framework-agnostic core, which is fully native to the framework you are using. It works by inserting framework-specific reactivity blocks when the core package is built, giving you native performance for any UI update. A modular methods API keeps bundles small by only including the methods you import, and end-to-end type safety covers deeply nested paths and field arrays with TypeScript inference that stays fast even as forms grow.
 
+For a side-by-side look at how Formisch compares to Reactive Forms, Signal Forms and TanStack Form, see the [comparison guide](https://formisch.dev/angular/guides/comparison/).
+
 ## Vision
 
 My vision for Formisch is to create a framework-agnostic platform similar to [Vite](https://vite.dev/), but for forms — a shared core that lets the same mental model and codebase work natively across every modern UI framework.
