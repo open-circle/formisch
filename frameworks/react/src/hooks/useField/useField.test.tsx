@@ -1,3 +1,4 @@
+import { getFieldStore, INTERNAL } from '@formisch/core/react';
 import { reset } from '@formisch/methods/react';
 import {
   act,
@@ -7,7 +8,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { type ReactElement, useState } from 'react';
+import { type ReactElement, useEffect, useState } from 'react';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
 import { Form } from '../../components/Form/index.ts';
@@ -445,6 +446,35 @@ describe('useField', () => {
       unmount();
 
       expect(screen.queryByTestId('input')).toBeNull();
+    });
+
+    test('should drop a detached element from the reset baseline after the elements moved', () => {
+      const schema = v.object({ name: v.string() });
+
+      let capturedForm: FormStore<typeof schema> | undefined;
+
+      function Test(): ReactElement {
+        const form = useForm({ schema, initialInput: { name: '' } });
+        useEffect(() => {
+          capturedForm = form;
+        }, [form]);
+        const field = useField(form, { path: ['name'] });
+        return <input data-testid="input" {...field.props} />;
+      }
+
+      const { unmount } = render(<Test />);
+      const element = screen.getByTestId('input');
+      const internalFieldStore = getFieldStore(capturedForm![INTERNAL], [
+        'name',
+      ]);
+      expect(internalFieldStore.initialElements).toContain(element);
+
+      // Simulate an array operation moving the elements to another store
+      internalFieldStore.elements = [];
+
+      // The detached element must not survive in the reset baseline
+      unmount();
+      expect(internalFieldStore.initialElements).not.toContain(element);
     });
   });
 });

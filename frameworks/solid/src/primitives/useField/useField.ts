@@ -113,12 +113,17 @@ export function useField(
           const elements = internalFieldStore.elements.filter(
             (el) => el !== element
           );
-          // Keep `initialElements` in sync unless a reorder has moved the
-          // elements, so resetting a remounted field restores its live element
+          // Keep `initialElements` in sync while the store still owns it
+          // (same reference) and filter it separately otherwise, so the
+          // detached element of a removed array item does not survive in the
+          // reset baseline
           if (
             internalFieldStore.elements === internalFieldStore.initialElements
           ) {
             internalFieldStore.initialElements = elements;
+          } else {
+            internalFieldStore.initialElements =
+              internalFieldStore.initialElements.filter((el) => el !== element);
           }
           internalFieldStore.elements = elements;
         });
