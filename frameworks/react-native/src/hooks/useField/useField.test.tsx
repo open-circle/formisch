@@ -1,5 +1,10 @@
 import { getFieldStore, INTERNAL } from '@formisch/core/react-native';
-import { handleSubmit, remove, reset } from '@formisch/methods/react-native';
+import {
+  handleSubmit,
+  remove,
+  reset,
+  swap,
+} from '@formisch/methods/react-native';
 import {
   act,
   fireEvent,
@@ -547,7 +552,7 @@ describe('useField', () => {
       );
     });
 
-    test('should not keep detached elements in the reset baseline after removing an array item', () => {
+    test('should only keep the live element registered after removing an array item', () => {
       const schema = v.object({
         todos: v.array(v.object({ label: v.string() })),
       });
@@ -590,7 +595,6 @@ describe('useField', () => {
       }
 
       render(<Test />);
-      const detachedElement = screen.getByTestId('input-0');
 
       // Remove the first item so `copyItemState` moves the second item's
       // element array into the first item's store
@@ -598,8 +602,7 @@ describe('useField', () => {
         remove(capturedForm!, { path: ['todos'], at: 0 });
       });
 
-      // The first item's store must only reference the live element, and its
-      // reset baseline must not resurrect the detached element after `reset`
+      // The first item's store must only reference the live element
       const internalFieldStore = getFieldStore(capturedForm![INTERNAL], [
         'todos',
         0,
@@ -609,7 +612,69 @@ describe('useField', () => {
       expect(internalFieldStore.elements[0]).toBe(
         screen.getByTestId('input-0')
       );
-      expect(internalFieldStore.initialElements).not.toContain(detachedElement);
+    });
+
+    test('should keep live elements in the reset baseline after an array reorder', async () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+
+      let capturedForm: FormStore<typeof schema> | undefined;
+
+      function TodoField({
+        form,
+        index,
+      }: {
+        form: FormStore<typeof schema>;
+        index: number;
+      }): ReactElement {
+        const field = useField(form, { path: ['todos', index, 'label'] });
+        return (
+          <TextInput
+            testID={`input-${index}`}
+            {...field.props}
+            value={field.input ?? ''}
+          />
+        );
+      }
+
+      function Test(): ReactElement {
+        const form = useForm({
+          schema,
+          initialInput: { todos: [{ label: 'a' }, { label: 'b' }] },
+        });
+        useEffect(() => {
+          capturedForm = form;
+        }, [form]);
+        const fieldArray = useFieldArray(form, { path: ['todos'] });
+        return (
+          <>
+            {fieldArray.items.map((item, index) => (
+              <TodoField key={item} form={form} index={index} />
+            ))}
+          </>
+        );
+      }
+
+      render(<Test />);
+      const firstElement = screen.getByTestId('input-0');
+      const secondElement = screen.getByTestId('input-1');
+
+      // Swap the items so the element arrays move between the stores and the
+      // refs re-register their live elements within the same commit
+      await act(async () => {
+        swap(capturedForm!, { path: ['todos'], at: 0, and: 1 });
+      });
+
+      // Both reset baselines must still contain their original live elements
+      expect(
+        getFieldStore(capturedForm![INTERNAL], ['todos', 0, 'label'])
+          .initialElements
+      ).toContain(firstElement);
+      expect(
+        getFieldStore(capturedForm![INTERNAL], ['todos', 1, 'label'])
+          .initialElements
+      ).toContain(secondElement);
     });
 
     test('should unmount cleanly when the registered element is removed', () => {

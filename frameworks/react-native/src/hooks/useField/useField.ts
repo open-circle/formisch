@@ -57,18 +57,18 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
   const instanceRef = useRef<FieldElement | null>(null);
 
   return useMemo(() => {
-    // Removes element instances that do not pass the given filter from the
-    // field store.
+    // Removes an element instance from the field store.
     // Hint: `initialElements` is kept in sync while the store still owns it
-    // (same reference) and filtered separately otherwise, so the detached
-    // element of a removed array item does not survive in the reset baseline
-    const filterElements = (predicate: (element: FieldElement) => boolean) => {
-      const elements = internalFieldStore.elements.filter(predicate);
+    // (same reference). After an array operation has moved the elements, a
+    // detached element may survive in the reset baseline until the field is
+    // registered again, which is accepted to keep this hook small, as the
+    // focus logic skips elements that do not report focus
+    const removeElement = (instance: FieldElement | null) => {
+      const elements = internalFieldStore.elements.filter(
+        (element) => element !== instance
+      );
       if (internalFieldStore.elements === internalFieldStore.initialElements) {
         internalFieldStore.initialElements = elements;
-      } else {
-        internalFieldStore.initialElements =
-          internalFieldStore.initialElements.filter(predicate);
       }
       internalFieldStore.elements = elements;
     };
@@ -112,7 +112,7 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
             // cleanup with the exact element that detaches, so multiple
             // elements sharing this ref are removed individually
             return () => {
-              filterElements((item) => item !== element);
+              removeElement(element);
             };
           }
           // Hint: React 18 and react-native-web's merged refs ignore the
@@ -120,7 +120,7 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
           // last registered instance is known and can be removed
           const instance = instanceRef.current;
           instanceRef.current = null;
-          filterElements((item) => item !== instance);
+          removeElement(instance);
         },
         onFocus() {
           setFieldBool(internalFieldStore, 'isTouched', true);
