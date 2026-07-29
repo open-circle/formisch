@@ -1,7 +1,14 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: /
+    directories:
+      - /
+      - /frameworks/*
+      - /packages/*
+      - /playgrounds/*
+      - /scripts
+      - /website
+      - /examples/svelte-invoice-form
     schedule:
       interval: weekly
       day: "saturday"
