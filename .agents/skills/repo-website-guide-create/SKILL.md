@@ -47,7 +47,7 @@ Determine the appropriate category:
 mkdir -p website/src/routes/{framework}/guides/(category-name)/guide-slug/
 ```
 
-- `{framework}` = angular, solid, qwik, preact, react-native, svelte, or vue
+- `{framework}` = angular, preact, qwik, react, react-native, solid, svelte, or vue
 - Use kebab-case for guide-slug
 
 ### Step 3: Create index.mdx

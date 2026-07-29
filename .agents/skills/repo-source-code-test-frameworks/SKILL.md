@@ -1,6 +1,6 @@
 ---
 name: repo-source-code-test-frameworks
-description: Write unit and type tests for Formisch framework packages (frameworks/angular, frameworks/preact, frameworks/solid, frameworks/svelte, frameworks/vue, frameworks/react, frameworks/react-native). Use when adding tests for hooks/composables/runes/inject functions (useForm/createForm/injectForm, useField, useFieldArray) or components and directives (Form, Field, FieldArray) in any framework wrapper.
+description: Write unit and type tests for Formisch framework packages (frameworks/angular, frameworks/preact, frameworks/solid, frameworks/svelte, frameworks/vue, frameworks/react, frameworks/react-native). Use when adding tests for hooks/composables/runes/inject functions (useForm/createForm/injectForm, useField/injectField, useFieldArray/injectFieldArray) or components and directives (Form, Field, FieldArray, formischForm, formischField) in any framework wrapper.
 metadata:
   author: formisch
   version: '1.0'
@@ -13,7 +13,7 @@ Tests for `frameworks/<fw>/`. For `packages/core/` or `packages/methods/`, use `
 ## Rules
 
 1. **React is the canonical reference.** New shared tests land in `frameworks/react` first, then port.
-2. **Cross-framework consistency.** Shared API (`useForm`/`createForm`/`injectForm`, `useField`, `useFieldArray`, `Form`, `Field`, `FieldArray`) keeps the same `describe`/`test` names, schemas, `initialInput`, expected outputs. Only mechanical adapters differ.
+2. **Cross-framework consistency.** Shared API (`useForm`/`createForm`/`injectForm`, `useField`, `useFieldArray`, `Field`, `FieldArray`) keeps the same `describe`/`test` names, schemas, `initialInput`, expected outputs. Only mechanical adapters differ. Test what the adapter actually exports: React Native has no `Form` component, and Angular ships directives instead of components.
 3. **No framework hint in test names.** Never `'should ... (Solid-only)'`. Use a `// ...` comment above the test if framework-specific reasoning matters.
 4. **No tautological assertions.** A test must be able to fail under a real source change.
 5. **100% coverage** on non-excluded files. Match React's `vitest.config.ts` exclusions: `src/types`, `src/vitest`, `**/index.ts(x)`, test files.
@@ -46,7 +46,7 @@ Identical `describe`/`test` names across all frameworks:
 | `useFieldArray` / `injectFieldArray`    | `initialization`, `reactivity`                                                | 6 + 4 type  |
 | `Form` / `Field` / `FieldArray`         | (flat)                                                                        | 3 each      |
 
-The `store stability` describe in React tests `useMemo` across re-renders and is **React-only**. In other frameworks omit it with a one-line `// Note: ...` comment.
+The `store stability` describe tests `useMemo` across re-renders and exists only in **React and React Native**. In other frameworks omit it with a one-line `// Note: ...` comment.
 
 ## Per-framework adapters
 
