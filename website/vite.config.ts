@@ -60,7 +60,7 @@ export default defineConfig(() => {
       qwikVite({
         experimental: ['valibot'],
       }),
-      tsconfigPaths(),
+      tsconfigPaths({ projects: ['./tsconfig.json'] }),
       tailwindcss(),
     ],
     preview: {
