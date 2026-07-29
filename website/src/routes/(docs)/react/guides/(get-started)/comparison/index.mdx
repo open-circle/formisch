@@ -16,16 +16,16 @@ Formisch is one of several form libraries available for React. The two most comm
 
 ## At a glance
 
-|                        | **Formisch**                                     | React Hook Form                     | TanStack Form                           |
-| ---------------------- | ------------------------------------------------ | ----------------------------------- | --------------------------------------- |
-| Type source            | Inferred from schema                             | Generic you declare                 | Inferred from `defaultValues`           |
-| Validation location    | Defined in schema                                | Per-field or resolver               | Per-validator config                    |
-| Validation timing      | Form-wide `validate` / `revalidate`              | Form-wide `mode` option             | Per-validator trigger                   |
-| Async validation       | Built-in via schema                              | Manual loading state                | Built-in `isValidating`                 |
-| Re-render scope        | Automatic per signal                             | Manual via `watch` / `useFormState` | Automatic per subscription              |
-| Schema libraries       | Valibot                                          | Any via resolvers                   | Standard Schema                         |
-| Bundle size (min+gzip) | From ~2.5 kB                                     | ~12 kB                              | ~15 kB                                  |
-| Framework support      | Angular, React, Preact, Solid, Svelte, Vue, Qwik | React                               | React, Vue, Solid, Svelte, Lit, Angular |
+|                        | **Formisch**                                                   | React Hook Form                     | TanStack Form                           |
+| ---------------------- | -------------------------------------------------------------- | ----------------------------------- | --------------------------------------- |
+| Type source            | Inferred from schema                                           | Generic you declare                 | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                                              | Per-field or resolver               | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`                            | Form-wide `mode` option             | Per-validator trigger                   |
+| Async validation       | Built-in via schema                                            | Manual loading state                | Built-in `isValidating`                 |
+| Re-render scope        | Automatic per signal                                           | Manual via `watch` / `useFormState` | Automatic per subscription              |
+| Schema libraries       | Valibot                                                        | Any via resolvers                   | Standard Schema                         |
+| Bundle size (min+gzip) | From ~2.5 kB                                                   | ~12 kB                              | ~15 kB                                  |
+| Framework support      | Angular, React, React Native, Preact, Solid, Svelte, Vue, Qwik | React                               | React, Vue, Solid, Svelte, Lit, Angular |
 
 The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and re-renders.
 

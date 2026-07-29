@@ -16,17 +16,17 @@ Formisch is one of several form libraries available for Angular. The most common
 
 ## At a glance
 
-|                        | **Formisch**                                     | Reactive Forms                  | Signal Forms                       | TanStack Form                           |
-| ---------------------- | ------------------------------------------------ | ------------------------------- | ---------------------------------- | --------------------------------------- |
-| Type source            | Inferred from schema                             | Declared manually               | Inferred from model signal         | Inferred from `defaultValues`           |
-| Validation location    | Defined in schema                                | Validator functions per control | Schema function or Standard Schema | Per-validator config                    |
-| Validation timing      | Form-wide `validate` / `revalidate`              | Per control (`updateOn`)        | Continuous, signal-driven          | Per-validator trigger                   |
-| Async validation       | Built-in via schema                              | Async validators                | Built-in (`validateAsync`)         | Built-in `isValidating`                 |
-| Reactivity scope       | Per signal subscription                          | RxJS observables                | Per signal subscription            | Per TanStack Store subscription         |
-| Schema libraries       | Valibot                                          | –                               | Standard Schema                    | Standard Schema                         |
-| UI approach            | Headless                                         | Headless                        | Headless                           | Headless                                |
-| Bundle size (min+gzip) | From ~4.5 kB                                     | Bundled with Angular            | Bundled with Angular               | ~15 kB                                  |
-| Framework support      | Angular, React, Preact, Solid, Svelte, Vue, Qwik | Angular                         | Angular                            | React, Vue, Solid, Svelte, Lit, Angular |
+|                        | **Formisch**                                                   | Reactive Forms                  | Signal Forms                       | TanStack Form                           |
+| ---------------------- | -------------------------------------------------------------- | ------------------------------- | ---------------------------------- | --------------------------------------- |
+| Type source            | Inferred from schema                                           | Declared manually               | Inferred from model signal         | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                                              | Validator functions per control | Schema function or Standard Schema | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`                            | Per control (`updateOn`)        | Continuous, signal-driven          | Per-validator trigger                   |
+| Async validation       | Built-in via schema                                            | Async validators                | Built-in (`validateAsync`)         | Built-in `isValidating`                 |
+| Reactivity scope       | Per signal subscription                                        | RxJS observables                | Per signal subscription            | Per TanStack Store subscription         |
+| Schema libraries       | Valibot                                                        | –                               | Standard Schema                    | Standard Schema                         |
+| UI approach            | Headless                                                       | Headless                        | Headless                           | Headless                                |
+| Bundle size (min+gzip) | From ~4.5 kB                                                   | Bundled with Angular            | Bundled with Angular               | ~15 kB                                  |
+| Framework support      | Angular, React, React Native, Preact, Solid, Svelte, Vue, Qwik | Angular                         | Angular                            | React, Vue, Solid, Svelte, Lit, Angular |
 
 The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and reactivity.
 

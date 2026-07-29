@@ -16,16 +16,16 @@ Formisch is one of several form libraries available for SolidJS. The two most co
 
 ## At a glance
 
-|                        | **Formisch**                                     | Felte                                | TanStack Form                           |
-| ---------------------- | ------------------------------------------------ | ------------------------------------ | --------------------------------------- |
-| Type source            | Inferred from schema                             | Inferred from validator or declared  | Inferred from `defaultValues`           |
-| Validation location    | Defined in schema                                | Validator package or `validate` fn   | Per-validator config                    |
-| Validation timing      | Form-wide `validate` / `revalidate`              | Per validator, with debounce         | Per-validator trigger                   |
-| Async validation       | Built-in via schema                              | Built-in                             | Built-in `isValidating`                 |
-| Reactivity scope       | Fine-grained per signal                          | Per Solid store subscription         | Per subscription                        |
-| Schema libraries       | Valibot                                          | Zod, Yup, Valibot, Vest, Superstruct | Standard Schema                         |
-| Bundle size (min+gzip) | From ~2.5 kB                                     | ~8 kB                                | ~15 kB                                  |
-| Framework support      | Angular, React, Preact, Solid, Svelte, Vue, Qwik | React, Preact, Solid, Svelte         | React, Vue, Solid, Svelte, Lit, Angular |
+|                        | **Formisch**                                                   | Felte                                | TanStack Form                           |
+| ---------------------- | -------------------------------------------------------------- | ------------------------------------ | --------------------------------------- |
+| Type source            | Inferred from schema                                           | Inferred from validator or declared  | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                                              | Validator package or `validate` fn   | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`                            | Per validator, with debounce         | Per-validator trigger                   |
+| Async validation       | Built-in via schema                                            | Built-in                             | Built-in `isValidating`                 |
+| Reactivity scope       | Fine-grained per signal                                        | Per Solid store subscription         | Per subscription                        |
+| Schema libraries       | Valibot                                                        | Zod, Yup, Valibot, Vest, Superstruct | Standard Schema                         |
+| Bundle size (min+gzip) | From ~2.5 kB                                                   | ~8 kB                                | ~15 kB                                  |
+| Framework support      | Angular, React, React Native, Preact, Solid, Svelte, Vue, Qwik | React, Preact, Solid, Svelte         | React, Vue, Solid, Svelte, Lit, Angular |
 
 The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and reactivity.
 

@@ -16,17 +16,17 @@ Formisch is one of several form libraries available for Svelte. The two most com
 
 ## At a glance
 
-|                        | **Formisch**                                     | Superforms                           | TanStack Form                           |
-| ---------------------- | ------------------------------------------------ | ------------------------------------ | --------------------------------------- |
-| Type source            | Inferred from schema                             | Inferred from schema                 | Inferred from `defaultValues`           |
-| Validation location    | Defined in schema                                | Defined in schema                    | Per-validator config                    |
-| Validation timing      | Form-wide `validate` / `revalidate`              | Configurable per form / event        | Per-validator trigger                   |
-| Async validation       | Built-in via schema                              | Built-in (client + server)           | Built-in `isValidating`                 |
-| Reactivity scope       | Fine-grained per rune                            | Per Svelte store / rune              | Per subscription                        |
-| Schema libraries       | Valibot                                          | Zod, Valibot, Yup, ArkType, …        | Standard Schema                         |
-| Server integration     | Client-only (SvelteKit support planned)          | First-class (SvelteKit form actions) | Client-only                             |
-| Bundle size (min+gzip) | From ~2.5 kB                                     | ~20 kB                               | ~15 kB                                  |
-| Framework support      | Angular, React, Preact, Solid, Svelte, Vue, Qwik | Svelte / SvelteKit                   | React, Vue, Solid, Svelte, Lit, Angular |
+|                        | **Formisch**                                                   | Superforms                           | TanStack Form                           |
+| ---------------------- | -------------------------------------------------------------- | ------------------------------------ | --------------------------------------- |
+| Type source            | Inferred from schema                                           | Inferred from schema                 | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                                              | Defined in schema                    | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`                            | Configurable per form / event        | Per-validator trigger                   |
+| Async validation       | Built-in via schema                                            | Built-in (client + server)           | Built-in `isValidating`                 |
+| Reactivity scope       | Fine-grained per rune                                          | Per Svelte store / rune              | Per subscription                        |
+| Schema libraries       | Valibot                                                        | Zod, Valibot, Yup, ArkType, …        | Standard Schema                         |
+| Server integration     | Client-only (SvelteKit support planned)                        | First-class (SvelteKit form actions) | Client-only                             |
+| Bundle size (min+gzip) | From ~2.5 kB                                                   | ~20 kB                               | ~15 kB                                  |
+| Framework support      | Angular, React, React Native, Preact, Solid, Svelte, Vue, Qwik | Svelte / SvelteKit                   | React, Vue, Solid, Svelte, Lit, Angular |
 
 The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and reactivity.
 

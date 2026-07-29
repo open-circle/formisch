@@ -16,17 +16,17 @@ Formisch is one of several form libraries available for Vue. The three most comm
 
 ## At a glance
 
-|                        | **Formisch**                                     | VeeValidate                   | FormKit                               | TanStack Form                           |
-| ---------------------- | ------------------------------------------------ | ----------------------------- | ------------------------------------- | --------------------------------------- |
-| Type source            | Inferred from schema                             | Inferred from schema          | Declared manually                     | Inferred from `defaultValues`           |
-| Validation location    | Defined in schema                                | Validator rules or schema     | Per-input prop or form schema         | Per-validator config                    |
-| Validation timing      | Form-wide `validate` / `revalidate`              | Per field, configurable       | Per input (`validation-visibility`)   | Per-validator trigger                   |
-| Async validation       | Built-in via schema                              | Built-in                      | Built-in                              | Built-in `isValidating`                 |
-| Reactivity scope       | Per Vue ref subscription                         | Per Vue ref subscription      | Per Vue ref subscription              | Per TanStack Store subscription         |
-| Schema libraries       | Valibot                                          | Zod, Yup, Valibot, ArkType, … | Built-in rules; schemas via plugins   | Standard Schema                         |
-| UI approach            | Headless                                         | Headless                      | Component-driven (batteries included) | Headless                                |
-| Bundle size (min+gzip) | From ~2.5 kB                                     | ~12 kB                        | ~25 kB+                               | ~15 kB                                  |
-| Framework support      | Angular, React, Preact, Solid, Svelte, Vue, Qwik | Vue 3 (Vue 2 via legacy)      | Vue 3                                 | React, Vue, Solid, Svelte, Lit, Angular |
+|                        | **Formisch**                                                   | VeeValidate                   | FormKit                               | TanStack Form                           |
+| ---------------------- | -------------------------------------------------------------- | ----------------------------- | ------------------------------------- | --------------------------------------- |
+| Type source            | Inferred from schema                                           | Inferred from schema          | Declared manually                     | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                                              | Validator rules or schema     | Per-input prop or form schema         | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`                            | Per field, configurable       | Per input (`validation-visibility`)   | Per-validator trigger                   |
+| Async validation       | Built-in via schema                                            | Built-in                      | Built-in                              | Built-in `isValidating`                 |
+| Reactivity scope       | Per Vue ref subscription                                       | Per Vue ref subscription      | Per Vue ref subscription              | Per TanStack Store subscription         |
+| Schema libraries       | Valibot                                                        | Zod, Yup, Valibot, ArkType, … | Built-in rules; schemas via plugins   | Standard Schema                         |
+| UI approach            | Headless                                                       | Headless                      | Component-driven (batteries included) | Headless                                |
+| Bundle size (min+gzip) | From ~2.5 kB                                                   | ~12 kB                        | ~25 kB+                               | ~15 kB                                  |
+| Framework support      | Angular, React, React Native, Preact, Solid, Svelte, Vue, Qwik | Vue 3 (Vue 2 via legacy)      | Vue 3                                 | React, Vue, Solid, Svelte, Lit, Angular |
 
 The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and reactivity.
 
