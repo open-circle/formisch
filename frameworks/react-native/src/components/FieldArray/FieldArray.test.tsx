@@ -56,9 +56,7 @@ describe('FieldArray', () => {
       return (
         <>
           <Pressable
-            onPress={() =>
-              insert(form, { path: ['items'], initialInput: 'c' })
-            }
+            onPress={() => insert(form, { path: ['items'], initialInput: 'c' })}
           >
             <Text>Add</Text>
           </Pressable>
