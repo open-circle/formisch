@@ -46,6 +46,8 @@ Identical `describe`/`test` names across all frameworks:
 | `useFieldArray` / `injectFieldArray`    | `initialization`, `reactivity`                                                | 6 + 4 type  |
 | `Form` / `Field` / `FieldArray`         | (flat)                                                                        | 3 each      |
 
+`Form` only exists where the adapter provides it: React Native has no `Form` component, and Angular ships the `[formischForm]` directive instead.
+
 The `store stability` describe tests `useMemo` across re-renders and exists only in **React and React Native**. In other frameworks omit it with a one-line `// Note: ...` comment.
 
 ## Per-framework adapters
