@@ -1,6 +1,6 @@
 # AI Instructions
 
-Formisch is a schema-based, headless form library with a framework-agnostic core supporting multiple frameworks (Angular, Preact, Qwik, React, Solid, Svelte, Vue).
+Formisch is a schema-based, headless form library with a framework-agnostic core supporting multiple frameworks (Angular, Preact, Qwik, React, React Native, Solid, Svelte, Vue).
 
 ## Monorepo Layout
 

@@ -94,14 +94,15 @@ const form = createForm({ schema });
 
 ### Framework Terminology
 
-| Framework | Related Section Heading            |
-| --------- | ---------------------------------- |
-| Solid     | `### Primitives`                   |
-| Qwik      | `### Hooks`                        |
-| Preact    | `### Hooks`                        |
-| Angular   | `### Functions` / `### Directives` |
-| Vue       | `### Composables`                  |
-| Svelte    | `### Runes`                        |
+| Framework    | Related Section Heading            |
+| ------------ | ---------------------------------- |
+| Solid        | `### Primitives`                   |
+| Qwik         | `### Hooks`                        |
+| Preact       | `### Hooks`                        |
+| React Native | `### Hooks`                        |
+| Angular      | `### Functions` / `### Directives` |
+| Vue          | `### Composables`                  |
+| Svelte       | `### Runes`                        |
 
 ### Type Links
 
