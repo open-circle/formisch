@@ -18,9 +18,11 @@ export interface FieldElementProps {
    *
    * Hint: `FieldElement` is a structural subset of the imperative methods of
    * React Native host component instances, so refs of `TextInput` and other
-   * focusable native components are accepted.
+   * focusable native components are accepted. On React 19 the callback
+   * returns a cleanup function that unregisters the exact element, while
+   * React 18 calls the callback with `null` instead.
    */
-  readonly ref: (element: FieldElement | null) => void;
+  readonly ref: (element: FieldElement | null) => void | (() => void);
   /**
    * The focus event handler of the field element.
    */

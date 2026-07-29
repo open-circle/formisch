@@ -52,13 +52,28 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
   const internalFormStore = form[INTERNAL];
   const internalFieldStore = getFieldStore(internalFormStore, config.path);
 
-  // Track the registered element instance so it can be identified and
-  // removed once it detaches, since native elements have no `isConnected`
-  // check
+  // Track the last registered element instance as a fallback for React 18,
+  // which ignores ref cleanup functions and calls the ref with `null` instead
   const instanceRef = useRef<FieldElement | null>(null);
 
-  return useMemo(
-    () => ({
+  return useMemo(() => {
+    // Removes element instances that do not pass the given filter from the
+    // field store.
+    // Hint: `initialElements` is kept in sync while the store still owns it
+    // (same reference) and filtered separately otherwise, so the detached
+    // element of a removed array item does not survive in the reset baseline
+    const filterElements = (predicate: (element: FieldElement) => boolean) => {
+      const elements = internalFieldStore.elements.filter(predicate);
+      if (internalFieldStore.elements === internalFieldStore.initialElements) {
+        internalFieldStore.initialElements = elements;
+      } else {
+        internalFieldStore.initialElements =
+          internalFieldStore.initialElements.filter(predicate);
+      }
+      internalFieldStore.elements = elements;
+    };
+
+    return {
       path: config.path,
       get input() {
         return getFieldInput(internalFieldStore);
@@ -87,26 +102,25 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
         ref(element) {
           if (element) {
             instanceRef.current = element;
-            internalFieldStore.elements.push(element);
-          } else {
-            // Hint: React nulls the ref when the element detaches, whether
-            // the field unmounts or the element is swapped while the field
-            // stays mounted, so the last known instance is removed here
-            const instance = instanceRef.current;
-            instanceRef.current = null;
-            const elements = internalFieldStore.elements.filter(
-              (element) => element !== instance
-            );
-            // Keep `initialElements` in sync unless a reorder has moved the
-            // elements, so resetting a remounted field restores its live
-            // element, not a stale one
-            if (
-              internalFieldStore.elements === internalFieldStore.initialElements
-            ) {
-              internalFieldStore.initialElements = elements;
+            // Hint: An array operation may have moved an element array in
+            // which the element is already registered, so it is only added
+            // once
+            if (!internalFieldStore.elements.includes(element)) {
+              internalFieldStore.elements.push(element);
             }
-            internalFieldStore.elements = elements;
+            // Hint: React 19 and React Native's merged refs invoke this
+            // cleanup with the exact element that detaches, so multiple
+            // elements sharing this ref are removed individually
+            return () => {
+              filterElements((item) => item !== element);
+            };
           }
+          // Hint: React 18 and react-native-web's merged refs ignore the
+          // cleanup above and call the ref with `null` instead, so only the
+          // last registered instance is known and can be removed
+          const instance = instanceRef.current;
+          instanceRef.current = null;
+          filterElements((item) => item !== instance);
         },
         onFocus() {
           setFieldBool(internalFieldStore, 'isTouched', true);
@@ -121,8 +135,7 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
           validateIfRequired(internalFormStore, internalFieldStore, 'blur');
         },
       },
-    }),
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [internalFormStore, internalFieldStore]
-  );
+  }, [internalFormStore, internalFieldStore]);
 }

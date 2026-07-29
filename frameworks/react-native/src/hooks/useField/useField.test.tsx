@@ -1,5 +1,5 @@
 import { getFieldStore, INTERNAL } from '@formisch/core/react-native';
-import { handleSubmit, reset } from '@formisch/methods/react-native';
+import { handleSubmit, remove, reset } from '@formisch/methods/react-native';
 import {
   act,
   fireEvent,
@@ -13,6 +13,7 @@ import { Pressable, Text, TextInput } from 'react-native';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
 import type { FormStore } from '../../types/index.ts';
+import { useFieldArray } from '../useFieldArray/index.ts';
 import { useForm } from '../useForm/index.ts';
 import { useField } from './useField.ts';
 
@@ -499,6 +500,116 @@ describe('useField', () => {
       await waitFor(() => {
         expect(document.activeElement).toBe(screen.getByTestId('input-second'));
       });
+    });
+
+    test('should unregister the correct element when the ref is shared', () => {
+      const schema = v.object({ email: v.string() });
+
+      let capturedForm: FormStore<typeof schema> | undefined;
+
+      // Hint: Raw DOM elements are rendered because React attaches the ref
+      // callback to them directly and honors its cleanup function, like
+      // React Native's merged refs do on native, while react-native-web's
+      // merged refs ignore the cleanup and only call the ref with `null`
+      function Test(): ReactElement {
+        const form = useForm({ schema, initialInput: { email: '' } });
+        useEffect(() => {
+          capturedForm = form;
+        }, [form]);
+        const field = useField(form, { path: ['email'] });
+        const { ref } = field.props;
+        const [showFirst, setShowFirst] = useState(true);
+        return (
+          <>
+            {showFirst && <input data-testid="input-first" ref={ref} />}
+            <input data-testid="input-second" ref={ref} />
+            <Pressable onPress={() => setShowFirst(false)}>
+              <Text>hide</Text>
+            </Pressable>
+          </>
+        );
+      }
+
+      render(<Test />);
+      const internalFieldStore = getFieldStore(capturedForm![INTERNAL], [
+        'email',
+      ]);
+      expect(internalFieldStore.elements).toHaveLength(2);
+
+      // Remove the first element while the second stays mounted, so exactly
+      // the detached element must be unregistered
+      act(() => {
+        fireEvent.click(screen.getByText('hide'));
+      });
+      expect(internalFieldStore.elements).toHaveLength(1);
+      expect(internalFieldStore.elements[0]).toBe(
+        screen.getByTestId('input-second')
+      );
+    });
+
+    test('should not keep detached elements in the reset baseline after removing an array item', () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+
+      let capturedForm: FormStore<typeof schema> | undefined;
+
+      function TodoField({
+        form,
+        index,
+      }: {
+        form: FormStore<typeof schema>;
+        index: number;
+      }): ReactElement {
+        const field = useField(form, { path: ['todos', index, 'label'] });
+        return (
+          <TextInput
+            testID={`input-${index}`}
+            {...field.props}
+            value={field.input ?? ''}
+          />
+        );
+      }
+
+      function Test(): ReactElement {
+        const form = useForm({
+          schema,
+          initialInput: { todos: [{ label: 'a' }, { label: 'b' }] },
+        });
+        useEffect(() => {
+          capturedForm = form;
+        }, [form]);
+        const fieldArray = useFieldArray(form, { path: ['todos'] });
+        return (
+          <>
+            {fieldArray.items.map((item, index) => (
+              <TodoField key={item} form={form} index={index} />
+            ))}
+          </>
+        );
+      }
+
+      render(<Test />);
+      const detachedElement = screen.getByTestId('input-0');
+
+      // Remove the first item so `copyItemState` moves the second item's
+      // element array into the first item's store
+      act(() => {
+        remove(capturedForm!, { path: ['todos'], at: 0 });
+      });
+
+      // The first item's store must only reference the live element, and its
+      // reset baseline must not resurrect the detached element after `reset`
+      const internalFieldStore = getFieldStore(capturedForm![INTERNAL], [
+        'todos',
+        0,
+        'label',
+      ]);
+      expect(internalFieldStore.elements).toHaveLength(1);
+      expect(internalFieldStore.elements[0]).toBe(
+        screen.getByTestId('input-0')
+      );
+      expect(internalFieldStore.initialElements).not.toContain(detachedElement);
     });
 
     test('should unmount cleanly when the registered element is removed', () => {
