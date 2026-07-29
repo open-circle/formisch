@@ -97,7 +97,7 @@ fs.writeFileSync(
       name: 'dev.formisch/docs',
       title: SERVER_INFO.title,
       description:
-        'Search and read the documentation of Formisch, the schema-based, headless and fully type-safe form library for Angular, Preact, Qwik, React, Solid, Svelte and Vue.',
+        'Search and read the documentation of Formisch, the schema-based, headless and fully type-safe form library for Angular, Preact, Qwik, React, React Native, Solid, Svelte and Vue.',
       version: SERVER_INFO.version,
       websiteUrl: 'https://formisch.dev/',
       repository: {

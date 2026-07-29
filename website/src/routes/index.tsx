@@ -18,6 +18,7 @@ import {
   PreactLogo,
   QwikLogo,
   ReactLogo,
+  ReactNativeLogo,
   SolidLogo,
   SvelteLogo,
   VueLogo,
@@ -105,6 +106,15 @@ export default component$(() => {
                   url: `${
                     import.meta.env.PUBLIC_STACKBLITZ_REACT_URL
                   }?file=src%2Froutes%2Flogin%2Findex.tsx`,
+                },
+                {
+                  // Hint: React Native shares the React atom, as it has no icon
+                  // of its own
+                  Icon: ReactIcon,
+                  Logo: ReactNativeLogo,
+                  url: `${
+                    import.meta.env.PUBLIC_STACKBLITZ_REACT_NATIVE_URL
+                  }?file=app%2Flogin.tsx`,
                 },
                 {
                   Icon: SolidIcon,
