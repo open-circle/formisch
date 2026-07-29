@@ -2,6 +2,12 @@
 
 reviews:
   profile: chill
+  collapse_walkthrough: false
+  changed_files_summary: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  suggested_labels: false
+  in_progress_fortune: false
 
   path_filters:
     - "!**/dist/**"
@@ -111,6 +117,18 @@ reviews:
     enabled: true
     drafts: false
 
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+
+  tools:
+    fbinfer:
+      enabled: false
+    presidio:
+      enabled: false
+
 knowledge_base:
   opt_out: false
 
@@ -142,3 +160,6 @@ knowledge_base:
     scope: auto
   pull_requests:
     scope: auto
+
+chat:
+  art: false
