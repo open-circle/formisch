@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix duplicate element registration in `useField` after array reorders
+
 ## v1.0.0-rc.0 (June 23, 2026)
 
 - Release candidate for v1.0.0

@@ -128,7 +128,13 @@ export function useField(
       },
       autofocus: !!internalFieldStore.value.errors.value,
       ref(element) {
-        if (element) {
+        // An array reorder transfers registered elements between the field
+        // stores, so the element may already be present when the framework
+        // re-registers it against the destination store
+        if (
+          element &&
+          !internalFieldStore.value.elements.includes(element as FieldElement)
+        ) {
           internalFieldStore.value.elements.push(element as FieldElement);
         }
       },

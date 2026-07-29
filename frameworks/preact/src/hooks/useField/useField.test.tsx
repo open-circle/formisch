@@ -1,3 +1,5 @@
+import { getFieldStore, INTERNAL } from '@formisch/core/preact';
+import { swap } from '@formisch/methods/preact';
 import {
   act,
   fireEvent,
@@ -10,6 +12,8 @@ import type { JSX } from 'preact';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
 import { Form } from '../../components/Form/index.ts';
+import type { FormStore } from '../../types/index.ts';
+import { useFieldArray } from '../useFieldArray/index.ts';
 import { useForm } from '../useForm/index.ts';
 import { useField } from './useField.ts';
 
@@ -419,6 +423,73 @@ describe('useField', () => {
       unmount();
 
       expect(screen.queryByTestId('input')).toBeNull();
+    });
+
+    test('should not register an element that is already present', () => {
+      const schema = v.object({ name: v.string() });
+      const { result } = renderHook(() => {
+        const form = useForm({ schema });
+        return { form, field: useField(form, { path: ['name'] }) };
+      });
+      const internalFieldStore = getFieldStore(result.current.form[INTERNAL], [
+        'name',
+      ]);
+      const element = document.createElement('input');
+      // Simulate an array reorder having already transferred the element
+      internalFieldStore.elements.push(element);
+      result.current.field.props.ref(element);
+      expect(internalFieldStore.elements).toEqual([element]);
+    });
+
+    test('should not duplicate element registration after an array reorder', async () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
+
+      function Row(props: {
+        form: FormStore<typeof schema>;
+        index: number;
+      }): JSX.Element {
+        const field = useField(props.form, {
+          path: ['todos', props.index, 'label'],
+        });
+        return <input {...field.props} />;
+      }
+
+      function Test(): JSX.Element {
+        const form = useForm({
+          schema,
+          initialInput: { todos: [{ label: 'a' }, { label: 'b' }] },
+        });
+        formStore = form;
+        const fieldArray = useFieldArray(form, { path: ['todos'] });
+        return (
+          <>
+            {fieldArray.items.value.map((id, index) => (
+              <Row key={id} form={form} index={index} />
+            ))}
+          </>
+        );
+      }
+
+      render(<Test />);
+      expect(
+        getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+      ).toHaveLength(1);
+
+      act(() => {
+        swap(formStore!, { path: ['todos'], at: 0, and: 1 });
+      });
+
+      await vi.waitFor(() => {
+        expect(
+          getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+        ).toHaveLength(1);
+        expect(
+          getFieldStore(formStore![INTERNAL], ['todos', 1, 'label']).elements
+        ).toHaveLength(1);
+      });
     });
   });
 });
