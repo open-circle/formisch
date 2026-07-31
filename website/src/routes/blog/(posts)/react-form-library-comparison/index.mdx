@@ -41,7 +41,7 @@ All three libraries support TypeScript. The more relevant question is where the 
 
 [RHF asks you to declare the form's shape as a TypeScript type and pass it in as a generic](https://react-hook-form.com/ts): `useForm<MyFormValues>()`. That generic is a TypeScript-only construct. It exists purely at compile time and is completely absent at runtime.
 
-The validation schema you configure through a resolver (whether that's Zod, Valibot, Yup, or anything else) is a separate runtime object. TypeScript has no enforced connection between the type you passed to `useForm` and the schema you passed to the resolver. You can have a type with ten fields and a schema that only validates seven of them, and TypeScript will not flag it. Keeping them aligned is entirely your responsibility, and there is no mechanism to enforce that they stay that way.
+The validation schema you configure through a resolver (whether that's Zod, Valibot, Yup, or anything else) is a separate runtime object. The typed resolvers from `@hookform/resolvers` do compare the schema's inferred shape against your generic, so a plain mismatch like the one below is flagged — but as an opaque `Resolver<...> is not assignable` error on the resolver line, not at the field that is missing. And that check only holds as long as the wiring stays fully typed: widen the generic, cast the resolver, or hand-roll one, and the two silently drift apart. Either way, the type and the schema remain two separate declarations of the same shape that you keep aligned.
 
 ```ts
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -60,16 +60,17 @@ const schema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   // you forgot to add username here
-  // nothing will warn you
 });
 
 // You pass both to RHF separately
 const form = useForm<MyFormValues>({
+  // TypeScript complains here with a resolver type mismatch,
+  // several layers away from the field you actually forgot
   resolver: zodResolver(schema),
 });
 ```
 
-If username is never validated, the form will still submit and TypeScript will not catch this.
+The error tells you that two shapes disagree, not which field you forgot or where to add it. Resolving it is still a manual diff between two declarations — and if the resolver or generic is ever cast to make an error go away, `username` ships unvalidated with no warning at all.
 
 Most teams handle this by deriving the TypeScript type directly from the schema using the library's inference utilities (Zod's `z.infer`, Valibot's `InferInput`, and so on) rather than writing the type manually. That removes the duplication, but it doesn't change the underlying architecture. The type and the schema are still two separate things that happen to share the same shape because you've wired them together. The resolver configuration that connects them at runtime is still something you set up yourself.
 

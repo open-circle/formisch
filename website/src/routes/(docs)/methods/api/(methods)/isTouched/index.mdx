@@ -11,7 +11,7 @@ import { properties } from './properties';
 
 # isTouched
 
-Checks whether a specific field or the entire form is touched by walking through the field store and all its descendants. A field is touched once it has received focus.
+Checks whether a specific field or the entire form is touched by walking through the field store and all its descendants. A field is touched once it has received focus or its value has been changed.
 
 ```ts
 const touched = isTouched<TSchema>(form);

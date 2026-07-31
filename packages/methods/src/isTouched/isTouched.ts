@@ -35,7 +35,7 @@ export interface IsFieldTouchedConfig<
 /**
  * Checks whether a specific field or the entire form is touched by walking
  * through the field store and all its descendants. A field is touched once it
- * has received focus.
+ * has received focus or its value has been changed.
  *
  * @param form The form store to check for being touched.
  *
@@ -48,7 +48,7 @@ export function isTouched<TSchema extends FormSchema>(
 /**
  * Checks whether a specific field or the entire form is touched by walking
  * through the field store and all its descendants. A field is touched once it
- * has received focus.
+ * has received focus or its value has been changed.
  *
  * @param form The form store to check for being touched.
  * @param config The is touched configuration.

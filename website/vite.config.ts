@@ -7,6 +7,7 @@ import rehypeExternalLinks from 'rehype-external-links';
 import { getSingletonHighlighter } from 'shiki';
 import shikiAngularHtml from 'shiki/langs/angular-html.mjs';
 import shikiBash from 'shiki/langs/bash.mjs';
+import shikiJsonc from 'shiki/langs/jsonc.mjs';
 import shikiSvelte from 'shiki/langs/svelte.mjs';
 import shikiTypeScript from 'shiki/langs/ts.mjs';
 import shikiTypeScriptX from 'shiki/langs/tsx.mjs';
@@ -21,6 +22,7 @@ await Promise.all([
     shikiTypeScript,
     shikiTypeScriptX,
     shikiBash,
+    shikiJsonc,
     shikiSvelte,
     shikiVue,
     shikiAngularHtml

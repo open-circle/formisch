@@ -42,7 +42,7 @@ const TodoFormSchema = v.object({
 
 ### FieldArray component
 
-To dynamically generate the form fields for the todos, you use the <Link href="/preact/api/FieldArray/">`FieldArray`</Link> component in combination with JavaScript's `Array.map()`. The field array provides an `items` signal that contains unique string identifiers which are used to detect when an item is added, moved, or removed.
+To dynamically generate the form fields for the todos, you use the <Link href="/preact/api/FieldArray/">`FieldArray`</Link> component in combination with JavaScript's `Array.prototype.map()` method. The field array provides an `items` signal that contains unique string identifiers which are used to detect when an item is added, moved, or removed.
 
 ```tsx
 import { Field, FieldArray, Form, useForm } from '@formisch/preact';

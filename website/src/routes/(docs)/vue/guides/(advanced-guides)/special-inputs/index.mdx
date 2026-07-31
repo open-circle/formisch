@@ -132,7 +132,7 @@ However, if you set the `multiple` attribute, multiple options can be selected m
 
 ## File
 
-For the HTML `<input type="file" />` element it works similarly to the HTML `<select />` element. Without the `multiple` attribute it represents a single file and with, a list of files. Since Vue does not allow `v-model` on file inputs, capture the selection with an `@input` handler and assign it to `field.input`:
+For the HTML `<input type="file" />` element it works similarly to the HTML `<select />` element. Without the `multiple` attribute, it represents a single file; with `multiple`, it represents a list of files. Since Vue does not allow `v-model` on file inputs, capture the selection with an `@input` handler and assign it to `field.input`:
 
 ```vue
 <template>
