@@ -13,7 +13,7 @@ import { Link } from '~/components';
 
 To make your code more readable, we recommend that you develop your own input components if you are not using a prebuilt UI library. There you can encapsulate logic to display error messages, for example.
 
-> If you're already a bit more experienced, you can use the input components we developed for our <Link href="/playground/login/">playground</Link> as a starting point. You can find the code in our GitHub repository <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/tree/main/playgrounds/qwik/src/components`} target="\_blank" rel="noreferrer">here</a>.
+> If you're already a bit more experienced, you can use the input components we developed for our <Link href="/playground/login/">playground</Link> as a starting point. You can find the code in our GitHub repository <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/tree/main/playgrounds/qwik/src/components`} target={'\_blank'} rel="noreferrer">here</a>.
 
 ## Why input components?
 
@@ -52,8 +52,8 @@ Our goal is to develop a `TextInput` component so that the code ends up looking 
       {...field.props}
       type="email"
       label="Email"
-      input={field.input.value}
-      errors={field.errors.value}
+      input={field.input}
+      errors={field.errors}
       required
     />
   )}
@@ -94,6 +94,7 @@ export const TextInput = component$<TextInputProps>(
   ({ input, label, errors, ...props }) => {
     // Component JSX will go here
   }
+);
 ```
 
 ### JSX code

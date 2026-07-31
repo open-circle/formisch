@@ -129,12 +129,12 @@ const UserSchema = v.object({
 const userForm = useForm$(() => ({ schema: UserSchema }));
 
 // ✓ Valid paths - TypeScript provides autocompletion
-<Field of={userForm} path={['profile', 'name', 'first']} render$={(field) => ...} />
-<Field of={userForm} path={['profile', 'email']} render$={(field) => ...} />
+<Field of={userForm} path={['profile', 'name', 'first']}>{/* ... */}</Field>
+<Field of={userForm} path={['profile', 'email']}>{/* ... */}</Field>
 
 // ✗ Invalid paths - TypeScript error
-<Field of={userForm} path={['profile', 'age']} render$={(field) => ...} />
-<Field of={userForm} path={['username']} render$={(field) => ...} />
+<Field of={userForm} path={['profile', 'age']}>{/* ... */}</Field>
+<Field of={userForm} path={['username']}>{/* ... */}</Field>
 ```
 
 ## Type-safe props

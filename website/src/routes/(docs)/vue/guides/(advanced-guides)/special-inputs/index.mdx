@@ -132,12 +132,17 @@ However, if you set the `multiple` attribute, multiple options can be selected m
 
 ## File
 
-For the HTML `<input type="file" />` element it works similar to the HTML `<select />` element. Without the `multiple` attribute it represents a single file and with, a list of files.
+For the HTML `<input type="file" />` element it works similarly to the HTML `<select />` element. Without the `multiple` attribute it represents a single file and with, a list of files. Since Vue does not allow `v-model` on file inputs, capture the selection with an `@input` handler and assign it to `field.input`:
 
 ```vue
 <template>
   <Field :of="form" :path="['avatar']" v-slot="field">
-    <input v-bind="field.props" type="file" accept="image/*" />
+    <input
+      v-bind="field.props"
+      type="file"
+      accept="image/*"
+      @input="field.input = ($event.target as HTMLInputElement).files?.[0]"
+    />
   </Field>
 </template>
 ```
@@ -147,7 +152,14 @@ With the `multiple` attribute, users can select multiple files:
 ```vue
 <template>
   <Field :of="form" :path="['documents']" v-slot="field">
-    <input v-bind="field.props" type="file" multiple />
+    <input
+      v-bind="field.props"
+      type="file"
+      multiple
+      @input="
+        field.input = Array.from(($event.target as HTMLInputElement).files ?? [])
+      "
+    />
   </Field>
 </template>
 ```

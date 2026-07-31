@@ -37,7 +37,7 @@ Use Svelte's `{#snippet children(field)}` syntax to define how the field should 
   });
 </script>
 
-<Form of={loginForm}>
+<Form of={loginForm} onsubmit={(output) => console.log(output)}>
   <Field of={loginForm} path={['email']}>
     {#snippet children(field)}
       <input {...field.props} value={field.input} type="email" />

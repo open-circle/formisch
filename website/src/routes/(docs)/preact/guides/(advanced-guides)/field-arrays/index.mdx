@@ -14,7 +14,7 @@ import { Link } from '~/components';
 
 A somewhat more special case are dynamically generated form fields based on an array. Since adding, removing, swapping and moving items can be a big challenge here, the library provides the <Link href="/preact/api/FieldArray/">`FieldArray`</Link> component which, in combination with various methods, makes it very easy for you to create such forms.
 
-> In our <Link href="/playground/todos/">playground</Link> you can take a look at a form with a field array and test them out.
+> In our <Link href="/playground/todos/">playground</Link> you can take a look at a form with a field array and test it out.
 
 ## Create a field array
 
@@ -42,7 +42,7 @@ const TodoFormSchema = v.object({
 
 ### FieldArray component
 
-To dynamically generate the form fields for the todos, you use the <Link href="/preact/api/FieldArray/">`FieldArray`</Link> component in combination with Preact's `Array.map()`. The field array provides an `items` signal that contains unique string identifiers which are used to detect when an item is added, moved, or removed.
+To dynamically generate the form fields for the todos, you use the <Link href="/preact/api/FieldArray/">`FieldArray`</Link> component in combination with JavaScript's `Array.map()`. The field array provides an `items` signal that contains unique string identifiers which are used to detect when an item is added, moved, or removed.
 
 ```tsx
 import { Field, FieldArray, Form, useForm } from '@formisch/preact';

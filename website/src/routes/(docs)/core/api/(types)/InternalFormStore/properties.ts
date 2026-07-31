@@ -29,6 +29,13 @@ export const properties: Record<string, PropertyProps> = {
   validators: {
     type: 'number',
   },
+  emptyInput: {
+    type: {
+      type: 'custom',
+      name: 'EmptyInput',
+      href: '../EmptyInput/',
+    },
+  },
   validate: {
     type: {
       type: 'custom',

@@ -38,7 +38,7 @@ export default component$(() => {
   }));
 
   return (
-    <Form of={loginForm}>
+    <Form of={loginForm} onSubmit$={(output) => console.log(output)}>
       <Field
         of={loginForm}
         path={['email']}

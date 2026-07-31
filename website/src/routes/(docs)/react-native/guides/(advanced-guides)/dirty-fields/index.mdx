@@ -41,7 +41,11 @@ const UserSchema = v.object({
   email: v.pipe(v.string(), v.email()),
 });
 
-export default function EditProfileScreen({ user }) {
+interface EditProfileProps {
+  user: v.InferInput<typeof UserSchema> & { id: string };
+}
+
+export default function EditProfileScreen({ user }: EditProfileProps) {
   const profileForm = useForm({
     schema: UserSchema,
     initialInput: user,

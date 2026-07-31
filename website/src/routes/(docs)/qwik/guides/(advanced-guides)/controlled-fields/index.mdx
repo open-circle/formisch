@@ -34,7 +34,7 @@ For a text input field you simply add the `value` attribute and pass the value o
 
 ### Exception for files
 
-The HTML `<input type="file" />` element is an exception because it cannot be controlled. However, you have the possibility to control the UI around it. For inspiration you can use the code of our <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/blob/main/playgrounds/qwik/src/components/FileInput.tsx`} target="\_blank" rel="noreferrer">`FileInput`</a> component from our <Link href="/playground/login/">playground</Link>.
+The HTML `<input type="file" />` element is an exception because it cannot be controlled. However, you have the possibility to control the UI around it. For inspiration you can use the code of our <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/blob/main/playgrounds/qwik/src/components/FileInput.tsx`} target={'\_blank'} rel="noreferrer">`FileInput`</a> component from our <Link href="/playground/special/">playground</Link>.
 
 ## Numbers and dates
 
@@ -48,24 +48,33 @@ You also have to handle `NaN`. While typing a floating point number, the value c
 
 ```tsx
 import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type QRL, useComputed$ } from '@qwik.dev/core';
+import {
+  component$,
+  type QRL,
+  type ReadonlySignal,
+  useSignal,
+  useTask$,
+} from '@qwik.dev/core';
 
 interface NumberInputProps extends Omit<FieldElementProps, 'onInput$'> {
   type: 'number';
   label?: string;
   placeholder?: string;
-  input: number | undefined;
-  errors: [string, ...string[]] | null;
+  input: ReadonlySignal<number | undefined>;
+  errors: ReadonlySignal<[string, ...string[]] | null>;
   required?: boolean;
   onInput$: QRL<(value: number | undefined) => void>;
 }
 
 export const NumberInput = component$<NumberInputProps>(
   ({ input, label, errors, name, onInput$, ...inputProps }) => {
-    // Update computed value if not NaN
-    const value = useComputed$(() =>
-      !Number.isNaN(input) ? input : undefined
-    );
+    // Keep the last displayed value that is not `NaN`
+    const value = useSignal<number>();
+    useTask$(({ track }) => {
+      if (!Number.isNaN(track(input))) {
+        value.value = input.value;
+      }
+    });
 
     return (
       <div>
@@ -80,10 +89,10 @@ export const NumberInput = component$<NumberInputProps>(
           onInput$={(_, element) =>
             onInput$(element.value === '' ? undefined : element.valueAsNumber)
           }
-          aria-invalid={!!errors}
+          aria-invalid={!!errors.value}
           aria-errormessage={`${name}-error`}
         />
-        {errors && <div id={`${name}-error`}>{errors[0]}</div>}
+        {errors.value && <div id={`${name}-error`}>{errors.value[0]}</div>}
       </div>
     );
   }
@@ -101,8 +110,8 @@ Pass `field.onInput` after spreading `field.props` so it overrides the native ha
       {...field.props}
       type="number"
       label="Age"
-      input={field.input.value}
-      errors={field.errors.value}
+      input={field.input}
+      errors={field.errors}
       onInput$={field.onInput}
     />
   )}
@@ -115,14 +124,19 @@ The same applies to dates. An `<input type="date" />` works with `yyyy-mm-dd` st
 
 ```tsx
 import type { FieldElementProps } from '@formisch/qwik';
-import { component$, type QRL, useComputed$ } from '@qwik.dev/core';
+import {
+  component$,
+  type QRL,
+  type ReadonlySignal,
+  useComputed$,
+} from '@qwik.dev/core';
 
 interface DateInputProps extends Omit<FieldElementProps, 'onInput$'> {
   type: 'date';
   label?: string;
   placeholder?: string;
-  input: Date | undefined;
-  errors: [string, ...string[]] | null;
+  input: ReadonlySignal<Date | undefined>;
+  errors: ReadonlySignal<[string, ...string[]] | null>;
   required?: boolean;
   onInput$: QRL<(value: Date | undefined) => void>;
 }
@@ -131,8 +145,8 @@ export const DateInput = component$<DateInputProps>(
   ({ input, label, errors, name, onInput$, ...inputProps }) => {
     // Transform date to string
     const value = useComputed$(() =>
-      input && !Number.isNaN(input.getTime())
-        ? input.toISOString().split('T', 1)[0]
+      input.value && !Number.isNaN(input.value.getTime())
+        ? input.value.toISOString().split('T', 1)[0]
         : ''
     );
 
@@ -147,10 +161,10 @@ export const DateInput = component$<DateInputProps>(
           value={value.value}
           // Convert string to date before storing
           onInput$={(_, element) => onInput$(element.valueAsDate ?? undefined)}
-          aria-invalid={!!errors}
+          aria-invalid={!!errors.value}
           aria-errormessage={`${name}-error`}
         />
-        {errors && <div id={`${name}-error`}>{errors[0]}</div>}
+        {errors.value && <div id={`${name}-error`}>{errors.value[0]}</div>}
       </div>
     );
   }
@@ -168,8 +182,8 @@ As with the number input, pass `field.onInput` after the spread to override the 
       {...field.props}
       type="date"
       label="Birthday"
-      input={field.input.value}
-      errors={field.errors.value}
+      input={field.input}
+      errors={field.errors}
       onInput$={field.onInput}
     />
   )}

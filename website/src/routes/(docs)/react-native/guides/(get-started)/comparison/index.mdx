@@ -35,7 +35,7 @@ Three reasons to pick Formisch over the alternatives above:
 
 **One schema, no second source of truth.** A single Valibot schema is everything the form needs: the runtime validator, the source of types, and the description of the form's structure — all at once. There is no separate TypeScript generic to declare, no `defaultValues` object to keep aligned with the schema, no resolver to configure. When the schema changes, every part of the form follows — at compile time and at runtime.
 
-**The smallest bundle, by a wide margin.** Formisch starts at ~2.5 kB and grows only as you import additional methods like `focus`, `getInput`, and `reset`. That is several times smaller than the alternatives in the table above — and it stays that way because the core is intentionally small and the library is fully tree-shakable, so methods you don't import don't end up in your bundle.
+**The smallest bundle, by a wide margin.** Formisch starts at ~2.5 kB and grows only as you import additional methods like `focus`, `getInput`, and `reset`. That is several times smaller than the alternatives in the table above — and it stays that way because the core is intentionally small and the library is fully tree-shakeable, so methods you don't import don't end up in your bundle.
 
 **Type safety that stays fast.** Types flow from the schema through every API, including deeply nested paths and field arrays. The inference is structured to keep TypeScript editor performance from degrading as schemas grow — which matters in large codebases where heavily-generic form libraries become a friction point.
 
@@ -51,7 +51,7 @@ Three reasons to pick Formisch over the alternatives above:
 
 Migrating to Formisch is a genuine rewrite of the form layer, not a drop-in replacement. The mental model is different: instead of starting from a component and attaching form behavior to it, you start from a schema and build the component around it. The libraries can coexist in the same application, so you can migrate one form at a time.
 
-We provide a dedicated migration guide for each library, with a side-by-side example, step-by-step instructions, and an API mapping table: <Link href="/react-native/guides/migrate-from-react-hook-form/">migrate from React Hook Form</Link> and <Link href="/react-native/guides/migrate-from-tanstack-form/">migrate from TanStack Form</Link>.
+We provide a dedicated migration guide for each library, with a side-by-side example, step-by-step instructions, and an API mapping table: <Link href="/react-native/guides/migrate-from-react-hook-form/">migrate from React Hook Form</Link> and <Link href="/react-native/guides/migrate-from-tanstack-form/">migrate from TanStack Form</Link>. A <Link href="/react-native/guides/migrate-from-formik/">migrate from Formik</Link> guide is also available.
 
 ## Next steps
 

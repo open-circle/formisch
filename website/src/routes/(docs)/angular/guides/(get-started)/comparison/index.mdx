@@ -38,7 +38,7 @@ Three reasons to pick Formisch over the alternatives above:
 
 **One schema, no second source of truth.** A single Valibot schema is everything the form needs: the runtime validator, the source of types, and the description of the form's structure — all at once. There is no `FormGroup` shape to declare next to an interface, no `Validators` list to keep aligned with your model, no resolver to configure. When the schema changes, every part of the form follows — at compile time and at runtime.
 
-**A small, tree-shakable bundle.** A form with the directives and `injectForm` starts at ~4.5 kB min+gzip and grows only as you import additional methods like `focus`, `getInput`, and `reset` — methods you don't import don't end up in your bundle. Angular's built-in form libraries ship with the framework, but compared to other third-party form libraries Formisch is several times smaller.
+**A small, tree-shakeable bundle.** A form with the directives and `injectForm` starts at ~4.5 kB min+gzip and grows only as you import additional methods like `focus`, `getInput`, and `reset` — methods you don't import don't end up in your bundle. Angular's built-in form libraries ship with the framework, but compared to other third-party form libraries Formisch is several times smaller.
 
 **Type safety that stays fast.** Types flow from the schema through every API, including deeply nested paths and field arrays — and through your templates, since the structural directives declare a typed template context. With `strictTemplates` enabled, an invalid path or a mistyped field is a compile error. The inference is structured to keep TypeScript editor performance from degrading as schemas grow.
 

@@ -9,6 +9,10 @@ export const properties: Record<string, PropertyProps> = {
       href: '/core/api/FormSchema/',
     },
   },
+  path: {
+    type: 'undefined',
+    default: 'undefined',
+  },
   initialInput: {
     type: {
       type: 'custom',

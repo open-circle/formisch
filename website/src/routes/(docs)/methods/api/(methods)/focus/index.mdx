@@ -1,6 +1,6 @@
 ---
 title: focus
-description: Focuses the first input element of a field.
+description: Focuses the first focusable input element of a field.
 source: /packages/methods/src/focus/focus.ts
 contributors:
   - fabian-hiller
@@ -11,7 +11,7 @@ import { properties } from './properties';
 
 # focus
 
-Focuses the first input element of a field. This is useful for programmatically setting focus to a specific field, such as after validation errors or user interactions.
+Focuses the first focusable input element of a field. This is useful for programmatically setting focus to a specific field, such as after validation errors or user interactions.
 
 ```ts
 focus<TSchema, TFieldPath>(form, config);
@@ -29,7 +29,7 @@ focus<TSchema, TFieldPath>(form, config);
 
 ### Explanation
 
-The `form` parameter is the form store containing the field to focus. The `config` parameter specifies which field to focus using the `path` property, and can optionally include additional focus options.
+The `form` parameter is the form store containing the field to focus. The `config` parameter specifies which field to focus using the `path` property.
 
 ## Related
 

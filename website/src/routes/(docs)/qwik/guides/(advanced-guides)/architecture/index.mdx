@@ -107,6 +107,9 @@ const form = useConstant(() => {
     isTouched: createComputed$(() =>
       getFieldBool(internalFormStore, 'isTouched')
     ),
+    isEdited: createComputed$(() =>
+      getFieldBool(internalFormStore, 'isEdited')
+    ),
     isDirty: createComputed$(() => getFieldBool(internalFormStore, 'isDirty')),
     isValid: createComputed$(() => !getFieldBool(internalFormStore, 'errors')),
     errors: internalFormStore.errors,

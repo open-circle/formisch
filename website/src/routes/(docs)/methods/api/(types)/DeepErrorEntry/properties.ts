@@ -4,6 +4,7 @@ export const properties: Record<string, PropertyProps> = {
   TValue: {
     modifier: 'extends',
     type: 'unknown',
+    default: 'unknown',
   },
   path: {
     type: {

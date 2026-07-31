@@ -38,7 +38,7 @@ const loginForm = useForm({
 </script>
 
 <template>
-  <Form :of="loginForm">
+  <Form :of="loginForm" @submit="(output) => console.log(output)">
     <Field :of="loginForm" :path="['email']" v-slot="field">
       <input v-model="field.input" v-bind="field.props" type="email" />
     </Field>

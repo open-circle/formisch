@@ -155,12 +155,10 @@ const Definition = component$<DefinitionProps>(({ parent, data }) => (
             data === 'void' ||
             data === 'never' ||
             data === 'any' ||
-            data === 'unknown',
+            data === 'unknown' ||
+            data === 'object',
           'capitalize text-sky-600 dark:text-sky-400':
-            data === 'object' ||
-            data === 'array' ||
-            data === 'tuple' ||
-            data === 'function',
+            data === 'array' || data === 'tuple' || data === 'function',
         }}
       >
         {data}

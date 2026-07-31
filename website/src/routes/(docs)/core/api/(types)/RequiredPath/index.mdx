@@ -6,13 +6,16 @@ contributors:
   - fabian-hiller
 ---
 
-import { ApiList } from '~/components';
+import { ApiList, Property } from '~/components';
+import { properties } from './properties';
 
 # RequiredPath
 
 A type that represents a required path into an object structure with at least one key.
 
-> This type is too complex to display. Please refer to the [source code](https://github.com/open-circle/formisch/blob/main/packages/core/src/types/path/path.ts).
+## Definition
+
+- `RequiredPath` <Property {...properties.RequiredPath} />
 
 ## Related
 

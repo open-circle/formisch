@@ -123,12 +123,12 @@ const UserSchema = v.object({
 const userForm = useForm({ schema: UserSchema });
 
 // ✓ Valid paths - TypeScript provides autocompletion
-<Field :of="userForm" :path="['profile', 'name', 'first']" v-slot="field" />
-<Field :of="userForm" :path="['profile', 'email']" v-slot="field" />
+// <Field :of="userForm" :path="['profile', 'name', 'first']" v-slot="field" />
+// <Field :of="userForm" :path="['profile', 'email']" v-slot="field" />
 
 // ✗ Invalid paths - TypeScript error
-<Field :of="userForm" :path="['profile', 'age']" v-slot="field" />
-<Field :of="userForm" :path="['username']" v-slot="field" />
+// <Field :of="userForm" :path="['profile', 'age']" v-slot="field" />
+// <Field :of="userForm" :path="['username']" v-slot="field" />
 ```
 
 ## Type-safe props
@@ -154,12 +154,21 @@ const loginForm = useForm({
   <FormContent :of="loginForm" />
 </template>
 
+<!-- In another file: FormContent.vue -->
 <script setup lang="ts">
+import { Form, type FormStore } from '@formisch/vue';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
 type FormContentProps = {
   of: FormStore<typeof LoginSchema>;
 };
 
-defineProps<FormContentProps>();
+const props = defineProps<FormContentProps>();
 </script>
 
 <template>

@@ -10,6 +10,7 @@ export const properties: Record<string, PropertyProps> = {
     type: {
       type: 'custom',
       name: 'Path',
+      href: '/core/api/Path/',
     },
   },
   PathValue: {

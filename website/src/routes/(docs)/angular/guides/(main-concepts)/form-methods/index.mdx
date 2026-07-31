@@ -25,7 +25,7 @@ To retrieve values from your form, you can use:
 - <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>: Get all error
   messages across the entire form
 
-Formisch uses Angular Signals internally which means that reading values with these methods is reactive. When you call them inside a `computed`, an `effect` or a template expression, they re-run automatically as soon as the form state changes — including in `OnPush` and zoneless components.
+Formisch uses Angular Signals internally, which means that reading values with these methods is reactive. When you call them inside a `computed`, an `effect` or a template expression, they re-run automatically as soon as the form state changes — including in `OnPush` and zoneless components.
 
 ## Dirty state
 
