@@ -191,7 +191,7 @@ import { DatePicker } from 'some-component-library';
   render$={(field) => (
     <DatePicker
       value={field.input.value}
-      onInput$={(newDate) => field.onInput(newDate)}
+      onChange$={(newDate) => field.onInput(newDate)}
     />
   )}
 />;

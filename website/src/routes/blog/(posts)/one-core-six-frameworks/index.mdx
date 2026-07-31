@@ -15,7 +15,7 @@ import { Link } from '~/components';
 
 Most "framework-agnostic" libraries are agnostic at runtime. They ship their own reactivity primitive (a custom store, an observer protocol, a subscription bus) and bridge it into whichever framework you're using. That bridge has a real cost: extra bytes in your bundle, an adapter layer your framework has to drive, and no integration with the framework's own batching or scheduling.
 
-Formisch, a schema-first form library for SolidJS, React, Vue, Svelte, Preact, and Qwik, takes a different approach. Instead of a runtime reactivity layer, it swaps in the framework's native primitive at build time. In Solid, form state is real Solid signals. In Vue, real `shallowRef`s. In Svelte, real `$state` cells. No runtime adapter or abstraction tax.
+Formisch, a schema-first form library for Angular, Preact, Qwik, React, React Native, SolidJS, Svelte, and Vue, takes a different approach. Instead of a runtime reactivity layer, it swaps in the framework's native primitive at build time. In Solid, form state is real Solid signals. In Vue, real `shallowRef`s. In Svelte, real `$state` cells. No runtime adapter or abstraction tax.
 
 This post is about why that distinction matters and how the design works.
 
@@ -36,7 +36,7 @@ The trick is that the core never picks an implementation of `Signal<T>`. It just
 
 ## The build-time swap
 
-Inside the core there's a single [`framework/index.ts`](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.ts) that exposes the four functions. Next to it, six siblings: `index.solid.ts`, `index.react.ts`, `index.vue.ts`, `index.svelte.ts`, `index.preact.ts` and `index.qwik.ts`. None of them ship to your app on their own. The switch happens at build time.
+Inside the core there's a single [`framework/index.ts`](https://github.com/open-circle/formisch/blob/main/packages/core/src/framework/index.ts) that exposes the four functions. Next to it, one sibling per supported framework: `index.angular.ts`, `index.preact.ts`, `index.qwik.ts`, `index.react.ts`, `index.react-native.ts`, `index.solid.ts`, `index.svelte.ts` and `index.vue.ts`. None of them ship to your app on their own. The switch happens at build time.
 
 When the bundler resolves an import of `./framework/index.ts`, a small [rolldown plugin](https://github.com/open-circle/formisch/blob/main/packages/core/tsdown.config.ts) checks whether a sibling `./framework/index.{framework}.ts` exists. If it does, the plugin redirects the import there. The build runs once per framework with a different target, and each run produces a self-contained bundle with that framework's adapter inlined.
 
@@ -102,7 +102,7 @@ Bundle size is the obvious benefit. But it's not the most important one.
 
 **Type safety from one source.** The same Valibot schema you pass to the form drives both runtime parsing _and_ the inferred TypeScript types for paths, inputs and outputs. There is no second declaration to keep in sync, no resolver to configure, no helper type to import. Rename a field in your schema and every `<Field path={...} />` in your codebase is type-checked against the new shape immediately.
 
-**One library, six communities.** Because the core is genuinely shared, an improvement in Svelte benefits React, Vue, Solid, Preact and Qwik at the same time. Same for bug fixes and performance work. There's one implementation of the recursive store builder, one validation orchestration, one set of methods and every framework community benefits.
+**One library, every community.** Because the core is genuinely shared, an improvement in Svelte benefits Angular, Preact, Qwik, React, React Native, Solid and Vue at the same time. Same for bug fixes and performance work. There's one implementation of the recursive store builder, one validation orchestration, one set of methods and every framework community benefits.
 
 Framework-agnostic is usually framed as a trade-off: you give up framework-native integration in exchange for portability. In Formisch's case, that trade-off doesn't exist. Building the abstraction at the source code level instead of the runtime level means you get both.
 

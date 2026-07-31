@@ -137,8 +137,9 @@ To pass your form to another component via props, you can use the <Link href="/v
 
 ```vue
 <script setup lang="ts">
-import { Form, type FormStore, useForm } from '@formisch/vue';
+import { useForm } from '@formisch/vue';
 import * as v from 'valibot';
+import FormContent from './FormContent.vue';
 
 const LoginSchema = v.object({
   email: v.pipe(v.string(), v.email()),
@@ -192,13 +193,11 @@ import { useField } from '@formisch/vue';
 import type { FormStore } from '@formisch/vue';
 import * as v from 'valibot';
 
-export interface EmailInputProps<
-  TSchema extends v.GenericSchema<{ email: string }>,
-> {
+interface EmailInputProps {
   of: FormStore<TSchema>;
 }
 
-const props = defineProps<EmailInputProps<TSchema>>();
+const props = defineProps<EmailInputProps>();
 
 const field = useField(
   () => props.of,

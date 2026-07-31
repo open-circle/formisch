@@ -147,8 +147,9 @@ To pass your form to another component via props, you can use the <Link href="/s
 
 ```svelte
 <script lang="ts">
-  import { createForm, Form, type FormStore } from '@formisch/svelte';
+  import { createForm } from '@formisch/svelte';
   import * as v from 'valibot';
+  import FormContent from './FormContent.svelte';
 
   const LoginSchema = v.object({
     email: v.pipe(v.string(), v.email()),
@@ -162,7 +163,7 @@ To pass your form to another component via props, you can use the <Link href="/s
 
 <FormContent of={loginForm} />
 
-<!-- In another file -->
+<!-- In another file: FormContent.svelte -->
 <script lang="ts">
   import {
     Form,

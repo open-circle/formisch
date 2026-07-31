@@ -121,7 +121,7 @@ However, if you set the `multiple` attribute, multiple options can be selected m
 ```tsx
 <Field of={form} path={['frameworks']}>
   {(field) => (
-    {/* Set "multiple" to "true" */}
+    // Set "multiple" to "true"
     <select {...field.props} multiple>
       <For
         each={[

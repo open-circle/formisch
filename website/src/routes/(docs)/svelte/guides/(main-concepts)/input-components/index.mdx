@@ -183,7 +183,7 @@ When using component libraries that don't expose their underlying native HTML el
   {#snippet children(field)}
     <DatePicker
       value={field.input}
-      onInput={(newDate) => field.onInput(newDate)}
+      onChange={(newDate) => field.onInput(newDate)}
     />
   {/snippet}
 </Field>

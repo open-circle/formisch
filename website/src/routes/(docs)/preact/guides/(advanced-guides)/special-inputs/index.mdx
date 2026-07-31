@@ -115,14 +115,18 @@ However, if you set the `multiple` attribute, multiple options can be selected m
 ```tsx
 <Field of={form} path={['frameworks']}>
   {(field) => (
-    {/* Set "multiple" to "true" */}
+    // Set "multiple" to "true"
     <select {...field.props} multiple>
       {[
         { label: 'Preact', value: 'preact' },
         { label: 'Solid', value: 'solid' },
         { label: 'Qwik', value: 'qwik' },
       ].map(({ label, value }) => (
-        <option key={value} value={value} selected={field.input.value?.includes(value)}>
+        <option
+          key={value}
+          value={value}
+          selected={field.input.value?.includes(value)}
+        >
           {label}
         </option>
       ))}

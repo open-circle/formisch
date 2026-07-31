@@ -18,7 +18,7 @@ Since the library is written in TypeScript and we put a lot of emphasis on the d
 
 Formisch's structural directives declare a typed template context through Angular's `ngTemplateContextGuard`. To benefit from that in your templates, enable `strictTemplates` in the `angularCompilerOptions` of your `tsconfig.json`:
 
-```ts
+```json
 {
   "angularCompilerOptions": {
     "strictTemplates": true
@@ -161,6 +161,11 @@ To pass your form to another component, use the <Link href="/angular/api/FormSto
 import { Component, input } from '@angular/core';
 import { FormischForm, type FormStore } from '@formisch/angular';
 import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
 
 @Component({
   selector: 'app-form-content',
