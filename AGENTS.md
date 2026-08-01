@@ -29,6 +29,10 @@ pnpm -C website dev             # Start docs site
 - **JSDoc required** on exported functions (first overload only for overload sets)
 - **`// @__NO_SIDE_EFFECTS__`** before pure factory functions for tree-shaking
 
+## API Docs Conventions
+
+- **Generics always show a constraint** in `properties.ts`. Use `modifier: 'extends'` with the constraint from the source, and default to `extends unknown` when the source has none.
+
 ## Library Architecture
 
 Framework-agnostic core with framework-specific reactivity injected at build time:
