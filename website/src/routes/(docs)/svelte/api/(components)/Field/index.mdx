@@ -13,7 +13,7 @@ import { properties } from './properties';
 
 Headless form field component that provides reactive properties and state. The field component takes a form store, path to field, and a snippet that receives a field store to display field state and handle user interactions.
 
-```tsx
+```svelte
 <Field of={…} path={…}>children</Field>
 ```
 
@@ -30,7 +30,7 @@ Headless form field component that provides reactive properties and state. The f
 
 ### Explanation
 
-The `Field` component is a headless component that doesn't render any UI itself. Instead, it provides a snippet via the `children` prop that receives a <Link href="../FieldStore/">`FieldStore`</Link> containing all the reactive state and props needed to render a form field.
+The `Field` component is a headless component that doesn't render any UI itself. Instead, it accepts a `children` snippet and invokes it with a <Link href="../FieldStore/">`FieldStore`</Link> containing all the reactive state and props needed to render a form field.
 
 The component automatically handles field registration, validation, and state management through the `of` prop that references the form store.
 

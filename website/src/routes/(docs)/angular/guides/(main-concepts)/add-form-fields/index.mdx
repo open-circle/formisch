@@ -167,7 +167,7 @@ The field store provides access to the following properties:
 - `isValid`: A signal with whether the field passes all validation rules.
 - `setInput`: Sets the field input value programmatically.
 
-All state is exposed as signals, so you call them like functions in your template (e.g. `field.errors()`). The only exception is `path`, which is a plain value.
+All reactive state is exposed as signals, so you call it like a function in your template (e.g. `field.errors()`). The `path` property is a plain value, and `setInput` is a method.
 
 ## Next steps
 

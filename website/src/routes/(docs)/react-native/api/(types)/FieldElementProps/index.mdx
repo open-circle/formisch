@@ -23,8 +23,8 @@ Props to spread onto a field element for integration with React Native form hand
 
 ### Explanation
 
-The props are spread onto a `TextInput` to connect it to the form. Since React Native has no native form elements, inputs are controlled. Therefore, always pass `value={field.input}` alongside the spread props. The `onChangeText` handler updates the field input whenever the text changes.
+The props are spread onto a `TextInput` to connect it to the form. Since React Native has no DOM form controls with browser-managed values, inputs are controlled. Therefore, always pass `value={field.input}` alongside the spread props. The `onChangeText` handler updates the field input whenever the text changes.
 
-Non-text components such as `Switch`, sliders and pickers do not report text, so spreading these props is not enough to connect them: pass their value from `field.input` and their change handler to the field store's `onChange` method instead. The `ref` and the `onFocus` and `onBlur` handlers can still be forwarded to make such a component focusable and to keep its touched and blurred state.
+Non-text components such as `Switch`, sliders and pickers do not report text, so spreading these props is not enough to connect them: pass their value from `field.input` and their change handler to the field store's `onChange` method instead. The `ref` and the `onFocus` and `onBlur` handlers can still be forwarded to make such a component focusable and preserve touch and blur validation behavior.
 
 The `ref` callback registers the native component instance. <Link href="../FieldElement/">`FieldElement`</Link> is a structural subset of the imperative methods of React Native host component instances, so refs of `TextInput` and other focusable native components are accepted. On React 19 the callback returns a cleanup function that unregisters the exact element, while React 18 calls the callback with `null` instead.

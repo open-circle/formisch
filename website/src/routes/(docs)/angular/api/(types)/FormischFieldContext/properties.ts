@@ -8,10 +8,20 @@ export const properties: Record<string, PropertyProps> = {
       name: 'FormSchema',
       href: '/core/api/FormSchema/',
     },
+    default: {
+      type: 'custom',
+      name: 'FormSchema',
+      href: '/core/api/FormSchema/',
+    },
   },
   TFieldPath: {
     modifier: 'extends',
     type: {
+      type: 'custom',
+      name: 'RequiredPath',
+      href: '/core/api/RequiredPath/',
+    },
+    default: {
       type: 'custom',
       name: 'RequiredPath',
       href: '/core/api/RequiredPath/',

@@ -30,7 +30,7 @@ export interface UseFieldConfig<
 }
 
 /**
- * Creates a reactive field store of a specific field within a form store.
+ * Creates a reactive field store for a specific field within a form store.
  *
  * @param form The form store instance, ref, or getter function.
  * @param config The field configuration, ref, or getter function.

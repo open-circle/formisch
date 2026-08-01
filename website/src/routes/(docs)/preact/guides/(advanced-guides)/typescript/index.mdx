@@ -87,14 +87,14 @@ export default function ProfilePage() {
     >
       <Field of={profileForm} path={['age']}>
         {(field) => (
-          // field.input is string
+          // field.input.value is string
           <input {...field.props} value={field.input} type="text" />
         )}
       </Field>
 
       <Field of={profileForm} path={['birthDate']}>
         {(field) => (
-          // field.input is string
+          // field.input.value is string
           <input {...field.props} value={field.input} type="date" />
         )}
       </Field>

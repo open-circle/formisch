@@ -7,21 +7,20 @@ export const properties: Record<string, PropertyProps> = {
       options: [
         {
           type: 'custom',
-          name: 'T',
+          name: 'TValue',
         },
         {
           type: 'function',
           params: [],
           return: {
             type: 'custom',
-            name: 'T',
+            name: 'TValue',
           },
         },
       ],
     },
   },
-  T: {
-    modifier: 'extends',
+  TValue: {
     type: 'unknown',
   },
 };

@@ -6,11 +6,16 @@ contributors:
   - fabian-hiller
 ---
 
-import { ApiList } from '~/components';
+import { ApiList, Property } from '~/components';
+import { properties } from './properties';
 
 # DeepPartial
 
 A utility type that recursively makes all properties and nested properties optional.
+
+## Generics
+
+- `TValue` <Property {...properties.TValue} />
 
 > This type is too complex to display. Please refer to the [source code](https://github.com/open-circle/formisch/blob/main/packages/core/src/types/utils/utils.ts).
 

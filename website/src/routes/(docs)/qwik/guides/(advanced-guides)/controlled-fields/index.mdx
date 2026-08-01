@@ -42,7 +42,7 @@ Fields defined with a `v.number()` or `v.date()` schema need extra steps to be c
 
 ### Number input example
 
-An `<input type="number" />` only reads and writes strings. So if you spread `field.props` onto it, `field.input` holds a string like `"123"`, even though it is typed as `number`. To store a real number, override the input handler with one that converts the value via `valueAsNumber` and forwards it to `field.onInput`.
+An `<input type="number" />` only reads and writes strings. So if you spread `field.props` onto it, `field.input.value` holds a string like `"123"`, even though it is typed as `number`. To store a real number, override the input handler with one that converts the value via `valueAsNumber` and forwards it to `field.onInput`.
 
 You also have to handle `NaN`. While typing a floating point number, the value can briefly be `NaN`, for example right after typing `1.`. If you don't catch this for the displayed value, the input is cleared. It is best to encapsulate both in a separate component as described in the <Link href="/qwik/guides/input-components/">input components</Link> guide.
 

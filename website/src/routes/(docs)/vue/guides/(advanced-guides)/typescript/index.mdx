@@ -184,17 +184,13 @@ const props = defineProps<FormContentProps>();
 You can create generic field components with proper TypeScript typing using the <Link href="/vue/api/FormStore/">`FormStore`</Link> type with Valibot's `GenericSchema`.
 
 ```vue
-<script
-  setup
-  lang="ts"
-  generic="TSchema extends v.GenericSchema<{ email: string }>"
->
+<script setup lang="ts">
 import { useField } from '@formisch/vue';
 import type { FormStore } from '@formisch/vue';
 import * as v from 'valibot';
 
 interface EmailInputProps {
-  of: FormStore<TSchema>;
+  of: FormStore<v.GenericSchema<{ email: string }>>;
 }
 
 const props = defineProps<EmailInputProps>();

@@ -98,7 +98,7 @@ export function TextInput({
 
 ### JSX code
 
-After that, you can add the JSX code to the return statement. Since React Native has no input types, we map the `type` prop to the matching `keyboardType` and use `secureTextEntry` for passwords. React Native has no equivalent of the `aria-invalid` attribute, so the visible error message below the input is what communicates the invalid state. It also has no way to associate a separate label element with an input, so the label text is passed to the input as its `accessibilityLabel` for screen readers.
+After that, you can add the JSX code to the return statement. Since React Native's `TextInput` has no HTML-style `type` prop, we map our component's `type` prop to the matching `keyboardType` and use `secureTextEntry` for passwords. React Native has no equivalent of the `aria-invalid` attribute, so the component renders a visible error message below the input. To label the input consistently across platforms, it also passes the label text directly to the input as its `accessibilityLabel`.
 
 ```tsx
 import type { FieldElementProps } from '@formisch/react-native';

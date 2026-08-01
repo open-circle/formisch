@@ -133,8 +133,9 @@ The <Link href="/qwik/api/Field/">`Field`</Link> component is essentially a thin
 
 ## Field store
 
-The field store provides access to the following properties as signals:
+The field store provides access to the following properties:
 
+- `path`: A signal containing the path to the field within the form (access with `.value`).
 - `props`: JSX props to spread onto your input element (includes event handlers, ref callback, name attribute, and `autofocus` to automatically focus fields with errors).
 - `input`: A signal containing the current input value of the field (access with `.value`).
 - `errors`: A signal containing an array of error messages if validation fails (access with `.value`).
@@ -142,7 +143,7 @@ The field store provides access to the following properties as signals:
 - `isEdited`: A signal indicating whether the field's value has been changed (access with `.value`).
 - `isDirty`: A signal indicating whether the current input differs from the initial input (access with `.value`).
 - `isValid`: A signal indicating whether the field passes all validation rules (access with `.value`).
-- `onInput`: Sets the field input value programmatically. Use this when the field cannot be connected to a native HTML element (e.g., complex custom inputs or component libraries that don't expose the underlying element).
+- `onInput`: A QRL that sets the field input value programmatically. Use this when the field cannot be connected to a native HTML element (e.g., complex custom inputs or component libraries that don't expose the underlying element).
 
 ## Next steps
 

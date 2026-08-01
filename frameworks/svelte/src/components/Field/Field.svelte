@@ -28,7 +28,7 @@
      */
     readonly path: ValidPath<v.InferInput<TSchema>, TFieldPath>;
     /**
-     * The render function that receives the field store and returns JSX.
+     * The child snippet that receives the field store.
      */
     readonly children: Snippet<[FieldStore<TSchema, TFieldPath>]>;
   }

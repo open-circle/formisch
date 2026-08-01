@@ -11,7 +11,7 @@ import { Link } from '~/components';
 
 # Handle submission
 
-Now your first form is almost ready. There is only one little thing missing and that is the data processing when the form is submitted.
+Your first form is almost ready. The remaining step is processing its data when the form is submitted.
 
 ## Submit event
 
@@ -61,7 +61,7 @@ While the form is being submitted, you can use `loginForm.isSubmitting.value` to
 </button>
 ```
 
-The form store also provides other reactive properties like `isSubmitted`, `isValidating`, `isTouched`, `isDirty`, `isValid`, and `errors` for tracking form state. Note that `errors` only contains validation errors at the root level of the form — to get all errors from all fields, use the <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link> method.
+The form store also provides other reactive properties like `isSubmitted`, `isValidating`, `isTouched`, `isDirty`, `isValid`, and `errors` for tracking form state. Note that `errors.value` only contains validation errors at the root level of the form — to get all errors from all fields, use the <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link> method.
 
 ### Async submission
 
