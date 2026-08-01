@@ -128,7 +128,7 @@ href: '/core/api/FormSchema/';
 
 ### properties.ts
 
-- [ ] All generics have `modifier: 'extends'`
+- [ ] All generics have `modifier: 'extends'` (`extends unknown` when the source has no constraint)
 - [ ] Custom types have valid `href` links
 - [ ] Property order: `name`, `href`, `generics`
 - [ ] No unused properties

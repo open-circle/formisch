@@ -74,7 +74,7 @@ See [references/property-component.md](references/property-component.md) for the
 import type { PropertyProps } from '~/components';
 
 export const properties: Record<string, PropertyProps> = {
-  // 1. GENERICS - with modifier: 'extends'
+  // 1. GENERICS - always with modifier: 'extends'
   TSchema: {
     modifier: 'extends',
     type: {
@@ -82,6 +82,12 @@ export const properties: Record<string, PropertyProps> = {
       name: 'FormSchema',
       href: '/core/api/FormSchema/',
     },
+  },
+
+  // Generics without a constraint in the source default to `extends unknown`
+  TValue: {
+    modifier: 'extends',
+    type: 'unknown',
   },
 
   // 2. PARAMETERS - matching function signature
