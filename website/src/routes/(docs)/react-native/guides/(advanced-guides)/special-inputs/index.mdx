@@ -12,7 +12,7 @@ import { Link } from '~/components';
 
 # Special inputs
 
-React Native has no DOM-style form controls such as checkboxes, dropdown selects, or file inputs. Text is entered through `TextInput`, which connects to a field by spreading `field.props`. Other kinds of input, including the built-in `Switch` and components from community packages, are wired up manually: read the current value from `field.input` and write it back with `field.onChange`. This guide covers the most common cases.
+React Native has no DOM-style form controls such as checkboxes, dropdown selects, or file inputs. Text is entered through `TextInput`, which connects to a field by spreading `field.props` and passing `value={field.input}` to keep it controlled. Other kinds of input, including the built-in `Switch` and components from community packages, are wired up manually: read the current value from `field.input` and write it back with `field.onChange`. This guide covers the most common cases.
 
 > In our <Link href="/playground/special/">playground</Link> you can take a look at such fields and test them out.
 

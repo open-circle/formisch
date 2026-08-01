@@ -71,7 +71,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
   {(field) => (
     <DateTimePicker
       value={field.input ?? new Date()}
-      onChange={(event, date) => date && field.onChange(date)}
+      onValueChange={(event, date) => field.onChange(date)}
     />
   )}
 </Field>;

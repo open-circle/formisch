@@ -11,7 +11,7 @@ import { properties } from './properties';
 
 # Form
 
-Form component that manages form submission and applies internal state. It wraps a native form element and passes submission events to the provided handler.
+Form component that manages form submission and applies internal state. It wraps a native form element and calls the provided handler with the validated form output and the submit event.
 
 ```tsx
 <Form of={…} onSubmit={…}>children</Form>
