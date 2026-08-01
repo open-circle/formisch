@@ -44,7 +44,7 @@ const TodoFormSchema = v.object({
 
 To dynamically generate the form fields for the todos, you use the <Link href="/angular/api/formischFieldArray/">`*formischFieldArray`</Link> directive in combination with Angular's `@for` block. The field array provides an `items` signal that contains unique string identifiers. Use them as the `track` expression so Angular detects when an item is added, moved, or removed.
 
-```ts
+```angular-ts
 import { Component } from '@angular/core';
 import {
   FormischControl,

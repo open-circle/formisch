@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
 import rehypeExternalLinks from 'rehype-external-links';
 import { getSingletonHighlighter } from 'shiki';
 import shikiAngularHtml from 'shiki/langs/angular-html.mjs';
+import shikiAngularTypeScript from 'shiki/langs/angular-ts.mjs';
 import shikiBash from 'shiki/langs/bash.mjs';
 import shikiJsonc from 'shiki/langs/jsonc.mjs';
 import shikiSvelte from 'shiki/langs/svelte.mjs';
@@ -25,7 +26,8 @@ await Promise.all([
     shikiJsonc,
     shikiSvelte,
     shikiVue,
-    shikiAngularHtml
+    shikiAngularHtml,
+    shikiAngularTypeScript
   ),
   highlighter.loadTheme(
     JSON.parse(readFileSync('shiki/pace-theme-light+.json', 'utf8')),

@@ -29,7 +29,7 @@ Formisch is a schema-based, headless form library for Angular. It manages form s
 
 Every form starts with the <Link href="/angular/api/injectForm/">`injectForm`</Link> function. It initializes your form's store based on the provided Valibot schema and infers its types. Next, add the <Link href="/angular/api/formischForm/">`[formischForm]`</Link> directive to your native `<form>` element. It handles form validation and submission. Then, create a field with the <Link href="/angular/api/formischField/">`*formischField`</Link> directive (or the <Link href="/angular/api/injectField/">`injectField`</Link> function in your component class) and bind it to your input with the <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive, which syncs the value, the `name` and `aria-invalid` attributes, and all event handlers for you.
 
-```ts
+```angular-ts
 import { Component } from '@angular/core';
 import {
   FormischControl,

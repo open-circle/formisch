@@ -64,7 +64,7 @@ Each field exposes several state signals to drive this decision:
 
 The form additionally exposes `isSubmitted()`, which becomes `true` after the first submit attempt. Combining `isEdited()` with `isSubmitted()` gives the balanced behavior described above:
 
-```ts
+```angular-ts
 import { Component } from '@angular/core';
 import {
   FormischControl,
@@ -114,7 +114,7 @@ export class LoginComponent {
 
 Writing this guard at every field gets repetitive. The common fix is to move it into a small reusable component, either on its own or folded into the `TextInputComponent` from the <Link href="/angular/guides/input-components/">input components</Link> guide, so the `isEdited() || isSubmitted()` logic lives in exactly one place:
 
-```ts
+```angular-ts
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
@@ -152,7 +152,7 @@ Add `FieldErrorComponent` to the `imports` array of the components that use it. 
 
 When your schema contains asynchronous checks, validation does not resolve instantly. The form's `isValidating()` state is `true` while any validation is in flight, which you can use to show a loading indicator or to disable the submit button until validation settles.
 
-```ts
+```angular-ts
 import { Component } from '@angular/core';
 import { FormischForm, injectForm } from '@formisch/angular';
 import * as v from 'valibot';

@@ -56,7 +56,7 @@ In the first step, you create a new file for the `TextInputComponent`. The compo
 
 Keep the component generic over the schema and the field path. The field store is invariant because of its `setInput` method, so a component that widens the input to the default `FieldStore` cannot accept a concrete field.
 
-```ts
+```angular-ts
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import {
   type FieldStore,
@@ -87,7 +87,7 @@ export class TextInputComponent<
 
 After that, you can add the template code. Use `field().name()` as the `id` so that the label and the error message reference the input element.
 
-```ts
+```angular-ts
 template: `
   @if (label(); as label) {
     <label [for]="field().name()">
@@ -119,7 +119,7 @@ You can now build on this code and add CSS, for example. You can also follow the
 
 Below is an overview of the entire code of the `TextInputComponent`.
 
-```ts
+```angular-ts
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import {
   type FieldStore,

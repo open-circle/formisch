@@ -18,7 +18,7 @@ To add a field to your form, you can use the <Link href="/angular/api/formischFi
 
 The <Link href="/angular/api/formischField/">`*formischField`</Link> directive is a structural directive. It takes the path to the field, the form store after the `of` keyword, and exposes the field store as the implicit template context. If you use TypeScript, you get full autocompletion for the path based on your schema.
 
-```ts
+```angular-ts
 import { Component } from '@angular/core';
 import {
   FormischControl,
@@ -69,7 +69,7 @@ Because the directive writes to the element, you must not bind `[value]` or `[ch
 
 When a field spans more than one element — a label, the input and an error message — use an `<ng-container>` as the host of the structural directive:
 
-```ts
+```angular-ts
 template: `
   <ng-container *formischField="['email'] of loginForm; let field">
     <label [for]="field.name()">Email</label>
@@ -114,7 +114,7 @@ The API design of the <Link href="/angular/api/formischField/">`*formischField`<
 
 For very complex forms where you create individual components for each form field, Formisch provides the <Link href="/angular/api/injectField/">`injectField`</Link> function. It allows you to access the field state directly within your component class. Like <Link href="/angular/api/injectForm/">`injectForm`</Link>, it must be called in an injection context.
 
-```ts
+```angular-ts
 import { Component, input } from '@angular/core';
 import {
   FormischControl,
