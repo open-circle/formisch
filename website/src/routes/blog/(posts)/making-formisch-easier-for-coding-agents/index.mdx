@@ -1,0 +1,79 @@
+---
+cover: Coding Agents
+title: 'Making Formisch easier for coding agents to use'
+description: >-
+  How we reworked the Formisch documentation for coding agents, with two agent
+  skills, a framework-aware MCP server, a Markdown version of every page, and
+  per-framework LLMs.txt routes.
+published: 2026-08-05
+authors:
+  - flySewa
+---
+
+import { Link } from '~/components';
+
+We assume a lot of people use coding agents when they're building with Formisch, and because the library is new, there isn't much code for models to have learned from yet. That makes good documentation even more important, so we spent the last few weeks reworking it to make it easier for agents to use.
+
+Most of the work fell into a few areas.
+
+## Two agent skills
+
+The Formisch skill works alongside the Valibot skill, giving coding agents the context they need across both libraries. The Formisch skill covers form state, field paths, and array fields, while the Valibot skill covers the schemas those fields are typed by. Both use the current API and include the patterns we recommend, so the code an agent writes follows the examples in our guides. 
+
+Install them with one command.
+
+```bash
+npx skills add open-circle/agent-skills --skill formisch valibot
+```
+
+We recommend installing it, and being specific in prompts. When there are multiple valid ways to implement something, a model will usually choose the approach it has seen most often. Giving it the intended direction helps it produce the result you want.
+
+## An MCP server
+
+Our MCP server gives coding agents direct access to the Formisch documentation while they work. When an agent needs information about a specific part of the library, it can search the docs and retrieve the relevant page instead of relying only on its training data or loading unrelated documentation.
+
+We run one at `https://formisch.dev/mcp`. It is free to use and doesn't require authentication.
+
+Add it to Claude Code with this:
+
+```bash
+claude mcp add --transport http formisch https://formisch.dev/mcp
+```
+
+For Cursor and other tools that use a JSON configuration file, add this entry:
+
+```json
+{
+  "mcpServers": {
+    "formisch": {
+      "url": "https://formisch.dev/mcp"
+    }
+  }
+}
+```
+
+The server provides three tools.
+
+- `search_docs` searches the documentation and returns matching pages
+- `get_doc` reads a specific page and returns it as Markdown
+- `list_docs` lists all pages grouped by framework and area
+
+All three take a framework, so setting it to `react` returns React pages plus the shared form methods and core types while excluding the other seven. `get_doc` also reports when a page exists for other frameworks and links to those versions, so an agent working in one framework doesn't follow an example written for another.
+
+## Documentation agents can read
+
+Every documentation page is available as Markdown, so agents get the API details, examples, and guides in a format that is easier to process. An HTML page carries navigation, scripts, and styling that an agent pays for and doesn't need, so the same page costs a fraction of the context. API reference pages include their full type signatures, and links between pages stay within Markdown so an agent can keep following documentation without switching formats.
+
+LLMs.txt gives an agent a map of that documentation before it decides what to read. Formisch ships eight framework adapters, so we publish a set per framework rather than one for the whole site. For React that means `llms-react.txt` as a table of contents, `llms-react-full.txt` for the entire React documentation, and `llms-react-guides.txt` and `llms-react-api.txt` for the guides and API reference. The same four exist for every framework, alongside `llms-blog.txt` for the blog posts, so an agent working in Vue loads Vue documentation only.
+
+All of it is static, with more than 340 pages generated ahead of time and served as files, which matters because agents often retrieve several documents while working through a single task. Thanks to the [ZanReal](https://zanreal.com/) team for making this possible. They wrote about the [migration](https://zanreal.com/case-studies/valibot-formisch-static-docs) if you're interested in how it works.
+
+## API design matters too
+
+Documentation is one part of making a library easier for coding agents to use. The API design matters too. We think models do better when there are fewer concepts to keep track of and more patterns they can reuse.
+
+Formisch is one framework-agnostic core with a thin adapter per framework and no abstraction layer in between. Our <Link href="/blog/one-core-six-frameworks/">architecture post</Link> covers how that works. For a model it means the same schema, field paths, store, and methods across every framework, with only the reactivity syntax changing. So a model learns one set of primitives and applies them across eight frameworks instead of learning eight libraries.
+
+The schema is the single source of truth for validation and types, so there is no second declaration to keep in sync and no way for the two to drift apart.
+
+Everything above is available on the coding agents page for <Link href="/angular/guides/coding-agents/">Angular</Link>, <Link href="/preact/guides/coding-agents/">Preact</Link>, <Link href="/qwik/guides/coding-agents/">Qwik</Link>, <Link href="/react/guides/coding-agents/">React</Link>, <Link href="/react-native/guides/coding-agents/">React Native</Link>, <Link href="/solid/guides/coding-agents/">Solid</Link>, <Link href="/svelte/guides/coding-agents/">Svelte</Link> and <Link href="/vue/guides/coding-agents/">Vue</Link>. [Valibot](https://valibot.dev/guides/coding-agents/), which Formisch uses for schemas, has the same setup.
