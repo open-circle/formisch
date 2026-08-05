@@ -108,9 +108,15 @@ export const properties: Record<string, PropertyProps> = {
         {
           name: 'element',
           type: {
-            type: 'custom',
-            name: 'FieldElement',
-            href: '/core/api/FieldElement/',
+            type: 'union',
+            options: [
+              {
+                type: 'custom',
+                name: 'FieldElement',
+                href: '/core/api/FieldElement/',
+              },
+              'null',
+            ],
           },
         },
       ],

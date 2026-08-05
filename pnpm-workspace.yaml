@@ -17,6 +17,7 @@ allowBuilds:
   lmdb: false
   msgpackr-extract: false
   sharp: true
+  unrs-resolver: true
   vercel: true
   workerd: true
 overrides:

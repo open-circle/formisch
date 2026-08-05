@@ -37,7 +37,7 @@ export default function App() {
   });
 
   return (
-    <Form of={loginForm}>
+    <Form of={loginForm} onSubmit={(output) => console.log(output)}>
       <Field of={loginForm} path={['email']}>
         {(field) => <input {...field.props} value={field.input} type="email" />}
       </Field>
@@ -119,6 +119,7 @@ The <Link href="/react/api/Field/">`Field`</Link> component is essentially a thi
 
 The field store provides access to the following properties. They are plain values, but because Formisch wires into React's rendering, your components re-render when they change.
 
+- `path`: The path to the field within the form.
 - `props`: JSX props to spread onto your input element (includes event handlers, ref callback, name attribute, and `autoFocus` to automatically focus fields with errors).
 - `input`: The current input value of the field.
 - `errors`: The current array of error messages if validation fails.

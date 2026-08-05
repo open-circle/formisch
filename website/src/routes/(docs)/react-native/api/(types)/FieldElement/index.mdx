@@ -1,0 +1,41 @@
+---
+title: FieldElement
+description: >-
+  The imperative methods of the native components that can be registered with a
+  field store.
+source: /packages/core/src/types/field/field.react-native.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# FieldElement
+
+The imperative methods of the native components that can be registered with a field store.
+
+## Definition
+
+- `FieldElement`
+  - `focus` <Property {...properties.focus} />
+  - `blur` <Property {...properties.blur} />
+  - `isFocused` <Property {...properties.isFocused} />
+
+### Explanation
+
+React Native has no DOM elements. Instead of a union of HTML elements, `FieldElement` is a structural subset of the imperative methods that React Native host component instances provide. This way the refs of `TextInput` and other focusable native components are accepted without depending on the `react-native` package.
+
+Only `focus` is required, as it is what <Link href="/methods/api/focus/">`focus`</Link> calls to focus a field. `isFocused` is implemented by `TextInput` and is used to verify that an element actually received focus, so that elements which cannot be focused are skipped.
+
+## Related
+
+### Methods
+
+<ApiList items={[{ text: 'focus', href: '/methods/api/focus/' }]} />
+
+### Types
+
+<ApiList
+  items={[{ text: 'FieldElementProps', href: '../FieldElementProps/' }]}
+/>

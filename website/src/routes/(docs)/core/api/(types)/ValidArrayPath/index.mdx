@@ -6,8 +6,16 @@ contributors:
   - fabian-hiller
 ---
 
+import { Property } from '~/components';
+import { properties } from './properties';
+
 # ValidArrayPath
 
 A utility type that validates array paths and returns the first possible valid array path based on the given value if the provided path is invalid.
+
+## Generics
+
+- `TValue` <Property {...properties.TValue} />
+- `TPath` <Property {...properties.TPath} />
 
 > This type is too complex to display. Please refer to the [source code](https://github.com/open-circle/formisch/blob/main/packages/core/src/types/path/path.ts).

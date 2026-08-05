@@ -32,7 +32,7 @@ For a text input field you simply add the `value` attribute and pass the value o
 
 ### Exception for files
 
-The HTML `<input type="file" />` element is an exception because it cannot be controlled. However, you have the possibility to control the UI around it. For inspiration you can use the code of our <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/blob/main/playgrounds/svelte/src/components/FileInput.svelte`} target="\_blank" rel="noreferrer">`FileInput`</a> component from our <Link href="/playground/login/">playground</Link>.
+The HTML `<input type="file" />` element is an exception because it cannot be controlled. However, you have the possibility to control the UI around it. For inspiration you can use the code of our <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/blob/main/playgrounds/svelte/src/lib/components/FileInput.svelte`} target={'\_blank'} rel="noreferrer">`FileInput`</a> component from our <Link href="/playground/special/">playground</Link>.
 
 ## Numbers and dates
 
@@ -66,10 +66,8 @@ You also have to handle `NaN`. While typing a floating point number, the value c
     input,
     errors,
     required,
-    onfocus,
     oninput,
-    onchange,
-    onblur,
+    ...fieldProps
   }: NumberInputProps = $props();
 
   // Update value if it is not `NaN`
@@ -81,22 +79,21 @@ You also have to handle `NaN`. While typing a floating point number, the value c
     <label for={name}>{label}</label>
   {/if}
   <input
+    {...fieldProps}
     {name}
     {type}
     {placeholder}
+    {required}
     id={name}
     value={getValue()}
     aria-invalid={!!errors}
     aria-errormessage={`${name}-error`}
-    {onfocus}
     oninput={(event) =>
       oninput(
         event.currentTarget.value === ''
           ? undefined
           : event.currentTarget.valueAsNumber
       )}
-    {onchange}
-    {onblur}
   />
   {#if errors}
     <div id={`${name}-error`}>{errors[0]}</div>
@@ -147,10 +144,8 @@ The same applies to dates. An `<input type="date" />` works with `yyyy-mm-dd` st
     input,
     errors,
     required,
-    onfocus,
     oninput,
-    onchange,
-    onblur,
+    ...fieldProps
   }: DateInputProps = $props();
 
   // Transform date to string
@@ -165,17 +160,16 @@ The same applies to dates. An `<input type="date" />` works with `yyyy-mm-dd` st
     <label for={name}>{label}</label>
   {/if}
   <input
+    {...fieldProps}
     {name}
     {type}
     {placeholder}
+    {required}
     id={name}
     value={getValue()}
     aria-invalid={!!errors}
     aria-errormessage={`${name}-error`}
-    {onfocus}
     oninput={(event) => oninput(event.currentTarget.valueAsDate ?? undefined)}
-    {onchange}
-    {onblur}
   />
   {#if errors}
     <div id={`${name}-error`}>{errors[0]}</div>

@@ -33,13 +33,17 @@ export default component$(() => {
     schema: LoginSchema,
   }));
 
-  return <Form of={loginForm}>{/* Form fields will go here */}</Form>;
+  return (
+    <Form of={loginForm} onSubmit$={(output) => console.log(output)}>
+      {/* Form fields will go here */}
+    </Form>
+  );
 });
 ```
 
 ### Configuration options
 
-The <Link href="/qwik/api/useForm$/">`useForm$`</Link> hook accepts a configuration object with the following options:
+The <Link href="/qwik/api/useForm$/">`useForm$`</Link> hook accepts a function that returns a configuration object with the following options:
 
 - `schema`: Your Valibot schema that defines the form
 - `initialInput`: Initial values for your form fields (optional)
@@ -107,8 +111,12 @@ export default component$(() => {
 
   return (
     <>
-      <Form of={loginForm}>{/* … */}</Form>
-      <Form of={registerForm}>{/* … */}</Form>
+      <Form of={loginForm} onSubmit$={(output) => console.log(output)}>
+        {/* … */}
+      </Form>
+      <Form of={registerForm} onSubmit$={(output) => console.log(output)}>
+        {/* … */}
+      </Form>
     </>
   );
 });

@@ -34,7 +34,7 @@ const loginForm = useForm({
 </script>
 
 <template>
-  <Form :of="loginForm">
+  <Form :of="loginForm" @submit="(output) => console.log(output)">
     <!-- Form fields will go here -->
   </Form>
 </template>
@@ -109,8 +109,12 @@ const registerForm = useForm({ schema: RegisterSchema });
 </script>
 
 <template>
-  <Form :of="loginForm"><!-- … --></Form>
-  <Form :of="registerForm"><!-- … --></Form>
+  <Form :of="loginForm" @submit="(output) => console.log(output)">
+    <!-- … -->
+  </Form>
+  <Form :of="registerForm" @submit="(output) => console.log(output)">
+    <!-- … -->
+  </Form>
 </template>
 ```
 

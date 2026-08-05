@@ -18,11 +18,11 @@ Since the library is written in TypeScript and we put a lot of emphasis on the d
 
 Formisch's structural directives declare a typed template context through Angular's `ngTemplateContextGuard`. To benefit from that in your templates, enable `strictTemplates` in the `angularCompilerOptions` of your `tsconfig.json`:
 
-```ts
+```jsonc
 {
   "angularCompilerOptions": {
-    "strictTemplates": true
-  }
+    "strictTemplates": true,
+  },
 }
 ```
 
@@ -32,7 +32,7 @@ With strict templates, an invalid field path is a compile error in the template 
 
 Formisch uses Valibot's type inference to automatically derive TypeScript types from your schemas. You don't need to define separate types — they're inferred automatically.
 
-```ts
+```angular-ts
 import { Component } from '@angular/core';
 import { FormischForm, injectForm } from '@formisch/angular';
 import * as v from 'valibot';
@@ -82,7 +82,7 @@ const ProfileSchema = v.object({
 });
 ```
 
-```ts
+```angular-ts
 @Component({
   selector: 'app-profile',
   imports: [FormischForm, FormischField, FormischControl],
@@ -157,9 +157,15 @@ const UserSchema = v.object({
 
 To pass your form to another component, use the <Link href="/angular/api/FormStore/">`FormStore`</Link> type along with your schema type to get full type safety.
 
-```ts
+```angular-ts
 import { Component, input } from '@angular/core';
 import { FormischForm, type FormStore } from '@formisch/angular';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
 
 @Component({
   selector: 'app-form-content',
@@ -183,7 +189,7 @@ export class FormContentComponent {
 
 A component that owns a single field takes the form as an input and creates the field with <Link href="/angular/api/injectField/">`injectField`</Link>. Type the input with <Link href="/angular/api/FormStore/">`FormStore`</Link> and the concrete schema the component belongs to.
 
-```ts
+```angular-ts
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import {
   FormischControl,
@@ -223,7 +229,7 @@ Passing a form whose schema has no `email` field of type `string` is a compile e
 
 When a component takes a **field store** as an input instead of the form, make it generic over the schema and the path. The field store is invariant, because `setInput` accepts the field's value type. A component that declares a bare `FieldStore` input therefore cannot accept a concrete field store.
 
-```ts
+```angular-ts
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import {
   type FieldStore,

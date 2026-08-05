@@ -59,6 +59,7 @@ Create folder in the appropriate category:
 - `solid/api/(types)` - SolidJS-specific types
 - `qwik/api/(hooks)` - Qwik hooks (useForm$, useField)
 - `preact/api/(hooks)` - Preact hooks
+- `react-native/api/(hooks)` - React Native hooks (useForm, useField)
 - `angular/api/(functions)` - Angular functions (injectForm, injectField)
 - `angular/api/(directives)` - Angular directives (formischForm, formischField)
 - `angular/api/(types)` - Angular-specific types (FormStore, FieldStore, SignalOrValue)
@@ -73,7 +74,7 @@ See [references/property-component.md](references/property-component.md) for the
 import type { PropertyProps } from '~/components';
 
 export const properties: Record<string, PropertyProps> = {
-  // 1. GENERICS - with modifier: 'extends'
+  // 1. GENERICS - always with modifier: 'extends'
   TSchema: {
     modifier: 'extends',
     type: {
@@ -81,6 +82,12 @@ export const properties: Record<string, PropertyProps> = {
       name: 'FormSchema',
       href: '/core/api/FormSchema/',
     },
+  },
+
+  // Generics without a constraint in the source default to `extends unknown`
+  TValue: {
+    modifier: 'extends',
+    type: 'unknown',
   },
 
   // 2. PARAMETERS - matching function signature
@@ -242,14 +249,15 @@ Parentheses folders don't appear in URLs:
 
 ### Framework-Specific Terminology
 
-| Framework | Category Term          | Example API               |
-| --------- | ---------------------- | ------------------------- |
-| Solid     | Primitives             | createForm, useField      |
-| Qwik      | Hooks                  | useForm$, useField        |
-| Preact    | Hooks                  | useForm, useField         |
-| Angular   | Functions / Directives | injectForm, formischField |
-| Vue       | Composables            | useForm, useField         |
-| Svelte    | Runes                  | createForm, useField      |
+| Framework    | Category Term          | Example API               |
+| ------------ | ---------------------- | ------------------------- |
+| Solid        | Primitives             | createForm, useField      |
+| Qwik         | Hooks                  | useForm$, useField        |
+| Preact       | Hooks                  | useForm, useField         |
+| React Native | Hooks                  | useForm, useField         |
+| Angular      | Functions / Directives | injectForm, formischField |
+| Vue          | Composables            | useForm, useField         |
+| Svelte       | Runes                  | createForm, useField      |
 
 ## References
 

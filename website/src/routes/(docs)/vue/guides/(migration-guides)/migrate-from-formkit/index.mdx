@@ -30,7 +30,7 @@ The main differences at a glance:
 - **Source of truth**: In FormKit, structure lives in the template, validation lives on each input, and types live in your TypeScript code. In Formisch, all three live in one Valibot schema.
 - **Validation location and timing**: FormKit validates each input against its `validation` prop and controls message display per input via `validation-visibility`. Formisch validates the whole form against the schema and controls timing form-wide via the `validate` and `revalidate` config. When errors are shown is up to your markup.
 - **Reactivity**: FormKit keeps state in its own framework-agnostic core node tree that you access through `getNode`, node contexts, or slot props. Formisch stores state directly in Vue's reactivity system, so you read `form.isSubmitting` or `field.errors` like any other reactive value.
-- **Bundle size**: FormKit starts at roughly 25 kB (min+gzip). Formisch starts at about 2.5 kB and only grows with the methods you import, since it is fully tree-shakable.
+- **Bundle size**: FormKit starts at roughly 25 kB (min+gzip). Formisch starts at about 2.5 kB and only grows with the methods you import, since it is fully tree-shakeable.
 
 ## Side-by-side example
 

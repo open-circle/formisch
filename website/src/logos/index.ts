@@ -14,6 +14,7 @@ export * from './OpenAILogo';
 export * from './PreactLogo';
 export * from './QwikLogo';
 export * from './ReactLogo';
+export * from './ReactNativeLogo';
 export * from './PaceLogo';
 export * from './SolidLogo';
 export * from './StainlessLogo';

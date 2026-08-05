@@ -13,6 +13,7 @@ public/angular/
 public/preact/
 public/qwik/
 public/react/
+public/react-native/
 public/solid/
 public/svelte/
 public/vue/

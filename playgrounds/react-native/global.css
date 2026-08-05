@@ -1,0 +1,11 @@
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css';
+
+@import 'nativewind/theme';
+
+/* Lexend font families loaded via expo-font in the root layout */
+@theme {
+  --font-lexend: Lexend_400Regular;
+  --font-lexend-medium: Lexend_500Medium;
+}

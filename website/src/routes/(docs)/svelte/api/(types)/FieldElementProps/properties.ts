@@ -15,7 +15,6 @@ export const properties: Record<string, PropertyProps> = {
         },
         {
           key: '[ref: symbol]',
-          optional: true,
           value: {
             type: 'function',
             params: [
@@ -37,7 +36,6 @@ export const properties: Record<string, PropertyProps> = {
         },
         {
           key: 'onfocus',
-          optional: true,
           value: {
             type: 'custom',
             name: 'FocusEventHandler',
@@ -52,7 +50,6 @@ export const properties: Record<string, PropertyProps> = {
         },
         {
           key: 'oninput',
-          optional: true,
           value: {
             type: 'custom',
             name: 'FormEventHandler',
@@ -67,7 +64,6 @@ export const properties: Record<string, PropertyProps> = {
         },
         {
           key: 'onchange',
-          optional: true,
           value: {
             type: 'custom',
             name: 'FormEventHandler',
@@ -82,7 +78,6 @@ export const properties: Record<string, PropertyProps> = {
         },
         {
           key: 'onblur',
-          optional: true,
           value: {
             type: 'custom',
             name: 'FocusEventHandler',

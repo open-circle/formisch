@@ -27,6 +27,8 @@ export const Debugger = component$((props: DebuggerProps) => {
     const path = location.url.pathname.split('/')[2] || '';
     if (framework.value === 'angular') {
       return `${import.meta.env.PUBLIC_GITHUB_URL}/tree/main/playgrounds/angular/src/routes/${path}/${path}.component.ts`;
+    } else if (framework.value === 'react-native') {
+      return `${import.meta.env.PUBLIC_GITHUB_URL}/tree/main/playgrounds/react-native/app/${path}.tsx`;
     } else if (framework.value === 'vue') {
       return `${import.meta.env.PUBLIC_GITHUB_URL}/tree/main/playgrounds/vue/src/views/${path.charAt(0).toUpperCase() + path.slice(1)}View.vue`;
     } else if (framework.value === 'svelte') {
@@ -41,6 +43,8 @@ export const Debugger = component$((props: DebuggerProps) => {
     const path = location.url.pathname.split('/')[2] || '';
     if (framework.value === 'angular') {
       return `${import.meta.env.PUBLIC_STACKBLITZ_ANGULAR_URL}?file=src/routes/${path}/${path}.component.ts`;
+    } else if (framework.value === 'react-native') {
+      return `${import.meta.env.PUBLIC_STACKBLITZ_REACT_NATIVE_URL}?file=app/${path}.tsx`;
     } else if (framework.value === 'vue') {
       return `${import.meta.env.PUBLIC_STACKBLITZ_VUE_URL}?file=src/views/${path.charAt(0).toUpperCase() + path.slice(1)}View.vue`;
     } else if (framework.value === 'svelte') {

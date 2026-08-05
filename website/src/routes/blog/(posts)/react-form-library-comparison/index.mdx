@@ -41,7 +41,7 @@ All three libraries support TypeScript. The more relevant question is where the 
 
 [RHF asks you to declare the form's shape as a TypeScript type and pass it in as a generic](https://react-hook-form.com/ts): `useForm<MyFormValues>()`. That generic is a TypeScript-only construct. It exists purely at compile time and is completely absent at runtime.
 
-The validation schema you configure through a resolver (whether that's Zod, Valibot, Yup, or anything else) is a separate runtime object with no connection to each other. TypeScript has no enforced connection between the type you passed to `useForm` and the schema you passed to the resolver. You can have a type with ten fields and a schema that only validates seven of them, and TypeScript will not flag it. Keeping them aligned is entirely your responsibility, and there is no mechanism to enforce that they stay that way.
+The validation schema you configure through a resolver (whether that's Zod, Valibot, Yup, or anything else) is a separate runtime object. The typed resolvers from `@hookform/resolvers` do compare the schema's inferred shape against your generic, so a plain mismatch like the one below is flagged — but as an opaque `Resolver<...> is not assignable` error on the resolver line, not at the field that is missing. And that check only holds as long as the wiring stays fully typed: widen the generic, cast the resolver, or hand-roll one, and the two silently drift apart. Either way, the type and the schema remain two separate declarations of the same shape that you keep aligned.
 
 ```ts
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -60,20 +60,21 @@ const schema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   // you forgot to add username here
-  // nothing will warn you
 });
 
 // You pass both to RHF separately
 const form = useForm<MyFormValues>({
+  // TypeScript complains here with a resolver type mismatch,
+  // several layers away from the field you actually forgot
   resolver: zodResolver(schema),
 });
 ```
 
-If username is never validated, the form will still submit and TypeScript will not catch this.
+The error tells you that two shapes disagree, not which field you forgot or where to add it. Resolving it is still a manual diff between two declarations — and if the resolver or generic is ever cast to make an error go away, `username` ships unvalidated with no warning at all.
 
 Most teams handle this by deriving the TypeScript type directly from the schema using the library's inference utilities (Zod's `z.infer`, Valibot's `InferInput`, and so on) rather than writing the type manually. That removes the duplication, but it doesn't change the underlying architecture. The type and the schema are still two separate things that happen to share the same shape because you've wired them together. The resolver configuration that connects them at runtime is still something you set up yourself.
 
-The other area where this shows up is field path typing, RHF type-checks the string paths you pass to `register`, `setValue`, `watch`, and similar APIs against the generic type. This works for flat or moderately nested structures.
+The other area where this shows up is field path typing. RHF type-checks the string paths you pass to `register`, `setValue`, `watch`, and similar APIs against the generic type. This works for flat or moderately nested structures.
 
 With deeply nested objects, discriminated unions, or complex conditional field types, the path inference can produce `any` where you'd expect a concrete type. `useFieldArray` in particular has had issues here, especially when the array items themselves have nested or optional fields.
 
@@ -237,9 +238,9 @@ const schema = v.object({
 const form = useForm({ schema });
 ```
 
-Validation runs when the form is submitted by default, rather than on individual field events like `onChange`. The `<Form>` component intercepts the submit event, runs the schema against all current values, and blocks submission if anything fails. After that first submission attempt the validation re-runs as the user types, giving users silent-until-submit behaviour on first interaction, then live feedback as they correct mistakes. For most forms, this covers the range of timing behaviour users expect.
+Validation runs when the form is submitted by default, rather than on individual field events like `onChange`. The `<Form>` component intercepts the submit event, runs the schema against all current values, and blocks submission if anything fails. After that first submission attempt the validation re-runs as the user types, giving users silent-until-submit behavior on first interaction, then live feedback as they correct mistakes. For most forms, this covers the range of timing behavior users expect.
 
-> Formisch lets you configure this behaviour at the form level via the `validate` and `revalidate` options of `useForm`.
+> Formisch lets you configure this behavior at the form level via the `validate` and `revalidate` options of `useForm`.
 
 Async validation follows the same pattern. A username availability check, for example, requires calling your server. In TanStack Form, that async logic lives on the field itself. In Formisch, it lives in the schema using `pipeAsync` and `checkAsync`. The field component is unchanged and just reads `field.errors`. Rather than wiring up a per-field async validator with its own trigger and loading state, you configure the async rule once in the schema. The form exposes
 `isValidating` on the form store if you need to show a global loading indicator.
@@ -285,7 +286,7 @@ When validation rules change, you update the schema, and the rest of the form re
 
 This becomes more noticeable as validation rules evolve or as the form grows in complexity. In RHF, validation logic is either attached to individual fields or wired through a resolver, so changes often involve updating rules in multiple places. In TanStack Form, validation is centralized in configuration, but still lives alongside component code through validators and their triggers. In Formisch, validation lives entirely in the schema. When rules change, you update the schema, and the rest of the form derives from that definition.
 
-This also affects how portable your components are. In RHF, field components tend to carry implicit knowledge of their validation rules. In TanStack Form, they are tied to the validators configured for them. In Formisch, field components don’t contain validation logic, they adapt to whatever schema is provided.
+This also affects how portable your components are. In RHF, field components tend to carry implicit knowledge of their validation rules. In TanStack Form, they are tied to the validators configured for them. In Formisch, field components don't contain validation logic. They adapt to whatever schema is provided.
 
 With Formisch, validation is entirely schema-driven. Components remain simple, but the schema becomes the single place where correctness is defined.
 
@@ -341,7 +342,7 @@ A signal represents a single value and tracks exactly which components depend on
 The dependency graph is more direct than a store-based model. In a large field array where many rows update frequently, only the component reading that specific value re-renders. This difference is small in most web forms
 and more noticeable in React Native or in very large dynamic forms.
 
-Formisch is also framework-agnostic. The same mental model works across React, SolidJS, Vue, Svelte, Preact, and Qwik. That is relevant if your team works across multiple framework environments, or expects that to change.
+Formisch is also framework-agnostic. The same mental model works across Angular, Preact, Qwik, React, React Native, SolidJS, Svelte, and Vue. That is relevant if your team works across multiple framework environments, or expects that to change.
 
 For most applications, the difference between TanStack Form and Formisch comes down to this: both scope re-renders automatically without requiring deliberate component structure. Formisch does it at the signal level, which can reduce overhead as form size and update frequency increase.
 
@@ -407,7 +408,7 @@ The core change is that the schema becomes the starting point for everything. In
 - Schema resolvers are no longer needed. The schema is passed directly to `useForm`.
 - `formState.errors.field` becomes `field.errors`.
 - `watch("field")` is replaced by [`getInput(form, { path: ["field"] })`](https://formisch.dev/methods/api/getInput/) when you need access outside the field component.
-- `useFieldArray` is replaced by Formisch's [`useFieldArray`](https://formisch.dev/react/api/useFieldArray) hook or [`FieldArray`](https://formisch.dev/react/api/FieldArray/) component used alongside `insert`, `remove`, `move`, `swap`, and `replace` methods on the form.
+- `useFieldArray` is replaced by Formisch's [`useFieldArray`](https://formisch.dev/react/api/useFieldArray/) hook or [`FieldArray`](https://formisch.dev/react/api/FieldArray/) component used alongside `insert`, `remove`, `move`, `swap`, and `replace` methods on the form.
 
 Your input components, submit handlers, and server-side validation logic remain mostly the same. Formisch is headless and works with your existing UI components.
 

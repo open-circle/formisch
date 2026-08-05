@@ -14,7 +14,7 @@ import { properties } from './properties';
 Headless field array component that provides reactive properties and state for managing array fields. The field array component takes a form store, path to array field, and a scoped slot that receives a field array store to manage array items and handle array operations.
 
 ```vue
-<FieldArray of="{…}" path="{…}" v-slot="fieldArray">
+<FieldArray :of="…" :path="…" v-slot="fieldArray">
   <!-- Use field array store here -->
 </FieldArray>
 ```
@@ -31,11 +31,11 @@ Headless field array component that provides reactive properties and state for m
 
 ## Slots
 
-- `default` - Scoped slot that receives a <Link href="../FieldArrayStore/">`FieldArrayStore`</Link> with reactive array field state and methods
+- `default` - Scoped slot that receives a <Link href="../FieldArrayStore/">`FieldArrayStore`</Link> with the reactive state of the array field
 
 ### Explanation
 
-The `FieldArray` component is a headless component that doesn't render any UI itself. Instead, it provides a scoped slot that receives a <Link href="../FieldArrayStore/">`FieldArrayStore`</Link> containing all the reactive state and methods needed to manage an array of form fields.
+The `FieldArray` component is a headless component that doesn't render any UI itself. Instead, it provides a scoped slot that receives a <Link href="../FieldArrayStore/">`FieldArrayStore`</Link> containing the reactive state of the array field, such as its item IDs and validation errors. The items themselves are manipulated with the form methods listed below.
 
 The component automatically handles array field registration, validation, and state management through the `of` prop that references the form store.
 

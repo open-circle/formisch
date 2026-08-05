@@ -1,6 +1,6 @@
 ---
 title: useField
-description: Creates a reactive field store of a specific field within a form store.
+description: Creates a reactive field store for a specific field within a form store.
 source: /frameworks/vue/src/composables/useField/useField.ts
 contributors:
   - fabian-hiller
@@ -11,7 +11,7 @@ import { properties } from './properties';
 
 # useField
 
-Creates a reactive field store of a specific field within a form store.
+Creates a reactive field store for a specific field within a form store.
 
 ```ts
 const field = useField<TSchema, TFieldPath>(form, config);
@@ -29,7 +29,7 @@ const field = useField<TSchema, TFieldPath>(form, config);
 
 ### Explanation
 
-With `useField` you create a reactive field store for a specific field path within your form. The field store provides reactive access to the field's input value, validation errors, touched state, and more. It also includes a `props` object that you can spread onto an HTML input or textarea element to automatically handle user interactions like focus, blur, and input events.
+With `useField` you create a reactive field store for a specific field path within your form. The field store provides reactive access to the field's input value, validation errors, touched state, and more. It also includes a `props` object that you can bind to an HTML input or textarea element with `v-bind` to automatically handle user interactions like focus, change, and blur. The value itself is bound with `v-model="field.input"`.
 
 ## Returns
 

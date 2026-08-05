@@ -11,13 +11,13 @@ import { Link } from '~/components';
 
 # Handle submission
 
-Now your first form is almost ready. There is only one little thing missing and that is the data processing when the form is submitted.
+Your first form is almost ready. The remaining step is processing its data when the form is submitted.
 
 ## Submit event
 
 To process the values on submission, you pass a function to the `[formischSubmit]` input of the <Link href="/angular/api/formischForm/">`[formischForm]`</Link> directive. The first parameter passed to the function contains the validated form values.
 
-```ts
+```angular-ts
 import { Component } from '@angular/core';
 import {
   FormischForm,
@@ -102,7 +102,7 @@ The directive also registers the pending submission with Angular's `PendingTasks
 
 If you want to trigger submission programmatically from outside the form, you can use the <Link href="/methods/api/submit/">`submit`</Link> method. It calls `requestSubmit()` on the underlying form element:
 
-```ts
+```angular-ts
 import { submit } from '@formisch/angular';
 
 @Component({
@@ -136,7 +136,7 @@ In some cases, you may not be able to wrap your fields in a `<form>` element —
 
 The returned function accepts no arguments and can be called from anywhere — for example, from a button's `(click)` handler:
 
-```ts
+```angular-ts
 import { Component } from '@angular/core';
 import { handleSubmit, injectForm } from '@formisch/angular';
 import * as v from 'valibot';

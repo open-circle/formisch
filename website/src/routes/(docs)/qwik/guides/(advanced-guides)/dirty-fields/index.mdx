@@ -33,6 +33,7 @@ import {
   type SubmitHandler,
   useForm$,
 } from '@formisch/qwik';
+import { $, component$ } from '@qwik.dev/core';
 import * as v from 'valibot';
 
 const UserSchema = v.object({
@@ -40,25 +41,29 @@ const UserSchema = v.object({
   email: v.pipe(v.string(), v.email()),
 });
 
-export default function EditProfile({ user }) {
+interface EditProfileProps {
+  user: v.InferInput<typeof UserSchema> & { id: string };
+}
+
+export default component$<EditProfileProps>(({ user }) => {
   const profileForm = useForm$(() => ({
     schema: UserSchema,
     initialInput: user,
   }));
 
-  const onSubmit: SubmitHandler<typeof UserSchema> = async () => {
+  const onSubmit = $<SubmitHandler<typeof UserSchema>>(async () => {
     const dirty = getDirtyInput(profileForm);
     if (dirty) {
       await api.patchUser(user.id, dirty);
     }
-  };
+  });
 
   return (
     <Form of={profileForm} onSubmit$={onSubmit}>
       {/* fields */}
     </Form>
   );
-}
+});
 ```
 
 If only `email` was edited, `dirty` is `{ email: 'new@example.com' }`. If nothing was edited, it is `undefined`.
@@ -84,13 +89,14 @@ Filters a user-supplied value down to its dirty parts using the form's dirty mas
 
 ```tsx
 import { pickDirty, type SubmitHandler } from '@formisch/qwik';
+import { $ } from '@qwik.dev/core';
 
-const onSubmit: SubmitHandler<typeof UserSchema> = async (output) => {
+const onSubmit = $<SubmitHandler<typeof UserSchema>>(async (output) => {
   const dirty = pickDirty(profileForm, { from: output });
   if (dirty) {
     await api.update(dirty);
   }
-};
+});
 ```
 
 ## Why `pickDirty` exists
@@ -112,14 +118,15 @@ After validation, `output.name` has whitespace trimmed and `output.age` is a num
 
 ```tsx
 import { pickDirty, type SubmitHandler } from '@formisch/qwik';
+import { $ } from '@qwik.dev/core';
 
-const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
+const onSubmit = $<SubmitHandler<typeof Schema>>(async (output) => {
   // output.age is a number — pickDirty preserves that.
   const dirty = pickDirty(form, { from: output });
   if (dirty) {
     await api.update(dirty);
   }
-};
+});
 ```
 
 If the schema reshapes the output entirely — for example, by combining several input fields into a single output value — `pickDirty` returns `undefined` because the shape no longer aligns with the form's input shape.
@@ -138,17 +145,18 @@ The snippets below assume `form` is your form store (the result of <Link href="/
 
 ### Skip submission when nothing changed
 
-The form's `isDirty` flag is the cheapest way to ask "is anything dirty?" — it short-circuits on the first dirty field it finds and doesn't allocate. Use it when all you need is the yes/no answer. If you actually consume the output of `getDirtyInput`, `getDirtyPaths`, or `pickDirty`, call that method directly — its return value already signals "nothing dirty", so checking `form.isDirty` first would just walk the tree twice.
+The form's `isDirty` flag is the cheapest way to ask "is anything dirty?" — it short-circuits on the first dirty field it finds and doesn't allocate. Use it when all you need is the yes/no answer. If you actually consume the output of `getDirtyInput`, `getDirtyPaths`, or `pickDirty`, call that method directly — its return value already signals "nothing dirty", so checking `form.isDirty.value` first would just walk the tree twice.
 
 ```tsx
-import type { SubmitHandler } from '@formisch/qwik';
+import { type SubmitHandler } from '@formisch/qwik';
+import { $ } from '@qwik.dev/core';
 
-const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
-  if (!form.isDirty) {
+const onSubmit = $<SubmitHandler<typeof Schema>>(async (output) => {
+  if (!form.isDirty.value) {
     return;
   }
   await api.update(output);
-};
+});
 ```
 
 ### Send only the dirty raw input
@@ -166,13 +174,14 @@ if (dirty) {
 
 ```tsx
 import { pickDirty, type SubmitHandler } from '@formisch/qwik';
+import { $ } from '@qwik.dev/core';
 
-const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
+const onSubmit = $<SubmitHandler<typeof Schema>>(async (output) => {
   const dirty = pickDirty(form, { from: output });
   if (dirty) {
     await api.update(dirty);
   }
-};
+});
 ```
 
 ## Performance

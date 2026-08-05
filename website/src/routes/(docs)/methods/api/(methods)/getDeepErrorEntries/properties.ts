@@ -72,6 +72,19 @@ export const properties: Record<string, PropertyProps> = {
         type: 'custom',
         name: 'DeepErrorEntry',
         href: '../DeepErrorEntry/',
+        generics: [
+          {
+            type: 'custom',
+            name: 'v.InferInput',
+            href: 'https://valibot.dev/api/InferInput/',
+            generics: [
+              {
+                type: 'custom',
+                name: 'TSchema',
+              },
+            ],
+          },
+        ],
       },
     },
   },

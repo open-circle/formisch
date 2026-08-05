@@ -19,7 +19,7 @@ Formisch is a schema-based, headless form library for Angular. It manages form s
 - Small bundle size due to its modular design
 - Schema-based validation with Valibot
 - Type safety with autocompletion in editor, including fully typed templates
-- Open source and fully tested with 100 % coverage
+- Open source and fully tested with 100% coverage
 - It's fast – fine-grained updates powered by Angular Signals
 - Works with zoneless change detection and `OnPush` components
 - Minimal, readable and well thought out API
@@ -29,7 +29,7 @@ Formisch is a schema-based, headless form library for Angular. It manages form s
 
 Every form starts with the <Link href="/angular/api/injectForm/">`injectForm`</Link> function. It initializes your form's store based on the provided Valibot schema and infers its types. Next, add the <Link href="/angular/api/formischForm/">`[formischForm]`</Link> directive to your native `<form>` element. It handles form validation and submission. Then, create a field with the <Link href="/angular/api/formischField/">`*formischField`</Link> directive (or the <Link href="/angular/api/injectField/">`injectField`</Link> function in your component class) and bind it to your input with the <Link href="/angular/api/formischControl/">`[formischControl]`</Link> directive, which syncs the value, the `name` and `aria-invalid` attributes, and all event handlers for you.
 
-```ts
+```angular-ts
 import { Component } from '@angular/core';
 import {
   FormischControl,
@@ -74,7 +74,7 @@ export class LoginComponent {
 }
 ```
 
-In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include <Link href="/methods/api/focus/">`focus`</Link>, <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>, <Link href="/methods/api/getErrors/">`getErrors`</Link>, <Link href="/methods/api/getInput/">`getInput`</Link>, <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link>, <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/replace/">`replace`</Link>, <Link href="/methods/api/reset/">`reset`</Link>, <Link href="/methods/api/setErrors/">`setErrors`</Link>, <Link href="/methods/api/setInput/">`setInput`</Link>, <Link href="/methods/api/submit/">`submit`</Link>, <Link href="/methods/api/swap/">`swap`</Link> and <Link href="/methods/api/validate/">`validate`</Link>. These methods allow you to control the form programmatically.
+In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include <Link href="/methods/api/focus/">`focus`</Link>, <Link href="/methods/api/getDeepErrorEntries/">`getDeepErrorEntries`</Link>, <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>, <Link href="/methods/api/getDirtyInput/">`getDirtyInput`</Link>, <Link href="/methods/api/getDirtyPaths/">`getDirtyPaths`</Link>, <Link href="/methods/api/getErrors/">`getErrors`</Link>, <Link href="/methods/api/getInput/">`getInput`</Link>, <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link>, <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/isDirty/">`isDirty`</Link>, <Link href="/methods/api/isEdited/">`isEdited`</Link>, <Link href="/methods/api/isTouched/">`isTouched`</Link>, <Link href="/methods/api/isValid/">`isValid`</Link>, <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/pickDirty/">`pickDirty`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/replace/">`replace`</Link>, <Link href="/methods/api/reset/">`reset`</Link>, <Link href="/methods/api/setErrors/">`setErrors`</Link>, <Link href="/methods/api/setInput/">`setInput`</Link>, <Link href="/methods/api/submit/">`submit`</Link>, <Link href="/methods/api/swap/">`swap`</Link> and <Link href="/methods/api/validate/">`validate`</Link>. These methods allow you to control the form programmatically.
 
 ## Coming from Angular forms
 
@@ -105,8 +105,8 @@ My vision for Formisch is to create a framework-agnostic platform similar to <a 
 
 ## Feedback
 
-Find a bug or have an idea how to improve the library? Please fill out an <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/issues/new`} target="\_blank" rel="noreferrer">issue</a>. Together we can make forms even better!
+Find a bug or have an idea how to improve the library? Please fill out an <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/issues/new`} target={'\_blank'} rel="noreferrer">issue</a>. Together we can make forms even better!
 
 ## License
 
-This project is available free of charge and licensed under the <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/blob/main/LICENSE.md`} target="\_blank" rel="noreferrer">MIT license</a>.
+This project is available free of charge and licensed under the <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/blob/main/LICENSE.md`} target={'\_blank'} rel="noreferrer">MIT license</a>.

@@ -1,1 +1,0 @@
-// Removed properties for clarity

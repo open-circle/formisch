@@ -16,16 +16,16 @@ Formisch is one of several form libraries available for React. The two most comm
 
 ## At a glance
 
-|                        | **Formisch**                                     | React Hook Form                     | TanStack Form                           |
-| ---------------------- | ------------------------------------------------ | ----------------------------------- | --------------------------------------- |
-| Type source            | Inferred from schema                             | Generic you declare                 | Inferred from `defaultValues`           |
-| Validation location    | Defined in schema                                | Per-field or resolver               | Per-validator config                    |
-| Validation timing      | Form-wide `validate` / `revalidate`              | Form-wide `mode` option             | Per-validator trigger                   |
-| Async validation       | Built-in via schema                              | Manual loading state                | Built-in `isValidating`                 |
-| Re-render scope        | Automatic per signal                             | Manual via `watch` / `useFormState` | Automatic per subscription              |
-| Schema libraries       | Valibot                                          | Any via resolvers                   | Standard Schema                         |
-| Bundle size (min+gzip) | From ~2.5 kB                                     | ~12 kB                              | ~15 kB                                  |
-| Framework support      | Angular, React, Preact, Solid, Svelte, Vue, Qwik | React                               | React, Vue, Solid, Svelte, Lit, Angular |
+|                        | **Formisch**                                                   | React Hook Form                     | TanStack Form                           |
+| ---------------------- | -------------------------------------------------------------- | ----------------------------------- | --------------------------------------- |
+| Type source            | Inferred from schema                                           | Generic you declare                 | Inferred from `defaultValues`           |
+| Validation location    | Defined in schema                                              | Per-field or resolver               | Per-validator config                    |
+| Validation timing      | Form-wide `validate` / `revalidate`                            | Form-wide `mode` option             | Per-validator trigger                   |
+| Async validation       | Built-in via schema                                            | Manual loading state                | Built-in `isValidating`                 |
+| Re-render scope        | Automatic per signal                                           | Manual via `watch` / `useFormState` | Automatic per subscription              |
+| Schema libraries       | Valibot                                                        | Any via resolvers                   | Standard Schema                         |
+| Bundle size (min+gzip) | From ~2.5 kB                                                   | ~12 kB                              | ~15 kB                                  |
+| Framework support      | Angular, React, React Native, Preact, Solid, Svelte, Vue, Qwik | React                               | React, Vue, Solid, Svelte, Lit, Angular |
 
 The table is intentionally short. It only covers the dimensions that most often drive a library choice in practice. Other differences such as devtools, ecosystem maturity, and community size are real but tend to matter less than how each library handles types, validation, and re-renders.
 
@@ -35,7 +35,7 @@ Three reasons to pick Formisch over the alternatives above:
 
 **One schema, no second source of truth.** A single Valibot schema is everything the form needs: the runtime validator, the source of types, and the description of the form's structure — all at once. There is no separate TypeScript generic to declare, no `defaultValues` object to keep aligned with the schema, no resolver to configure. When the schema changes, every part of the form follows — at compile time and at runtime.
 
-**The smallest bundle, by a wide margin.** Formisch starts at ~2.5 kB and grows only as you import additional methods like `focus`, `getInput`, and `reset`. That is several times smaller than the alternatives in the table above — and it stays that way because the core is intentionally small and the library is fully tree-shakable, so methods you don't import don't end up in your bundle.
+**The smallest bundle, by a wide margin.** Formisch starts at ~2.5 kB and grows only as you import additional methods like `focus`, `getInput`, and `reset`. That is several times smaller than the alternatives in the table above — and it stays that way because the core is intentionally small and the library is fully tree-shakeable, so methods you don't import don't end up in your bundle.
 
 **Type safety that stays fast.** Types flow from the schema through every API, including deeply nested paths and field arrays. The inference is structured to keep TypeScript editor performance from degrading as schemas grow — which matters in large codebases where heavily-generic form libraries become a friction point.
 
@@ -51,7 +51,7 @@ Three reasons to pick Formisch over the alternatives above:
 
 Migrating to Formisch is a genuine rewrite of the form layer, not a drop-in replacement. The mental model is different: instead of starting from a component and attaching form behavior to it, you start from a schema and build the component around it. The libraries can coexist in the same application, so you can migrate one form at a time.
 
-We provide a dedicated migration guide for each library, with a side-by-side example, step-by-step instructions, and an API mapping table: <Link href="/react/guides/migrate-from-react-hook-form/">migrate from React Hook Form</Link> and <Link href="/react/guides/migrate-from-tanstack-form/">migrate from TanStack Form</Link>.
+We provide a dedicated migration guide for each library, with a side-by-side example, step-by-step instructions, and an API mapping table: <Link href="/react/guides/migrate-from-react-hook-form/">migrate from React Hook Form</Link> and <Link href="/react/guides/migrate-from-tanstack-form/">migrate from TanStack Form</Link>. A <Link href="/react/guides/migrate-from-formik/">migrate from Formik</Link> guide is also available.
 
 ## Next steps
 

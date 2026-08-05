@@ -1,0 +1,64 @@
+---
+title: Define your form
+description: >-
+  Learn how to define your form schema using Valibot. Formisch uses schemas
+  instead of TypeScript types for type-safe form validation and inference.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Define your form
+
+Creating a form in Formisch starts with defining a Valibot schema. The schema serves as the blueprint for your form, outlining the structure, data types, and validation rules for each field.
+
+## Schema definition
+
+Formisch is a schema-first form library built on top of [Valibot](https://valibot.dev/). When you create a form with <Link href="/react-native/api/useForm/">`useForm`</Link>, TypeScript types are automatically inferred from your schema, giving you full autocompletion and type safety throughout your form without needing to write any manual type definitions.
+
+### Example schema
+
+The following schema defines a form with two required string fields. The `email` field must be a valid email format, and the `password` field must be at least 8 characters long. Each validation includes custom error messages that will be displayed when validation fails.
+
+> For more complex schema examples, check out the schemas of our <Link href="/playground/login/">playground</Link>.
+
+```ts
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+```
+
+### Field order
+
+The order in which you define fields in your schema matters. When a form is submitted with invalid values, Formisch focuses the first field with an error. Since this follows your schema, define your fields in the same order they appear in your form, so the focus moves to the first invalid field instead of one further down the screen.
+
+## Schema validation
+
+Your schema definition should reflect exactly the data you expect when submitting the form. For example, if the value of a field is optional and will only be submitted in certain cases, your schema should reflect this information by using `v.optional(…)`.
+
+```ts
+import * as v from 'valibot';
+
+const ProfileSchema = v.object({
+  name: v.pipe(v.string(), v.nonEmpty()),
+  bio: v.optional(v.string()), // <- Optional field
+});
+```
+
+Formisch validates your form values against the schema before submission, ensuring that your form can only be submitted if it matches your schema definition.
+
+## Next steps
+
+Now that you understand how to define your form schema, continue to the <Link href="/react-native/guides/create-your-form/">create your form</Link> guide to learn how to initialize your form with <Link href="/react-native/api/useForm/">`useForm`</Link>.

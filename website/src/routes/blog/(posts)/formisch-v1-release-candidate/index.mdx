@@ -73,11 +73,11 @@ You can run this exact example on the <Link href="/playground/login/">playground
 
 The `path` is fully typed against your schema, so if you rename a field, TypeScript flags every place that no longer matches. Because state lives in fine-grained signals, only the fields that actually change re-render. And thanks to the modular design, the bundle size starts at around 2.5 kB.
 
-Formisch runs on React, Vue, Solid, Qwik, Svelte, and Preact from a single core, but there is no adapter tax. At build time it swaps in your framework's own reactivity, so you get real React updates, real Solid signals, and native performance with no extra layer in your bundle.
+Formisch runs on Angular, Preact, Qwik, React, React Native, SolidJS, Svelte, and Vue from a single core, but there is no adapter tax. At build time it swaps in your framework's own reactivity, so you get real React updates, real Solid signals, and native performance with no extra layer in your bundle.
 
 For a deeper look at the design decisions behind Formisch, read our <Link href="/blog/one-core-six-frameworks/">architecture post</Link>. We explain how the runtime works and why there is no abstraction layer.
 
-Curious how it compares to popular form libraries? Our comparison guides break down the differences in API design and mental models for <Link href="/react/guides/comparison/">React</Link>, <Link href="/solid/guides/comparison/">Solid</Link>, <Link href="/svelte/guides/comparison/">Svelte</Link>, and <Link href="/vue/guides/comparison/">Vue</Link>.
+Curious how it compares to popular form libraries? Our comparison guides break down the differences in API design and mental models for <Link href="/angular/guides/comparison/">Angular</Link>, <Link href="/react/guides/comparison/">React</Link>, <Link href="/react-native/guides/comparison/">React Native</Link>, <Link href="/solid/guides/comparison/">Solid</Link>, <Link href="/svelte/guides/comparison/">Svelte</Link>, and <Link href="/vue/guides/comparison/">Vue</Link>.
 
 ## How we got here
 
@@ -107,13 +107,13 @@ If something behaves unexpectedly in your forms, that feedback is the most valua
 
 ## Give it a try
 
-Install it for your framework. Here is the React package as an example. Every other framework works the same way, just swap in `@formisch/solid`, `@formisch/vue`, `@formisch/svelte`, `@formisch/preact`, or `@formisch/qwik`:
+Install it for your framework. Here is the React package as an example. Every other framework works the same way, just swap in `@formisch/angular`, `@formisch/preact`, `@formisch/qwik`, `@formisch/react-native`, `@formisch/solid`, `@formisch/svelte`, or `@formisch/vue`:
 
 ```bash
 npm install @formisch/react valibot
 ```
 
-Take a look at the <Link href="/playground/login/">playground</Link>, which runs in your browser with no install, or open a [StackBlitz example](https://stackblitz.com/edit/formisch-playground-react) to get a feel for it. If you find any bugs or something does not work the way you expect, [open an issue](https://github.com/open-circle/formisch/issues) or find us on [Discord](https://discord.gg/tkMjQACf2P). That feedback is exactly what helps us get v1 right.
+Take a look at the <Link href="/playground/login/">playground</Link>, which runs in your browser with no install, or open a [StackBlitz example](https://stackblitz.com/edit/formisch-playground-react) to get a feel for it. If you find any bugs or something does not work the way you expect, [open an issue](https://github.com/open-circle/formisch/issues) or find us on [Discord](https://discord.gg/w5mRTETqzv). That feedback is exactly what helps us get v1 right.
 
 If Formisch is useful to you, a [GitHub star](https://github.com/open-circle/formisch) helps others discover the project and signals that this direction is valuable. 🙏
 

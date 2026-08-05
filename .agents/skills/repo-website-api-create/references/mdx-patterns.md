@@ -167,14 +167,15 @@ Do NOT include implementation signatures.
 
 ### Framework-Specific Headings
 
-| Framework | Heading                            |
-| --------- | ---------------------------------- |
-| Solid     | `### Primitives`                   |
-| Qwik      | `### Hooks`                        |
-| Preact    | `### Hooks`                        |
-| Angular   | `### Functions` / `### Directives` |
-| Vue       | `### Composables`                  |
-| Svelte    | `### Runes`                        |
+| Framework    | Heading                            |
+| ------------ | ---------------------------------- |
+| Solid        | `### Primitives`                   |
+| Qwik         | `### Hooks`                        |
+| Preact       | `### Hooks`                        |
+| React Native | `### Hooks`                        |
+| Angular      | `### Functions` / `### Directives` |
+| Vue          | `### Composables`                  |
+| Svelte       | `### Runes`                        |
 
 ## ApiList Component
 

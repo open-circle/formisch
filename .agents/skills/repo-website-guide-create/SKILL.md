@@ -47,7 +47,7 @@ Determine the appropriate category:
 mkdir -p website/src/routes/{framework}/guides/(category-name)/guide-slug/
 ```
 
-- `{framework}` = angular, solid, qwik, preact, svelte, or vue
+- `{framework}` = angular, preact, qwik, react, react-native, solid, svelte, or vue
 - Use kebab-case for guide-slug
 
 ### Step 3: Create index.mdx
@@ -142,14 +142,15 @@ See <Link href="/solid/api/createForm/">`createForm`</Link>.
 
 ### Framework Terminology
 
-| Framework | API Category |
-| --------- | ------------ |
-| Solid     | "primitive"  |
-| Qwik      | "hook"       |
-| Preact    | "hook"       |
-| Angular   | "function" / "directive" |
-| Vue       | "composable" |
-| Svelte    | "rune"       |
+| Framework    | API Category             |
+| ------------ | ------------------------ |
+| Solid        | "primitive"              |
+| Qwik         | "hook"                   |
+| Preact       | "hook"                   |
+| React Native | "hook"                   |
+| Angular      | "function" / "directive" |
+| Vue          | "composable"             |
+| Svelte       | "rune"                   |
 
 ### Formatting
 

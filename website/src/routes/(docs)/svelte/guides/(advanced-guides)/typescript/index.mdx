@@ -147,8 +147,9 @@ To pass your form to another component via props, you can use the <Link href="/s
 
 ```svelte
 <script lang="ts">
-  import { createForm, Form, type FormStore } from '@formisch/svelte';
+  import { createForm } from '@formisch/svelte';
   import * as v from 'valibot';
+  import FormContent from './FormContent.svelte';
 
   const LoginSchema = v.object({
     email: v.pipe(v.string(), v.email()),
@@ -162,7 +163,7 @@ To pass your form to another component via props, you can use the <Link href="/s
 
 <FormContent of={loginForm} />
 
-<!-- In another file -->
+<!-- In another file: FormContent.svelte -->
 <script lang="ts">
   import {
     Form,
@@ -198,12 +199,12 @@ To pass your form to another component via props, you can use the <Link href="/s
 You can create generic field components with proper TypeScript typing using the <Link href="/svelte/api/FormStore/">`FormStore`</Link> type with Valibot's `GenericSchema`.
 
 ```svelte
-<script lang="ts" generics="T extends v.GenericSchema<{ email: string }>">
+<script lang="ts">
   import { type FormStore, useField } from '@formisch/svelte';
   import * as v from 'valibot';
 
   type EmailInputProps = {
-    of: FormStore<T>;
+    of: FormStore<v.GenericSchema<{ email: string }>>;
   };
 
   let { of }: EmailInputProps = $props();

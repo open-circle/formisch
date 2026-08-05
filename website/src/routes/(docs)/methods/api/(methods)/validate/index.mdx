@@ -14,7 +14,8 @@ import { properties } from './properties';
 Validates the entire form input against its schema. Returns a safe parse result indicating success or failure with detailed issues. Optionally focuses the first field with validation errors.
 
 ```ts
-const result = validate<TSchema>(form, config?);
+const result = validate<TSchema>(form);
+const result = validate<TSchema>(form, config);
 ```
 
 ## Generics

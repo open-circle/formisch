@@ -20,12 +20,19 @@ export const properties: Record<string, PropertyProps> = {
   form: {
     type: {
       type: 'custom',
-      name: 'FormStore',
-      href: '../FormStore/',
+      name: 'MaybeRefOrGetter',
+      href: 'https://vuejs.org/api/utility-types.html#maybereforgetter',
       generics: [
         {
           type: 'custom',
-          name: 'TSchema',
+          name: 'FormStore',
+          href: '../FormStore/',
+          generics: [
+            {
+              type: 'custom',
+              name: 'TSchema',
+            },
+          ],
         },
       ],
     },
@@ -33,16 +40,23 @@ export const properties: Record<string, PropertyProps> = {
   config: {
     type: {
       type: 'custom',
-      name: 'UseFieldConfig',
-      href: '../UseFieldConfig/',
+      name: 'MaybeRefOrGetter',
+      href: 'https://vuejs.org/api/utility-types.html#maybereforgetter',
       generics: [
         {
           type: 'custom',
-          name: 'TSchema',
-        },
-        {
-          type: 'custom',
-          name: 'TFieldPath',
+          name: 'UseFieldConfig',
+          href: '../UseFieldConfig/',
+          generics: [
+            {
+              type: 'custom',
+              name: 'TSchema',
+            },
+            {
+              type: 'custom',
+              name: 'TFieldPath',
+            },
+          ],
         },
       ],
     },

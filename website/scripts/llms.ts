@@ -36,7 +36,7 @@ for (const file of fs.readdirSync('public')) {
 
 // Create intro text with title and summary for llms files
 const introText =
-  '# Formisch\n\n> The lightweight, schema-first and fully type-safe form library for Angular, Preact, Qwik, React, Solid, Svelte and Vue.\n';
+  '# Formisch\n\n> The lightweight, schema-first and fully type-safe form library for Angular, Preact, Qwik, React, React Native, Solid, Svelte and Vue.\n';
 
 // Create details text with pointers to other resources for the llms.txt file
 const detailsText =

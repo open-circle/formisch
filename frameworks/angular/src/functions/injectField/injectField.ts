@@ -79,10 +79,15 @@ export function injectField(
     const elements = fieldStore.elements.filter(
       (element) => element.isConnected
     );
-    // Keep `initialElements` in sync unless a reorder has moved the elements,
-    // so resetting a remounted field restores its live element, not a stale one
+    // Keep `initialElements` in sync while the store still owns it (same
+    // reference) and filter it separately otherwise, so the detached element
+    // of a removed array item does not survive in the reset baseline
     if (fieldStore.elements === fieldStore.initialElements) {
       fieldStore.initialElements = elements;
+    } else {
+      fieldStore.initialElements = fieldStore.initialElements.filter(
+        (element) => element.isConnected
+      );
     }
     fieldStore.elements = elements;
   });

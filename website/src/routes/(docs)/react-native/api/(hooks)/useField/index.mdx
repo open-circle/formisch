@@ -1,0 +1,121 @@
+---
+title: useField
+description: Creates a reactive field store for a specific field within a form store.
+source: /frameworks/react-native/src/hooks/useField/useField.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# useField
+
+Creates a reactive field store for a specific field within a form store.
+
+```ts
+const field = useField<TSchema, TFieldPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+With `useField` you create a reactive field store for a specific field path within your form. The field store provides reactive access to the field's input value, validation errors, touched state, and more. It also includes a `props` object that you can spread onto React Native's `TextInput` component to automatically handle user interactions like focus, blur, and text change events.
+
+The `props` object contains exactly a `ref` callback and `onFocus`, `onBlur` and `onChangeText` handlers. The `ref` callback registers the underlying native component instance, which enables methods like <Link href="/methods/api/focus/">`focus`</Link> to control it. Since `props` does not set the input value, text inputs are controlled and you always pass `value={field.input}`. For non-text components such as `Switch`, set the value with the field store's `onChange` method instead.
+
+## Returns
+
+- `field` <Property {...properties.FieldStore} />
+  - `props` <Property {...properties.props} />
+
+## Examples
+
+The following examples show how `useField` can be used.
+
+### Text field
+
+```tsx
+import { useField, useForm } from '@formisch/react-native';
+import { Text, TextInput, View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+});
+
+export default function LoginScreen() {
+  const loginForm = useForm({ schema: LoginSchema });
+  const field = useField(loginForm, { path: ['email'] });
+
+  return (
+    <View>
+      <TextInput {...field.props} value={field.input} />
+      {field.errors && <Text>{field.errors[0]}</Text>}
+    </View>
+  );
+}
+```
+
+### Non-text components
+
+```tsx
+import { useField, useForm } from '@formisch/react-native';
+import { Switch } from 'react-native';
+import * as v from 'valibot';
+
+const SettingsSchema = v.object({
+  notifications: v.optional(v.boolean(), false),
+});
+
+export default function SettingsScreen() {
+  const settingsForm = useForm({ schema: SettingsSchema });
+  const field = useField(settingsForm, { path: ['notifications'] });
+
+  return <Switch value={field.input} onValueChange={field.onChange} />;
+}
+```
+
+## Related
+
+The following APIs can be combined with `useField`.
+
+### Hooks
+
+<ApiList
+  items={[
+    { text: 'useForm', href: '../useForm/' },
+    { text: 'useFieldArray', href: '../useFieldArray/' },
+  ]}
+/>
+
+### Components
+
+<ApiList
+  items={[
+    { text: 'Field', href: '../Field/' },
+    { text: 'FieldArray', href: '../FieldArray/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'focus', href: '/methods/api/focus/' },
+    { text: 'getErrors', href: '/methods/api/getErrors/' },
+    { text: 'getInput', href: '/methods/api/getInput/' },
+    { text: 'setErrors', href: '/methods/api/setErrors/' },
+    { text: 'setInput', href: '/methods/api/setInput/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>

@@ -177,4 +177,27 @@ describe('injectField', () => {
     expect(internalFieldStore.initialElements).toBe(initialElements);
     expect(internalFieldStore.initialElements).toContain(element);
   });
+
+  it('drops a detached element from the reset baseline on destroy', () => {
+    const injector = createEnvironmentInjector(
+      [],
+      TestBed.inject(EnvironmentInjector)
+    );
+    const { form, field } = runInInjectionContext(injector, () => {
+      const form = injectForm({ schema: Schema });
+      return { form, field: injectField(form, { path: ['email'] }) };
+    });
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+
+    const element = document.createElement('input');
+    field[CONTROL].ref(element);
+    expect(internalFieldStore.initialElements).toContain(element);
+
+    // Simulate an array operation moving the elements to another store
+    internalFieldStore.elements = [];
+
+    // The detached element must not survive in the reset baseline
+    injector.destroy();
+    expect(internalFieldStore.initialElements).not.toContain(element);
+  });
 });

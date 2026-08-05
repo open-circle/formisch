@@ -30,7 +30,7 @@ export interface UseFieldConfig<
 }
 
 /**
- * Creates a reactive field store of a specific field within a form store.
+ * Creates a reactive field store for a specific field within a form store.
  *
  * @param form The form store instance.
  * @param config The field configuration.
@@ -57,10 +57,16 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
       const elements = internalFieldStore.elements.filter(
         (element) => element.isConnected
       );
-      // Keep `initialElements` in sync unless a reorder has moved the elements,
-      // so resetting a remounted field restores its live element, not a stale one
+      // Keep `initialElements` in sync while the store still owns it (same
+      // reference) and filter it separately otherwise, so the detached element
+      // of a removed array item does not survive in the reset baseline
       if (internalFieldStore.elements === internalFieldStore.initialElements) {
         internalFieldStore.initialElements = elements;
+      } else {
+        internalFieldStore.initialElements =
+          internalFieldStore.initialElements.filter(
+            (element) => element.isConnected
+          );
       }
       internalFieldStore.elements = elements;
     };
@@ -96,7 +102,10 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
         name: internalFieldStore.name,
         autoFocus: !!internalFieldStore.errors.value,
         ref(element) {
-          if (element) {
+          // An array reorder transfers registered elements between the field
+          // stores, so the element may already be present when the framework
+          // re-registers it against the destination store
+          if (element && !internalFieldStore.elements.includes(element)) {
             internalFieldStore.elements.push(element);
           }
         },

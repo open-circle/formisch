@@ -1,9 +1,13 @@
+import { getFieldStore, INTERNAL } from '@formisch/core/svelte';
+import { swap } from '@formisch/methods/svelte';
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { flushSync, tick } from 'svelte';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
+import type { FormStore } from '../../types/index.ts';
 import FieldHost from '../../vitest/FieldHost.svelte';
 import { renderHook } from '../../vitest/renderHook.ts';
+import ReorderHost from '../../vitest/ReorderHost.svelte';
 import UnmountHost from '../../vitest/UnmountHost.svelte';
 import { createForm } from '../createForm/createForm.svelte.ts';
 import { useField } from './useField.svelte.ts';
@@ -319,6 +323,65 @@ describe('useField', () => {
       unmount();
 
       expect(screen.queryByTestId('input')).toBeNull();
+    });
+
+    test('should not register an element that is already present', () => {
+      const schema = v.object({ name: v.string() });
+      const { result } = renderHook(() => {
+        const form = createForm({ schema });
+        return { form, field: useField(form, { path: ['name'] }) };
+      });
+      const internalFieldStore = getFieldStore(result.current.form[INTERNAL], [
+        'name',
+      ]);
+      const element = document.createElement('input');
+      // Simulate an array reorder having already transferred the element
+      internalFieldStore.elements.push(element);
+      // The element attachment is keyed by a private symbol
+      const [attachmentKey] = Object.getOwnPropertySymbols(
+        result.current.field.props
+      );
+      (
+        (result.current.field.props as unknown as Record<symbol, unknown>)[
+          attachmentKey
+        ] as (element: HTMLElement) => void
+      )(element);
+      expect(internalFieldStore.elements).toEqual([element]);
+    });
+
+    test('should not duplicate element registration after an array reorder', async () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
+
+      render(ReorderHost, {
+        props: {
+          config: {
+            schema,
+            initialInput: { todos: [{ label: 'a' }, { label: 'b' }] },
+          },
+          onMounted: (form: FormStore<typeof schema>) => {
+            formStore = form;
+          },
+        },
+      });
+
+      expect(
+        getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+      ).toHaveLength(1);
+
+      swap(formStore!, { path: ['todos'], at: 0, and: 1 });
+      flushSync();
+
+      await vi.waitFor(() => {
+        expect(
+          getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+        ).toHaveLength(1);
+        expect(
+          getFieldStore(formStore![INTERNAL], ['todos', 1, 'label']).elements
+        ).toHaveLength(1);
+      });
     });
   });
 });

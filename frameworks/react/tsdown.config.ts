@@ -8,6 +8,6 @@ export default defineConfig({
     dts: '.d.ts',
   }),
   dts: {
-    resolve: ['@formisch/core/vanilla', '@formisch/methods/vanilla'],
+    resolve: ['@formisch/core/react', '@formisch/methods/react'],
   },
 });

@@ -37,8 +37,8 @@ A simple checkbox represents a boolean and is `true` when checked or `false` oth
 However, you can also use multiple checkboxes to represent an array of strings. For this you simply have to add the `value` attribute to the HTML `<input />` element.
 
 ```tsx
-{
-  [
+<>
+  {[
     { label: 'Bananas', value: 'bananas' },
     { label: 'Apples', value: 'apples' },
     { label: 'Grapes', value: 'grapes' },
@@ -59,8 +59,8 @@ However, you can also use multiple checkboxes to represent an array of strings. 
         </label>
       )}
     />
-  ));
-}
+  ))}
+</>
 ```
 
 ## Radio
@@ -128,14 +128,18 @@ However, if you set the `multiple` attribute, multiple options can be selected m
   of={form}
   path={['frameworks']}
   render$={(field) => (
-    {/* Set "multiple" to "true" */}
+    // Set "multiple" to "true"
     <select {...field.props} multiple>
       {[
         { label: 'Preact', value: 'preact' },
         { label: 'Solid', value: 'solid' },
         { label: 'Qwik', value: 'qwik' },
       ].map(({ label, value }) => (
-        <option key={value} value={value} selected={field.input.value?.includes(value)}>
+        <option
+          key={value}
+          value={value}
+          selected={field.input.value?.includes(value)}
+        >
           {label}
         </option>
       ))}
@@ -146,7 +150,7 @@ However, if you set the `multiple` attribute, multiple options can be selected m
 
 ## File
 
-For the HTML `<input type="file" />` element it works similar to the HTML `<select />` element. Without the `multiple` attribute it represents a single file and with, a list of files.
+An HTML `<input type="file" />` works similarly to an HTML `<select />` element. Without the `multiple` attribute, it represents a single file; with `multiple`, it represents a list of files.
 
 ```tsx
 <Field
