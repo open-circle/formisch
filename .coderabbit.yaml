@@ -139,18 +139,36 @@ knowledge_base:
     filePatterns:
       - "AGENTS.md"
       - "CONTRIBUTING.md"
-      - files: ".agents/skills/repo-source-code-review/SKILL.md,.agents/skills/repo-source-code-document/SKILL.md,.agents/skills/repo-structure-navigate/SKILL.md"
-        applyTo: "packages/*/src/**,frameworks/*/src/**"
-      - files: ".agents/skills/repo-source-code-test-packages/SKILL.md"
-        applyTo: "packages/*/src/**"
-      - files: ".agents/skills/repo-source-code-test-frameworks/SKILL.md"
-        applyTo: "frameworks/*/src/**"
-      - files: ".agents/skills/repo-website-api-create/SKILL.md,.agents/skills/repo-website-api-review/SKILL.md,.agents/skills/repo-website-api-update/SKILL.md"
-        applyTo: "website/src/routes/(docs)/**/api/**"
-      - files: ".agents/skills/repo-website-guide-create/SKILL.md"
-        applyTo: "website/src/routes/(docs)/**/guides/**"
-      - files: ".agents/skills/repo-prepare-release/SKILL.md"
-        applyTo: "**/CHANGELOG.md,package.json"
+      - files:
+          - ".agents/skills/repo-source-code-review/SKILL.md"
+          - ".agents/skills/repo-source-code-document/SKILL.md"
+          - ".agents/skills/repo-structure-navigate/SKILL.md"
+        applyTo:
+          - "packages/*/src/**"
+          - "frameworks/*/src/**"
+      - files:
+          - ".agents/skills/repo-source-code-test-packages/SKILL.md"
+        applyTo:
+          - "packages/*/src/**"
+      - files:
+          - ".agents/skills/repo-source-code-test-frameworks/SKILL.md"
+        applyTo:
+          - "frameworks/*/src/**"
+      - files:
+          - ".agents/skills/repo-website-api-create/SKILL.md"
+          - ".agents/skills/repo-website-api-review/SKILL.md"
+          - ".agents/skills/repo-website-api-update/SKILL.md"
+        applyTo:
+          - "website/src/routes/(docs)/**/api/**"
+      - files:
+          - ".agents/skills/repo-website-guide-create/SKILL.md"
+        applyTo:
+          - "website/src/routes/(docs)/**/guides/**"
+      - files:
+          - ".agents/skills/repo-prepare-release/SKILL.md"
+        applyTo:
+          - "**/CHANGELOG.md"
+          - "package.json"
 
   # Actively use this repo's history as review context.
   learnings:
