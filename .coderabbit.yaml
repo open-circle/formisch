@@ -1,0 +1,183 @@
+# yaml-language-server: $schema=https://storage.googleapis.com/coderabbit_public_assets/schema.v2.json
+
+reviews:
+  profile: chill
+  collapse_walkthrough: false
+  changed_files_summary: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  suggested_labels: false
+  in_progress_fortune: false
+
+  path_filters:
+    - "!**/dist/**"
+    - "!**/coverage/**"
+    - "!**/node_modules/**"
+    - "!pnpm-lock.yaml"
+    - "!**/*.snap"
+    - "!brand/**"
+    - "!**/*.webp"
+
+  # Path-specific review directives. The underlying guideline content (AGENTS.md
+  # and the /.agents/skills/*/SKILL.md files) is loaded via knowledge_base.code_guidelines
+  # below, so these instructions tell the reviewer *what to check*, not repeat the rules.
+  path_instructions:
+    - path: "packages/*/src/**/*.ts"
+      instructions: >-
+        Review against AGENTS.md and the repo-source-code-review /
+        repo-source-code-document / repo-structure-navigate skills. Specifically
+        check: (1) `interface` is used for object shapes, `type` only for
+        unions/aliases; (2) all relative imports use the `.ts` extension; (3)
+        `// @__NO_SIDE_EFFECTS__` immediately precedes every pure factory/primitive
+        function (form/field/method creators) and is absent from functions that
+        mutate arguments, perform I/O, or touch global state; (4) every exported
+        function/interface has complete JSDoc — one full JSDoc block per overload
+        (implementation signature has none), `@param`/`@returns` documented, first
+        line matches the kind (`Creates a ...` for primitives, `Focuses`/`Resets`/
+        `Validates ...` for methods, `[Name] [category] interface.` for
+        interfaces); (5) each exported function lives in its own folder with the
+        implementation file, `.test.ts`, and an `index.ts`; core logic outside
+        `src/framework/` stays framework-agnostic. Flag any deviation as a required
+        change, not a nitpick.
+    - path: "packages/*/src/**/*.test.ts"
+      instructions: >-
+        Verify against the repo-source-code-test-packages skill: no `as` type
+        casts — use the type-guard pattern (extract to a variable, assert
+        `.kind`, narrow with `if`) for the `InternalFieldStore` union; DOM
+        interactions use real elements via `document.createElement(...)`, never
+        mock objects cast to a DOM type, with `// @vitest-environment jsdom`
+        present when needed; tests reuse the shared `createTestStore` /
+        `objectPath` / `arrayPath` / `validationIssue` helpers rather than
+        reimplementing them; test names start with "should" and cover success,
+        failure, and edge cases.
+    - path: "frameworks/*/src/**/*.{ts,tsx,svelte}"
+      instructions: >-
+        Review against the repo-source-code-review / repo-source-code-document
+        skills with emphasis on cross-framework consistency: primitives/hooks/
+        composables/runes/functions and components with the same purpose across
+        Angular/Preact/Qwik/React/Solid/Svelte/Vue must expose the same
+        conceptual API and identical JSDoc text — compare against the equivalent
+        file in sibling `frameworks/*` packages before approving wording changes.
+        Pure factory functions carry `// @__NO_SIDE_EFFECTS__`; naming keeps the
+        framework's existing `use`/`create`/`inject` prefix and `Store` suffix
+        conventions.
+    - path: "frameworks/*/src/**/*.{test.ts,test.tsx,test-d.ts}"
+      instructions: >-
+        Apply the repo-source-code-test-frameworks skill: React is the canonical
+        reference — new shared tests land in `frameworks/react` first and are
+        ported with only mechanical adapter changes; `describe`/`test` names,
+        schemas, `initialInput`, and expected outputs match the equivalent React
+        test exactly, with no `(Framework-only)` suffixes in test names (a `//
+        ...` comment explains framework-specific reasoning instead); async
+        assertions use `vi.waitFor(...)`, never `setTimeout(0)`; schema types are
+        derived with `typeof schema`, never hand-written Valibot generics; no
+        tautological assertions that can't fail under a real regression.
+    - path: "website/src/routes/(docs)/**/api/**/index.mdx"
+      instructions: >-
+        Review against the repo-website-api-create / repo-website-api-update
+        skills. Check: frontmatter has title/description/source/contributors
+        (type pages omit `source`); the signature and generics match the
+        referenced file in `/packages/` or `/frameworks/` exactly; every generic
+        and parameter is documented via the `Property` component; heading is `##
+        Parameters` for functions/primitives and `## Properties` for components
+        (components omit `## Returns`/`## Examples`; types omit `## Examples` and
+        list no types under `## Related`); the framework term in `## Related`
+        matches its category (Solid: Primitives, Qwik/Preact: Hooks, Angular:
+        Functions/Directives, Vue: Composables, Svelte: Runes); `menu.md` is
+        updated alphabetically for new pages.
+    - path: "website/src/routes/(docs)/**/api/**/properties.ts"
+      instructions: >-
+        Verify property definitions match the corresponding source file exactly,
+        including generic constraints. Cross-package links use absolute paths
+        (e.g. `/core/api/FormSchema/`), same-section links are relative
+        (`../Name/`), and Qwik route-group parentheses are omitted from `href`s.
+    - path: "website/src/routes/(docs)/**/guides/**/index.mdx"
+      instructions: >-
+        Review against the repo-website-guide-create skill. Check: frontmatter
+        has title/description/contributors; internal links use the `Link`
+        component with a framework-prefixed href; code examples import from
+        `@formisch/{framework}` and Valibot as `import * as v from 'valibot'`,
+        using `v.nonEmpty()` rather than `v.minLength(1)`; no em-dash pairs in
+        prose; the guide is added to `menu.md` in the correct category.
+    - path: "**/CHANGELOG.md"
+      instructions: >-
+        Apply the repo-prepare-release skill. Version headings use `## vX.X.X
+        (Month DD, YYYY)`; unreleased entries keep that literal placeholder until
+        release; the bump implied by each entry (`Add`/`Change` (API)/`Rename` →
+        minor, `Fix`/`Change @formisch/*` → patch) is consistent within the
+        package, and framework changelogs bumping `@formisch/core` or
+        `@formisch/methods` match that dependency's own bump direction.
+    - path: "**/*.ts"
+      instructions: >-
+        Confirm ESM import style: all relative imports, including type-only
+        imports, include the `.ts` extension, as required by AGENTS.md and
+        enforced by ESLint.
+
+  auto_review:
+    enabled: true
+    drafts: false
+
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+
+  tools:
+    fbinfer:
+      enabled: false
+    presidio:
+      enabled: false
+
+knowledge_base:
+  opt_out: false
+
+  # Feed the repo's own coding standards into every review instead of duplicating
+  # them in path_instructions. AGENTS.md is the file CLAUDE.md symlinks to.
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "AGENTS.md"
+      - "CONTRIBUTING.md"
+      - files:
+          - ".agents/skills/repo-source-code-review/SKILL.md"
+          - ".agents/skills/repo-source-code-document/SKILL.md"
+          - ".agents/skills/repo-structure-navigate/SKILL.md"
+        applyTo:
+          - "packages/*/src/**"
+          - "frameworks/*/src/**"
+      - files:
+          - ".agents/skills/repo-source-code-test-packages/SKILL.md"
+        applyTo:
+          - "packages/*/src/**"
+      - files:
+          - ".agents/skills/repo-source-code-test-frameworks/SKILL.md"
+        applyTo:
+          - "frameworks/*/src/**"
+      - files:
+          - ".agents/skills/repo-website-api-create/SKILL.md"
+          - ".agents/skills/repo-website-api-review/SKILL.md"
+          - ".agents/skills/repo-website-api-update/SKILL.md"
+        applyTo:
+          - "website/src/routes/(docs)/**/api/**"
+      - files:
+          - ".agents/skills/repo-website-guide-create/SKILL.md"
+        applyTo:
+          - "website/src/routes/(docs)/**/guides/**"
+      - files:
+          - ".agents/skills/repo-prepare-release/SKILL.md"
+        applyTo:
+          - "**/CHANGELOG.md"
+          - "package.json"
+
+  # Actively use this repo's history as review context.
+  learnings:
+    scope: auto
+    approval_delay: 0
+  issues:
+    scope: auto
+  pull_requests:
+    scope: auto
+
+chat:
+  art: false
