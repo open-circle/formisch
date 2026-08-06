@@ -1,0 +1,288 @@
+---
+cover: Practical Example ＃1
+title: 'Generating a 400-Field `.coderabbit.yaml` Form from a JSON Schema'
+description: >-
+  How I combined Valibot and Formisch to turn a 400+ property JSON Schema
+  into a fully validated GUI for generating .coderabbit.yaml configuration
+  files, without hand-writing a single field.
+published: 2026-07-28
+authors:
+  - ysknsid25
+---
+
+This time I want to introduce a practical example of a web application built by combining Valibot and Formisch. You can find the app I built and its source code here:
+
+- [CodeRabbit Config Generator](https://coderabbit-config-generator.web.app/)
+- [ysknsid25/coderabbit-config-generator on GitHub](https://github.com/ysknsid25/coderabbit-config-generator)
+
+This app also received positive feedback from [Santosh](https://x.com/SantoshYadavDev), a member of the [CodeRabbit](https://www.coderabbit.ai/?utm_source=github&utm_campaign=coderabbit_oss&utm_content=coderabbit&utm_term=valibot&ref=valibot&utm_medium=opensource&dub_id=qTTcoKIVG3MKo5j1) team, [on X](https://x.com/SantoshYadavDev/status/2078400163698065917).
+
+The tech stack looks like this:
+
+| Area                | Choice                                                                  |
+| ------------------- | ----------------------------------------------------------------------- |
+| UI                  | React 19                                                                |
+| Forms               | [Formisch (for React)](https://formisch.dev/react/guides/introduction/) |
+| Validation / schema | [Valibot](https://valibot.dev/)                                         |
+| Styling             | Tailwind CSS 4                                                          |
+
+## What is `.coderabbit.yaml`?
+
+It's a configuration file for applying various context and settings to [CodeRabbit](https://www.coderabbit.ai/), the AI review tool. Fleshing out this configuration file greatly improves the accuracy of CodeRabbit's reviews.
+
+## What This Application Solves
+
+`.coderabbit.yaml` has a huge number of configuration options.
+
+You can check the full [configuration reference](https://docs.coderabbit.ai/reference/configuration) for it.
+
+Writing all of these options into an editor while comparing them one by one is quite a lot of work. You have to look back and forth between two screens to figure out what effect each option has and what value should be set. And if you're not used to writing YAML in the first place, it's easy to get the key/value syntax wrong for which options should even be included.
+
+On top of that, if you set a key that doesn't exist or a value that isn't valid, you might not even notice.
+
+That's the problem this application solves: it lists all the configuration options in a GUI and validates the input values in real time. <u>Valibot and Formisch are used to their full extent both for listing the configuration options and for real-time validation.</u>
+
+## What is Valibot
+
+[Valibot](https://valibot.dev/) is a schema validation library for TypeScript. You describe a data's shape once, as a schema, and Valibot both validates values against it and infers the matching TypeScript types from it — the schema is the single source of truth for both. In this app, I wrote code that **converts each item of CodeRabbit's JSON Schema into Valibot schema calls like `v.object({...})` and `v.string()`, at runtime** (more on this below), instead of hand-writing a schema for each option.
+
+If you're new to Valibot, the [introduction guide](https://valibot.dev/guides/introduction/) is a good place to start.
+
+## What is Formisch
+
+[Formisch](https://formisch.dev/) is a schema-first, headless form library built on Valibot, with room to support other Standard Schema libraries like Zod and ArkType. It's also available for Angular, Preact, Qwik, React Native, Solid, Svelte, and Vue. Instead of managing field values with `useState` and writing a separate `validate` function by hand, you pass a schema straight to `useForm`, and the form's input values, initial values, and validation errors are all derived from it automatically.
+
+Here's the official sample code, based on a login form.
+
+```typescript
+import { Field, Form, useForm } from '@formisch/react';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function LoginPage() {
+  // 1. Just pass the schema, and the whole set of form state management (loginForm) is built for you
+  const loginForm = useForm({ schema: LoginSchema });
+
+  return (
+    <Form of={loginForm} onSubmit={(output) => console.log(output)}>
+      {/* 2. path is an array representing "where in the schema does this field correspond to" */}
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <div>
+            {/* 3. Passing field.props straight to <input> automatically wires up reading and writing the value */}
+            <input {...field.props} value={field.input} type="email" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="password" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit">Login</button>
+    </Form>
+  );
+}
+```
+
+Neither `useState` nor a `validate` function shows up here, both the value management and the validation are entirely bundled inside the `LoginSchema` schema. If you're new to Formisch, the [introduction guide](https://formisch.dev/react/guides/introduction/) covers this in more depth.
+
+## What Combining Valibot and Formisch Makes Possible
+
+For the `.coderabbit.yaml` configuration options, the specification of the options is provided as structured data in JSON, called [schema.v2.json](https://storage.googleapis.com/coderabbit_public_assets/schema.v2.json). This JSON looks like this (excerpt only):
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "tone_instructions": {
+      "default": "",
+      "description": "Set the tone of reviews and chat. Example: 'You must talk like Mr. T. I pity the fool who doesn't!'",
+      "type": "string",
+      "maxLength": 250
+    },
+    "early_access": {
+      "default": false,
+      "description": "Enable early-access features.",
+      "type": "boolean"
+    }
+  }
+}
+```
+
+In other words, each `properties` entry — each configuration option — has its required fields, value type, and input rules all fully structured. This means every `properties` entry can be treated as a schema based on its `type`.
+
+And as long as it can be treated as a Valibot schema, it can be handed straight to Formisch to set default values for input content or to validate it.
+
+In other words, by defining the specification of the input fields in JSON, you can convert them into GUI input fields using Valibot and Formisch, and by editing the JSON, that specification is reflected in Valibot and Formisch as well. The JSON stays the single source of truth for both.
+
+Now let's get into the specifics of how the JSON is converted into a Valibot schema and into the components that Formisch handles.
+
+## JSON Schema → Valibot Schema
+
+A file called `src/schema/jsonSchemaToValibot.ts` provides a function that takes a JSON Schema node (the definition of a single item) and assembles the corresponding Valibot rule. Based on the `type` field written there, it assembles the matching Valibot schema. The CodeRabbit Config Generator has the following conversion rules.
+
+| JSON Schema `type`            | Converted Valibot                                                                                      |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `boolean`                     | `v.boolean()`                                                                                          |
+| `string`                      | `v.string()` (if `minLength`/`maxLength`/`pattern` are present, additional rules are added via `pipe`) |
+| `number` / `integer`          | `v.number()` (if `minimum`/`maximum` are present, additional rules are added via `pipe`)               |
+| `array`                       | `v.array(schema of the element)`                                                                       |
+| `object`                      | `v.object({ key: sub-schema, ... })`                                                                   |
+| `enum` (fixed set of choices) | `v.picklist([...])`                                                                                    |
+
+By calling this recursively, even nested objects can be converted wholesale into a Valibot schema. You can think of it as: instead of hand-writing something like the `LoginSchema` from the Valibot example, this function writes it automatically while reading the JSON Schema.
+
+Once the entire JSON has been turned into a single schema this way, it's then passed on to Formisch.
+
+## Passing the Schema to Formisch
+
+The schema produced by the JSON → schema conversion can just be passed straight to `useForm`. `configSchema` is the final schema built by the function described above.
+
+```typescript
+// src/form/useConfigForm.ts
+import { useForm } from '@formisch/react';
+import { configSchema } from '../schema';
+
+export function useConfigForm() {
+  return useForm({ schema: configSchema });
+}
+```
+
+This is the same as writing `useForm({ schema: LoginSchema })` in the earlier `LoginSchema` example — the only difference is that `configSchema` is a schema with 400+ items auto-generated from the JSON Schema.
+
+The simplicity here is the whole point: **no matter how much the number of form fields increases or decreases, this code on the app side doesn't change by a single line.** Even if CodeRabbit adds new items to the JSON Schema, as long as they go through the conversion function, this app automatically supports the latest version.
+
+With that, a single `configSchema` gives us state management, initial values, and validation for 400 fields' worth of data. From here, all that's left is to render each field according to the content of `meta`, the same way as in the sample code we saw in the "What is Formisch" section, to build the UI in a unified way.
+
+## JSON Schema → "How to Render on Screen"
+
+By passing the schema to `useForm`, we've obtained the form's state management — that is, "what value is currently entered" and "where errors are showing." But there's still something missing: **the visual information about "should this item be rendered as a checkbox, or as a text field."**
+
+Just converting `type: "boolean"` into `v.boolean()` doesn't decide whether to render it as a toggle switch or as a checkbox. That's not the responsibility of Valibot or Formisch — it's a concern specific to this app.
+
+So, following the same idea as `src/schema/jsonSchemaToValibot.ts`, this app has **another, separate conversion function**. That's `src/schema/toFieldMeta.ts`, which takes a JSON Schema node and this time converts it into rendering metadata: "label text," "description," "choices," and "which widget to render with."
+
+The rules for determining the widget are as follows.
+
+| JSON Schema condition                           | Widget used                 |
+| ----------------------------------------------- | --------------------------- |
+| `boolean`                                       | Toggle switch               |
+| `enum` (4 or fewer choices)                     | Radio buttons               |
+| `enum` (5–20 choices)                           | Select box                  |
+| `enum` (with `enumNames`, more than 20 choices) | Searchable combobox         |
+| `string` (short text)                           | Single-line input           |
+| `string` (long text)                            | Textarea                    |
+| `number` / `integer`                            | Number input (with min/max) |
+| `array` (array of strings)                      | Tag input                   |
+| `array` (array of objects)                      | Repeatable group            |
+| `object` (record with free-form keys)           | Key/value editor            |
+| `object` (fixed set of properties)              | Section (heading + content) |
+
+The actual code looks like this.
+
+```typescript
+// src/schema/toFieldMeta.ts
+function widgetKind(node: JSONSchema, key: string): WidgetKind {
+  if (node.enum && node.enum.length > 0) {
+    const n = node.enum.length;
+    if (node.enumNames && n > 20) return 'enum-combobox';
+    if (n <= 4) return 'enum-radio';
+    return 'enum-select';
+  }
+  switch (node.type) {
+    case 'boolean':
+      return 'boolean';
+    case 'integer':
+    case 'number':
+      return 'number';
+    case 'string':
+      return isLongText(node, key) ? 'textarea' : 'text';
+    case 'array': {
+      const item = resolveItemNode(node.items);
+      return item.type === 'object' || item.properties
+        ? 'object-array'
+        : 'string-array';
+    }
+    case 'object':
+    default:
+      // If additionalProperties is a schema, it's a "record with free-form keys"
+      return node.additionalProperties &&
+        typeof node.additionalProperties === 'object'
+        ? 'key-value'
+        : 'group';
+  }
+}
+```
+
+For example, the `language` configuration option holds 99 language codes as an `enum`, so it becomes `enum-combobox` (searchable), and `tone_instructions` is a string with `maxLength: 250`, so it becomes `textarea`, and so on.
+
+The point here, just like with the conversion to Valibot, is that **once you write the decision logic for "which JSON Schema node maps to which React component" a single time, it's automatically applied to every item from then on.** Even if CodeRabbit adds a new configuration option, as long as its `type` is one of the known ones, the rendering code doesn't need to be touched.
+
+## Recursive Renderer That Draws Every Field
+
+Now we have both the Valibot schema (= Formisch's state management) and the rendering metadata. All that's left is to combine them and render.
+
+The entry point for rendering is a single component called `FieldRenderer`, which is just a thin dispatcher that looks at the `kind` of the rendering metadata and delegates to the matching widget.
+
+```tsx
+// src/form/FieldRenderer.tsx
+export function FieldRenderer({ form, meta, path, depth = 0 }: Props) {
+  switch (meta.kind) {
+    case 'boolean':
+      return <BooleanField form={form} meta={meta} path={path} />;
+    case 'enum-radio':
+    case 'enum-select':
+    case 'enum-combobox':
+      return <EnumField form={form} meta={meta} path={path} />;
+    case 'text':
+    case 'textarea':
+      return <TextField form={form} meta={meta} path={path} />;
+    case 'number':
+      return <NumberField form={form} meta={meta} path={path} />;
+    case 'string-array':
+      return <StringArrayField form={form} meta={meta} path={path} />;
+    case 'object-array':
+      return <ObjectArrayField form={form} meta={meta} path={path} />;
+    case 'key-value':
+      return <KeyValueField form={form} meta={meta} path={path} />;
+    case 'group':
+      return <ObjectGroup form={form} meta={meta} path={path} depth={depth} />;
+    default:
+      return null;
+  }
+}
+```
+
+All it takes is looking at `meta.kind`, and then returning the matching component. Even with around ten kinds of widgets, this function on its own is complete just like this.
+
+And when it's a `group` (a nested object), `ObjectGroup` calls `FieldRenderer` again for each child `meta`, one by one. In other words, this function renders both a single-level field and a field nested four levels deep with the exact same code, by calling itself recursively.
+
+Once you've written these three pieces — `FieldRenderer`, `toFieldMeta`, and `jsonSchemaToValibot` — no matter how many JSON Schema items there are, and no matter how many are added or removed along the way, the app-side code doesn't change at all. The moment CodeRabbit adds a new configuration option, this app renders it as a form field, as is.
+
+## Conclusion
+
+Making a configuration file with as many options as `.coderabbit.yaml` usable through a GUI is a genuinely tedious job. Rendering each item by hand one at a time, holding onto the values, writing the validation logic, keeping up every time the spec changes... if you try to build all of this yourself with plain React, you end up carrying the entire weight of it on your own.
+
+But as I've shown here, combining Valibot and Formisch changes the picture.
+
+- Once you write the process that converts JSON Schema into a Valibot schema (112 lines in this app), holding the values, setting initial values, and checking input are all covered by a single line: `useForm({ schema })`
+- Prepare a single `FieldRenderer` together with the visual decisions (`meta`), and you can recursively render every item regardless of how deeply nested it is
+- Because the schema becomes the single source of truth, **just swapping out the spec (the JSON Schema) makes the form follow along, so the implementation and the documentation never drift apart**
+
+Being able to build a 400-item form in effectively a few hundred lines of code, in a way that's resilient to spec changes, came from the combination of Valibot's design — where "the schema isn't just a validation rule, it represents the shape of the data itself" — and Formisch, which lets you reuse that schema directly as the form's state management without any conversion at all.
+
+If you're currently writing form state management and validation by hand every time and finding it tedious, or if you ever run into a requirement like "I want to auto-generate a GUI from a spec," I'd strongly recommend giving the combination of Valibot and Formisch a try. All of the source code introduced here is public, so if you're interested, please take a look.
+
+- [Formisch](https://formisch.dev/)
+- [Valibot](https://valibot.dev/)
+- [ysknsid25/coderabbit-config-generator on GitHub](https://github.com/ysknsid25/coderabbit-config-generator)
