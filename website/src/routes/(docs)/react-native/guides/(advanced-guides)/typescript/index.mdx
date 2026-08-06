@@ -1,0 +1,233 @@
+---
+title: TypeScript
+description: >-
+  Learn how to leverage TypeScript with Formisch for maximum type safety.
+  Formisch is built with TypeScript and provides full type inference from
+  your Valibot schemas.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# TypeScript
+
+Since the library is written in TypeScript and we put a lot of emphasis on the development experience, you can expect maximum TypeScript support. Types are automatically inferred from your <Link href="/react-native/guides/define-your-form/">Valibot schemas</Link>, providing type safety throughout your forms.
+
+## Type inference
+
+Formisch uses Valibot's type inference to automatically derive TypeScript types from your schemas. You don't need to define separate types—they're inferred automatically.
+
+```tsx
+import { Field, handleSubmit, useForm } from '@formisch/react-native';
+import { Button, View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function LoginScreen() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+  });
+
+  // TypeScript knows the form structure from the schema
+  // loginForm is of type FormStore<typeof LoginSchema>
+
+  const submitForm = handleSubmit(loginForm, (output) => {
+    // output is fully typed based on LoginSchema
+    console.log(output.email); // ✓ Type-safe
+    console.log(output.username); // ✗ TypeScript error
+  });
+
+  return (
+    <View>
+      {/* Form fields */}
+      <Button title="Login" onPress={submitForm} />
+    </View>
+  );
+}
+```
+
+### Input and output types
+
+Valibot schemas can have different input and output types when using transformations. Formisch provides proper typing for both.
+
+```tsx
+import { Field, handleSubmit, useForm } from '@formisch/react-native';
+import { Button, TextInput, View } from 'react-native';
+import * as v from 'valibot';
+
+const ProfileSchema = v.object({
+  age: v.pipe(
+    v.string(), // Input type: string (from TextInput)
+    v.transform((input) => Number(input)), // Output type: number
+    v.number()
+  ),
+  birthDate: v.pipe(
+    v.string(), // Input type: string (ISO date string)
+    v.transform((input) => new Date(input)), // Output type: Date
+    v.date()
+  ),
+});
+
+export default function ProfileScreen() {
+  const profileForm = useForm({
+    schema: ProfileSchema,
+  });
+
+  const submitForm = handleSubmit(profileForm, (output) => {
+    // output is: { age: number; birthDate: Date }
+    console.log(output.age); // number
+    console.log(output.birthDate); // Date
+  });
+
+  return (
+    <View>
+      <Field of={profileForm} path={['age']}>
+        {(field) => (
+          // field.input is string
+          <TextInput
+            {...field.props}
+            value={field.input}
+            keyboardType="numeric"
+          />
+        )}
+      </Field>
+
+      <Field of={profileForm} path={['birthDate']}>
+        {(field) => (
+          // field.input is string
+          <TextInput
+            {...field.props}
+            value={field.input}
+            placeholder="YYYY-MM-DD"
+          />
+        )}
+      </Field>
+
+      <Button title="Submit" onPress={submitForm} />
+    </View>
+  );
+}
+```
+
+### Type-safe paths
+
+Field paths are fully type-checked. TypeScript will provide autocompletion and catch invalid paths at compile time.
+
+```tsx
+const UserSchema = v.object({
+  profile: v.object({
+    name: v.object({
+      first: v.string(),
+      last: v.string(),
+    }),
+    email: v.string(),
+  }),
+});
+
+const userForm = useForm({ schema: UserSchema });
+
+// ✓ Valid paths - TypeScript provides autocompletion
+<Field of={userForm} path={['profile', 'name', 'first']}>{() => <>{/* ... */}</>}</Field>
+<Field of={userForm} path={['profile', 'email']}>{() => <>{/* ... */}</>}</Field>
+
+// ✗ Invalid paths - TypeScript error
+<Field of={userForm} path={['profile', 'age']}>{() => <>{/* ... */}</>}</Field>
+<Field of={userForm} path={['username']}>{() => <>{/* ... */}</>}</Field>
+```
+
+## Type-safe props
+
+To pass your form to another component via props, you can use the <Link href="/react-native/api/FormStore/">`FormStore`</Link> type along with your schema type to get full type safety.
+
+```tsx
+import { type FormStore, handleSubmit, useForm } from '@formisch/react-native';
+import { Button, View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function LoginScreen() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+  });
+
+  return <FormContent of={loginForm} />;
+}
+
+type FormContentProps = {
+  of: FormStore<typeof LoginSchema>;
+};
+
+function FormContent(props: FormContentProps) {
+  const submitForm = handleSubmit(props.of, (output) => console.log(output));
+
+  return (
+    <View>
+      {/* Form fields */}
+      <Button title="Login" onPress={submitForm} />
+    </View>
+  );
+}
+```
+
+## Generic field components
+
+You can create generic field components with proper TypeScript typing using the <Link href="/react-native/api/FormStore/">`FormStore`</Link> type with Valibot's `GenericSchema`.
+
+```tsx
+import { type FormStore, useField } from '@formisch/react-native';
+import type { FunctionComponent } from 'react';
+import { Text, TextInput, View } from 'react-native';
+import * as v from 'valibot';
+
+type EmailInputProps = {
+  of: FormStore<v.GenericSchema<{ email: string }>>;
+};
+
+const EmailInput: FunctionComponent<EmailInputProps> = (props) => {
+  const field = useField(props.of, { path: ['email'] });
+
+  return (
+    <View>
+      <Text>Email</Text>
+      <TextInput
+        {...field.props}
+        value={field.input}
+        autoCapitalize="none"
+        keyboardType="email-address"
+      />
+      {field.errors && <Text>{field.errors[0]}</Text>}
+    </View>
+  );
+};
+```
+
+The `v.GenericSchema<{ email: string }>` type ensures that the form passed to `EmailInput` must have an `email` field of type `string`. TypeScript will catch any type mismatches at compile time.
+
+## Available types
+
+Most types you need can be imported from `@formisch/react-native`. You can find all available types in our <Link href="/react-native/api/">API reference</Link>.
+
+- <Link href="/react-native/api/FormStore/">`FormStore`</Link> - The form store
+  type
+- <Link href="/react-native/api/FieldStore/">`FieldStore`</Link> - The field
+  store type
+- <Link href="/react-native/api/FieldArrayStore/">`FieldArrayStore`</Link> - The
+  field array store type
+- <Link href="/core/api/ValidPath/">`ValidPath`</Link> - Type for valid field
+  paths
+- <Link href="/core/api/ValidArrayPath/">`ValidArrayPath`</Link> - Type for
+  valid array field paths
+- <Link href="/core/api/FormSchema/">`FormSchema`</Link> - Form schema type
+  required at the root
+- <Link href="/core/api/Schema/">`Schema`</Link> - Base schema type from Valibot
+- <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link> - Type for submit
+  handlers that receive the validated output

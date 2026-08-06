@@ -87,14 +87,14 @@ export default function ProfilePage() {
     >
       <Field of={profileForm} path={['age']}>
         {(field) => (
-          // field.input is string
+          // field.input.value is string
           <input {...field.props} value={field.input} type="text" />
         )}
       </Field>
 
       <Field of={profileForm} path={['birthDate']}>
         {(field) => (
-          // field.input is string
+          // field.input.value is string
           <input {...field.props} value={field.input} type="date" />
         )}
       </Field>
@@ -123,12 +123,12 @@ const UserSchema = v.object({
 const userForm = useForm({ schema: UserSchema });
 
 // ✓ Valid paths - TypeScript provides autocompletion
-<Field of={userForm} path={['profile', 'name', 'first']} />
-<Field of={userForm} path={['profile', 'email']} />
+<Field of={userForm} path={['profile', 'name', 'first']}>{() => <>{/* ... */}</>}</Field>
+<Field of={userForm} path={['profile', 'email']}>{() => <>{/* ... */}</>}</Field>
 
 // ✗ Invalid paths - TypeScript error
-<Field of={userForm} path={['profile', 'age']} />
-<Field of={userForm} path={['username']} />
+<Field of={userForm} path={['profile', 'age']}>{() => <>{/* ... */}</>}</Field>
+<Field of={userForm} path={['username']}>{() => <>{/* ... */}</>}</Field>
 ```
 
 ## Type-safe props

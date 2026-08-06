@@ -4,7 +4,15 @@ import { join } from 'node:path';
 import type { RolldownPluginOption } from 'rolldown';
 import { defineConfig, type UserConfig, type UserConfigFn } from 'tsdown';
 
-type Framework = 'angular' | 'preact' | 'qwik' | 'react' | 'solid' | 'svelte' | 'vue';
+type Framework =
+  | 'angular'
+  | 'preact'
+  | 'qwik'
+  | 'react'
+  | 'react-native'
+  | 'solid'
+  | 'svelte'
+  | 'vue';
 
 /**
  * Rolldown plugin to rewrite framework-specific imports.
@@ -120,6 +128,7 @@ const config: (UserConfig | UserConfigFn)[] = [
   defineFrameworkConfig('preact'),
   defineFrameworkConfig('qwik'),
   defineFrameworkConfig('react'),
+  defineFrameworkConfig('react-native'),
   defineFrameworkConfig('solid'),
   defineFrameworkConfig('svelte'),
   defineFrameworkConfig('vue'),

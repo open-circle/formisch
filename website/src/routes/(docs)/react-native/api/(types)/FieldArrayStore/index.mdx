@@ -1,0 +1,30 @@
+---
+title: FieldArrayStore
+description: Reactive field array store interface with properties for array field management.
+source: /frameworks/react-native/src/types/field.ts
+contributors:
+  - fabian-hiller
+---
+
+import { Property } from '~/components';
+import { properties } from './properties';
+
+# FieldArrayStore
+
+Reactive field array store interface with properties for managing array fields.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldArrayPath` <Property {...properties.TFieldArrayPath} />
+
+## Definition
+
+- `FieldArrayStore`
+  - `path` <Property {...properties.path} />
+  - `items` <Property {...properties.items} />
+  - `errors` <Property {...properties.errors} />
+  - `isTouched` <Property {...properties.isTouched} />
+  - `isEdited` <Property {...properties.isEdited} />
+  - `isDirty` <Property {...properties.isDirty} />
+  - `isValid` <Property {...properties.isValid} />

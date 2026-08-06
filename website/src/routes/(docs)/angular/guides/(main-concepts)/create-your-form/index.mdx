@@ -20,7 +20,7 @@ The <Link href="/angular/api/injectForm/">`injectForm`</Link> function initializ
 
 Like Angular's own `inject`, it must be called in an injection context — a field initializer or the constructor of your component.
 
-```ts
+```angular-ts
 import { Component } from '@angular/core';
 import { FormischForm, injectForm } from '@formisch/angular';
 import * as v from 'valibot';
@@ -98,7 +98,7 @@ Optional and nullable fields are never affected and keep starting as `undefined`
 
 When a component contains multiple forms, you can create separate form stores for each one:
 
-```ts
+```angular-ts
 @Component({
   selector: 'app-auth',
   imports: [FormischForm],

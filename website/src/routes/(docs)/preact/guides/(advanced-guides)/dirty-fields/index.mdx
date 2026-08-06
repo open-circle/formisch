@@ -40,7 +40,11 @@ const UserSchema = v.object({
   email: v.pipe(v.string(), v.email()),
 });
 
-export default function EditProfile({ user }) {
+interface EditProfileProps {
+  user: v.InferInput<typeof UserSchema> & { id: string };
+}
+
+export default function EditProfile({ user }: EditProfileProps) {
   const profileForm = useForm({
     schema: UserSchema,
     initialInput: user,
@@ -138,13 +142,13 @@ The snippets below assume `form` is your form store (the result of <Link href="/
 
 ### Skip submission when nothing changed
 
-The form's `isDirty` flag is the cheapest way to ask "is anything dirty?" — it short-circuits on the first dirty field it finds and doesn't allocate. Use it when all you need is the yes/no answer. If you actually consume the output of `getDirtyInput`, `getDirtyPaths`, or `pickDirty`, call that method directly — its return value already signals "nothing dirty", so checking `form.isDirty` first would just walk the tree twice.
+The form's `isDirty` flag is the cheapest way to ask "is anything dirty?" — it short-circuits on the first dirty field it finds and doesn't allocate. Use it when all you need is the yes/no answer. If you actually consume the output of `getDirtyInput`, `getDirtyPaths`, or `pickDirty`, call that method directly — its return value already signals "nothing dirty", so checking `form.isDirty.value` first would just walk the tree twice.
 
 ```tsx
 import type { SubmitHandler } from '@formisch/preact';
 
 const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
-  if (!form.isDirty) {
+  if (!form.isDirty.value) {
     return;
   }
   await api.update(output);

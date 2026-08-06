@@ -13,7 +13,7 @@ metadata:
 Scan these for unreleased changes (placeholder: `## vX.X.X (Month DD, YYYY)`):
 
 - `packages/core/CHANGELOG.md` and `packages/methods/CHANGELOG.md`
-- `frameworks/{angular,preact,qwik,react,solid,svelte,vue}/CHANGELOG.md`
+- `frameworks/{angular,preact,qwik,react,react-native,solid,svelte,vue}/CHANGELOG.md`
 
 ## Version Bump Rules
 

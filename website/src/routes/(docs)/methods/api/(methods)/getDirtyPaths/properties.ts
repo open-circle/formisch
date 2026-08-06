@@ -57,7 +57,7 @@ export const properties: Record<string, PropertyProps> = {
             },
             {
               type: 'custom',
-              name: 'RequiredPath',
+              name: 'TFieldPath',
             },
           ],
         },
@@ -70,8 +70,20 @@ export const properties: Record<string, PropertyProps> = {
       type: 'array',
       item: {
         type: 'custom',
-        name: 'RequiredPath',
-        href: '/core/api/RequiredPath/',
+        name: 'DirtyPath',
+        generics: [
+          {
+            type: 'custom',
+            name: 'v.InferInput',
+            href: 'https://valibot.dev/api/InferInput/',
+            generics: [
+              {
+                type: 'custom',
+                name: 'TSchema',
+              },
+            ],
+          },
+        ],
       },
     },
   },

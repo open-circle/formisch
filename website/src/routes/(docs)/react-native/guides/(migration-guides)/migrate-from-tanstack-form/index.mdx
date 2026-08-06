@@ -1,0 +1,429 @@
+---
+title: Migrate from TanStack Form
+description: >-
+  Learn how to migrate your React Native forms from TanStack Form to Formisch,
+  with a side-by-side example, step-by-step instructions, and an API mapping
+  table.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from TanStack Form
+
+This guide walks you through migrating your React Native forms from [TanStack Form](https://tanstack.com/form/latest) to Formisch. It explains the mental-model shift, shows the same form in both libraries side by side, breaks the migration into small steps, and maps common TanStack Form APIs to their Formisch equivalents.
+
+Migrating is a rewrite of the form layer, not a drop-in replacement. The component structure often stays similar, but the way you define types, validation, and state access changes. The good news: TanStack Form supports Standard Schema validators, so if you already validate with [Valibot](https://valibot.dev), your schemas carry over unchanged.
+
+Both libraries can coexist in the same application without conflicts. You can migrate one form at a time and remove `@tanstack/react-form` once the last form has been converted. Since both libraries export a hook named `useForm`, the import path determines which one a component uses.
+
+## Key differences
+
+TanStack Form starts from a state container: you declare `defaultValues`, TypeScript infers the form's types from them, and you attach validators to the form or to individual fields, each with its own trigger like `onChange`, `onBlur`, or `onSubmit`. Reactivity is subscription-based: you opt into re-renders with `form.Subscribe` or `useStore` selectors.
+
+Formisch starts from a schema: a single Valibot schema is the source of types, validation rules, and form structure at once. There is no `defaultValues` object to keep aligned with your types and no per-field validator configuration. Validation always parses the entire form against the schema, so cross-field rules work without extra wiring, and its timing is controlled form-wide with the `validate` and `revalidate` config. Reactivity is built on fine-grained signals wired into React's render cycle, so you read state directly from the form store and only the components that depend on it re-render.
+
+In practice, the migration boils down to these changes:
+
+- **Types**: Inferred from the schema instead of from `defaultValues`.
+- **Validation**: Defined once in the schema instead of spread across `validators` configs; timing moves from per-validator triggers to the form-wide `validate` and `revalidate` options.
+- **Field addressing**: Path arrays like `['todos', 0, 'label']` instead of interpolated string names like `` `todos[${index}].label` ``.
+- **Field binding**: Spreading `field.props` instead of manually wiring `value`, `onChangeText`, and `onBlur`.
+- **Submission**: A press handler created with <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> instead of calling `form.handleSubmit()` yourself.
+- **State access**: Reading the form store directly instead of subscribing with selectors.
+- **Errors**: Plain string arrays in `field.errors` instead of issue objects in `field.state.meta.errors`.
+
+## Side-by-side example
+
+The following login form validates an email and a password and logs the values on submission. Both versions use the exact same Valibot schema, which TanStack Form accepts as a Standard Schema validator.
+
+### TanStack Form
+
+```tsx
+import { useForm } from '@tanstack/react-form';
+import { Button, Text, TextInput, View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+export default function LoginScreen() {
+  const form = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    validators: {
+      onChange: LoginSchema,
+    },
+    onSubmit: async ({ value }) => {
+      console.log(value);
+    },
+  });
+
+  return (
+    <View>
+      <form.Field name="email">
+        {(field) => (
+          <View>
+            <TextInput
+              value={field.state.value}
+              onChangeText={field.handleChange}
+              onBlur={field.handleBlur}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            {!field.state.meta.isValid && (
+              <Text>{field.state.meta.errors[0]?.message}</Text>
+            )}
+          </View>
+        )}
+      </form.Field>
+      <form.Field name="password">
+        {(field) => (
+          <View>
+            <TextInput
+              value={field.state.value}
+              onChangeText={field.handleChange}
+              onBlur={field.handleBlur}
+              secureTextEntry
+            />
+            {!field.state.meta.isValid && (
+              <Text>{field.state.meta.errors[0]?.message}</Text>
+            )}
+          </View>
+        )}
+      </form.Field>
+      <form.Subscribe selector={(state) => state.isSubmitting}>
+        {(isSubmitting) => (
+          <Button
+            title="Login"
+            onPress={() => form.handleSubmit()}
+            disabled={isSubmitting}
+          />
+        )}
+      </form.Subscribe>
+    </View>
+  );
+}
+```
+
+### Formisch
+
+```tsx
+import { Field, handleSubmit, useForm } from '@formisch/react-native';
+import { Button, Text, TextInput, View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+export default function LoginScreen() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+  });
+
+  const submitForm = handleSubmit(loginForm, async (values) => {
+    console.log(values);
+  });
+
+  return (
+    <View>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <View>
+            <TextInput
+              {...field.props}
+              value={field.input}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            {field.errors && <Text>{field.errors[0]}</Text>}
+          </View>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <View>
+            <TextInput {...field.props} value={field.input} secureTextEntry />
+            {field.errors && <Text>{field.errors[0]}</Text>}
+          </View>
+        )}
+      </Field>
+      <Button
+        title="Login"
+        onPress={submitForm}
+        disabled={loginForm.isSubmitting}
+      />
+    </View>
+  );
+}
+```
+
+Notice what disappeared: the `defaultValues` object (required string fields start as `''` automatically), the manual `value`, `onChangeText`, and `onBlur` wiring (replaced by spreading `field.props`), and the `form.Subscribe` wrapper around the submit button (`loginForm.isSubmitting` is read directly). The `onSubmit` option moved out of the hook into the <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method, which returns a ready-to-use press handler. One timing difference: the TanStack Form version validates on every change from the start, while Formisch by default waits until the first submit and then revalidates on every input. Pass `validate: 'input'` to <Link href="/react-native/api/useForm/">`useForm`</Link> if you want to match the TanStack Form behavior.
+
+## Migration steps
+
+### Install Formisch
+
+Install Formisch and Valibot alongside your existing setup. Both form libraries can run in the same app during the migration.
+
+```bash
+npm install @formisch/react-native valibot
+```
+
+See the <Link href="/react-native/guides/installation/">installation</Link> guide for other package managers and TypeScript requirements.
+
+### Move validation into a Valibot schema
+
+If your form already passes a Valibot schema to `validators`, you can reuse it as is. If you use another Standard Schema library like Zod, or hand-written validator functions attached to fields, rewrite the rules as a single Valibot schema. Each field-level validator becomes a validation rule in the schema:
+
+```ts
+import * as v from 'valibot';
+
+// Before: onChange: ({ value }) => (!value ? 'Please enter your email.' : undefined)
+// After: defined once in the schema
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(v.string(), v.nonEmpty(), v.minLength(8)),
+});
+```
+
+Define the fields in the same order they appear in your form, because Formisch focuses the first field with an error after a failed submission. See the <Link href="/react-native/guides/define-your-form/">define your form</Link> guide for details.
+
+### Replace the form setup
+
+Swap the `useForm` import from `@tanstack/react-form` to `@formisch/react-native` and pass your schema instead of `defaultValues` and `validators`. The `onSubmit` option moves out of the hook (see below). If your `defaultValues` contained real data instead of empty placeholders, pass it as `initialInput`:
+
+```tsx
+import { useForm } from '@formisch/react-native';
+
+const loginForm = useForm({
+  schema: LoginSchema,
+  initialInput: {
+    email: 'user@example.com',
+  },
+});
+```
+
+Required string fields start as `''` automatically, so you no longer need to list every field just to initialize it. See the <Link href="/react-native/guides/create-your-form/">create your form</Link> guide for all configuration options.
+
+### Replace field bindings
+
+Replace each `form.Field` with the <Link href="/react-native/api/Field/">`Field`</Link> component. String names become path arrays, and the manual event wiring becomes a spread of `field.props`:
+
+```tsx
+import { Field } from '@formisch/react-native';
+
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <View>
+      <TextInput {...field.props} value={field.input} />
+      {field.errors && <Text>{field.errors[0]}</Text>}
+    </View>
+  )}
+</Field>;
+```
+
+`field.state.value` becomes `field.input`, and `field.state.meta.errors` becomes `field.errors`, which is either `null` or a non-empty array of strings, so no `.message` access is needed. For nested fields, `name="user.email"` becomes `path={['user', 'email']}` with full autocompletion from your schema. If you extracted fields into their own components, use the <Link href="/react-native/api/useField/">`useField`</Link> hook instead, as shown in the <Link href="/react-native/guides/add-form-fields/">add form fields</Link> guide.
+
+### Update submission handling
+
+Replace the `form.handleSubmit()` call with the Formisch <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method. Your `onSubmit` option becomes its second argument, and it receives the validated output of your schema, fully typed by <Link href="/core/api/SubmitHandler/">`SubmitHandler`</Link>. The returned function is passed to `onPress`, or to a `TextInput`'s `onSubmitEditing` to submit from the keyboard:
+
+```tsx
+import { handleSubmit } from '@formisch/react-native';
+
+const submitForm = handleSubmit(loginForm, async (values) => {
+  await fetch('https://api.example.com/login', {
+    method: 'POST',
+    body: JSON.stringify(values),
+  });
+});
+
+<Button title="Login" onPress={submitForm} disabled={loginForm.isSubmitting} />;
+```
+
+The handler only runs when the form input passes your schema; on a failed submission, Formisch focuses the first field with an error instead. See the <Link href="/react-native/guides/handle-submission/">handle submission</Link> guide for async patterns and error handling.
+
+## API mapping
+
+| TanStack Form                            | Formisch                                                                                                                               |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `useForm({ defaultValues, validators })` | <Link href="/react-native/api/useForm/">`useForm`</Link> with `schema`                                                                 |
+| `defaultValues`                          | `initialInput` (optional, types come from the schema)                                                                                  |
+| `onSubmit` option of `useForm`           | Handler passed to <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link>                                                        |
+| `form.handleSubmit()` in `onPress`       | Function returned by <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link>, passed to `onPress`                                |
+| `form.Field` with `name="user.email"`    | <Link href="/react-native/api/Field/">`Field`</Link> with `path={['user', 'email']}`                                                   |
+| `field.state.value`                      | `field.input`                                                                                                                          |
+| `field.handleChange`, `field.handleBlur` | Spread `field.props`, or `field.onChange` for non-text components                                                                      |
+| `field.state.meta.errors`                | `field.errors`                                                                                                                         |
+| `field.state.meta.isTouched`             | `field.isTouched`                                                                                                                      |
+| `field.state.meta.isDirty`               | `field.isEdited` (see below)                                                                                                           |
+| `field.state.meta.isDefaultValue`        | `!field.isDirty` (see below)                                                                                                           |
+| `form.Subscribe`, `useStore(form.store)` | Read the form store directly (e.g. `form.isSubmitting`, `form.isDirty`)                                                                |
+| `state.canSubmit`                        | No direct equivalent (see below)                                                                                                       |
+| `form.state.values`                      | <Link href="/methods/api/getInput/">`getInput`</Link>                                                                                  |
+| `form.setFieldValue(name, value)`        | <Link href="/methods/api/setInput/">`setInput`</Link>                                                                                  |
+| `form.reset()`                           | <Link href="/methods/api/reset/">`reset`</Link>                                                                                        |
+| `form.Field` with `mode="array"`         | <Link href="/react-native/api/FieldArray/">`FieldArray`</Link> or <Link href="/react-native/api/useFieldArray/">`useFieldArray`</Link> |
+| `pushValue`, `insertValue`               | <Link href="/methods/api/insert/">`insert`</Link>                                                                                      |
+| `removeValue`, `moveValue`               | <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/move/">`move`</Link>                                       |
+| `swapValues`, `replaceValue`             | <Link href="/methods/api/swap/">`swap`</Link>, <Link href="/methods/api/replace/">`replace`</Link>                                     |
+| `createFormHook`, `useAppForm`           | No equivalent needed (see below)                                                                                                       |
+| `asyncDebounceMs`                        | No direct equivalent (see below)                                                                                                       |
+
+A few entries deserve a short note:
+
+- **`state.canSubmit`**: Formisch does not compute a combined "can submit" flag. The idiomatic pattern is to keep the submit button enabled and let submission trigger validation, which focuses the first invalid field. If you want a validity-based flag, `form.isValid` reflects the result of the last validation run. With the default `validate: 'submit'` timing it stays `true` until the first submit, so combine it with `validate: 'initial'` if you want TanStack-like behavior.
+- **Dirty state** is split differently. TanStack Form's `isDirty` stays `true` once a field was changed, even if the value is reverted. That matches Formisch's `isEdited`. Formisch's `isDirty` compares the current input against the initial input and turns back off when they match, like TanStack Form's `isDefaultValue` inverted.
+- **`createFormHook` and `useAppForm`**: These exist in TanStack Form to pre-bind typed field components and share form configuration. Formisch does not need them, since every hook and component is already fully typed by your schema. The role of pre-bound field components is filled by regular <Link href="/react-native/guides/input-components/">input components</Link>.
+- **`asyncDebounceMs`**: Formisch has no built-in debounce option. Async rules live in the schema via `v.pipeAsync` and `v.checkAsync`, and `form.isValidating` is `true` while they run. See the <Link href="/react-native/guides/validation/">validation</Link> guide.
+
+## Common patterns
+
+### Form state
+
+In TanStack Form you subscribe to state with a selector to control re-renders, either through `form.Subscribe` (as with the submit button in the side-by-side example above) or with the `useStore` hook in component logic. In Formisch you read the form store directly. The store is built on fine-grained signals wired into React's render cycle, so components re-render only when the properties they read change, without selectors:
+
+```tsx
+<Button
+  title={loginForm.isSubmitting ? 'Submitting...' : 'Login'}
+  onPress={submitForm}
+  disabled={loginForm.isSubmitting}
+/>
+```
+
+The form store exposes `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors`. To read field values in component logic, use the <Link href="/methods/api/getInput/">`getInput`</Link> method, which also stays reactive inside components.
+
+### Validation timing
+
+TanStack Form couples timing to each validator: the key you register a rule under (`onChange`, `onBlur`, `onSubmit`, `onMount`) decides when it runs. In Formisch, the rules live in the schema and timing is configured once for the whole form:
+
+```tsx
+const loginForm = useForm({
+  schema: LoginSchema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+The `validate` option controls when a field is first validated (`'initial'`, `'touch'`, `'input'`, `'change'`, `'blur'`, or `'submit'`), and `revalidate` controls when it is checked again after it has an error or the form was submitted. As a rough mapping, `validators.onSubmit` corresponds to `validate: 'submit'` (the default), `validators.onBlur` to `validate: 'blur'`, `validators.onChange` to `validate: 'input'`, and `validators.onMount` to `validate: 'initial'`. Unlike TanStack Form, every validation pass parses the entire schema, so cross-field rules stay correct no matter which field triggered it. The <Link href="/react-native/guides/validation/">validation</Link> guide covers this in depth, including how to show errors only at the right time.
+
+### Field arrays
+
+In TanStack Form you set `mode="array"` on a field, map over `field.state.value`, and address items with interpolated string names:
+
+```tsx
+<form.Field name="todos" mode="array">
+  {(todosField) => (
+    <View>
+      {todosField.state.value.map((_, index) => (
+        <form.Field key={index} name={`todos[${index}].label`}>
+          {(field) => (
+            <TextInput
+              value={field.state.value}
+              onChangeText={field.handleChange}
+            />
+          )}
+        </form.Field>
+      ))}
+      <Button
+        title="Add todo"
+        onPress={() => todosField.pushValue({ label: '' })}
+      />
+    </View>
+  )}
+</form.Field>
+```
+
+In Formisch you use the <Link href="/react-native/api/FieldArray/">`FieldArray`</Link> component and standalone methods. The `items` array contains stable unique IDs to use as keys, so React correctly tracks items when they are added, moved, or removed:
+
+```tsx
+import { Field, FieldArray, insert } from '@formisch/react-native';
+
+<FieldArray of={todoForm} path={['todos']}>
+  {(fieldArray) => (
+    <View>
+      {fieldArray.items.map((item, index) => (
+        <Field key={item} of={todoForm} path={['todos', index, 'label']}>
+          {(field) => <TextInput {...field.props} value={field.input} />}
+        </Field>
+      ))}
+      <Button
+        title="Add todo"
+        onPress={() =>
+          insert(todoForm, { path: ['todos'], initialInput: { label: '' } })
+        }
+      />
+    </View>
+  )}
+</FieldArray>;
+```
+
+The <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/swap/">`swap`</Link>, and <Link href="/methods/api/replace/">`replace`</Link> methods cover the operations of `pushValue`, `removeValue`, `moveValue`, `swapValues`, and `replaceValue`. For example, `todosField.removeValue(index)` becomes `remove(todoForm, { path: ['todos'], at: index })`. Rules like a minimum or maximum number of items move into the schema, for example `v.pipe(v.array(…), v.maxLength(10))`. See the <Link href="/react-native/guides/field-arrays/">field arrays</Link> guide for the full picture.
+
+### Reset
+
+Where TanStack Form offers `form.reset()` to restore `defaultValues`, Formisch provides the <Link href="/methods/api/reset/">`reset`</Link> method, which can also target individual fields or update the baseline:
+
+```tsx
+import { reset } from '@formisch/react-native';
+
+// Reset the entire form to its initial input
+reset(loginForm);
+
+// Reset a single field
+reset(loginForm, { path: ['email'] });
+
+// Reset with a new initial input (e.g. refreshed server data)
+reset(loginForm, { initialInput: { email: 'jane@example.com' } });
+```
+
+Passing `initialInput` updates the dirty-tracking baseline, which is the right tool when server data changes. Use <Link href="/methods/api/setInput/">`setInput`</Link> instead when you only want to change the current value.
+
+### Non-text components
+
+In TanStack Form, components like `Switch` are wired manually, for example with `field.handleChange(checked)` inside the component's change handler. In Formisch, spreading `field.props` covers text inputs; non-text components bind `field.input` and set their value with `field.onChange`:
+
+```tsx
+<Field of={form} path={['cookies']}>
+  {(field) => (
+    <View>
+      <Text>Yes, I want cookies</Text>
+      <Switch value={field.input} onValueChange={field.onChange} />
+    </View>
+  )}
+</Field>
+```
+
+Native components emit typed values, so a `Switch` passes booleans and a slider passes real numbers straight to `field.onChange` without any conversion. See the <Link href="/react-native/guides/special-inputs/">special inputs</Link> guide for switches, sliders, radio groups, selects, and file pickers.
+
+## Next steps
+
+You now have everything you need to convert your forms one by one. To deepen your understanding of the Formisch side, read the <Link href="/react-native/guides/define-your-form/">define your form</Link> and <Link href="/react-native/guides/add-form-fields/">add form fields</Link> guides, explore the <Link href="/react-native/guides/form-methods/">form methods</Link> for programmatic control, and check out the <Link href="/react-native/guides/typescript/">TypeScript</Link> guide to get the most out of schema-based type inference.

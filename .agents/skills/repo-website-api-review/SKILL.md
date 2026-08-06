@@ -94,14 +94,15 @@ const form = createForm({ schema });
 
 ### Framework Terminology
 
-| Framework | Related Section Heading            |
-| --------- | ---------------------------------- |
-| Solid     | `### Primitives`                   |
-| Qwik      | `### Hooks`                        |
-| Preact    | `### Hooks`                        |
-| Angular   | `### Functions` / `### Directives` |
-| Vue       | `### Composables`                  |
-| Svelte    | `### Runes`                        |
+| Framework    | Related Section Heading            |
+| ------------ | ---------------------------------- |
+| Solid        | `### Primitives`                   |
+| Qwik         | `### Hooks`                        |
+| Preact       | `### Hooks`                        |
+| React Native | `### Hooks`                        |
+| Angular      | `### Functions` / `### Directives` |
+| Vue          | `### Composables`                  |
+| Svelte       | `### Runes`                        |
 
 ### Type Links
 
@@ -127,7 +128,7 @@ href: '/core/api/FormSchema/';
 
 ### properties.ts
 
-- [ ] All generics have `modifier: 'extends'`
+- [ ] All generics have `modifier: 'extends'` (`extends unknown` when the source has no constraint)
 - [ ] Custom types have valid `href` links
 - [ ] Property order: `name`, `href`, `generics`
 - [ ] No unused properties

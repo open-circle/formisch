@@ -1,0 +1,148 @@
+---
+title: useForm
+description: Creates a reactive form store from a form configuration that manages form state and provides reactive properties.
+source: /frameworks/react-native/src/hooks/useForm/useForm.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# useForm
+
+Creates a reactive form store from a form configuration. The form store manages form state and provides reactive properties.
+
+```ts
+const form = useForm<TSchema>(config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+
+## Parameters
+
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+`useForm` creates a reactive form store that manages form state using the provided Valibot schema. Validation runs when the form is submitted by default, after which fields revalidate on every input, but this can be customized with the `validate` and `revalidate` options.
+
+Since React Native has no native form element or submit event, there is no `<Form />` component. Instead, submission is triggered explicitly with the <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method, for example from a button's `onPress` or a text input's `onSubmitEditing` handler.
+
+## Returns
+
+- `form` <Property {...properties.FormStore} />
+
+## Examples
+
+The following examples show how `useForm` can be used.
+
+### Login screen
+
+```tsx
+import { Field, handleSubmit, useForm } from '@formisch/react-native';
+import { Button, Text, TextInput, View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function LoginScreen() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+  });
+
+  const submitForm = handleSubmit(loginForm, (output) => console.log(output));
+
+  return (
+    <View>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <View>
+            <TextInput {...field.props} value={field.input} />
+            {field.errors && <Text>{field.errors[0]}</Text>}
+          </View>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <View>
+            <TextInput {...field.props} value={field.input} secureTextEntry />
+            {field.errors && <Text>{field.errors[0]}</Text>}
+          </View>
+        )}
+      </Field>
+      <Button title="Login" onPress={submitForm} />
+    </View>
+  );
+}
+```
+
+### Initial input
+
+```ts
+const profileForm = useForm({
+  schema: ProfileSchema,
+  initialInput: {
+    name: 'Jane Doe',
+    email: 'jane@example.com',
+  },
+});
+```
+
+### Validation timing
+
+```ts
+const signUpForm = useForm({
+  schema: SignUpSchema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+## Related
+
+The following APIs can be combined with `useForm`.
+
+### Hooks
+
+<ApiList
+  items={[
+    { text: 'useField', href: '../useField/' },
+    { text: 'useFieldArray', href: '../useFieldArray/' },
+  ]}
+/>
+
+### Components
+
+<ApiList
+  items={[
+    { text: 'Field', href: '../Field/' },
+    { text: 'FieldArray', href: '../FieldArray/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'focus', href: '/methods/api/focus/' },
+    { text: 'getDeepErrors', href: '/methods/api/getDeepErrors/' },
+    { text: 'getErrors', href: '/methods/api/getErrors/' },
+    { text: 'getInput', href: '/methods/api/getInput/' },
+    { text: 'handleSubmit', href: '/methods/api/handleSubmit/' },
+    { text: 'insert', href: '/methods/api/insert/' },
+    { text: 'move', href: '/methods/api/move/' },
+    { text: 'remove', href: '/methods/api/remove/' },
+    { text: 'replace', href: '/methods/api/replace/' },
+    { text: 'reset', href: '/methods/api/reset/' },
+    { text: 'setErrors', href: '/methods/api/setErrors/' },
+    { text: 'setInput', href: '/methods/api/setInput/' },
+    { text: 'swap', href: '/methods/api/swap/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>

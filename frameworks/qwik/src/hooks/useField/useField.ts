@@ -36,7 +36,7 @@ export interface UseFieldConfig<
 }
 
 /**
- * Creates a reactive field store of a specific field within a form store.
+ * Creates a reactive field store for a specific field within a form store.
  *
  * @param form The form store instance.
  * @param config The field configuration.
@@ -66,13 +66,19 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
       const elements = internalFieldStoreValue.elements.filter(
         (element) => element.isConnected
       );
-      // Keep `initialElements` in sync unless a reorder has moved the elements,
-      // so resetting a remounted field restores its live element, not a stale one
+      // Keep `initialElements` in sync while the store still owns it (same
+      // reference) and filter it separately otherwise, so the detached element
+      // of a removed array item does not survive in the reset baseline
       if (
         internalFieldStoreValue.elements ===
         internalFieldStoreValue.initialElements
       ) {
         internalFieldStoreValue.initialElements = elements;
+      } else {
+        internalFieldStoreValue.initialElements =
+          internalFieldStoreValue.initialElements.filter(
+            (element) => element.isConnected
+          );
       }
       internalFieldStoreValue.elements = elements;
     });
@@ -104,7 +110,12 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
       },
       autofocus: !!internalFieldStore.value.errors.value,
       ref: $((element) => {
-        internalFieldStore.value.elements.push(element);
+        // An array reorder transfers registered elements between the field
+        // stores, so the element may already be present when the framework
+        // re-registers it against the destination store
+        if (!internalFieldStore.value.elements.includes(element)) {
+          internalFieldStore.value.elements.push(element);
+        }
       }),
       onFocus$: $(() => {
         setFieldBool(internalFieldStore.value, 'isTouched', true);

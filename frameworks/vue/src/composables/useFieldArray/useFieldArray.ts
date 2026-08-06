@@ -26,7 +26,7 @@ export interface UseFieldArrayConfig<
 }
 
 /**
- * Creates a reactive field array store of a specific field array within a form store.
+ * Creates a reactive field array store for a specific field array within a form store.
  *
  * @param form The form store instance, ref, or getter function.
  * @param config The field array configuration, ref, or getter function.

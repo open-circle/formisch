@@ -8,6 +8,11 @@ export const properties: Record<string, PropertyProps> = {
       name: 'FormSchema',
       href: '/core/api/FormSchema/',
     },
+    default: {
+      type: 'custom',
+      name: 'FormSchema',
+      href: '/core/api/FormSchema/',
+    },
   },
   FormConfig: {
     type: {
@@ -86,8 +91,18 @@ export const properties: Record<string, PropertyProps> = {
             options: [
               {
                 type: 'custom',
-                name: 'ValidationMode',
-                href: '/core/api/ValidationMode/',
+                name: 'Exclude',
+                generics: [
+                  {
+                    type: 'custom',
+                    name: 'ValidationMode',
+                    href: '/core/api/ValidationMode/',
+                  },
+                  {
+                    type: 'string',
+                    value: 'initial',
+                  },
+                ],
               },
               'undefined',
             ],

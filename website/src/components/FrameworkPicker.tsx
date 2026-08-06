@@ -86,15 +86,15 @@ export const FrameworkPicker = component$<FrameworkPickerProps>((props) => {
         type="button"
         onClick$={() => (isOpen.value = !isOpen.value)}
       >
-        <span class="flex items-center">
-          <CurrentIcon class="mr-2.5 h-[22px]" />
-          <span class="text-slate-900 dark:text-slate-200">
+        <span class="flex min-w-0 items-center">
+          <CurrentIcon class="mr-2.5 h-[22px] shrink-0" />
+          <span class="truncate text-slate-900 dark:text-slate-200">
             {getFrameworkName(framework.value)}
           </span>
         </span>
         <AngleUpIcon
           class={clsx(
-            'h-4.5 transition-transform duration-200',
+            'h-4.5 ml-2 shrink-0 transition-transform duration-200',
             isOpen.value ? 'rotate-0' : 'rotate-180'
           )}
         />
@@ -120,8 +120,8 @@ export const FrameworkPicker = component$<FrameworkPickerProps>((props) => {
                       isOpen.value = false;
                     }}
                   >
-                    <FrameworkIcon class="mr-2.5 h-[22px]" />
-                    {getFrameworkName(item)}
+                    <FrameworkIcon class="mr-2.5 h-[22px] shrink-0" />
+                    <span class="truncate">{getFrameworkName(item)}</span>
                   </button>
                 ) : (
                   <Link
@@ -129,8 +129,8 @@ export const FrameworkPicker = component$<FrameworkPickerProps>((props) => {
                     href={getPathname(item)}
                     onClick$={() => (isOpen.value = false)}
                   >
-                    <FrameworkIcon class="mr-2.5 h-[22px]" />
-                    {getFrameworkName(item)}
+                    <FrameworkIcon class="mr-2.5 h-[22px] shrink-0" />
+                    <span class="truncate">{getFrameworkName(item)}</span>
                   </Link>
                 )}
               </Fragment>

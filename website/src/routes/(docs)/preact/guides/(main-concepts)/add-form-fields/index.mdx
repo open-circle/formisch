@@ -37,7 +37,7 @@ export default function App() {
   });
 
   return (
-    <Form of={loginForm}>
+    <Form of={loginForm} onSubmit={(output) => console.log(output)}>
       <Field of={loginForm} path={['email']}>
         {(field) => <input {...field.props} value={field.input} type="email" />}
       </Field>
@@ -117,8 +117,9 @@ The <Link href="/preact/api/Field/">`Field`</Link> component is essentially a th
 
 ## Field store
 
-The field store provides access to the following properties (all properties except `props` are signals):
+The field store provides access to the following properties:
 
+- `path`: A signal containing the path to the field within the form.
 - `props`: JSX props to spread onto your input element (includes event handlers, ref callback, name attribute, and `autofocus` to automatically focus fields with errors).
 - `input`: A signal containing the current input value of the field.
 - `errors`: A signal containing an array of error messages if validation fails.
@@ -126,7 +127,7 @@ The field store provides access to the following properties (all properties exce
 - `isEdited`: A signal indicating whether the field's value has been changed.
 - `isDirty`: A signal indicating whether the current input differs from the initial input.
 - `isValid`: A signal indicating whether the field passes all validation rules.
-- `onInput`: Sets the field input value programmatically. Use this when the field cannot be connected to a native HTML element (e.g., complex custom inputs or component libraries that don't expose the underlying element).
+- `onInput`: A function that sets the field input value programmatically. Use this when the field cannot be connected to a native HTML element (e.g., complex custom inputs or component libraries that don't expose the underlying element).
 
 ## Next steps
 

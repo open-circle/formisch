@@ -9,6 +9,7 @@ type Framework =
   | 'preact'
   | 'qwik'
   | 'react'
+  | 'react-native'
   | 'solid'
   | 'svelte'
   | 'vue';
@@ -125,6 +126,7 @@ const config: (UserConfig | UserConfigFn)[] = [
   defineFrameworkConfig('preact'),
   defineFrameworkConfig('qwik'),
   defineFrameworkConfig('react'),
+  defineFrameworkConfig('react-native'),
   defineFrameworkConfig('solid'),
   defineFrameworkConfig('svelte'),
   defineFrameworkConfig('vue'),

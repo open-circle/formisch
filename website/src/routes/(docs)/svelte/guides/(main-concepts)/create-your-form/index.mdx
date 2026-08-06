@@ -33,7 +33,7 @@ The <Link href="/svelte/api/createForm/">`createForm`</Link> rune initializes an
   });
 </script>
 
-<Form of={loginForm}>
+<Form of={loginForm} onsubmit={(output) => console.log(output)}>
   <!-- Form fields will go here -->
 </Form>
 ```
@@ -106,8 +106,12 @@ When a page contains multiple forms, you can create separate form stores for eac
   const registerForm = createForm({ schema: RegisterSchema });
 </script>
 
-<Form of={loginForm}><!-- … --></Form>
-<Form of={registerForm}><!-- … --></Form>
+<Form of={loginForm} onsubmit={(output) => console.log(output)}>
+  <!-- … -->
+</Form>
+<Form of={registerForm} onsubmit={(output) => console.log(output)}>
+  <!-- … -->
+</Form>
 ```
 
 If you need a multi-step form (wizard), see the [multi-step form discussion](https://github.com/open-circle/formisch/discussions/108) for patterns and approaches.

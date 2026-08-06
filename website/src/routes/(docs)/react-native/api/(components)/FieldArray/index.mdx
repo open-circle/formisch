@@ -1,0 +1,62 @@
+---
+title: FieldArray
+description: Headless field array component that provides reactive properties and state for managing array fields.
+source: /frameworks/react-native/src/components/FieldArray/FieldArray.tsx
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# FieldArray
+
+Headless field array component that provides reactive properties and state for managing array fields. The field array component takes a form store, path to array field, and a render function that receives a field array store to manage array items and handle array operations.
+
+```tsx
+<FieldArray of={…} path={…}>children</FieldArray>
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldArrayPath` <Property {...properties.TFieldArrayPath} />
+
+## Properties
+
+- `of` <Property {...properties.of} />
+- `path` <Property {...properties.path} />
+- `children` <Property {...properties.children} />
+
+### Explanation
+
+The `FieldArray` component is a headless component that doesn't render any UI itself. Instead, it provides a render prop function via the `children` prop that receives a <Link href="../FieldArrayStore/">`FieldArrayStore`</Link> containing the reactive state of the array field, such as its item IDs and validation errors. The items themselves are manipulated with the form methods listed below.
+
+The component automatically handles array field registration, validation, and state management through the `of` prop that references the form store.
+
+## Related
+
+### Hooks
+
+<ApiList
+  items={[
+    { text: 'useForm', href: '../useForm/' },
+    { text: 'useFieldArray', href: '../useFieldArray/' },
+  ]}
+/>
+
+### Components
+
+<ApiList items={[{ text: 'Field', href: '../Field/' }]} />
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'insert', href: '/methods/api/insert/' },
+    { text: 'move', href: '/methods/api/move/' },
+    { text: 'remove', href: '/methods/api/remove/' },
+    { text: 'replace', href: '/methods/api/replace/' },
+    { text: 'swap', href: '/methods/api/swap/' },
+  ]}
+/>

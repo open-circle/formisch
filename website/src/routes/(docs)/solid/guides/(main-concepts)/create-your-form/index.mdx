@@ -32,7 +32,11 @@ export default function App() {
     schema: LoginSchema,
   });
 
-  return <Form of={loginForm}>{/* Form fields will go here */}</Form>;
+  return (
+    <Form of={loginForm} onSubmit={(output) => console.log(output)}>
+      {/* Form fields will go here */}
+    </Form>
+  );
 }
 ```
 
@@ -105,8 +109,12 @@ export default function App() {
 
   return (
     <>
-      <Form of={loginForm}>{/* … */}</Form>
-      <Form of={registerForm}>{/* … */}</Form>
+      <Form of={loginForm} onSubmit={(output) => console.log(output)}>
+        {/* … */}
+      </Form>
+      <Form of={registerForm} onSubmit={(output) => console.log(output)}>
+        {/* … */}
+      </Form>
     </>
   );
 }

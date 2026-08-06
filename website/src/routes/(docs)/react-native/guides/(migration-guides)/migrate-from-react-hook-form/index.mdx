@@ -1,0 +1,481 @@
+---
+title: Migrate from React Hook Form
+description: >-
+  Learn how to migrate your React Native forms from React Hook Form to
+  Formisch. This guide maps React Hook Form APIs to their Formisch equivalents
+  and walks through the migration step by step.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from React Hook Form
+
+This guide walks you through migrating your React Native forms from [React Hook Form](https://react-hook-form.com) to Formisch. It covers the mental-model shift, a complete side-by-side example, a step-by-step migration path, and a mapping of React Hook Form APIs to their Formisch equivalents.
+
+Migrating is a rewrite of the form layer, not a drop-in replacement. The mental model is different: instead of starting from a component and attaching form behavior to it, you start from a Valibot schema and build the component around it. The good news is that forms are naturally isolated units, so the rewrite happens one form at a time.
+
+Both libraries can coexist in the same application without conflicts. You can install Formisch next to React Hook Form, migrate a single form, and remove React Hook Form once the last one is converted. Since both libraries export a hook named `useForm`, the import path determines which one a component uses.
+
+## Key differences
+
+React Hook Form is component-first. You declare a TypeScript generic for your form values, wrap each input in a `Controller` addressed by string name, and attach validation either as per-field rules or through a resolver. Formisch is schema-first: a single Valibot schema is the source of types, validation rules, and form structure all at once. There is no separate generic to declare and no `defaultValues` object to keep aligned with your validation.
+
+The most important differences at a glance:
+
+- **Type source**: React Hook Form types come from a generic you declare on `useForm<FormValues>()`. Formisch infers all types, including field paths and the validated output, from the schema.
+- **Validation location**: React Hook Form spreads validation across `Controller` rules or a resolver. Formisch defines all validation in the schema, next to the structure it validates.
+- **Validation timing**: React Hook Form uses the `mode` and `reValidateMode` options. Formisch uses the equivalent `validate` and `revalidate` options with slightly different mode names.
+- **Validation scope**: React Hook Form validates individual fields as they trigger. Formisch always parses the entire form against the schema in a single pass and distributes the resulting errors to the individual fields. Cross-field rules work without extra wiring, and each field still only re-renders when its own errors change.
+- **Reactivity**: React Hook Form makes re-render scope your responsibility through `watch`, `useWatch`, and the `formState` Proxy with its destructuring rules. Formisch is built on fine-grained signals, so components automatically re-render when the state they read changes. There is no subscription API to manage.
+- **Field binding**: In React Native, React Hook Form connects inputs through the `Controller` component, whose `render` prop hands you `value`, `onChange`, and `onBlur` to wire to your `TextInput` manually. Formisch connects fields through the headless <Link href="/react-native/api/Field/">`Field`</Link> component with a type-safe path array (`path={['user', 'email']}`) and a single spread of `field.props`.
+
+If you already validate with `valibotResolver` from `@hookform/resolvers`, you are halfway there: your Valibot schema carries over to Formisch unchanged.
+
+## Side-by-side example
+
+The following login form has two validated fields, displays error messages, disables the submit button while submitting, and processes the values on submission. Both versions implement identical behavior.
+
+### React Hook Form
+
+```tsx
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
+import { Button, Text, TextInput, View } from 'react-native';
+
+interface LoginValues {
+  email: string;
+  password: string;
+}
+
+export default function LoginScreen() {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginValues>({
+    defaultValues: { email: '', password: '' },
+  });
+
+  const onSubmit: SubmitHandler<LoginValues> = async (values) => {
+    // Process the validated form values
+    console.log(values);
+  };
+
+  return (
+    <View>
+      <Controller
+        control={control}
+        name="email"
+        rules={{
+          required: 'Please enter your email.',
+          pattern: {
+            value: /^\S+@\S+\.\S+$/u,
+            message: 'The email address is badly formatted.',
+          },
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+        )}
+      />
+      {errors.email && <Text>{errors.email.message}</Text>}
+      <Controller
+        control={control}
+        name="password"
+        rules={{
+          required: 'Please enter your password.',
+          minLength: {
+            value: 8,
+            message: 'Your password must have 8 characters or more.',
+          },
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            secureTextEntry
+          />
+        )}
+      />
+      {errors.password && <Text>{errors.password.message}</Text>}
+      <Button
+        title="Login"
+        onPress={handleSubmit(onSubmit)}
+        disabled={isSubmitting}
+      />
+    </View>
+  );
+}
+```
+
+### Formisch
+
+```tsx
+import {
+  Field,
+  handleSubmit,
+  type SubmitHandler,
+  useForm,
+} from '@formisch/react-native';
+import { Button, Text, TextInput, View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+export default function LoginScreen() {
+  const loginForm = useForm({ schema: LoginSchema });
+
+  const onSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+    // Process the validated form values
+    console.log(values);
+  };
+
+  const submitForm = handleSubmit(loginForm, onSubmit);
+
+  return (
+    <View>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <View>
+            <TextInput
+              {...field.props}
+              value={field.input}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            {field.errors && <Text>{field.errors[0]}</Text>}
+          </View>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <View>
+            <TextInput {...field.props} value={field.input} secureTextEntry />
+            {field.errors && <Text>{field.errors[0]}</Text>}
+          </View>
+        )}
+      </Field>
+      <Button
+        title="Login"
+        onPress={submitForm}
+        disabled={loginForm.isSubmitting}
+      />
+    </View>
+  );
+}
+```
+
+Notice how the validation rules moved out of the JSX and into the schema, and how the `LoginValues` interface disappeared because the schema provides the types. The `Controller` wrapper with its manual `value`, `onChangeText`, and `onBlur` wiring became a `Field` that spreads `field.props`, and error messages live on each field store instead of a central `errors` object.
+
+## Migration steps
+
+### Install Formisch
+
+Add Formisch and Valibot alongside React Hook Form. Both form libraries can run in parallel during the migration.
+
+```bash
+npm install @formisch/react-native valibot
+```
+
+See the <Link href="/react-native/guides/installation/">installation</Link> guide for other package managers.
+
+### Move validation into a Valibot schema
+
+Translate your `Controller` rules or resolver schema into a single Valibot schema. Each rule has a direct counterpart: `required` becomes `v.nonEmpty()`, `minLength` becomes `v.minLength()`, and `pattern` usually becomes a dedicated action like `v.email()` or `v.regex()`.
+
+```ts
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+```
+
+If you already use `valibotResolver`, reuse your existing schema as-is. Define fields in the same order they appear in your form, because Formisch focuses the first field with an error on a failed submit. The <Link href="/react-native/guides/define-your-form/">define your form</Link> guide covers schema design in detail.
+
+### Replace the form setup
+
+Swap React Hook Form's `useForm` for the Formisch <Link href="/react-native/api/useForm/">`useForm`</Link> hook. The generic and the resolver disappear, and the schema takes their place. `defaultValues` becomes `initialInput` and is optional: required string fields start as an empty string automatically, so you no longer need to list every field just to avoid `undefined` values.
+
+```tsx
+// Before
+import { useForm } from 'react-hook-form';
+
+const { control, handleSubmit, formState } = useForm<LoginValues>({
+  resolver: valibotResolver(LoginSchema),
+  defaultValues: { email: '', password: '' },
+  mode: 'onTouched',
+});
+```
+
+```tsx
+// After
+import { useForm } from '@formisch/react-native';
+
+const loginForm = useForm({
+  schema: LoginSchema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+The `mode` and `reValidateMode` options map to `validate` and `revalidate`. See the <Link href="#validation-timing">validation timing</Link> section below for the exact mapping.
+
+### Replace field bindings
+
+Replace each `Controller` with the <Link href="/react-native/api/Field/">`Field`</Link> component. Instead of wiring `value`, `onChange`, and `onBlur` from the render prop by hand, you spread `field.props` onto the `TextInput` and bind `field.input` as its value. Errors move from the central `formState.errors` object to the field store, so the error display lives right next to the input.
+
+```tsx
+// Before
+<>
+  <Controller
+    control={control}
+    name="email"
+    rules={{ required: 'Please enter your email.' }}
+    render={({ field: { onChange, onBlur, value } }) => (
+      <TextInput value={value} onChangeText={onChange} onBlur={onBlur} />
+    )}
+  />
+  {errors.email && <Text>{errors.email.message}</Text>}
+</>
+```
+
+```tsx
+// After
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <View>
+      <TextInput {...field.props} value={field.input} />
+      {field.errors && <Text>{field.errors[0]}</Text>}
+    </View>
+  )}
+</Field>
+```
+
+String paths with dots become type-safe path arrays: `name="user.email"` turns into `path={['user', 'email']}` and `name="todos.0.label"` turns into `path={['todos', 0, 'label']}`. Where you used the `useController` hook for individual field components, use the <Link href="/react-native/api/useField/">`useField`</Link> hook instead. The <Link href="/react-native/guides/add-form-fields/">add form fields</Link> guide explains both in detail.
+
+### Update submission handling
+
+The submission wiring keeps the same shape: a `handleSubmit` function wraps your handler and returns a function to pass to `onPress`. The Formisch <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method is standalone and takes the form store as its first argument. Your handler only runs after validation succeeds and receives the validated values, which are now typed as the schema's output.
+
+```tsx
+// Before
+<Button title="Login" onPress={handleSubmit(onSubmit)} />
+```
+
+```tsx
+// After
+const submitForm = handleSubmit(loginForm, onSubmit);
+
+<Button title="Login" onPress={submitForm} />;
+```
+
+You can pass the returned function to any trigger, for example a `TextInput`'s `onSubmitEditing` to submit from the keyboard. Async handlers work the same way, and `loginForm.isSubmitting` replaces `formState.isSubmitting` for the loading state. See the <Link href="/react-native/guides/handle-submission/">handle submission</Link> guide for details.
+
+## API mapping
+
+| React Hook Form                       | Formisch                                                                                                                                                                                             |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useForm<T>(config)`                  | <Link href="/react-native/api/useForm/">`useForm`</Link> with `schema` (types are inferred)                                                                                                          |
+| `resolver: valibotResolver(schema)`   | `schema` option                                                                                                                                                                                      |
+| `defaultValues`                       | `initialInput` option                                                                                                                                                                                |
+| `mode` / `reValidateMode`             | `validate` / `revalidate` options                                                                                                                                                                    |
+| `<Controller name="email" />`         | <Link href="/react-native/api/Field/">`Field`</Link> component with `path={['email']}`                                                                                                               |
+| `useController`                       | <Link href="/react-native/api/useField/">`useField`</Link> hook or `field.onChange`                                                                                                                  |
+| `handleSubmit(onValid)`               | <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method                                                                                                                                 |
+| `formState.errors`                    | `field.errors` per field, <Link href="/methods/api/getErrors/">`getErrors`</Link>, <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>                                                   |
+| `formState.isDirty` / `dirtyFields`   | `form.isDirty`, `field.isDirty`, <Link href="/methods/api/getDirtyInput/">`getDirtyInput`</Link>                                                                                                     |
+| `formState.touchedFields`             | `field.isTouched`                                                                                                                                                                                    |
+| `formState.isSubmitting`              | `form.isSubmitting`                                                                                                                                                                                  |
+| `formState.isSubmitted`               | `form.isSubmitted`                                                                                                                                                                                   |
+| `formState.isValid`                   | `form.isValid`                                                                                                                                                                                       |
+| `formState.isValidating`              | `form.isValidating`                                                                                                                                                                                  |
+| `watch('name')` / `useWatch`          | `field.input`, <Link href="/methods/api/getInput/">`getInput`</Link>                                                                                                                                 |
+| `getValues()`                         | <Link href="/methods/api/getInput/">`getInput`</Link>                                                                                                                                                |
+| `setValue`                            | <Link href="/methods/api/setInput/">`setInput`</Link>                                                                                                                                                |
+| `setError` / `clearErrors`            | <Link href="/methods/api/setErrors/">`setErrors`</Link>                                                                                                                                              |
+| `trigger`                             | <Link href="/methods/api/validate/">`validate`</Link>                                                                                                                                                |
+| `setFocus`                            | <Link href="/methods/api/focus/">`focus`</Link>                                                                                                                                                      |
+| `reset` / `resetField`                | <Link href="/methods/api/reset/">`reset`</Link>                                                                                                                                                      |
+| `useFieldArray`                       | <Link href="/react-native/api/FieldArray/">`FieldArray`</Link> component or <Link href="/react-native/api/useFieldArray/">`useFieldArray`</Link> hook                                                |
+| `append` / `prepend` / `insert`       | <Link href="/methods/api/insert/">`insert`</Link>                                                                                                                                                    |
+| `remove` / `move` / `swap` / `update` | <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/move/">`move`</Link>, <Link href="/methods/api/swap/">`swap`</Link>, <Link href="/methods/api/replace/">`replace`</Link> |
+| `FormProvider` / `useFormContext`     | Not needed (see notes)                                                                                                                                                                               |
+| `unregister` / `shouldUnregister`     | No equivalent (see notes)                                                                                                                                                                            |
+
+A few entries deserve extra context:
+
+- **`FormProvider` / `useFormContext`**: The Formisch form store is a plain object. Pass it down as a prop, as our <Link href="/react-native/guides/input-components/">input components</Link> do, or share it through your own React context if you prefer.
+- **`unregister` / `shouldUnregister`**: In Formisch, the schema defines which fields exist, independent of what is currently mounted. For conditional form shapes, model the variants in the schema, for example with `v.optional` or `v.variant`.
+- **`watch` callbacks and subscriptions**: There is no subscription API because none is needed. Reading `field.input` or any form state during render is automatically reactive.
+- **`trigger('name')`**: The <Link href="/methods/api/validate/">`validate`</Link> method always validates the entire form against the schema. The results are still distributed per field, so field-level triggering is not necessary.
+- **`shouldFocusError`**: Formisch focuses the first field with an error automatically when a submit fails, following the field order of your schema.
+- **`formState.isValid`**: In Formisch, `form.isValid` reflects the result of the last validation run. With the default `validate: 'submit'` timing it stays `true` until the first submit, unlike React Hook Form's `isValid`, which validates proactively. If you rely on it before the first submit, for example to disable the submit button, set `validate: 'initial'`.
+- **`formState.touchedFields`**: Formisch marks a field as touched when it receives focus, while React Hook Form marks it on blur. Logic that shows errors based on touched state therefore reacts one event earlier.
+
+## Common patterns
+
+### Form state
+
+React Hook Form exposes form state through the `formState` Proxy, which requires you to destructure the properties you use so the subscription is set up correctly. In Formisch, you read state directly from the form store. Reads are tracked through signals, so components re-render automatically and only when the state they read changes.
+
+```tsx
+// Before
+const {
+  formState: { isDirty, isSubmitting },
+} = useForm<ProfileValues>();
+<Button title="Save" disabled={!isDirty || isSubmitting} onPress={onPress} />;
+
+// After
+const profileForm = useForm({ schema: ProfileSchema });
+<Button
+  title="Save"
+  disabled={!profileForm.isDirty || profileForm.isSubmitting}
+  onPress={submitForm}
+/>;
+```
+
+### Validation timing
+
+React Hook Form's `mode` and `reValidateMode` map to Formisch's `validate` and `revalidate`. The Formisch mode `'input'` fires on every keystroke and is what React Hook Form calls `onChange`. A separate `'change'` mode exists, but because `TextInput` emits its change on every keystroke, both behave the same in React Native, so prefer `'input'`. There are also more options like `'touch'` and `'initial'`.
+
+```tsx
+// Before
+const form = useForm<Values>({
+  resolver: valibotResolver(Schema),
+  mode: 'onTouched',
+  reValidateMode: 'onChange',
+});
+
+// After: first validation on blur, revalidation on every keystroke
+const form = useForm({
+  schema: Schema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+The defaults are already close: Formisch validates on submit first and revalidates on input, similar to React Hook Form's `onSubmit` mode with `onChange` revalidation. See the <Link href="/react-native/guides/validation/">validation</Link> guide for all modes and for showing errors at the right time.
+
+### Field arrays
+
+React Hook Form's `useFieldArray` returns `fields` with stable `id` keys plus mutation functions. Formisch provides the <Link href="/react-native/api/FieldArray/">`FieldArray`</Link> component, whose `items` array contains unique string identifiers to use as keys, and standalone methods like <Link href="/methods/api/insert/">`insert`</Link> and <Link href="/methods/api/remove/">`remove`</Link>.
+
+```tsx
+// Before
+const { fields, append, remove } = useFieldArray({ control, name: 'todos' });
+
+<>
+  {fields.map((item, index) => (
+    <View key={item.id}>
+      <Controller
+        control={control}
+        name={`todos.${index}.label`}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput value={value} onChangeText={onChange} onBlur={onBlur} />
+        )}
+      />
+      <Button title="Delete" onPress={() => remove(index)} />
+    </View>
+  ))}
+  <Button title="Add" onPress={() => append({ label: '' })} />
+</>;
+```
+
+```tsx
+// After
+import { Field, FieldArray, insert, remove } from '@formisch/react-native';
+
+<FieldArray of={todoForm} path={['todos']}>
+  {(fieldArray) => (
+    <View>
+      {fieldArray.items.map((item, index) => (
+        <View key={item}>
+          <Field of={todoForm} path={['todos', index, 'label']}>
+            {(field) => <TextInput {...field.props} value={field.input} />}
+          </Field>
+          <Button
+            title="Delete"
+            onPress={() => remove(todoForm, { path: ['todos'], at: index })}
+          />
+        </View>
+      ))}
+      <Button
+        title="Add"
+        onPress={() =>
+          insert(todoForm, { path: ['todos'], initialInput: { label: '' } })
+        }
+      />
+    </View>
+  )}
+</FieldArray>;
+```
+
+Unlike `append` and `prepend`, the single `insert` method covers all positions through its optional `at` option. See the <Link href="/react-native/guides/field-arrays/">field arrays</Link> guide for moving, swapping, and validating arrays.
+
+### Reset
+
+React Hook Form's `reset()` restores `defaultValues`, and `reset(values)` replaces them. The Formisch <Link href="/methods/api/reset/">`reset`</Link> method works the same way with its config object, and it also resets individual fields through the `path` option, replacing `resetField`.
+
+```tsx
+import { reset } from '@formisch/react-native';
+
+// Reset the entire form to its initial input
+reset(profileForm);
+
+// Reset with new initial input, e.g. after refetching server data
+reset(profileForm, { initialInput: { name: 'Jane' } });
+
+// Reset a single field
+reset(profileForm, { path: ['email'] });
+```
+
+As in React Hook Form, resetting updates the baseline for dirty tracking. Text inputs in Formisch are always controlled through `value={field.input}`, so programmatic resets are reflected immediately; the same applies to non-text components that bind `field.input`, as described in the <Link href="/react-native/guides/controlled-fields/">controlled fields</Link> guide.
+
+### Non-text components
+
+With React Hook Form, components like `Switch` are wired through `Controller`, passing the render prop's `value` and `onChange` to the component manually. In Formisch, text inputs are covered by spreading `field.props`, while non-text components bind `field.input` and set their value with `field.onChange`:
+
+```tsx
+<Field of={form} path={['cookies']}>
+  {(field) => (
+    <View>
+      <Text>Yes, I want cookies</Text>
+      <Switch value={field.input} onValueChange={field.onChange} />
+    </View>
+  )}
+</Field>
+```
+
+Where you used `valueAsNumber` or parsed values inside a `Controller`, note that native components emit typed values: a `Switch` passes booleans and a slider passes real numbers straight to `field.onChange`, so no conversion is needed. The <Link href="/react-native/guides/special-inputs/">special inputs</Link> guide covers switches, sliders, radio groups, selects, and file pickers in detail.
+
+## Next steps
+
+You now have everything you need to migrate your forms. Start with the <Link href="/react-native/guides/define-your-form/">define your form</Link> and <Link href="/react-native/guides/create-your-form/">create your form</Link> guides to deepen the schema-first workflow, build reusable <Link href="/react-native/guides/input-components/">input components</Link> to keep your migrated forms tidy, and explore the <Link href="/react-native/guides/form-methods/">form methods</Link> guide for everything that replaces React Hook Form's imperative API.

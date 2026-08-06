@@ -31,10 +31,7 @@ export const properties: Record<string, PropertyProps> = {
           name: 'ValidateFormConfig',
           href: '../ValidateFormConfig/',
         },
-        {
-          type: 'custom',
-          name: 'undefined',
-        },
+        'undefined',
       ],
     },
   },

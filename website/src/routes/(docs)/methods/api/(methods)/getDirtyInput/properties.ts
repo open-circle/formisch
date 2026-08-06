@@ -57,7 +57,7 @@ export const properties: Record<string, PropertyProps> = {
             },
             {
               type: 'custom',
-              name: 'RequiredPath',
+              name: 'TFieldPath',
             },
           ],
         },

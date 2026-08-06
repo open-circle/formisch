@@ -17,6 +17,8 @@ Creates a submit event handler for the form that prevents default browser submis
 const result = handleSubmit<TSchema>(form, handler);
 ```
 
+> In React Native, where there is no form element or submit event, `handleSubmit` returns a plain async function that you call from a button's `onPress` or a text input's `onSubmitEditing` handler. In this case the handler receives only the validated form output — there is no event object.
+
 ## Generics
 
 - `TSchema` <Property {...properties.TSchema} />
@@ -28,7 +30,7 @@ const result = handleSubmit<TSchema>(form, handler);
 
 ### Explanation
 
-The `form` parameter is the form store to handle submission for. The `handler` parameter can be a `SubmitHandler` (no event) or a `SubmitEventHandler` (with event) that gets called with the validated form output if validation succeeds.
+The `form` parameter is the form store to handle submission for. The `handler` parameter can be a `SubmitHandler` (no event) or, in the frameworks that submit through a form element, a `SubmitEventHandler` (with event) that gets called with the validated form output if validation succeeds. In React Native only `SubmitHandler` applies, as there is no submit event.
 
 ## Returns
 

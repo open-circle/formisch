@@ -2,7 +2,7 @@
 
 Formisch is a schema-based, headless form library for Angular. It manages form state and validation. It is type-safe, fast by default and its bundle size is small due to its modular design.
 
-Formisch is also available for [Preact][formisch-preact], [Qwik][formisch-qwik], [React][formisch-react], [SolidJS][formisch-solid], [Svelte][formisch-svelte] and [Vue][formisch-vue].
+Formisch is also available for [Preact][formisch-preact], [Qwik][formisch-qwik], [React][formisch-react], [React Native][formisch-react-native], [SolidJS][formisch-solid], [Svelte][formisch-svelte] and [Vue][formisch-vue].
 
 ## Highlights
 
@@ -87,6 +87,8 @@ Unlike `(ngSubmit)="save()"`, `[formischSubmit]` takes your handler instead of c
 
 What makes Formisch unique is its framework-agnostic core, which is fully native to the framework you are using. It works by inserting framework-specific reactivity blocks when the core package is built, giving you native performance for any UI update. A modular methods API keeps bundles small by only including the methods you import, and end-to-end type safety covers deeply nested paths and field arrays with TypeScript inference that stays fast even as forms grow.
 
+For a side-by-side look at how Formisch compares to Reactive Forms, Signal Forms and TanStack Form, see the [comparison guide](https://formisch.dev/angular/guides/comparison/).
+
 ## Vision
 
 My vision for Formisch is to create a framework-agnostic platform similar to [Vite](https://vite.dev/), but for forms — a shared core that lets the same mental model and codebase work natively across every modern UI framework.
@@ -108,6 +110,7 @@ This project is available free of charge and licensed under the [MIT license](ht
 [formisch-preact]: https://github.com/open-circle/formisch/tree/main/frameworks/preact
 [formisch-qwik]: https://github.com/open-circle/formisch/tree/main/frameworks/qwik
 [formisch-react]: https://github.com/open-circle/formisch/tree/main/frameworks/react
+[formisch-react-native]: https://github.com/open-circle/formisch/tree/main/frameworks/react-native
 [formisch-solid]: https://github.com/open-circle/formisch/tree/main/frameworks/solid
 [formisch-svelte]: https://github.com/open-circle/formisch/tree/main/frameworks/svelte
 [formisch-vue]: https://github.com/open-circle/formisch/tree/main/frameworks/vue

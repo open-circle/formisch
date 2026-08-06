@@ -26,7 +26,7 @@ export default component$(() => {
       <h1>API reference</h1>
       <p>
         This section of our website contains detailed reference documentation
-        for working with Valibot. Please create an{' '}
+        for working with Formisch. Please create an{' '}
         <a
           href={`${import.meta.env.PUBLIC_GITHUB_URL}/issues/new`}
           target="_blank"

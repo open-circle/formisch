@@ -1,0 +1,130 @@
+---
+title: Create your form
+description: >-
+  Learn how to create a form with the useForm hook. It initializes
+  your form's store based on your Valibot schema for managing form state
+  and validation.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Create your form
+
+Formisch consists of hooks, components and methods. To create a form you use the <Link href="/react-native/api/useForm/">`useForm`</Link> hook.
+
+## Form hook
+
+The <Link href="/react-native/api/useForm/">`useForm`</Link> hook initializes and returns the store of your form. The store contains the state of the form and can be used with other Formisch hooks, components and methods to build your form.
+
+Unlike the web, React Native has no native form element or submit event. Therefore, submission is triggered explicitly with the <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method — for example, from a button's `onPress` handler. You will learn more about this in the <Link href="/react-native/guides/handle-submission/">handle submission</Link> guide.
+
+```tsx
+import { handleSubmit, useForm } from '@formisch/react-native';
+import { Button, View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function LoginScreen() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+  });
+
+  const submitForm = handleSubmit(loginForm, (output) => console.log(output));
+
+  return (
+    <View>
+      {/* Form fields will go here */}
+      <Button title="Login" onPress={submitForm} />
+    </View>
+  );
+}
+```
+
+### Configuration options
+
+The <Link href="/react-native/api/useForm/">`useForm`</Link> hook accepts a configuration object with the following options:
+
+- `schema`: Your Valibot schema that defines the form
+- `initialInput`: Initial values for your form fields (optional)
+- `emptyInput`: The empty value each field type starts at when a required field has no initial input (optional, defaults to `{ string: '' }`)
+- `validate`: When validation first occurs (optional, defaults to `'submit'`)
+- `revalidate`: When revalidation occurs after initial validation (optional, defaults to `'input'`)
+
+```tsx
+const loginForm = useForm({
+  schema: LoginSchema,
+  initialInput: {
+    email: 'user@example.com',
+  },
+  validate: 'initial',
+  revalidate: 'input',
+});
+```
+
+Formisch tracks two inputs for every field: the **initial input** (baseline for dirty tracking) and the **current input** (what the user is editing). In many apps, the initial input represents the server state while the current input represents the client state.
+
+`isDirty` becomes `true` when a field's current input differs from its initial input. Use <Link href="/methods/api/setInput/">`setInput`</Link> to update the current input (client state), and use <Link href="/methods/api/reset/">`reset`</Link> to update the initial input (baseline) when your server data changes or is refreshed.
+
+### Empty input
+
+By default, a required string field starts as an empty string (`''`) instead of `undefined`, matching an empty text input. This way an empty field shows the validation message you defined for it (for example from `v.nonEmpty()`) without you setting an `initialInput` for every field.
+
+You can configure the empty value per field type, or opt out by setting a type to `undefined`:
+
+```tsx
+const loginForm = useForm({
+  schema: LoginSchema,
+  emptyInput: {
+    string: '', // the default
+    number: 0, // required numbers start at 0 instead of undefined
+    boolean: false, // switches start turned off
+  },
+});
+```
+
+Optional and nullable fields are never affected and keep starting as `undefined`, since they accept it. The supported types are `string`, `number`, `boolean` and `date`, and the default is `{ string: '' }`.
+
+## Multiple forms
+
+When a screen contains multiple forms, you can create separate form stores for each one:
+
+```tsx
+import { useForm } from '@formisch/react-native';
+import { View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+const RegisterSchema = v.object({
+  username: v.pipe(v.string(), v.minLength(3)),
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function AuthScreen() {
+  const loginForm = useForm({ schema: LoginSchema });
+  const registerForm = useForm({ schema: RegisterSchema });
+
+  return (
+    <View>
+      <View>{/* Login form fields */}</View>
+      <View>{/* Register form fields */}</View>
+    </View>
+  );
+}
+```
+
+If you need a multi-step form (wizard), see the [multi-step form discussion](https://github.com/open-circle/formisch/discussions/108) for patterns and approaches.
+
+## Next steps
+
+Now that you know how to create a form, continue to the <Link href="/react-native/guides/add-form-fields/">add form fields</Link> guide to learn how to connect your input components to the form using the <Link href="/react-native/api/Field/">`Field`</Link> component.

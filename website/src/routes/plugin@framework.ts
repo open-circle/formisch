@@ -26,6 +26,7 @@ import {
   PreactLogo,
   QwikLogo,
   ReactLogo,
+  ReactNativeLogo,
   SolidLogo,
   SvelteLogo,
   VueLogo,
@@ -39,6 +40,7 @@ export type Framework =
   | 'preact'
   | 'qwik'
   | 'react'
+  | 'react-native'
   | 'solid'
   | 'svelte'
   | 'vue';
@@ -48,6 +50,7 @@ export const FRAMEWORK_LIST: Framework[] = [
   'preact',
   'qwik',
   'react',
+  'react-native',
   'solid',
   'svelte',
   'vue',
@@ -58,6 +61,7 @@ export const FRAMEWORK_NAME_MAP: Record<Framework, string> = {
   preact: 'Preact',
   qwik: 'Qwik',
   react: 'React',
+  'react-native': 'React Native',
   solid: 'SolidJS',
   svelte: 'Svelte',
   vue: 'Vue',
@@ -71,6 +75,7 @@ const FRAMEWORK_LOGO_MAP: Record<
   preact: PreactLogo,
   qwik: QwikLogo,
   react: ReactLogo,
+  'react-native': ReactNativeLogo,
   solid: SolidLogo,
   svelte: SvelteLogo,
   vue: VueLogo,
@@ -84,6 +89,8 @@ const FRAMEWORK_ICON_MAP: Record<
   preact: PreactIcon,
   qwik: QwikIcon,
   react: ReactIcon,
+  // Hint: React Native shares the React atom, as it has no icon of its own
+  'react-native': ReactIcon,
   solid: SolidIcon,
   svelte: SvelteIcon,
   vue: VueIcon,

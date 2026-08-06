@@ -26,11 +26,12 @@ export type FormProps<TSchema extends FormSchema = FormSchema> = Omit<
 
 /**
  * Form component that manages form submission and applies internal state.
- * Wraps form element and passes submission events to the provided handler.
+ * Wraps a native form element and calls the provided handler with the validated
+ * form output and the submit event.
  *
  * @param props The form component props.
  *
- * @returns The a native form element.
+ * @returns A native form element.
  */
 export function Form<TSchema extends FormSchema>(
   props: FormProps<TSchema>

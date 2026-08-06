@@ -50,6 +50,10 @@
       "types": "./dist/index.react.d.ts",
       "default": "./dist/index.react.js"
     },
+    "./react-native": {
+      "types": "./dist/index.react-native.d.ts",
+      "default": "./dist/index.react-native.js"
+    },
     "./vue": {
       "types": "./dist/index.vue.d.ts",
       "default": "./dist/index.vue.js"

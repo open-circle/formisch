@@ -18,6 +18,7 @@ import {
   PreactLogo,
   QwikLogo,
   ReactLogo,
+  ReactNativeLogo,
   SolidLogo,
   SvelteLogo,
   VueLogo,
@@ -31,7 +32,7 @@ export const head: DocumentHead = {
     {
       name: 'description',
       content:
-        'Formisch is a schema-based, headless form library for JS frameworks. It manages form state and validation. It is type-safe, fast by default and its bundle size is small due to its modular design. ',
+        'Formisch is a schema-based, headless form library for JS frameworks. It manages form state and validation. It is type-safe, fast by default and its bundle size is small due to its modular design.',
     },
   ],
 };
@@ -105,6 +106,15 @@ export default component$(() => {
                   url: `${
                     import.meta.env.PUBLIC_STACKBLITZ_REACT_URL
                   }?file=src%2Froutes%2Flogin%2Findex.tsx`,
+                },
+                {
+                  // Hint: React Native shares the React atom, as it has no icon
+                  // of its own
+                  Icon: ReactIcon,
+                  Logo: ReactNativeLogo,
+                  url: `${
+                    import.meta.env.PUBLIC_STACKBLITZ_REACT_NATIVE_URL
+                  }?file=app%2Flogin.tsx`,
                 },
                 {
                   Icon: SolidIcon,
@@ -185,7 +195,7 @@ export default component$(() => {
             {
               emoji: '🧩',
               heading: 'Fine-grained updates',
-              text: 'Built on signals DOM updates are super fast and mostly fine-grained',
+              text: 'Built on signals, DOM updates are super fast and mostly fine-grained',
             },
             {
               emoji: '🤖',
@@ -209,12 +219,12 @@ export default component$(() => {
             {
               emoji: '🎨',
               heading: 'Headless design',
-              text: 'Bring your own components or connect it to any pre-build component library',
+              text: 'Bring your own components or connect it to any pre-built component library',
             },
             {
               emoji: '🧨',
               heading: 'Powerful features',
-              text: 'Add dynamic field arrays and nest your form values as deep as you like ',
+              text: 'Add dynamic field arrays and nest your form values as deep as you like',
             },
           ].map(({ emoji, heading, text }) => (
             <li
