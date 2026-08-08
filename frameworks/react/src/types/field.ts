@@ -7,7 +7,7 @@ import type {
   ValidArrayPath,
   ValidPath,
 } from '@formisch/core/react';
-import type { ChangeEventHandler, FocusEventHandler } from 'react';
+import type { ChangeEventHandler } from 'react';
 import type * as v from 'valibot';
 
 /**
@@ -27,17 +27,17 @@ export interface FieldElementProps {
    */
   readonly ref: (element: FieldElement | null) => void;
   /**
-   * The focus event handler of the field element.
+   * Marks the field as touched and runs touch validation.
    */
-  readonly onFocus: FocusEventHandler<FieldElement>;
+  readonly onFocus: () => void;
   /**
    * The change event handler of the field element.
    */
   readonly onChange: ChangeEventHandler<FieldElement>;
   /**
-   * The blur event handler of the field element.
+   * Runs blur validation for the field.
    */
-  readonly onBlur: FocusEventHandler<FieldElement>;
+  readonly onBlur: () => void;
 }
 
 /**

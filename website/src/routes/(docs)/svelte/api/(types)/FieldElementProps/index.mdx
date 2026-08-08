@@ -23,3 +23,7 @@ Props to spread onto a field element for integration with Svelte form handling.
   - `oninput` <Property {...properties.oninput} />
   - `onchange` <Property {...properties.onchange} />
   - `onblur` <Property {...properties.onblur} />
+
+### Explanation
+
+`onfocus` marks the field as touched and runs the configured `'touch'` validation, while `onblur` runs the configured `'blur'` validation. Neither handler uses the event object, so both are typed as `() => void` and can be passed to native elements or custom components with different focus event types.

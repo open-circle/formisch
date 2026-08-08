@@ -23,3 +23,7 @@ Props to spread onto a field element for integration with Qwik form handling.
   - `onInput$` <Property {...properties.onInput$} />
   - `onChange$` <Property {...properties.onChange$} />
   - `onBlur$` <Property {...properties.onBlur$} />
+
+### Explanation
+
+`onFocus$` marks the field as touched and runs the configured `'touch'` validation, while `onBlur$` runs the configured `'blur'` validation. Neither handler uses the event object, so their wrapped callbacks are typed as `() => void` and can be passed to native elements or custom components with different focus event types.

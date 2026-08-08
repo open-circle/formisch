@@ -27,9 +27,9 @@ export interface FieldElementProps {
    */
   readonly ref: QRL<(element: FieldElement) => void>;
   /**
-   * The focus event handler of the field element.
+   * Marks the field as touched and runs touch validation.
    */
-  readonly onFocus$: QRL<(event: FocusEvent, element: FieldElement) => void>;
+  readonly onFocus$: QRL<() => void>;
   /**
    * The input event handler of the field element.
    */
@@ -39,9 +39,9 @@ export interface FieldElementProps {
    */
   readonly onChange$: QRL<(event: Event, element: FieldElement) => void>;
   /**
-   * The blur event handler of the field element.
+   * Runs blur validation for the field.
    */
-  readonly onBlur$: QRL<(event: FocusEvent, element: FieldElement) => void>;
+  readonly onBlur$: QRL<() => void>;
 }
 
 /**

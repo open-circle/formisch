@@ -27,9 +27,9 @@ export interface FieldElementProps {
    */
   readonly ref: (element: FieldElement) => void;
   /**
-   * The focus event handler of the field element.
+   * Marks the field as touched and runs touch validation.
    */
-  readonly onFocus: JSX.EventHandler<FieldElement, FocusEvent>;
+  readonly onFocus: () => void;
   /**
    * The input event handler of the field element.
    */
@@ -39,9 +39,9 @@ export interface FieldElementProps {
    */
   readonly onChange: JSX.EventHandler<FieldElement, Event>;
   /**
-   * The blur event handler of the field element.
+   * Runs blur validation for the field.
    */
-  readonly onBlur: JSX.EventHandler<FieldElement, FocusEvent>;
+  readonly onBlur: () => void;
 }
 
 /**
