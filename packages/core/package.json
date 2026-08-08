@@ -30,6 +30,10 @@
       "types": "./dist/index.angular.d.ts",
       "default": "./dist/index.angular.js"
     },
+    "./honox": {
+      "types": "./dist/index.honox.d.ts",
+      "default": "./dist/index.honox.js"
+    },
     "./preact": {
       "types": "./dist/index.preact.d.ts",
       "default": "./dist/index.preact.js"
