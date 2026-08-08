@@ -28,7 +28,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan for vulnerabilities
-        uses: OWASP/cve-lite-cli@631eac57629e8d37a6821da3269467fd9224c905 # v1.27.0
+        uses: OWASP/cve-lite-cli@32c21bb9c73050bc177b563633b3fe684825517c # v1.28.0
         with:
           path: .
           fail-on: critical
@@ -77,7 +77,7 @@ jobs:
           fi
 
       - name: Upload SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        uses: github/codeql-action/upload-sarif@f205ea1c3313d32999d8d6a48b4f6530d4437b38 # v4.37.4
         if: always() && steps.sarif.outputs.exists == 'true'
         with:
           sarif_file: cve-lite.sarif
