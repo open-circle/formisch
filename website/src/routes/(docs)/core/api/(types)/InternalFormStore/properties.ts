@@ -26,7 +26,7 @@ export const properties: Record<string, PropertyProps> = {
       ],
     },
   },
-  validators: {
+  validationId: {
     type: 'number',
   },
   emptyInput: {
