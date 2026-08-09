@@ -28,7 +28,7 @@ export interface FieldElementProps {
    */
   readonly ref: (element: FieldElement | null) => void;
   /**
-   * Marks the field as touched and runs touch validation.
+   * The focus event handler of the field element.
    */
   readonly onFocus: () => void;
   /**
@@ -40,7 +40,7 @@ export interface FieldElementProps {
    */
   readonly onChange: GenericEventHandler<FieldElement>;
   /**
-   * Runs blur validation for the field.
+   * The blur event handler of the field element.
    */
   readonly onBlur: () => void;
 }
