@@ -28,7 +28,7 @@ Make the shortest guide that still produces a correct, accessible integration:
 - Keep introductory prose and caveats brief. Put component-specific details beside the relevant snippet instead of in a long notes section.
 - Use consistent names and page-unique DOM IDs so snippets can be combined safely.
 - Prefer complete, copy-safe snippets over shorter examples that silently omit validation, focus or accessibility behavior.
-- Avoid claiming that two library backends have the same API. State the exact library major version and primitive backend the guide targets. Treat visual styles separately: do not require a design preset unless the integration depends on it.
+- State the exact library major version. Mention a backend or preset only when the library offers one and it affects the integration. Do not impose an unrelated visual design choice.
 
 ## Guide Structure
 
@@ -36,7 +36,7 @@ Use this section order. FIXED parts stay consistent across integration guides; L
 
 ```
 # {Library}                     LIBRARY  2-3 sentence introduction with external
-                                         link, targeted major version/backend,
+                                         link, targeted major version/variant,
                                          and the two Formisch wiring patterns
 ## Installation                 LIBRARY  Formisch + Valibot + verified library or
                                          CLI commands
@@ -111,7 +111,7 @@ If a component exposes `onCheckedChange`, `onValueChange` or another value callb
 | `field.props.onFocus`   | focus event on the visible interactive control or group |
 | `field.props.onBlur`    | blur event on the visible interactive control or group  |
 
-The lifecycle mapping keeps `isTouched`, touch/blur validation, `focus()` and submit-time error focusing working. If the public wrapper hides the necessary primitive ref or event prop, adapt the copied local component and document that small change. A scoped ref lookup inside the owned wrapper is an acceptable fallback when the generated structure has been runtime-verified.
+The lifecycle mapping keeps `isTouched`, touch/blur validation, `focus()` and submit-time error focusing working. Prefer the library's public API or a local adapter when a component hides an essential ref or event prop. Only adapt the component itself when its source belongs to the reader. A scoped ref lookup inside owned source is an acceptable fallback when the structure has been runtime-verified.
 
 Formisch's focus and blur handlers are parameterless lifecycle callbacks. Pass them directly to component event props; any event argument supplied by the component is intentionally ignored. Do not add a cast or wrapper solely to erase an event parameter. Adapt a callback only when Formisch or the component actually needs a different value.
 
@@ -141,9 +141,9 @@ Every example that displays a label or error must preserve its semantic relation
 
 Do not write component props, event signatures or installation commands from memory.
 
-1. **Identify the target.** Record the current library major version and, when applicable, the generated primitive backend. Determine separately whether visual styles change the component APIs used by the integration. Do not force a design choice merely to make the scaffold reproducible.
-2. **Read authoritative docs.** Prefer the library's official documentation and generated source. Context7 may be used to retrieve it; use web search only as a fallback. Check Formisch's current field types and implementation locally.
-3. **Scaffold the real output.** In a temporary directory, use the documented CLI or package versions to create the same components readers will receive. Inspect the generated wrapper and its primitive type declarations, especially hidden inputs, refs and event targets. If the guide is design-agnostic, compare the relevant generated APIs across the supported visual styles.
+1. **Identify the target.** Record the current library major version and any variant that changes the API used by the guide.
+2. **Read authoritative docs.** Prefer the library's official documentation, public types and source. Check Formisch's current field types and implementation locally.
+3. **Reproduce the library.** In a temporary directory, install the documented package versions. If the library copies or generates components, run its official workflow and inspect the exact source readers receive. Compare variants only when they may change the documented API.
 4. **Compile every pattern.** Install `valibot` and the Formisch package that matches the documented API, then typecheck and production-build the transcribed examples. Use the published `@formisch/{framework}` for released behavior. For an unreleased repository change, build and pack the local framework package instead of installing it through a workspace symlink, which can introduce a second framework runtime. Do not rely on MDX syntax highlighting as verification.
 5. **Exercise behavior in a browser.** Verify that:
    - visible labels are the accessible names returned by role queries
@@ -153,7 +153,7 @@ Do not write component props, event signatures or installation commands from mem
    - focus marks the field as touched and triggers touch validation, while blur triggers blur validation
    - `focus()` and submit-time error focusing reach controlled fields
    - composite structure matches the value shape, such as one slider thumb per value
-6. **Add focused automated coverage.** When a generated wrapper has non-obvious behavior such as thumb derivation or focus delegation, add or run a small runtime test in the scaffold. Use a real browser for layout, visibility and focus claims that DOM emulators cannot model reliably.
+6. **Add focused automated coverage.** When a control has non-obvious behavior such as value-shape derivation or focus delegation, add or run a small runtime test in the temporary app. Use a real browser for layout, visibility and focus claims that DOM emulators cannot model reliably.
 
 Transcribe only the verified, minimal wiring into the guide. Delete the temporary scaffold after recording the results if it lives inside the repository.
 
@@ -180,7 +180,7 @@ Before submitting:
 
 - [ ] Route and menu entry follow the required location and heading
 - [ ] Section order matches this skill
-- [ ] Targeted library version and backend are explicit and verified without imposing an unrelated visual style
+- [ ] Targeted library version and relevant variants are explicit and verified without imposing an unrelated visual style
 - [ ] Canonical login schema is verbatim and controlled values are initialized
 - [ ] Native and controlled patterns preserve the full Formisch field contract
 - [ ] Labels, groups, errors and IDs are accessible and safe when snippets are combined
