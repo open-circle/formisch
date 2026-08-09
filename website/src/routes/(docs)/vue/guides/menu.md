@@ -36,5 +36,6 @@
 ## Integration guides
 
 - [shadcn-vue](/vue/guides/shadcn-vue/)
+- [Ark UI](/vue/guides/ark-ui/)
 - [Reka UI](/vue/guides/reka-ui/)
 - [PrimeVue](/vue/guides/primevue/)

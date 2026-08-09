@@ -1,0 +1,451 @@
+---
+title: Ark UI
+description: >-
+  Learn how to connect Formisch fields to Ark UI inputs, checkboxes, selects,
+  radio groups and sliders in Vue.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Ark UI
+
+[Ark UI](https://ark-ui.com) is a headless component library built on state machines, available for Vue among other frameworks. This guide targets Ark UI v5 for Vue. No adapter package is needed, and Ark handles more of the accessibility wiring than most libraries: inside its `Field`, the label association, `aria-invalid` and the error message reference are derived for you.
+
+## Installation
+
+Install Formisch, Valibot and Ark UI:
+
+```bash
+npm install @formisch/vue valibot @ark-ui/vue
+```
+
+Ark UI ships unstyled, so every example below leaves styling to you.
+
+## Wiring patterns
+
+Every Ark UI part is a Vue component rather than a plain element, so there is only one pattern here: bind the field entries individually. Never use `v-bind="field.props"`, not even on a text input. Vue treats the `ref` entry inside that object as a real template ref, so the spread would hand Formisch the component instance, and `focus` would fail on an object that has no `focus` method.
+
+Because the parts are components, the element reference always needs unwrapping. Every Ark part exposes its real DOM node as `$el`, so one small helper covers all of them:
+
+```ts
+function elementRef(register: (element: Element | null) => void) {
+  return (instance: Element | ComponentPublicInstance | null) =>
+    register(
+      instance && '$el' in instance
+        ? ((instance as ComponentPublicInstance).$el as Element | null)
+        : (instance as Element | null)
+    );
+}
+```
+
+Note also that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation. Keep the slot undestructured as `v-slot="field"`, since destructuring copies the value out of the accessor and assignments would go nowhere.
+
+### Text fields
+
+`Field.Input` wraps a native input, so it accepts `v-model` and forwards the lifecycle handlers to the element. Since Formisch and Ark UI both export a `Field`, the Ark one is imported as `ArkField`:
+
+```vue
+<Field :of="loginForm" :path="['email']" v-slot="field">
+  <ArkField.Root id="login-email" :invalid="!!field.errors">
+    <ArkField.Label>Email</ArkField.Label>
+    <ArkField.Input
+      :ref="elementRef(field.props.ref)"
+      v-model="field.input"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      type="email"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+    <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
+  </ArkField.Root>
+</Field>
+```
+
+The component accepts `modelValue` rather than `value`, so `v-model` is the way to bind it. Set the `id` on `ArkField.Root` rather than on the input, because Ark derives the control id and the label's `for` from it.
+
+### Controlled components
+
+A composite component owns its value, so bind `modelValue` and handle the change event, then forward the lifecycle props to its hidden native part. Registering that part is what keeps <Link href="/methods/api/focus/">`focus`</Link> and submit-time error focusing working:
+
+```vue
+<Field :of="loginForm" :path="['rememberMe']" v-slot="field">
+  <Checkbox.Root
+    :ids="{ hiddenInput: 'login-remember-me' }"
+    :name="field.props.name"
+    :checked="field.input ?? false"
+    :invalid="!!field.errors"
+    @checked-change="(details) => (field.input = details.checked === true)"
+  >
+    <Checkbox.HiddenInput
+      :ref="elementRef(field.props.ref)"
+      :autofocus="field.props.autofocus"
+      @focus="field.props.onFocus"
+      @blur="field.props.onBlur"
+    />
+    <Checkbox.Control>
+      <Checkbox.Indicator>✓</Checkbox.Indicator>
+    </Checkbox.Control>
+    <Checkbox.Label>Remember me</Checkbox.Label>
+  </Checkbox.Root>
+</Field>
+```
+
+`Checkbox.HiddenInput` is not optional: without it the checkbox does not react to clicks at all. Ark exposes its events as kebab-case emits, so the handler is `@checked-change` rather than a callback prop, and its payload can be `'indeterminate'`, which is normalized above.
+
+Prefer these explicit handlers over `v-model` on a composite root. Vue rejects `v-model` outright on the array based `Select.Root` and `Slider.Root`, and while it compiles on `Checkbox.Root` and `RadioGroup.Root`, it does not typecheck the write direction, so an indeterminate state or a `null` selection would flow into your field unchecked.
+
+Every Ark root also accepts an `ids` object, which is the supported way to give a hidden part a stable id. Setting `id` directly on a hidden part instead leaves the generated label pointing at the old value.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Inside `ArkField.Root`, pass `invalid` and render the message in `ArkField.ErrorText`. Ark adds `aria-invalid` and wires the error reference for you, and the text only renders while the field is invalid:
+
+```vue
+<ArkField.Root
+  id="login-email"
+  :ids="{ errorText: 'login-email-error' }"
+  :invalid="!!field.errors"
+>
+  <ArkField.Label>Email</ArkField.Label>
+  <ArkField.Input :ref="elementRef(field.props.ref)" v-model="field.input" />
+  <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
+</ArkField.Root>
+```
+
+Only `Field` has an error part. `Select`, `RadioGroup` and `Slider` have none, so render the message yourself and point the visible control at it with `aria-errormessage`. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/vue/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines two text fields, a controlled checkbox and accessible errors:
+
+```vue
+<script setup lang="ts">
+import { Checkbox } from '@ark-ui/vue/checkbox';
+import { Field as ArkField } from '@ark-ui/vue/field';
+import { Field, Form, type SubmitHandler, useForm } from '@formisch/vue';
+import * as v from 'valibot';
+import type { ComponentPublicInstance } from 'vue';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+  rememberMe: v.optional(v.boolean(), false),
+});
+
+const loginForm = useForm({
+  schema: LoginSchema,
+  initialInput: { email: '', password: '', rememberMe: false },
+});
+
+const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+  console.log(output);
+};
+
+// Every Ark UI part is a Vue component, so the ref callback receives a
+// component instance. Formisch calls `.focus()` on whatever it gets, so
+// unwrap the root DOM element before registering it.
+function elementRef(register: (element: Element | null) => void) {
+  return (instance: Element | ComponentPublicInstance | null) =>
+    register(
+      instance && '$el' in instance
+        ? ((instance as ComponentPublicInstance).$el as Element | null)
+        : (instance as Element | null)
+    );
+}
+</script>
+
+<template>
+  <Form :of="loginForm" @submit="handleSubmit">
+    <Field :of="loginForm" :path="['email']" v-slot="field">
+      <ArkField.Root
+        id="login-email"
+        :ids="{ errorText: 'login-email-error' }"
+        :invalid="!!field.errors"
+      >
+        <ArkField.Label>Email</ArkField.Label>
+        <ArkField.Input
+          :ref="elementRef(field.props.ref)"
+          v-model="field.input"
+          :name="field.props.name"
+          :autofocus="field.props.autofocus"
+          type="email"
+          autocomplete="email"
+          placeholder="jane@example.com"
+          @focus="field.props.onFocus"
+          @change="field.props.onChange"
+          @blur="field.props.onBlur"
+        />
+        <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
+      </ArkField.Root>
+    </Field>
+
+    <Field :of="loginForm" :path="['password']" v-slot="field">
+      <ArkField.Root
+        id="login-password"
+        :ids="{ errorText: 'login-password-error' }"
+        :invalid="!!field.errors"
+      >
+        <ArkField.Label>Password</ArkField.Label>
+        <ArkField.Input
+          :ref="elementRef(field.props.ref)"
+          v-model="field.input"
+          :name="field.props.name"
+          :autofocus="field.props.autofocus"
+          type="password"
+          autocomplete="current-password"
+          @focus="field.props.onFocus"
+          @change="field.props.onChange"
+          @blur="field.props.onBlur"
+        />
+        <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
+      </ArkField.Root>
+    </Field>
+
+    <Field :of="loginForm" :path="['rememberMe']" v-slot="field">
+      <Checkbox.Root
+        :ids="{ hiddenInput: 'login-remember-me' }"
+        :name="field.props.name"
+        :checked="field.input ?? false"
+        :invalid="!!field.errors"
+        @checked-change="(details) => (field.input = details.checked === true)"
+      >
+        <Checkbox.HiddenInput
+          :ref="elementRef(field.props.ref)"
+          :autofocus="field.props.autofocus"
+          @focus="field.props.onFocus"
+          @blur="field.props.onBlur"
+        />
+        <Checkbox.Control>
+          <Checkbox.Indicator>✓</Checkbox.Indicator>
+        </Checkbox.Control>
+        <Checkbox.Label>Remember me</Checkbox.Label>
+      </Checkbox.Root>
+    </Field>
+
+    <button type="submit" :disabled="loginForm.isSubmitting">Login</button>
+  </Form>
+</template>
+```
+
+The initial input keeps every control defined from its first render. Since `Field.Input` wraps a real native element, `@change` is worth forwarding there. On the composite controls it has nothing to fire on, so it stays unwired.
+
+## Component reference
+
+The following snippets assume a form store named `form`, initialized values that match the schema, and the `elementRef` helper from above.
+
+### Text input
+
+```vue
+<Field :of="form" :path="['email']" v-slot="field">
+  <ArkField.Root
+    id="profile-email"
+    :ids="{ errorText: 'profile-email-error' }"
+    :invalid="!!field.errors"
+  >
+    <ArkField.Label>Email</ArkField.Label>
+    <ArkField.Input
+      :ref="elementRef(field.props.ref)"
+      v-model="field.input"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      type="email"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+    <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
+  </ArkField.Root>
+</Field>
+```
+
+Swap `ArkField.Input` for `ArkField.Textarea` to get a multiline field with the same wiring.
+
+### Checkbox
+
+```vue
+<Field :of="form" :path="['newsletter']" v-slot="field">
+  <Checkbox.Root
+    :ids="{ hiddenInput: 'settings-newsletter' }"
+    :name="field.props.name"
+    :checked="field.input ?? false"
+    :invalid="!!field.errors"
+    @checked-change="(details) => (field.input = details.checked === true)"
+  >
+    <Checkbox.HiddenInput
+      :ref="elementRef(field.props.ref)"
+      :autofocus="field.props.autofocus"
+      @focus="field.props.onFocus"
+      @blur="field.props.onBlur"
+    />
+    <Checkbox.Control>
+      <Checkbox.Indicator>✓</Checkbox.Indicator>
+    </Checkbox.Control>
+    <Checkbox.Label>Newsletter</Checkbox.Label>
+  </Checkbox.Root>
+</Field>
+```
+
+### Select
+
+Ark's select is array based even for a single selection, so wrap the value and unwrap the payload, narrowing it to the schema union. Items come from a collection, and since Ark UI for Vue exports no portal component, Vue's own `Teleport` positions the popup:
+
+```ts
+const frameworkCollection = createListCollection({
+  items: [
+    { label: 'Angular', value: 'angular' },
+    { label: 'React', value: 'react' },
+    { label: 'Solid', value: 'solid' },
+    { label: 'Vue', value: 'vue' },
+  ],
+});
+```
+
+```vue
+<Field :of="form" :path="['framework']" v-slot="field">
+  <Select.Root
+    :ids="{
+      trigger: 'project-framework',
+      hiddenSelect: 'project-framework-select',
+    }"
+    :collection="frameworkCollection"
+    :name="field.props.name"
+    :model-value="field.input ? [field.input] : []"
+    :invalid="!!field.errors"
+    @value-change="
+      (details) => (field.input = details.value[0] as 'angular' | 'vue')
+    "
+  >
+    <Select.Label>Framework</Select.Label>
+    <Select.Control>
+      <Select.Trigger aria-errormessage="project-framework-error">
+        <Select.ValueText placeholder="Select a framework" />
+        <Select.Indicator>▾</Select.Indicator>
+      </Select.Trigger>
+    </Select.Control>
+    <Select.HiddenSelect
+      :ref="elementRef(field.props.ref)"
+      :autofocus="field.props.autofocus"
+      @focus="field.props.onFocus"
+      @blur="field.props.onBlur"
+    />
+    <span v-if="field.errors" id="project-framework-error">
+      {{ field.errors[0] }}
+    </span>
+    <Teleport to="body">
+      <Select.Positioner>
+        <Select.Content>
+          <Select.Item
+            v-for="item in frameworkCollection.items"
+            :key="item.value"
+            :item="item"
+          >
+            <Select.ItemText>{{ item.label }}</Select.ItemText>
+          </Select.Item>
+        </Select.Content>
+      </Select.Positioner>
+    </Teleport>
+  </Select.Root>
+</Field>
+```
+
+The hidden select forwards focus to the visible trigger on its own, so `focus` lands on the button the user sees.
+
+### Radio group
+
+Register every item's hidden input. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group. Put `autofocus` on the first item only, otherwise every radio competes for focus:
+
+```vue
+<Field :of="form" :path="['plan']" v-slot="field">
+  <RadioGroup.Root
+    :ids="{ itemHiddenInput: (value) => `plan-${value}` }"
+    :name="field.props.name"
+    :model-value="field.input ?? null"
+    :invalid="!!field.errors"
+    aria-errormessage="plan-error"
+    @value-change="(details) => (field.input = details.value as 'hobby' | 'pro')"
+  >
+    <RadioGroup.Label>Plan</RadioGroup.Label>
+    <RadioGroup.Item
+      v-for="(plan, index) in plans"
+      :key="plan.value"
+      :value="plan.value"
+    >
+      <RadioGroup.ItemHiddenInput
+        :ref="elementRef(field.props.ref)"
+        :autofocus="index === 0 && field.props.autofocus"
+        :aria-invalid="field.errors ? true : undefined"
+        @focus="field.props.onFocus"
+        @blur="field.props.onBlur"
+      />
+      <RadioGroup.ItemControl />
+      <RadioGroup.ItemText>{{ plan.label }}</RadioGroup.ItemText>
+    </RadioGroup.Item>
+    <span v-if="field.errors" id="plan-error">{{ field.errors[0] }}</span>
+  </RadioGroup.Root>
+</Field>
+```
+
+### Slider
+
+Ark's slider is array based like its select, and it uses `min` and `max` rather than `minValue` and `maxValue`. One `Slider.Thumb` renders exactly one thumb, and `Slider.Label` names it for you:
+
+```vue
+<Field :of="form" :path="['volume']" v-slot="field">
+  <Slider.Root
+    :ids="{ thumb: () => 'settings-volume-thumb' }"
+    :name="field.props.name"
+    :min="0"
+    :max="100"
+    :step="1"
+    :model-value="[field.input ?? 50]"
+    :invalid="!!field.errors"
+    @value-change="(details) => (field.input = details.value[0])"
+  >
+    <Slider.Label>Volume</Slider.Label>
+    <Slider.ValueText />
+    <Slider.Control>
+      <Slider.Track>
+        <Slider.Range />
+      </Slider.Track>
+      <Slider.Thumb :index="0" aria-errormessage="settings-volume-error">
+        <Slider.HiddenInput
+          :ref="elementRef(field.props.ref)"
+          @focus="field.props.onFocus"
+          @blur="field.props.onBlur"
+        />
+      </Slider.Thumb>
+    </Slider.Control>
+    <span v-if="field.errors" id="settings-volume-error">
+      {{ field.errors[0] }}
+    </span>
+  </Slider.Root>
+</Field>
+```
+
+`Slider.HiddenInput` renders with the `hidden` attribute, which makes it unfocusable, so `focus` cannot move focus to this field. Keyboard users still reach the thumb normally, and validation, `isTouched` and blur validation are unaffected.
+
+## Library-specific notes
+
+`field.props.autofocus` is a snapshot taken when the field mounts, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own.
+
+Ark UI is also available for other frameworks. The part names and the `ids` and `invalid` props are identical there, so this wiring ports with only the framework API changing. See our <Link href="/react/guides/ark-ui/">React</Link> and <Link href="/solid/guides/ark-ui/">Solid</Link> guides.
+
+If you prefer a library where native elements stay plain elements, our <Link href="/vue/guides/reka-ui/">Reka UI guide</Link> covers that style, at the cost of writing the accessibility attributes yourself.
+
+## Next steps
+
+Read the <Link href="/vue/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/vue/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/vue/guides/validation/">validation</Link> guide for validation timing.

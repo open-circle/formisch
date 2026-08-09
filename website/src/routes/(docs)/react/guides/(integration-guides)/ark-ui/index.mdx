@@ -2,7 +2,7 @@
 title: Ark UI
 description: >-
   Learn how to connect Formisch fields to Ark UI inputs, checkboxes, selects,
-  radio groups and sliders in Solid.
+  radio groups and sliders in React.
 contributors:
   - fabian-hiller
 ---
@@ -11,14 +11,14 @@ import { Link } from '~/components';
 
 # Ark UI
 
-[Ark UI](https://ark-ui.com) is a headless component library built on state machines, available for Solid among other frameworks. This guide targets Ark UI v5 for Solid. No adapter package is needed: each component exposes the native element as one of its parts, so you spread `field.props` onto that part and let the component root handle the value.
+[Ark UI](https://ark-ui.com) is a headless component library built on state machines, available for React among other frameworks. This guide targets Ark UI v5 for React. No adapter package is needed: each component exposes the native element as one of its parts, so you spread `field.props` onto that part and let the component root handle the value.
 
 ## Installation
 
 Install Formisch, Valibot and Ark UI:
 
 ```bash
-npm install @formisch/solid valibot @ark-ui/solid
+npm install @formisch/react valibot @ark-ui/react
 ```
 
 Ark UI ships unstyled, so every example below leaves styling to you.
@@ -28,9 +28,9 @@ Ark UI ships unstyled, so every example below leaves styling to you.
 Choose the wiring from the part you are rendering:
 
 - If the part is a native `<input>`, `<textarea>` or `<select>`, spread `field.props` onto it and pass `field.input` as the value.
-- If the component owns the value, pass `field.input` to the root and send the root's value callback to `field.onInput`, then forward the lifecycle props to the component's hidden native part.
+- If the component owns the value, pass `field.input` to the root and send the root's value callback to `field.onChange`, then forward the lifecycle props to the component's hidden native part.
 
-`field.onInput` and `field.props.onInput` are different functions and mixing them up is the easiest mistake to make here. `field.onInput(value)` stores a value, while `field.props.onInput(event)` reads the value from a DOM element. Because it reads from the element, it always produces a string, so a number, boolean or enum field must go through the component's own callback rather than the spread.
+Both of those are named `onChange`, which makes them easy to confuse. `field.onChange(value)` stores a value, while `field.props.onChange(event)` reads the value from a DOM element. Because it reads from the element, it always produces a string, so a number, boolean or enum field must go through the component's own callback rather than the spread.
 
 ### Spreading field.props
 
@@ -39,7 +39,7 @@ Choose the wiring from the part you are rendering:
 ```tsx
 <Field of={loginForm} path={['email']}>
   {(field) => (
-    <ArkField.Root id="login-email" invalid={!!field.errors}>
+    <ArkField.Root id="login-email" invalid={field.errors !== null}>
       <ArkField.Label>Email</ArkField.Label>
       <ArkField.Input {...field.props} type="email" value={field.input ?? ''} />
       <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
@@ -48,7 +48,7 @@ Choose the wiring from the part you are rendering:
 </Field>
 ```
 
-Set the `id` on `ArkField.Root` rather than on the input. Ark derives the control id and the label's `for` attribute from it, so overriding the part's own `id` would break that association.
+Set the `id` on `ArkField.Root` rather than on the input. Ark derives the control id and the label's `htmlFor` from it, so overriding the part's own `id` would break that association. Passing `value={field.input ?? ''}` next to the spread keeps the input controlled from its first render.
 
 ### Controlled components
 
@@ -61,12 +61,12 @@ A checkbox owns its value, so the root takes `checked` and `onCheckedChange`, wh
       ids={{ hiddenInput: 'login-remember-me' }}
       name={field.props.name}
       checked={field.input ?? false}
-      onCheckedChange={(details) => field.onInput(details.checked === true)}
-      invalid={!!field.errors}
+      onCheckedChange={(details) => field.onChange(details.checked === true)}
+      invalid={field.errors !== null}
     >
       <Checkbox.HiddenInput
         ref={field.props.ref}
-        autofocus={field.props.autofocus}
+        autoFocus={field.props.autoFocus}
         onFocus={field.props.onFocus}
         onBlur={field.props.onBlur}
       />
@@ -89,7 +89,7 @@ Formisch exposes errors as `[string, ...string[]] | null`. Inside `ArkField.Root
 <ArkField.Root
   id="login-email"
   ids={{ errorText: 'login-email-error' }}
-  invalid={!!field.errors}
+  invalid={field.errors !== null}
 >
   <ArkField.Label>Email</ArkField.Label>
   <ArkField.Input {...field.props} value={field.input ?? ''} />
@@ -99,16 +99,16 @@ Formisch exposes errors as `[string, ...string[]] | null`. Inside `ArkField.Root
 
 Only `Field` has an error part. `Select`, `RadioGroup` and `Slider` have none, so render the message yourself and point the visible control at it with `aria-errormessage`. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
 
-By default, Formisch validates on submit and revalidates on input. The <Link href="/solid/guides/validation/">validation guide</Link> explains how to change that timing.
+By default, Formisch validates on submit and revalidates on input. The <Link href="/react/guides/validation/">validation guide</Link> explains how to change that timing.
 
 ## Login form example
 
 This complete example combines two text fields, a controlled checkbox and accessible errors:
 
 ```tsx
-import { Checkbox } from '@ark-ui/solid/checkbox';
-import { Field as ArkField } from '@ark-ui/solid/field';
-import { createForm, Field, Form, type SubmitHandler } from '@formisch/solid';
+import { Checkbox } from '@ark-ui/react/checkbox';
+import { Field as ArkField } from '@ark-ui/react/field';
+import { Field, Form, type SubmitHandler, useForm } from '@formisch/react';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -126,7 +126,7 @@ const LoginSchema = v.object({
 });
 
 export default function LoginPage() {
-  const loginForm = createForm({
+  const loginForm = useForm({
     schema: LoginSchema,
     initialInput: {
       email: '',
@@ -146,13 +146,13 @@ export default function LoginPage() {
           <ArkField.Root
             id="login-email"
             ids={{ errorText: 'login-email-error' }}
-            invalid={!!field.errors}
+            invalid={field.errors !== null}
           >
             <ArkField.Label>Email</ArkField.Label>
             <ArkField.Input
               {...field.props}
               type="email"
-              autocomplete="email"
+              autoComplete="email"
               placeholder="jane@example.com"
               value={field.input ?? ''}
             />
@@ -166,13 +166,13 @@ export default function LoginPage() {
           <ArkField.Root
             id="login-password"
             ids={{ errorText: 'login-password-error' }}
-            invalid={!!field.errors}
+            invalid={field.errors !== null}
           >
             <ArkField.Label>Password</ArkField.Label>
             <ArkField.Input
               {...field.props}
               type="password"
-              autocomplete="current-password"
+              autoComplete="current-password"
               value={field.input ?? ''}
             />
             <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
@@ -187,13 +187,13 @@ export default function LoginPage() {
             name={field.props.name}
             checked={field.input ?? false}
             onCheckedChange={(details) =>
-              field.onInput(details.checked === true)
+              field.onChange(details.checked === true)
             }
-            invalid={!!field.errors}
+            invalid={field.errors !== null}
           >
             <Checkbox.HiddenInput
               ref={field.props.ref}
-              autofocus={field.props.autofocus}
+              autoFocus={field.props.autoFocus}
               onFocus={field.props.onFocus}
               onBlur={field.props.onBlur}
             />
@@ -217,7 +217,7 @@ The initial input keeps every control defined from its first render. The two tex
 
 ## Component reference
 
-The following snippets assume a form store named `form` and initialized values that match the schema. Never destructure the field store, and read `field.input` and `field.errors` inside JSX so Solid tracks them.
+The following snippets assume a form store named `form` and initialized values that match the schema.
 
 ### Text input
 
@@ -227,7 +227,7 @@ The following snippets assume a form store named `form` and initialized values t
     <ArkField.Root
       id="profile-email"
       ids={{ errorText: 'profile-email-error' }}
-      invalid={!!field.errors}
+      invalid={field.errors !== null}
     >
       <ArkField.Label>Email</ArkField.Label>
       <ArkField.Input {...field.props} type="email" value={field.input ?? ''} />
@@ -248,12 +248,12 @@ Swap `ArkField.Input` for `ArkField.Textarea` to get a multiline field with the 
       ids={{ hiddenInput: 'settings-newsletter' }}
       name={field.props.name}
       checked={field.input ?? false}
-      onCheckedChange={(details) => field.onInput(details.checked === true)}
-      invalid={!!field.errors}
+      onCheckedChange={(details) => field.onChange(details.checked === true)}
+      invalid={field.errors !== null}
     >
       <Checkbox.HiddenInput
         ref={field.props.ref}
-        autofocus={field.props.autofocus}
+        autoFocus={field.props.autoFocus}
         onFocus={field.props.onFocus}
         onBlur={field.props.onBlur}
       />
@@ -268,7 +268,7 @@ Swap `ArkField.Input` for `ArkField.Textarea` to get a multiline field with the 
 
 ### Select
 
-Ark's select is array based even for a single selection, so wrap the value and unwrap the callback. Items come from a collection:
+Ark's select is array based even for a single selection, so wrap the value and unwrap the callback. Items come from a collection, and `Portal` is imported from Ark UI rather than from React:
 
 ```tsx
 const frameworkCollection = createListCollection({
@@ -293,9 +293,9 @@ const frameworkCollection = createListCollection({
       name={field.props.name}
       value={field.input ? [field.input] : []}
       onValueChange={(details) =>
-        field.onInput(details.value[0] as 'angular' | 'react')
+        field.onChange(details.value[0] as 'angular' | 'react')
       }
-      invalid={!!field.errors}
+      invalid={field.errors !== null}
     >
       <Select.Label>Framework</Select.Label>
       <Select.Control>
@@ -306,7 +306,7 @@ const frameworkCollection = createListCollection({
       </Select.Control>
       <Select.HiddenSelect
         ref={field.props.ref}
-        autofocus={field.props.autofocus}
+        autoFocus={field.props.autoFocus}
         onFocus={field.props.onFocus}
         onBlur={field.props.onBlur}
       />
@@ -314,13 +314,11 @@ const frameworkCollection = createListCollection({
       <Portal>
         <Select.Positioner>
           <Select.Content>
-            <For each={frameworkCollection.items}>
-              {(item) => (
-                <Select.Item item={item}>
-                  <Select.ItemText>{item.label}</Select.ItemText>
-                </Select.Item>
-              )}
-            </For>
+            {frameworkCollection.items.map((item) => (
+              <Select.Item key={item.value} item={item}>
+                <Select.ItemText>{item.label}</Select.ItemText>
+              </Select.Item>
+            ))}
           </Select.Content>
         </Select.Positioner>
       </Portal>
@@ -333,7 +331,7 @@ The hidden select forwards focus to the visible trigger on its own, so `focus` l
 
 ### Radio group
 
-Register every item's hidden input. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group. Put `autofocus` on the first item only, otherwise every radio competes for focus:
+Register every item's hidden input. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group. Put `autoFocus` on the first item only, otherwise every radio competes for focus:
 
 ```tsx
 <Field of={form} path={['plan']}>
@@ -343,26 +341,24 @@ Register every item's hidden input. Formisch keeps a list of registered elements
       name={field.props.name}
       value={field.input ?? null}
       onValueChange={(details) =>
-        field.onInput(details.value as 'hobby' | 'pro')
+        field.onChange(details.value as 'hobby' | 'pro')
       }
       aria-errormessage="plan-error"
     >
       <RadioGroup.Label>Plan</RadioGroup.Label>
-      <For each={PLANS}>
-        {(plan, index) => (
-          <RadioGroup.Item value={plan}>
-            <RadioGroup.ItemHiddenInput
-              ref={field.props.ref}
-              autofocus={index() === 0 && field.props.autofocus}
-              onFocus={field.props.onFocus}
-              onBlur={field.props.onBlur}
-              aria-invalid={field.errors ? true : undefined}
-            />
-            <RadioGroup.ItemControl />
-            <RadioGroup.ItemText>{PLAN_LABELS[plan]}</RadioGroup.ItemText>
-          </RadioGroup.Item>
-        )}
-      </For>
+      {PLANS.map((plan, index) => (
+        <RadioGroup.Item key={plan} value={plan}>
+          <RadioGroup.ItemHiddenInput
+            ref={field.props.ref}
+            autoFocus={index === 0 && field.props.autoFocus}
+            onFocus={field.props.onFocus}
+            onBlur={field.props.onBlur}
+            aria-invalid={field.errors !== null ? true : undefined}
+          />
+          <RadioGroup.ItemControl />
+          <RadioGroup.ItemText>{PLAN_LABELS[plan]}</RadioGroup.ItemText>
+        </RadioGroup.Item>
+      ))}
       <span id="plan-error">{field.errors?.[0]}</span>
     </RadioGroup.Root>
   )}
@@ -382,8 +378,8 @@ Ark's slider is array based like its select, and it uses `min` and `max` rather 
       min={0}
       max={100}
       value={[field.input ?? 50]}
-      onValueChange={(details) => field.onInput(details.value[0])}
-      invalid={!!field.errors}
+      onValueChange={(details) => field.onChange(details.value[0])}
+      invalid={field.errors !== null}
     >
       <Slider.Label>Volume</Slider.Label>
       <Slider.ValueText />
@@ -409,10 +405,10 @@ Ark's slider is array based like its select, and it uses `min` and `max` rather 
 
 ## Library-specific notes
 
-`field.props.autofocus` is a snapshot taken when the field is created, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own, so you rarely need to read it directly.
+`field.props.autoFocus` is a snapshot taken when the field is created, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own, so you rarely need to read it directly.
 
-Ark UI is also available for other frameworks. The part names and the `ids` and `invalid` props are identical there, so this wiring ports with only the framework API changing. See our <Link href="/react/guides/ark-ui/">React</Link>, <Link href="/vue/guides/ark-ui/">Vue</Link> and <Link href="/svelte/guides/ark-ui/">Svelte</Link> guides.
+Ark UI is also available for other frameworks. The part names and the `ids` and `invalid` props are identical there, so this wiring ports with only the framework API changing. See our <Link href="/solid/guides/ark-ui/">Solid</Link>, <Link href="/vue/guides/ark-ui/">Vue</Link> and <Link href="/svelte/guides/ark-ui/">Svelte</Link> guides.
 
 ## Next steps
 
-Read the <Link href="/solid/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/solid/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/solid/guides/validation/">validation</Link> guide for validation timing.
+Read the <Link href="/react/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/react/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/react/guides/validation/">validation</Link> guide for validation timing.
