@@ -183,10 +183,9 @@ export function setFieldInput(
           // recomputed, because dirtiness from other sources, such as a
           // changed item order or length of an array, cannot be derived from
           // the presence of the container.
-          internalFieldStore.isDirty.value =
-            internalFieldStore.isDirty.value ||
+          internalFieldStore.isDirty.value ||=
             internalFieldStore.startInput.value !==
-              internalFieldStore.input.value;
+            internalFieldStore.input.value;
         }
       }
 
