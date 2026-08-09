@@ -29,6 +29,7 @@ website/src/routes/{framework}/guides/
 - `(main-concepts)` - Core library concepts
 - `(advanced-guides)` - Advanced features
 - `(migration-guides)` - Migration from other form libraries
+- `(integration-guides)` - Integration with UI component libraries
 
 ## Step-by-Step Process
 
@@ -40,6 +41,7 @@ Determine the appropriate category:
 - **(main-concepts)**: Define form, Create form, Add fields, Handle submission
 - **(advanced-guides)**: Controlled fields, Field arrays, TypeScript
 - **(migration-guides)**: Migrate from React Hook Form, Migrate from TanStack Form
+- **(integration-guides)**: shadcn/ui, Chakra UI, Mantine (see `repo-website-integration-guide-create` for the required structure)
 
 ### Step 2: Create Guide Directory
 
