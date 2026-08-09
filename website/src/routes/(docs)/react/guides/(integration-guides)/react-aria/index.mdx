@@ -105,15 +105,19 @@ These examples wire fields directly so you can see the complete integration. Onc
 Formisch exposes errors as `[string, ...string[]] | null`. Pass `isInvalid` to the form component and render the first message inside `FieldError`, which only appears while the field is invalid and is associated with the control automatically:
 
 ```tsx
-<TextField
-  /* ... */
-  validationBehavior="aria"
-  isInvalid={field.errors !== null}
->
-  <Label>Email</Label>
-  <Input ref={field.props.ref} />
-  <FieldError>{field.errors?.[0]}</FieldError>
-</TextField>
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <TextField
+      /* ... */
+      validationBehavior="aria"
+      isInvalid={field.errors !== null}
+    >
+      <Label>Email</Label>
+      <Input ref={field.props.ref} />
+      <FieldError>{field.errors?.[0]}</FieldError>
+    </TextField>
+  )}
+</Field>
 ```
 
 `validationBehavior="aria"` matters: without it, React Aria defaults to native browser validation, which would compete with your schema. By default, Formisch validates on submit and revalidates on input. The <Link href="/react/guides/validation/">validation guide</Link> explains how to change that timing.

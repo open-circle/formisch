@@ -80,11 +80,15 @@ These examples wire fields directly so you can see the complete integration. Onc
 Formisch exposes errors as `[string, ...string[]] | null`. Wrap any control in `ChakraField.Root` and pass its `invalid` prop; `ChakraField.ErrorText` then renders the message, and nested native inputs receive `aria-invalid` and `aria-describedby` automatically:
 
 ```tsx
-<ChakraField.Root invalid={field.errors !== null}>
-  <ChakraField.Label>Email</ChakraField.Label>
-  <Input {...field.props} value={field.input ?? ''} />
-  <ChakraField.ErrorText>{field.errors?.[0]}</ChakraField.ErrorText>
-</ChakraField.Root>
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <ChakraField.Root invalid={field.errors !== null}>
+      <ChakraField.Label>Email</ChakraField.Label>
+      <Input {...field.props} value={field.input ?? ''} />
+      <ChakraField.ErrorText>{field.errors?.[0]}</ChakraField.ErrorText>
+    </ChakraField.Root>
+  )}
+</Field>
 ```
 
 Composite components such as `Select.Root` and `Slider.Root` additionally accept their own `invalid` prop to mark the visible trigger. By default, Formisch validates on submit and revalidates on input. The <Link href="/react/guides/validation/">validation guide</Link> explains how to change that timing.

@@ -88,15 +88,19 @@ The setter runs input-mode validation, so a form configured with `validate: 'cha
 Formisch exposes errors as `[string, ...string[]] | null`. Inside `ArkField.Root`, pass `invalid` and render the message in `ArkField.ErrorText`. Ark adds `aria-invalid` and wires `aria-errormessage` to that element for you, and the error text only renders while the field is invalid:
 
 ```tsx
-<ArkField.Root
-  id="login-email"
-  ids={{ errorText: 'login-email-error' }}
-  invalid={!!field.errors}
->
-  <ArkField.Label>Email</ArkField.Label>
-  <ArkField.Input {...field.props} value={field.input ?? ''} />
-  <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
-</ArkField.Root>
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <ArkField.Root
+      id="login-email"
+      ids={{ errorText: 'login-email-error' }}
+      invalid={!!field.errors}
+    >
+      <ArkField.Label>Email</ArkField.Label>
+      <ArkField.Input {...field.props} value={field.input ?? ''} />
+      <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+    </ArkField.Root>
+  )}
+</Field>
 ```
 
 Only `Field` has an error part. `Select`, `RadioGroup` and `Slider` have none, so render the message yourself and point the visible control at it with `aria-errormessage`. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.

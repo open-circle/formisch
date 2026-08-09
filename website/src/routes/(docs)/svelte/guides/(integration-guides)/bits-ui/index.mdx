@@ -45,10 +45,14 @@ An `<input>` accepts every entry of `field.props`, including the element referen
 Do not reach for `bind:value={field.input}` here. It compiles and passes `svelte-check`, then throws at runtime because `field.input` is a getter rather than a `$state` reference, and the input silently drifts out of sync with the form. Use `value={field.input}` as above, or a function binding if you prefer that shape:
 
 ```svelte
-<input
-  {...field.props}
-  bind:value={() => field.input ?? '', (value) => field.onInput(value)}
-/>
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <input
+      {...field.props}
+      bind:value={() => field.input ?? '', (value) => field.onInput(value)}
+    />
+  {/snippet}
+</Field>
 ```
 
 ### Controlled components
@@ -84,16 +88,20 @@ Dropping `onchange` also means change-mode validation never fires for this contr
 Formisch exposes errors as `[string, ...string[]] | null`. Bits UI has no error primitive, so render the message yourself, give it a stable id and point the control at it while errors exist:
 
 ```svelte
-<input
-  {...field.props}
-  id="login-email"
-  value={field.input}
-  aria-invalid={!!field.errors}
-  aria-errormessage="login-email-error"
-/>
-{#if field.errors}
-  <div id="login-email-error">{field.errors[0]}</div>
-{/if}
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <input
+      {...field.props}
+      id="login-email"
+      value={field.input}
+      aria-invalid={!!field.errors}
+      aria-errormessage="login-email-error"
+    />
+    {#if field.errors}
+      <div id="login-email-error">{field.errors[0]}</div>
+    {/if}
+  {/snippet}
+</Field>
 ```
 
 Use page-unique ids rather than the field name. `field.props.name` is the JSON encoded path, such as `["email"]`, which is meant for form submission and not for `for` and `id` attributes.

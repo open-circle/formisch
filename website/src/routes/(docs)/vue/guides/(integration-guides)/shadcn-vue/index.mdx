@@ -96,16 +96,18 @@ Assigning `field.input` runs input-mode validation, so a form configured with `v
 Formisch exposes errors as `[string, ...string[]] | null`. Render the message yourself, give it a stable id and point the control at it while errors exist. `aria-invalid` also switches the generated components to their destructive styling:
 
 ```vue
-<Input
-  id="login-email"
-  :ref="elementRef(field.props.ref)"
-  v-model="field.input"
-  :aria-invalid="!!field.errors"
-  aria-errormessage="login-email-error"
-/>
-<p v-if="field.errors" id="login-email-error" class="text-destructive text-sm">
-  {{ field.errors[0] }}
-</p>
+<Field :of="loginForm" :path="['email']" v-slot="field">
+  <Input
+    id="login-email"
+    :ref="elementRef(field.props.ref)"
+    v-model="field.input"
+    :aria-invalid="!!field.errors"
+    aria-errormessage="login-email-error"
+  />
+  <p v-if="field.errors" id="login-email-error" class="text-destructive text-sm">
+    {{ field.errors[0] }}
+  </p>
+</Field>
 ```
 
 Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.

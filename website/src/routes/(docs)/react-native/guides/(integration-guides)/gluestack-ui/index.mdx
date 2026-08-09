@@ -93,21 +93,25 @@ Note that the programmatic setter is `field.onChange(value)`. In React Native, `
 Formisch exposes errors as `[string, ...string[]] | null`. Wrap a control in `FormControl` and pass `isInvalid`, then render the message in `FormControlError`. The wrapper also applies the invalid state to the nested control, so setting `aria-invalid` yourself has no effect:
 
 ```tsx
-<FormControl isInvalid={!!field.errors}>
-  <FormControlLabel>
-    <FormControlLabelText>Email</FormControlLabelText>
-  </FormControlLabel>
-  <Input>
-    <InputField
-      {...field.props}
-      ref={field.props.ref as never}
-      value={field.input ?? ''}
-    />
-  </Input>
-  <FormControlError>
-    <FormControlErrorText>{field.errors?.[0]}</FormControlErrorText>
-  </FormControlError>
-</FormControl>
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <FormControl isInvalid={!!field.errors}>
+      <FormControlLabel>
+        <FormControlLabelText>Email</FormControlLabelText>
+      </FormControlLabel>
+      <Input>
+        <InputField
+          {...field.props}
+          ref={field.props.ref as never}
+          value={field.input ?? ''}
+        />
+      </Input>
+      <FormControlError>
+        <FormControlErrorText>{field.errors?.[0]}</FormControlErrorText>
+      </FormControlError>
+    </FormControl>
+  )}
+</Field>
 ```
 
 By default, Formisch validates on submit and revalidates on input. The <Link href="/react-native/guides/validation/">validation guide</Link> explains how to change that timing.

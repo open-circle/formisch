@@ -107,15 +107,17 @@ Assigning `field.input` runs input-mode validation, so a form configured with `v
 Formisch exposes errors as `[string, ...string[]] | null`. Inside `ArkField.Root`, pass `invalid` and render the message in `ArkField.ErrorText`. Ark adds `aria-invalid` and wires the error reference for you, and the text only renders while the field is invalid:
 
 ```vue
-<ArkField.Root
-  id="login-email"
-  :ids="{ errorText: 'login-email-error' }"
-  :invalid="!!field.errors"
->
-  <ArkField.Label>Email</ArkField.Label>
-  <ArkField.Input :ref="elementRef(field.props.ref)" v-model="field.input" />
-  <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
-</ArkField.Root>
+<Field :of="loginForm" :path="['email']" v-slot="field">
+  <ArkField.Root
+    id="login-email"
+    :ids="{ errorText: 'login-email-error' }"
+    :invalid="!!field.errors"
+  >
+    <ArkField.Label>Email</ArkField.Label>
+    <ArkField.Input :ref="elementRef(field.props.ref)" v-model="field.input" />
+    <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
+  </ArkField.Root>
+</Field>
 ```
 
 Only `Field` has an error part. `Select`, `RadioGroup` and `Slider` have none, so render the message yourself and point the visible control at it with `aria-errormessage`. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.

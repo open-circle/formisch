@@ -47,10 +47,14 @@ Choose the wiring from the element the generated component renders:
 Do not reach for `bind:value={field.input}` here. It compiles and passes `svelte-check`, then throws at runtime because `field.input` is a getter rather than a `$state` reference, and the input silently drifts out of sync with the form. Use `value={field.input}` as above, or a function binding if you prefer that shape:
 
 ```svelte
-<Input
-  {...field.props}
-  bind:value={() => field.input ?? '', (value) => field.onInput(value)}
-/>
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <Input
+      {...field.props}
+      bind:value={() => field.input ?? '', (value) => field.onInput(value)}
+    />
+  {/snippet}
+</Field>
 ```
 
 ### Controlled components
@@ -82,18 +86,22 @@ Dropping `onchange` also means change-mode validation never fires for this contr
 Formisch exposes errors as `[string, ...string[]] | null`. The generated components have no error part, so render the message yourself, give it a stable id and point the control at it while errors exist:
 
 ```svelte
-<Input
-  {...field.props}
-  id="login-email"
-  value={field.input}
-  aria-invalid={!!field.errors}
-  aria-errormessage="login-email-error"
-/>
-{#if field.errors}
-  <p id="login-email-error" class="text-sm text-destructive">
-    {field.errors[0]}
-  </p>
-{/if}
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <Input
+      {...field.props}
+      id="login-email"
+      value={field.input}
+      aria-invalid={!!field.errors}
+      aria-errormessage="login-email-error"
+    />
+    {#if field.errors}
+      <p id="login-email-error" class="text-sm text-destructive">
+        {field.errors[0]}
+      </p>
+    {/if}
+  {/snippet}
+</Field>
 ```
 
 `aria-invalid` also switches the generated components to their destructive styling. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.

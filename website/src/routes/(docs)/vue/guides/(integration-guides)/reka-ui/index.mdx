@@ -84,14 +84,16 @@ Reka UI renders each of these primitives with the focusable element as its root,
 Formisch exposes errors as `[string, ...string[]] | null`. Reka UI has no error primitive, so render the message yourself, give it a stable id and point the control at it while errors exist:
 
 ```vue
-<input
-  v-bind="field.props"
-  id="login-email"
-  v-model="field.input"
-  :aria-invalid="!!field.errors"
-  aria-errormessage="login-email-error"
-/>
-<div v-if="field.errors" id="login-email-error">{{ field.errors[0] }}</div>
+<Field :of="loginForm" :path="['email']" v-slot="field">
+  <input
+    v-bind="field.props"
+    id="login-email"
+    v-model="field.input"
+    :aria-invalid="!!field.errors"
+    aria-errormessage="login-email-error"
+  />
+  <div v-if="field.errors" id="login-email-error">{{ field.errors[0] }}</div>
+</Field>
 ```
 
 Use page-unique ids rather than the field name. `field.props.name` is the JSON encoded path, such as `["email"]`, which is meant for form submission and not for `for` and `id` attributes.

@@ -98,14 +98,16 @@ Assigning `field.input` runs input-mode validation, so a form configured with `v
 Formisch exposes errors as `[string, ...string[]] | null`. Prefer PrimeVue's own `invalid` prop over setting `aria-invalid` yourself, since the component writes `aria-invalid` onto the inner control and omits it while the field is valid:
 
 ```vue
-<InputText
-  id="login-email"
-  :ref="elementRef(field.props.ref)"
-  v-model="field.input"
-  :invalid="!!field.errors"
-  aria-errormessage="login-email-error"
-/>
-<small v-if="field.errors" id="login-email-error">{{ field.errors[0] }}</small>
+<Field :of="loginForm" :path="['email']" v-slot="field">
+  <InputText
+    id="login-email"
+    :ref="elementRef(field.props.ref)"
+    v-model="field.input"
+    :invalid="!!field.errors"
+    aria-errormessage="login-email-error"
+  />
+  <small v-if="field.errors" id="login-email-error">{{ field.errors[0] }}</small>
+</Field>
 ```
 
 For a wrapped control, route `aria-errormessage` through `pt` so it lands on the element that carries the role. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.

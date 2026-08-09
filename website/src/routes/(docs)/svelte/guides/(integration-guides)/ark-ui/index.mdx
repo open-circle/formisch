@@ -88,8 +88,13 @@ The setter runs input-mode validation, so a form configured with `validate: 'cha
 For the select and the slider, put `onfocus` and `onblur` on the visible part rather than on the hidden one. Their hidden inputs are not what a keyboard user lands on, so handlers placed there never fire during real interaction and the field would stay untouched:
 
 ```svelte
-{@const { name, oninput, onchange, onfocus, onblur, ...fieldProps } =
-  field.props}
+<Field of={form} path={['framework']}>
+  {#snippet children(field)}
+    {@const { name, oninput, onchange, onfocus, onblur, ...fieldProps } =
+      field.props}
+    <!-- ... -->
+  {/snippet}
+</Field>
 ```
 
 The attachment stays on the hidden part, while `onfocus` and `onblur` move to `Select.Trigger` or `Slider.Thumb`. `focus` keeps working for the select, because Ark forwards focus from the hidden select to the visible trigger, and `autofocus` can stay in the spread there for the same reason. The slider is the exception: its hidden input carries the `hidden` attribute and cannot be focused at all, so pass `autofocus` to the thumb as well.
@@ -99,15 +104,19 @@ The attachment stays on the hidden part, while `onfocus` and `onblur` move to `S
 Formisch exposes errors as `[string, ...string[]] | null`. Inside `ArkField.Root`, pass `invalid` and render the message in `ArkField.ErrorText`. Ark adds `aria-invalid` and wires the error reference for you, and the text only renders while the field is invalid:
 
 ```svelte
-<ArkField.Root
-  id="login-email"
-  ids={{ errorText: 'login-email-error' }}
-  invalid={!!field.errors}
->
-  <ArkField.Label>Email</ArkField.Label>
-  <ArkField.Input {...field.props} value={field.input} />
-  <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
-</ArkField.Root>
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <ArkField.Root
+      id="login-email"
+      ids={{ errorText: 'login-email-error' }}
+      invalid={!!field.errors}
+    >
+      <ArkField.Label>Email</ArkField.Label>
+      <ArkField.Input {...field.props} value={field.input} />
+      <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+    </ArkField.Root>
+  {/snippet}
+</Field>
 ```
 
 Only `Field` has an error part. `Select`, `RadioGroup` and `Slider` have none, so render the message yourself and point the visible control at it with `aria-errormessage`. The select, checkbox and radio group derive `aria-invalid` from their root's `invalid` prop, but the slider does not, so set it on the thumb yourself.

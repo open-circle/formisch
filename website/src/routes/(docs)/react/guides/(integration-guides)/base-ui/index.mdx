@@ -79,13 +79,17 @@ These examples wire fields directly so you can see the complete integration. Onc
 Formisch exposes errors as `[string, ...string[]] | null`. Base UI's `Field.Error` normally displays messages from its own validity tracking, so pass `match` to force it whenever Formisch reports errors, and set `invalid` on `Field.Root` for the visual and `aria` invalid state:
 
 ```tsx
-<BaseField.Root invalid={field.errors !== null}>
-  <BaseField.Label>Email</BaseField.Label>
-  <Input {...field.props} value={field.input ?? ''} />
-  <BaseField.Error match={field.errors !== null}>
-    {field.errors?.[0]}
-  </BaseField.Error>
-</BaseField.Root>
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <BaseField.Root invalid={field.errors !== null}>
+      <BaseField.Label>Email</BaseField.Label>
+      <Input {...field.props} value={field.input ?? ''} />
+      <BaseField.Error match={field.errors !== null}>
+        {field.errors?.[0]}
+      </BaseField.Error>
+    </BaseField.Root>
+  )}
+</Field>
 ```
 
 By default, Formisch validates on submit and revalidates on input. The <Link href="/react/guides/validation/">validation guide</Link> explains how to change that timing.

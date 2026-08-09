@@ -85,15 +85,19 @@ Note that the programmatic setter is `field.onChange(value)`. In React Native, `
 Formisch exposes errors as `[string, ...string[]] | null`. Paper's `HelperText` renders the message and unmounts it when the field becomes valid again:
 
 ```tsx
-<TextInput
-  {...field.props}
-  label="Email"
-  value={field.input ?? ''}
-  error={!!field.errors}
-/>
-<HelperText type="error" visible={!!field.errors}>
-  {field.errors?.[0]}
-</HelperText>
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <TextInput
+      {...field.props}
+      label="Email"
+      value={field.input ?? ''}
+      error={!!field.errors}
+    />
+    <HelperText type="error" visible={!!field.errors}>
+      {field.errors?.[0]}
+    </HelperText>
+  )}
+</Field>
 ```
 
 Paper does not associate the helper text with the input, so there is no equivalent of `aria-errormessage` here.

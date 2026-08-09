@@ -81,19 +81,27 @@ These examples wire fields directly so you can see the complete integration. Onc
 Formisch exposes errors as `[string, ...string[]] | null`. Mantine inputs display an error message through their `error` prop and set `aria-invalid` and `aria-describedby` on the input automatically, so a single expression covers the visual and accessible error state:
 
 ```tsx
-<TextInput
-  {...field.props}
-  value={field.input ?? ''}
-  error={field.errors?.[0]}
-/>
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <TextInput
+      {...field.props}
+      value={field.input ?? ''}
+      error={field.errors?.[0]}
+    />
+  )}
+</Field>
 ```
 
 For widgets without an `error` prop, such as `Slider`, wrap the control in `Input.Wrapper`, which renders the same label and error markup:
 
 ```tsx
-<Input.Wrapper label="Volume" error={field.errors?.[0]}>
-  <Slider {/* ... */} />
-</Input.Wrapper>
+<Field of={form} path={['volume']}>
+  {(field) => (
+    <Input.Wrapper label="Volume" error={field.errors?.[0]}>
+      <Slider {/* ... */} />
+    </Input.Wrapper>
+  )}
+</Field>
 ```
 
 By default, Formisch validates on submit and revalidates on input. The <Link href="/react/guides/validation/">validation guide</Link> explains how to change that timing.

@@ -90,18 +90,22 @@ The setter runs input-mode validation, so a form configured with `validate: 'cha
 Formisch exposes errors as `[string, ...string[]] | null`. Pass `validationState` to the root and render the message in the component's `ErrorMessage` part, which only appears while the state is invalid:
 
 ```tsx
-<TextField validationState={field.errors ? 'invalid' : 'valid'}>
-  <TextField.Label>Email</TextField.Label>
-  <TextField.Input
-    {...field.props}
-    id="login-email"
-    value={field.input ?? ''}
-    aria-errormessage="login-email-error"
-  />
-  <TextField.ErrorMessage id="login-email-error">
-    {field.errors?.[0]}
-  </TextField.ErrorMessage>
-</TextField>
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <TextField validationState={field.errors ? 'invalid' : 'valid'}>
+      <TextField.Label>Email</TextField.Label>
+      <TextField.Input
+        {...field.props}
+        id="login-email"
+        value={field.input ?? ''}
+        aria-errormessage="login-email-error"
+      />
+      <TextField.ErrorMessage id="login-email-error">
+        {field.errors?.[0]}
+      </TextField.ErrorMessage>
+    </TextField>
+  )}
+</Field>
 ```
 
 Kobalte sets `aria-invalid` on the native parts, but not on a select trigger or a slider thumb, so add it yourself on those two. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
@@ -425,15 +429,22 @@ let triggerElement: HTMLButtonElement | undefined;
 ```
 
 ```tsx
-<Select.HiddenSelect
-  ref={field.props.ref}
-  onFocus={() => {
-    field.props.onFocus();
-    triggerElement?.focus();
-  }}
-  onBlur={field.props.onBlur}
-/>
-<Select.Trigger ref={triggerElement}>{/* ... */}</Select.Trigger>
+<Field of={form} path={['framework']}>
+  {(field) => (
+    // The remaining Select props are the same as in the reference above
+    <Select<Framework>>
+      <Select.HiddenSelect
+        ref={field.props.ref}
+        onFocus={() => {
+          field.props.onFocus();
+          triggerElement?.focus();
+        }}
+        onBlur={field.props.onBlur}
+      />
+      <Select.Trigger ref={triggerElement}>{/* ... */}</Select.Trigger>
+    </Select>
+  )}
+</Field>
 ```
 
 `field.props.autofocus` is a snapshot taken when the field is created, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own, so you rarely need to read it directly.
