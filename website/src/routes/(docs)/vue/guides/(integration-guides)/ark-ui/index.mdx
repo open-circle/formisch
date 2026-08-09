@@ -47,22 +47,24 @@ Note also that `field.input` is a getter and setter rather than a method. Assign
 `Field.Input` wraps a native input, so it accepts `v-model` and forwards the lifecycle handlers to the element. Since Formisch and Ark UI both export a `Field`, the Ark one is imported as `ArkField`:
 
 ```vue
-<Field :of="loginForm" :path="['email']" v-slot="field">
-  <ArkField.Root id="login-email" :invalid="!!field.errors">
-    <ArkField.Label>Email</ArkField.Label>
-    <ArkField.Input
-      :ref="elementRef(field.props.ref)"
-      v-model="field.input"
-      :name="field.props.name"
-      :autofocus="field.props.autofocus"
-      type="email"
-      @focus="field.props.onFocus"
-      @change="field.props.onChange"
-      @blur="field.props.onBlur"
-    />
-    <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
-  </ArkField.Root>
-</Field>
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <ArkField.Root id="login-email" :invalid="!!field.errors">
+      <ArkField.Label>Email</ArkField.Label>
+      <ArkField.Input
+        :ref="elementRef(field.props.ref)"
+        v-model="field.input"
+        :name="field.props.name"
+        :autofocus="field.props.autofocus"
+        type="email"
+        @focus="field.props.onFocus"
+        @change="field.props.onChange"
+        @blur="field.props.onBlur"
+      />
+      <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
+    </ArkField.Root>
+  </Field>
+</template>
 ```
 
 The component accepts `modelValue` rather than `value`, so `v-model` is the way to bind it. Set the `id` on `ArkField.Root` rather than on the input, because Ark derives the control id and the label's `for` from it.
@@ -72,26 +74,28 @@ The component accepts `modelValue` rather than `value`, so `v-model` is the way 
 A composite component owns its value, so bind `modelValue` and handle the change event, then forward the lifecycle props to its hidden native part. Registering that part is what keeps <Link href="/methods/api/focus/">`focus`</Link> and submit-time error focusing working:
 
 ```vue
-<Field :of="loginForm" :path="['rememberMe']" v-slot="field">
-  <Checkbox.Root
-    :ids="{ hiddenInput: 'login-remember-me' }"
-    :name="field.props.name"
-    :checked="field.input ?? false"
-    :invalid="!!field.errors"
-    @checked-change="(details) => (field.input = details.checked === true)"
-  >
-    <Checkbox.HiddenInput
-      :ref="elementRef(field.props.ref)"
-      :autofocus="field.props.autofocus"
-      @focus="field.props.onFocus"
-      @blur="field.props.onBlur"
-    />
-    <Checkbox.Control>
-      <Checkbox.Indicator>✓</Checkbox.Indicator>
-    </Checkbox.Control>
-    <Checkbox.Label>Remember me</Checkbox.Label>
-  </Checkbox.Root>
-</Field>
+<template>
+  <Field :of="loginForm" :path="['rememberMe']" v-slot="field">
+    <Checkbox.Root
+      :ids="{ hiddenInput: 'login-remember-me' }"
+      :name="field.props.name"
+      :checked="field.input ?? false"
+      :invalid="!!field.errors"
+      @checked-change="(details) => (field.input = details.checked === true)"
+    >
+      <Checkbox.HiddenInput
+        :ref="elementRef(field.props.ref)"
+        :autofocus="field.props.autofocus"
+        @focus="field.props.onFocus"
+        @blur="field.props.onBlur"
+      />
+      <Checkbox.Control>
+        <Checkbox.Indicator>✓</Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label>Remember me</Checkbox.Label>
+    </Checkbox.Root>
+  </Field>
+</template>
 ```
 
 `Checkbox.HiddenInput` is not optional: without it the checkbox does not react to clicks at all. Ark exposes its events as kebab-case emits, so the handler is `@checked-change` rather than a callback prop, and its payload can be `'indeterminate'`, which is normalized above.
@@ -107,17 +111,22 @@ Assigning `field.input` runs input-mode validation, so a form configured with `v
 Formisch exposes errors as `[string, ...string[]] | null`. Inside `ArkField.Root`, pass `invalid` and render the message in `ArkField.ErrorText`. Ark adds `aria-invalid` and wires the error reference for you, and the text only renders while the field is invalid:
 
 ```vue
-<Field :of="loginForm" :path="['email']" v-slot="field">
-  <ArkField.Root
-    id="login-email"
-    :ids="{ errorText: 'login-email-error' }"
-    :invalid="!!field.errors"
-  >
-    <ArkField.Label>Email</ArkField.Label>
-    <ArkField.Input :ref="elementRef(field.props.ref)" v-model="field.input" />
-    <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
-  </ArkField.Root>
-</Field>
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <ArkField.Root
+      id="login-email"
+      :ids="{ errorText: 'login-email-error' }"
+      :invalid="!!field.errors"
+    >
+      <ArkField.Label>Email</ArkField.Label>
+      <ArkField.Input
+        :ref="elementRef(field.props.ref)"
+        v-model="field.input"
+      />
+      <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
+    </ArkField.Root>
+  </Field>
+</template>
 ```
 
 Only `Field` has an error part. `Select`, `RadioGroup` and `Slider` have none, so render the message yourself and point the visible control at it with `aria-errormessage`. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
@@ -254,26 +263,28 @@ The following snippets assume a form store named `form`, initialized values that
 ### Text input
 
 ```vue
-<Field :of="form" :path="['email']" v-slot="field">
-  <ArkField.Root
-    id="profile-email"
-    :ids="{ errorText: 'profile-email-error' }"
-    :invalid="!!field.errors"
-  >
-    <ArkField.Label>Email</ArkField.Label>
-    <ArkField.Input
-      :ref="elementRef(field.props.ref)"
-      v-model="field.input"
-      :name="field.props.name"
-      :autofocus="field.props.autofocus"
-      type="email"
-      @focus="field.props.onFocus"
-      @change="field.props.onChange"
-      @blur="field.props.onBlur"
-    />
-    <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
-  </ArkField.Root>
-</Field>
+<template>
+  <Field :of="form" :path="['email']" v-slot="field">
+    <ArkField.Root
+      id="profile-email"
+      :ids="{ errorText: 'profile-email-error' }"
+      :invalid="!!field.errors"
+    >
+      <ArkField.Label>Email</ArkField.Label>
+      <ArkField.Input
+        :ref="elementRef(field.props.ref)"
+        v-model="field.input"
+        :name="field.props.name"
+        :autofocus="field.props.autofocus"
+        type="email"
+        @focus="field.props.onFocus"
+        @change="field.props.onChange"
+        @blur="field.props.onBlur"
+      />
+      <ArkField.ErrorText>{{ field.errors?.[0] }}</ArkField.ErrorText>
+    </ArkField.Root>
+  </Field>
+</template>
 ```
 
 Swap `ArkField.Input` for `ArkField.Textarea` to get a multiline field with the same wiring.
@@ -281,26 +292,28 @@ Swap `ArkField.Input` for `ArkField.Textarea` to get a multiline field with the 
 ### Checkbox
 
 ```vue
-<Field :of="form" :path="['newsletter']" v-slot="field">
-  <Checkbox.Root
-    :ids="{ hiddenInput: 'settings-newsletter' }"
-    :name="field.props.name"
-    :checked="field.input ?? false"
-    :invalid="!!field.errors"
-    @checked-change="(details) => (field.input = details.checked === true)"
-  >
-    <Checkbox.HiddenInput
-      :ref="elementRef(field.props.ref)"
-      :autofocus="field.props.autofocus"
-      @focus="field.props.onFocus"
-      @blur="field.props.onBlur"
-    />
-    <Checkbox.Control>
-      <Checkbox.Indicator>✓</Checkbox.Indicator>
-    </Checkbox.Control>
-    <Checkbox.Label>Newsletter</Checkbox.Label>
-  </Checkbox.Root>
-</Field>
+<template>
+  <Field :of="form" :path="['newsletter']" v-slot="field">
+    <Checkbox.Root
+      :ids="{ hiddenInput: 'settings-newsletter' }"
+      :name="field.props.name"
+      :checked="field.input ?? false"
+      :invalid="!!field.errors"
+      @checked-change="(details) => (field.input = details.checked === true)"
+    >
+      <Checkbox.HiddenInput
+        :ref="elementRef(field.props.ref)"
+        :autofocus="field.props.autofocus"
+        @focus="field.props.onFocus"
+        @blur="field.props.onBlur"
+      />
+      <Checkbox.Control>
+        <Checkbox.Indicator>✓</Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label>Newsletter</Checkbox.Label>
+    </Checkbox.Root>
+  </Field>
+</template>
 ```
 
 ### Select
@@ -319,51 +332,53 @@ const frameworkCollection = createListCollection({
 ```
 
 ```vue
-<Field :of="form" :path="['framework']" v-slot="field">
-  <Select.Root
-    :ids="{
-      trigger: 'project-framework',
-      hiddenSelect: 'project-framework-select',
-    }"
-    :collection="frameworkCollection"
-    :name="field.props.name"
-    :model-value="field.input ? [field.input] : []"
-    :invalid="!!field.errors"
-    @value-change="
-      (details) => (field.input = details.value[0] as typeof field.input)
-    "
-  >
-    <Select.Label>Framework</Select.Label>
-    <Select.Control>
-      <Select.Trigger
-        :autofocus="field.props.autofocus"
-        aria-errormessage="project-framework-error"
-        @focus="field.props.onFocus"
-        @blur="field.props.onBlur"
-      >
-        <Select.ValueText placeholder="Select a framework" />
-        <Select.Indicator>▾</Select.Indicator>
-      </Select.Trigger>
-    </Select.Control>
-    <Select.HiddenSelect :ref="elementRef(field.props.ref)" />
-    <span v-if="field.errors" id="project-framework-error">
-      {{ field.errors[0] }}
-    </span>
-    <Teleport to="body">
-      <Select.Positioner>
-        <Select.Content>
-          <Select.Item
-            v-for="item in frameworkCollection.items"
-            :key="item.value"
-            :item="item"
-          >
-            <Select.ItemText>{{ item.label }}</Select.ItemText>
-          </Select.Item>
-        </Select.Content>
-      </Select.Positioner>
-    </Teleport>
-  </Select.Root>
-</Field>
+<template>
+  <Field :of="form" :path="['framework']" v-slot="field">
+    <Select.Root
+      :ids="{
+        trigger: 'project-framework',
+        hiddenSelect: 'project-framework-select',
+      }"
+      :collection="frameworkCollection"
+      :name="field.props.name"
+      :model-value="field.input ? [field.input] : []"
+      :invalid="!!field.errors"
+      @value-change="
+        (details) => (field.input = details.value[0] as typeof field.input)
+      "
+    >
+      <Select.Label>Framework</Select.Label>
+      <Select.Control>
+        <Select.Trigger
+          :autofocus="field.props.autofocus"
+          aria-errormessage="project-framework-error"
+          @focus="field.props.onFocus"
+          @blur="field.props.onBlur"
+        >
+          <Select.ValueText placeholder="Select a framework" />
+          <Select.Indicator>▾</Select.Indicator>
+        </Select.Trigger>
+      </Select.Control>
+      <Select.HiddenSelect :ref="elementRef(field.props.ref)" />
+      <span v-if="field.errors" id="project-framework-error">
+        {{ field.errors[0] }}
+      </span>
+      <Teleport to="body">
+        <Select.Positioner>
+          <Select.Content>
+            <Select.Item
+              v-for="item in frameworkCollection.items"
+              :key="item.value"
+              :item="item"
+            >
+              <Select.ItemText>{{ item.label }}</Select.ItemText>
+            </Select.Item>
+          </Select.Content>
+        </Select.Positioner>
+      </Teleport>
+    </Select.Root>
+  </Field>
+</template>
 ```
 
 Put the focus handlers on the trigger rather than on the hidden select, because that is the element a keyboard user lands on. `focus` still works, since Ark forwards focus from the hidden select to the visible trigger.
@@ -373,34 +388,36 @@ Put the focus handlers on the trigger rather than on the hidden select, because 
 Register every item's hidden input. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group. Put `autofocus` on the first item only, otherwise every radio competes for focus:
 
 ```vue
-<Field :of="form" :path="['plan']" v-slot="field">
-  <RadioGroup.Root
-    :ids="{ itemHiddenInput: (value) => `plan-${value}` }"
-    :name="field.props.name"
-    :model-value="field.input ?? null"
-    :invalid="!!field.errors"
-    aria-errormessage="plan-error"
-    @value-change="(details) => (field.input = details.value as 'hobby' | 'pro')"
-  >
-    <RadioGroup.Label>Plan</RadioGroup.Label>
-    <RadioGroup.Item
-      v-for="(plan, index) in plans"
-      :key="plan.value"
-      :value="plan.value"
+<template>
+  <Field :of="form" :path="['plan']" v-slot="field">
+    <RadioGroup.Root
+      :ids="{ itemHiddenInput: (value) => `plan-${value}` }"
+      :name="field.props.name"
+      :model-value="field.input ?? null"
+      :invalid="!!field.errors"
+      aria-errormessage="plan-error"
+      @value-change="(details) => (field.input = details.value as 'hobby' | 'pro')"
     >
-      <RadioGroup.ItemHiddenInput
-        :ref="elementRef(field.props.ref)"
-        :autofocus="index === 0 && field.props.autofocus"
-        :aria-invalid="field.errors ? true : undefined"
-        @focus="field.props.onFocus"
-        @blur="field.props.onBlur"
-      />
-      <RadioGroup.ItemControl />
-      <RadioGroup.ItemText>{{ plan.label }}</RadioGroup.ItemText>
-    </RadioGroup.Item>
-    <span v-if="field.errors" id="plan-error">{{ field.errors[0] }}</span>
-  </RadioGroup.Root>
-</Field>
+      <RadioGroup.Label>Plan</RadioGroup.Label>
+      <RadioGroup.Item
+        v-for="(plan, index) in plans"
+        :key="plan.value"
+        :value="plan.value"
+      >
+        <RadioGroup.ItemHiddenInput
+          :ref="elementRef(field.props.ref)"
+          :autofocus="index === 0 && field.props.autofocus"
+          :aria-invalid="field.errors ? true : undefined"
+          @focus="field.props.onFocus"
+          @blur="field.props.onBlur"
+        />
+        <RadioGroup.ItemControl />
+        <RadioGroup.ItemText>{{ plan.label }}</RadioGroup.ItemText>
+      </RadioGroup.Item>
+      <span v-if="field.errors" id="plan-error">{{ field.errors[0] }}</span>
+    </RadioGroup.Root>
+  </Field>
+</template>
 ```
 
 ### Slider
@@ -408,38 +425,40 @@ Register every item's hidden input. Formisch keeps a list of registered elements
 Ark's slider is array based like its select, and it uses `min` and `max` rather than `minValue` and `maxValue`. One `Slider.Thumb` renders exactly one thumb, and `Slider.Label` names it for you:
 
 ```vue
-<Field :of="form" :path="['volume']" v-slot="field">
-  <Slider.Root
-    :ids="{ thumb: () => 'settings-volume-thumb' }"
-    :name="field.props.name"
-    :min="0"
-    :max="100"
-    :step="1"
-    :model-value="[field.input ?? 50]"
-    :invalid="!!field.errors"
-    @value-change="(details) => (field.input = details.value[0])"
-  >
-    <Slider.Label>Volume</Slider.Label>
-    <Slider.ValueText />
-    <Slider.Control>
-      <Slider.Track>
-        <Slider.Range />
-      </Slider.Track>
-      <Slider.Thumb
-        :index="0"
-        :autofocus="field.props.autofocus"
-        aria-errormessage="settings-volume-error"
-        @focus="field.props.onFocus"
-        @blur="field.props.onBlur"
-      >
-        <Slider.HiddenInput :ref="elementRef(field.props.ref)" />
-      </Slider.Thumb>
-    </Slider.Control>
-    <span v-if="field.errors" id="settings-volume-error">
-      {{ field.errors[0] }}
-    </span>
-  </Slider.Root>
-</Field>
+<template>
+  <Field :of="form" :path="['volume']" v-slot="field">
+    <Slider.Root
+      :ids="{ thumb: () => 'settings-volume-thumb' }"
+      :name="field.props.name"
+      :min="0"
+      :max="100"
+      :step="1"
+      :model-value="[field.input ?? 50]"
+      :invalid="!!field.errors"
+      @value-change="(details) => (field.input = details.value[0])"
+    >
+      <Slider.Label>Volume</Slider.Label>
+      <Slider.ValueText />
+      <Slider.Control>
+        <Slider.Track>
+          <Slider.Range />
+        </Slider.Track>
+        <Slider.Thumb
+          :index="0"
+          :autofocus="field.props.autofocus"
+          aria-errormessage="settings-volume-error"
+          @focus="field.props.onFocus"
+          @blur="field.props.onBlur"
+        >
+          <Slider.HiddenInput :ref="elementRef(field.props.ref)" />
+        </Slider.Thumb>
+      </Slider.Control>
+      <span v-if="field.errors" id="settings-volume-error">
+        {{ field.errors[0] }}
+      </span>
+    </Slider.Root>
+  </Field>
+</template>
 ```
 
 `Slider.HiddenInput` renders with the `hidden` attribute, which makes it unfocusable, so `focus` cannot move focus to this field. Keyboard users still reach the thumb normally, and validation, `isTouched` and blur validation are unaffected.

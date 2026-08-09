@@ -50,19 +50,21 @@ function elementRef(register: (element: Element | null) => void) {
 ```
 
 ```vue
-<Field :of="loginForm" :path="['email']" v-slot="field">
-  <Input
-    id="login-email"
-    type="email"
-    :ref="elementRef(field.props.ref)"
-    :name="field.props.name"
-    :autofocus="field.props.autofocus"
-    v-model="field.input"
-    @focus="field.props.onFocus"
-    @change="field.props.onChange"
-    @blur="field.props.onBlur"
-  />
-</Field>
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <Input
+      id="login-email"
+      type="email"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      v-model="field.input"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
 ```
 
 ### Controlled components
@@ -70,21 +72,23 @@ function elementRef(register: (element: Element | null) => void) {
 The composite components are thin wrappers that forward both attributes and the element reference, so the same shape applies. Because each of them renders the focusable element as its root, unwrapping `$el` is enough for <Link href="/methods/api/focus/">`focus`</Link> and submit-time error focusing to reach the control:
 
 ```vue
-<Field :of="loginForm" :path="['rememberMe']" v-slot="field">
-  <Checkbox
-    id="login-remember-me"
-    :ref="elementRef(field.props.ref)"
-    :name="field.props.name"
-    :autofocus="field.props.autofocus"
-    :model-value="field.input ?? false"
-    @update:model-value="
-      (value) => (field.input = value === 'indeterminate' ? false : value)
-    "
-    @focus="field.props.onFocus"
-    @blur="field.props.onBlur"
-  />
-  <Label for="login-remember-me">Remember me</Label>
-</Field>
+<template>
+  <Field :of="loginForm" :path="['rememberMe']" v-slot="field">
+    <Checkbox
+      id="login-remember-me"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      :model-value="field.input ?? false"
+      @update:model-value="
+        (value) => (field.input = value === 'indeterminate' ? false : value)
+      "
+      @focus="field.props.onFocus"
+      @blur="field.props.onBlur"
+    />
+    <Label for="login-remember-me">Remember me</Label>
+  </Field>
+</template>
 ```
 
 Forwarding `@focus` matters, because assigning `field.input` updates the value but only the focus handler marks the field as touched.
@@ -96,18 +100,24 @@ Assigning `field.input` runs input-mode validation, so a form configured with `v
 Formisch exposes errors as `[string, ...string[]] | null`. Render the message yourself, give it a stable id and point the control at it while errors exist. `aria-invalid` also switches the generated components to their destructive styling:
 
 ```vue
-<Field :of="loginForm" :path="['email']" v-slot="field">
-  <Input
-    id="login-email"
-    :ref="elementRef(field.props.ref)"
-    v-model="field.input"
-    :aria-invalid="!!field.errors"
-    aria-errormessage="login-email-error"
-  />
-  <p v-if="field.errors" id="login-email-error" class="text-destructive text-sm">
-    {{ field.errors[0] }}
-  </p>
-</Field>
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <Input
+      id="login-email"
+      :ref="elementRef(field.props.ref)"
+      v-model="field.input"
+      :aria-invalid="!!field.errors"
+      aria-errormessage="login-email-error"
+    />
+    <p
+      v-if="field.errors"
+      id="login-email-error"
+      class="text-destructive text-sm"
+    >
+      {{ field.errors[0] }}
+    </p>
+  </Field>
+</template>
 ```
 
 Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
@@ -253,22 +263,24 @@ The following snippets assume a form store named `form`, initialized values that
 `Input` keeps the native element as its root, so attributes and the reference reach it directly:
 
 ```vue
-<Field :of="form" :path="['email']" v-slot="field">
-  <Label for="profile-email">Email</Label>
-  <Input
-    id="profile-email"
-    type="email"
-    :ref="elementRef(field.props.ref)"
-    :name="field.props.name"
-    :autofocus="field.props.autofocus"
-    v-model="field.input"
-    :aria-invalid="!!field.errors"
-    aria-errormessage="profile-email-error"
-    @focus="field.props.onFocus"
-    @change="field.props.onChange"
-    @blur="field.props.onBlur"
-  />
-</Field>
+<template>
+  <Field :of="form" :path="['email']" v-slot="field">
+    <Label for="profile-email">Email</Label>
+    <Input
+      id="profile-email"
+      type="email"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      v-model="field.input"
+      :aria-invalid="!!field.errors"
+      aria-errormessage="profile-email-error"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
 ```
 
 `Textarea` works the same way.
@@ -278,22 +290,24 @@ The following snippets assume a form store named `form`, initialized values that
 The component reports `boolean | 'indeterminate'`, so normalize the value before storing it:
 
 ```vue
-<Field :of="form" :path="['newsletter']" v-slot="field">
-  <Checkbox
-    id="settings-newsletter"
-    :ref="elementRef(field.props.ref)"
-    :name="field.props.name"
-    :autofocus="field.props.autofocus"
-    :model-value="field.input ?? false"
-    :aria-invalid="!!field.errors"
-    @update:model-value="
-      (value) => (field.input = value === 'indeterminate' ? false : value)
-    "
-    @focus="field.props.onFocus"
-    @blur="field.props.onBlur"
-  />
-  <Label for="settings-newsletter">Newsletter</Label>
-</Field>
+<template>
+  <Field :of="form" :path="['newsletter']" v-slot="field">
+    <Checkbox
+      id="settings-newsletter"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      :model-value="field.input ?? false"
+      :aria-invalid="!!field.errors"
+      @update:model-value="
+        (value) => (field.input = value === 'indeterminate' ? false : value)
+      "
+      @focus="field.props.onFocus"
+      @blur="field.props.onBlur"
+    />
+    <Label for="settings-newsletter">Newsletter</Label>
+  </Field>
+</template>
 ```
 
 ### Select
@@ -301,36 +315,40 @@ The component reports `boolean | 'indeterminate'`, so normalize the value before
 Put the element reference and the lifecycle handlers on the trigger, which is the focusable part. Unlike Reka UI's primitive, the generated component drops the value type parameter, so narrow the payload to the schema union:
 
 ```vue
-<Field :of="form" :path="['framework']" v-slot="field">
-  <Label id="project-framework-label" for="project-framework">Framework</Label>
-  <Select
-    :name="field.props.name"
-    :model-value="field.input"
-    @update:model-value="(value) => (field.input = value as typeof field.input)"
-  >
-    <SelectTrigger
-      id="project-framework"
-      :ref="elementRef(field.props.ref)"
-      :autofocus="field.props.autofocus"
-      aria-labelledby="project-framework-label project-framework"
-      :aria-invalid="!!field.errors"
-      aria-errormessage="project-framework-error"
-      @focus="field.props.onFocus"
-      @blur="field.props.onBlur"
+<template>
+  <Field :of="form" :path="['framework']" v-slot="field">
+    <Label id="project-framework-label" for="project-framework"
+      >Framework</Label
     >
-      <SelectValue placeholder="Select a framework" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem
-        v-for="framework in frameworks"
-        :key="framework.value"
-        :value="framework.value"
+    <Select
+      :name="field.props.name"
+      :model-value="field.input"
+      @update:model-value="(value) => (field.input = value as typeof field.input)"
+    >
+      <SelectTrigger
+        id="project-framework"
+        :ref="elementRef(field.props.ref)"
+        :autofocus="field.props.autofocus"
+        aria-labelledby="project-framework-label project-framework"
+        :aria-invalid="!!field.errors"
+        aria-errormessage="project-framework-error"
+        @focus="field.props.onFocus"
+        @blur="field.props.onBlur"
       >
-        {{ framework.label }}
-      </SelectItem>
-    </SelectContent>
-  </Select>
-</Field>
+        <SelectValue placeholder="Select a framework" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem
+          v-for="framework in frameworks"
+          :key="framework.value"
+          :value="framework.value"
+        >
+          {{ framework.label }}
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  </Field>
+</template>
 ```
 
 ### Radio group
@@ -338,29 +356,35 @@ Put the element reference and the lifecycle handlers on the trigger, which is th
 Register every item. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group:
 
 ```vue
-<Field :of="form" :path="['plan']" v-slot="field">
-  <span id="plan-label" class="text-sm font-medium">Plan</span>
-  <RadioGroup
-    :name="field.props.name"
-    :model-value="field.input"
-    aria-labelledby="plan-label"
-    :aria-invalid="!!field.errors"
-    aria-errormessage="plan-error"
-    @update:model-value="(value) => (field.input = value as 'hobby' | 'pro')"
-  >
-    <div v-for="plan in plans" :key="plan.value" class="flex items-center gap-2">
-      <RadioGroupItem
-        :id="`plan-${plan.value}`"
-        :ref="elementRef(field.props.ref)"
-        :value="plan.value"
-        :autofocus="field.props.autofocus"
-        @focus="field.props.onFocus"
-        @blur="field.props.onBlur"
-      />
-      <Label :for="`plan-${plan.value}`">{{ plan.label }}</Label>
-    </div>
-  </RadioGroup>
-</Field>
+<template>
+  <Field :of="form" :path="['plan']" v-slot="field">
+    <span id="plan-label" class="text-sm font-medium">Plan</span>
+    <RadioGroup
+      :name="field.props.name"
+      :model-value="field.input"
+      aria-labelledby="plan-label"
+      :aria-invalid="!!field.errors"
+      aria-errormessage="plan-error"
+      @update:model-value="(value) => (field.input = value as 'hobby' | 'pro')"
+    >
+      <div
+        v-for="plan in plans"
+        :key="plan.value"
+        class="flex items-center gap-2"
+      >
+        <RadioGroupItem
+          :id="`plan-${plan.value}`"
+          :ref="elementRef(field.props.ref)"
+          :value="plan.value"
+          :autofocus="field.props.autofocus"
+          @focus="field.props.onFocus"
+          @blur="field.props.onBlur"
+        />
+        <Label :for="`plan-${plan.value}`">{{ plan.label }}</Label>
+      </div>
+    </RadioGroup>
+  </Field>
+</template>
 ```
 
 ### Slider
@@ -382,38 +406,42 @@ const delegatedProps = reactiveOmit(props, 'class', 'thumbProps');
 Then spread it onto the thumb in the same file:
 
 ```vue
-<SliderThumb
-  v-for="(_, key) in modelValue"
-  :key="key"
-  data-slot="slider-thumb"
-  v-bind="props.thumbProps"
-/>
+<template>
+  <SliderThumb
+    v-for="(_, key) in modelValue"
+    :key="key"
+    data-slot="slider-thumb"
+    v-bind="props.thumbProps"
+  />
+</template>
 ```
 
 With that in place, the field wiring reads naturally. The value is an array, so wrap the number and unwrap it in the handler:
 
 ```vue
-<Field :of="form" :path="['volume']" v-slot="field">
-  <Label for="settings-volume">Volume</Label>
-  <Slider
-    :name="field.props.name"
-    :model-value="[field.input ?? 0]"
-    :min="0"
-    :max="100"
-    :step="1"
-    :thumb-props="{
-      id: 'settings-volume',
-      ref: elementRef(field.props.ref),
-      autofocus: field.props.autofocus,
-      'aria-label': 'Volume',
-      'aria-invalid': !!field.errors,
-      'aria-errormessage': 'settings-volume-error',
-      onFocus: field.props.onFocus,
-      onBlur: field.props.onBlur,
-    }"
-    @update:model-value="(value) => (field.input = value?.[0])"
-  />
-</Field>
+<template>
+  <Field :of="form" :path="['volume']" v-slot="field">
+    <Label for="settings-volume">Volume</Label>
+    <Slider
+      :name="field.props.name"
+      :model-value="[field.input ?? 0]"
+      :min="0"
+      :max="100"
+      :step="1"
+      :thumb-props="{
+        id: 'settings-volume',
+        ref: elementRef(field.props.ref),
+        autofocus: field.props.autofocus,
+        'aria-label': 'Volume',
+        'aria-invalid': !!field.errors,
+        'aria-errormessage': 'settings-volume-error',
+        onFocus: field.props.onFocus,
+        onBlur: field.props.onBlur,
+      }"
+      @update:model-value="(value) => (field.input = value?.[0])"
+    />
+  </Field>
+</template>
 ```
 
 ## Library-specific notes

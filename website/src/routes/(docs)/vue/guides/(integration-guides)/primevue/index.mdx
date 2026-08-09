@@ -35,20 +35,22 @@ Note that `field.input` is a getter and setter rather than a method. Assigning i
 Never spread `field.props` onto a PrimeVue component. Vue treats the `ref` entry inside a `v-bind` object as a real template ref, so the spread would hand Formisch the component instance, and `focus` would fail on an object that has no `focus` method. Bind the entries individually instead:
 
 ```vue
-<Field :of="loginForm" :path="['email']" v-slot="field">
-  <InputText
-    id="login-email"
-    type="email"
-    :ref="elementRef(field.props.ref)"
-    :name="field.props.name"
-    :autofocus="field.props.autofocus"
-    v-model="field.input"
-    :invalid="!!field.errors"
-    @focus="field.props.onFocus"
-    @change="field.props.onChange"
-    @blur="field.props.onBlur"
-  />
-</Field>
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <InputText
+      id="login-email"
+      type="email"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      v-model="field.input"
+      :invalid="!!field.errors"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
 ```
 
 ### Controlled components
@@ -71,22 +73,24 @@ function elementRef(register: (element: Element | null) => void) {
 ```
 
 ```vue
-<Field :of="loginForm" :path="['rememberMe']" v-slot="field">
-  <Checkbox
-    input-id="login-remember-me"
-    binary
-    :ref="elementRef(field.props.ref)"
-    :name="field.props.name"
-    :model-value="field.input ?? false"
-    :invalid="!!field.errors"
-    :pt="{ input: { autofocus: field.props.autofocus } }"
-    @update:model-value="(value) => (field.input = value as boolean)"
-    @focus="field.props.onFocus"
-    @change="field.props.onChange"
-    @blur="field.props.onBlur"
-  />
-  <label for="login-remember-me">Remember me</label>
-</Field>
+<template>
+  <Field :of="loginForm" :path="['rememberMe']" v-slot="field">
+    <Checkbox
+      input-id="login-remember-me"
+      binary
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :model-value="field.input ?? false"
+      :invalid="!!field.errors"
+      :pt="{ input: { autofocus: field.props.autofocus } }"
+      @update:model-value="(value) => (field.input = value as boolean)"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+    <label for="login-remember-me">Remember me</label>
+  </Field>
+</template>
 ```
 
 Two PrimeVue conventions show up here. `inputId` puts an id on the real control so a `<label for>` can reach it, while a plain `id` would land on the wrapper. The `pt` object is spread onto an internal element, so it carries any attribute or listener you need to place there. Forwarding `@focus` matters as well, because assigning `field.input` updates the value but only the focus handler marks the field as touched.
@@ -98,16 +102,20 @@ Assigning `field.input` runs input-mode validation, so a form configured with `v
 Formisch exposes errors as `[string, ...string[]] | null`. Prefer PrimeVue's own `invalid` prop over setting `aria-invalid` yourself, since the component writes `aria-invalid` onto the inner control and omits it while the field is valid:
 
 ```vue
-<Field :of="loginForm" :path="['email']" v-slot="field">
-  <InputText
-    id="login-email"
-    :ref="elementRef(field.props.ref)"
-    v-model="field.input"
-    :invalid="!!field.errors"
-    aria-errormessage="login-email-error"
-  />
-  <small v-if="field.errors" id="login-email-error">{{ field.errors[0] }}</small>
-</Field>
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <InputText
+      id="login-email"
+      :ref="elementRef(field.props.ref)"
+      v-model="field.input"
+      :invalid="!!field.errors"
+      aria-errormessage="login-email-error"
+    />
+    <small v-if="field.errors" id="login-email-error">{{
+      field.errors[0]
+    }}</small>
+  </Field>
+</template>
 ```
 
 For a wrapped control, route `aria-errormessage` through `pt` so it lands on the element that carries the role. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
@@ -259,22 +267,24 @@ The following snippets assume a form store named `form`, initialized values that
 `InputText` renders the native element as its root, so the reference reaches it without a lookup:
 
 ```vue
-<Field :of="form" :path="['email']" v-slot="field">
-  <label for="profile-email">Email</label>
-  <InputText
-    id="profile-email"
-    type="email"
-    :ref="elementRef(field.props.ref)"
-    :name="field.props.name"
-    :autofocus="field.props.autofocus"
-    v-model="field.input"
-    :invalid="!!field.errors"
-    aria-errormessage="profile-email-error"
-    @focus="field.props.onFocus"
-    @change="field.props.onChange"
-    @blur="field.props.onBlur"
-  />
-</Field>
+<template>
+  <Field :of="form" :path="['email']" v-slot="field">
+    <label for="profile-email">Email</label>
+    <InputText
+      id="profile-email"
+      type="email"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      v-model="field.input"
+      :invalid="!!field.errors"
+      aria-errormessage="profile-email-error"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
 ```
 
 `Textarea` works the same way.
@@ -284,22 +294,24 @@ The following snippets assume a form store named `form`, initialized values that
 A boolean field needs the `binary` prop, and the payload is typed loosely, so narrow it:
 
 ```vue
-<Field :of="form" :path="['newsletter']" v-slot="field">
-  <Checkbox
-    input-id="settings-newsletter"
-    binary
-    :ref="elementRef(field.props.ref)"
-    :name="field.props.name"
-    :model-value="field.input ?? false"
-    :invalid="!!field.errors"
-    :pt="{ input: { autofocus: field.props.autofocus } }"
-    @update:model-value="(value) => (field.input = value as boolean)"
-    @focus="field.props.onFocus"
-    @change="field.props.onChange"
-    @blur="field.props.onBlur"
-  />
-  <label for="settings-newsletter">Newsletter</label>
-</Field>
+<template>
+  <Field :of="form" :path="['newsletter']" v-slot="field">
+    <Checkbox
+      input-id="settings-newsletter"
+      binary
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :model-value="field.input ?? false"
+      :invalid="!!field.errors"
+      :pt="{ input: { autofocus: field.props.autofocus } }"
+      @update:model-value="(value) => (field.input = value as boolean)"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+    <label for="settings-newsletter">Newsletter</label>
+  </Field>
+</template>
 ```
 
 ### Select
@@ -307,31 +319,33 @@ A boolean field needs the `binary` prop, and the payload is typed loosely, so na
 The focusable part is a span with a `combobox` role, which a `<label>` cannot name. PrimeVue writes its own `aria-label` from the current selection, so set `aria-label` explicitly to keep the name stable. Its change event is a PrimeVue payload rather than a DOM event, so forward the original:
 
 ```vue
-<Field :of="form" :path="['framework']" v-slot="field">
-  <label for="project-framework">Framework</label>
-  <Select
-    label-id="project-framework"
-    :ref="elementRef(field.props.ref)"
-    :name="field.props.name"
-    :model-value="field.input"
-    :options="frameworks"
-    option-label="label"
-    option-value="value"
-    placeholder="Select a framework"
-    aria-label="Framework"
-    :invalid="!!field.errors"
-    :pt="{
-      label: {
-        autofocus: field.props.autofocus,
-        'aria-errormessage': 'project-framework-error',
-      },
-    }"
-    @update:model-value="(value) => (field.input = value)"
-    @focus="field.props.onFocus"
-    @change="(event) => field.props.onChange(event.originalEvent)"
-    @blur="field.props.onBlur"
-  />
-</Field>
+<template>
+  <Field :of="form" :path="['framework']" v-slot="field">
+    <label for="project-framework">Framework</label>
+    <Select
+      label-id="project-framework"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :model-value="field.input"
+      :options="frameworks"
+      option-label="label"
+      option-value="value"
+      placeholder="Select a framework"
+      aria-label="Framework"
+      :invalid="!!field.errors"
+      :pt="{
+        label: {
+          autofocus: field.props.autofocus,
+          'aria-errormessage': 'project-framework-error',
+        },
+      }"
+      @update:model-value="(value) => (field.input = value)"
+      @focus="field.props.onFocus"
+      @change="(event) => field.props.onChange(event.originalEvent)"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
 ```
 
 ### Radio group
@@ -339,34 +353,36 @@ The focusable part is a span with a `combobox` role, which a `<label>` cannot na
 Register every button. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group:
 
 ```vue
-<Field :of="form" :path="['plan']" v-slot="field">
-  <span id="plan-label">Plan</span>
-  <RadioButtonGroup
-    :name="field.props.name"
-    :model-value="field.input"
-    aria-labelledby="plan-label"
-    @update:model-value="(value) => (field.input = value)"
-  >
-    <div v-for="plan in plans" :key="plan.value">
-      <RadioButton
-        :input-id="`plan-${plan.value}`"
-        :ref="elementRef(field.props.ref)"
-        :value="plan.value"
-        :invalid="!!field.errors"
-        :pt="{
-          input: {
-            autofocus: field.props.autofocus,
-            'aria-errormessage': 'plan-error',
-          },
-        }"
-        @focus="field.props.onFocus"
-        @change="field.props.onChange"
-        @blur="field.props.onBlur"
-      />
-      <label :for="`plan-${plan.value}`">{{ plan.label }}</label>
-    </div>
-  </RadioButtonGroup>
-</Field>
+<template>
+  <Field :of="form" :path="['plan']" v-slot="field">
+    <span id="plan-label">Plan</span>
+    <RadioButtonGroup
+      :name="field.props.name"
+      :model-value="field.input"
+      aria-labelledby="plan-label"
+      @update:model-value="(value) => (field.input = value)"
+    >
+      <div v-for="plan in plans" :key="plan.value">
+        <RadioButton
+          :input-id="`plan-${plan.value}`"
+          :ref="elementRef(field.props.ref)"
+          :value="plan.value"
+          :invalid="!!field.errors"
+          :pt="{
+            input: {
+              autofocus: field.props.autofocus,
+              'aria-errormessage': 'plan-error',
+            },
+          }"
+          @focus="field.props.onFocus"
+          @change="field.props.onChange"
+          @blur="field.props.onBlur"
+        />
+        <label :for="`plan-${plan.value}`">{{ plan.label }}</label>
+      </div>
+    </RadioButtonGroup>
+  </Field>
+</template>
 ```
 
 ### Slider
@@ -374,31 +390,33 @@ Register every button. Formisch keeps a list of registered elements, so each rad
 `Slider` emits no focus or blur events of its own, so route those handlers through `pt` onto the inner range input. Its change event carries a raw number, so use `slideend` when you need the underlying DOM event:
 
 ```vue
-<Field :of="form" :path="['volume']" v-slot="field">
-  <label for="settings-volume">Volume</label>
-  <Slider
-    input-id="settings-volume"
-    :ref="elementRef(field.props.ref)"
-    :name="field.props.name"
-    :model-value="field.input"
-    :min="0"
-    :max="100"
-    :step="1"
-    aria-label="Volume"
-    :invalid="!!field.errors"
-    :pt="{
-      input: {
-        autofocus: field.props.autofocus,
-        'aria-invalid': !!field.errors,
-        'aria-errormessage': 'settings-volume-error',
-        onFocus: field.props.onFocus,
-        onBlur: field.props.onBlur,
-      },
-    }"
-    @update:model-value="(value) => (field.input = value as number)"
-    @slideend="(event) => field.props.onChange(event.originalEvent)"
-  />
-</Field>
+<template>
+  <Field :of="form" :path="['volume']" v-slot="field">
+    <label for="settings-volume">Volume</label>
+    <Slider
+      input-id="settings-volume"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :model-value="field.input"
+      :min="0"
+      :max="100"
+      :step="1"
+      aria-label="Volume"
+      :invalid="!!field.errors"
+      :pt="{
+        input: {
+          autofocus: field.props.autofocus,
+          'aria-invalid': !!field.errors,
+          'aria-errormessage': 'settings-volume-error',
+          onFocus: field.props.onFocus,
+          onBlur: field.props.onBlur,
+        },
+      }"
+      @update:model-value="(value) => (field.input = value as number)"
+      @slideend="(event) => field.props.onChange(event.originalEvent)"
+    />
+  </Field>
+</template>
 ```
 
 The slider's `slider` role sits on a real range input, and the default single-value mode renders exactly one.
