@@ -8,6 +8,7 @@ All notable changes to the library will be documented in this file.
 - Add React Native specific `FieldElement` type, internal form store types and `focusFieldElement` function that work without DOM APIs (issue #117)
 - Remove `getElementInput` and `decodeFormData` from the React Native build output as they depend on DOM APIs (issue #117)
 - Add missing `createSignal` overload without an initial value to the React framework adapter
+- Fix select and file inputs bound to array fields to always return an array by deriving the value shape from the schema instead of the `multiple` attribute
 
 ## v1.0.0-rc.0 (June 23, 2026)
 
