@@ -34,7 +34,7 @@ Make the shortest guide that still produces a correct, accessible integration:
 
 Use this section order. FIXED parts stay consistent across integration guides; LIBRARY parts follow the verified component APIs.
 
-```
+```text
 # {Library}                     LIBRARY  2-3 sentence introduction with external
                                          link, targeted major version/variant,
                                          and the two Formisch wiring patterns
@@ -112,6 +112,8 @@ If a component exposes `onCheckedChange`, `onValueChange` or another value callb
 | `field.props.onBlur`    | blur event on the visible interactive control or group  |
 
 The lifecycle mapping keeps `isTouched`, touch/blur validation, `focus()` and submit-time error focusing working. Prefer the library's public API or a local adapter when a component hides an essential ref or event prop. Only adapt the component itself when its source belongs to the reader. A scoped ref lookup inside owned source is an acceptable fallback when the structure has been runtime-verified.
+
+For composite controls, only call the focus and blur handlers when focus enters or leaves the whole control, not when it moves between children.
 
 Formisch's focus and blur handlers are parameterless lifecycle callbacks. Pass them directly to component event props; any event argument supplied by the component is intentionally ignored. Do not add a cast or wrapper solely to erase an event parameter. Adapt a callback only when Formisch or the component actually needs a different value.
 
