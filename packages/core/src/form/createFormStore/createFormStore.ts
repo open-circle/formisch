@@ -37,7 +37,7 @@ export function createFormStore(
   store.emptyInput = { ...DEFAULT_EMPTY_INPUT, ...config.emptyInput };
 
   // Set form config and validation
-  store.validators = 0;
+  store.validationId = 0;
   store.validate = config.validate ?? 'submit';
   store.revalidate = config.revalidate ?? 'input';
   store.parse = parse;

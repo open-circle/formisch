@@ -31,8 +31,8 @@ export async function validateFormInput(
   internalFormStore: InternalFormStore,
   config?: ValidateFormInputConfig
 ): Promise<v.SafeParseResult<Schema>> {
-  // Update validation state
-  internalFormStore.validators++;
+  // Record validation order and mark form as validating
+  const validationId = ++internalFormStore.validationId;
   internalFormStore.isValidating.value = true;
 
   try {
@@ -40,6 +40,15 @@ export async function validateFormInput(
     const result = await internalFormStore.parse(
       untrack(() => getFieldInput(internalFormStore))
     );
+
+    // Return outdated result without processing it if a newer validation was
+    // started in the meantime
+    // Hint: Only the newest validation may write errors or reset the validating
+    // state, so an older async result that settles late cannot overwrite the
+    // state of a newer validation.
+    if (internalFormStore.validationId !== validationId) {
+      return result;
+    }
 
     // Create variables for root and nested errors
     let rootErrors: [string, ...string[]] | undefined;
@@ -131,8 +140,7 @@ export async function validateFormInput(
       });
 
       // Reset validation state of form
-      internalFormStore.validators--;
-      internalFormStore.isValidating.value = internalFormStore.validators > 0;
+      internalFormStore.isValidating.value = false;
     });
 
     // Return validation result
@@ -141,10 +149,11 @@ export async function validateFormInput(
     // If parsing throws, still reset validation state so form does not stay
     // stuck in a validating state
   } catch (error) {
-    batch(() => {
-      internalFormStore.validators--;
-      internalFormStore.isValidating.value = internalFormStore.validators > 0;
-    });
+    // Hint: The reset is guarded so a stale validation cannot clear the
+    // validating state of a newer validation that is still pending.
+    if (internalFormStore.validationId === validationId) {
+      internalFormStore.isValidating.value = false;
+    }
     throw error;
   }
 }
