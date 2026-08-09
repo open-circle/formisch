@@ -302,7 +302,7 @@ Put the element reference and the lifecycle handlers on the trigger, which is th
   <Select
     :name="field.props.name"
     :model-value="field.input"
-    @update:model-value="(value) => (field.input = value as 'angular' | 'vue')"
+    @update:model-value="(value) => (field.input = value as typeof field.input)"
   >
     <SelectTrigger
       id="project-framework"

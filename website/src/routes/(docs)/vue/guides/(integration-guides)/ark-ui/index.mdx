@@ -326,22 +326,22 @@ const frameworkCollection = createListCollection({
     :model-value="field.input ? [field.input] : []"
     :invalid="!!field.errors"
     @value-change="
-      (details) => (field.input = details.value[0] as 'angular' | 'vue')
+      (details) => (field.input = details.value[0] as typeof field.input)
     "
   >
     <Select.Label>Framework</Select.Label>
     <Select.Control>
-      <Select.Trigger aria-errormessage="project-framework-error">
+      <Select.Trigger
+        :autofocus="field.props.autofocus"
+        aria-errormessage="project-framework-error"
+        @focus="field.props.onFocus"
+        @blur="field.props.onBlur"
+      >
         <Select.ValueText placeholder="Select a framework" />
         <Select.Indicator>▾</Select.Indicator>
       </Select.Trigger>
     </Select.Control>
-    <Select.HiddenSelect
-      :ref="elementRef(field.props.ref)"
-      :autofocus="field.props.autofocus"
-      @focus="field.props.onFocus"
-      @blur="field.props.onBlur"
-    />
+    <Select.HiddenSelect :ref="elementRef(field.props.ref)" />
     <span v-if="field.errors" id="project-framework-error">
       {{ field.errors[0] }}
     </span>
@@ -362,7 +362,7 @@ const frameworkCollection = createListCollection({
 </Field>
 ```
 
-The hidden select forwards focus to the visible trigger on its own, so `focus` lands on the button the user sees.
+Put the focus handlers on the trigger rather than on the hidden select, because that is the element a keyboard user lands on. `focus` still works, since Ark forwards focus from the hidden select to the visible trigger.
 
 ### Radio group
 
@@ -421,12 +421,13 @@ Ark's slider is array based like its select, and it uses `min` and `max` rather 
       <Slider.Track>
         <Slider.Range />
       </Slider.Track>
-      <Slider.Thumb :index="0" aria-errormessage="settings-volume-error">
-        <Slider.HiddenInput
-          :ref="elementRef(field.props.ref)"
-          @focus="field.props.onFocus"
-          @blur="field.props.onBlur"
-        />
+      <Slider.Thumb
+        :index="0"
+        aria-errormessage="settings-volume-error"
+        @focus="field.props.onFocus"
+        @blur="field.props.onBlur"
+      >
+        <Slider.HiddenInput :ref="elementRef(field.props.ref)" />
       </Slider.Thumb>
     </Slider.Control>
     <span v-if="field.errors" id="settings-volume-error">
@@ -442,7 +443,7 @@ Ark's slider is array based like its select, and it uses `min` and `max` rather 
 
 `field.props.autofocus` is a snapshot taken when the field mounts, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own.
 
-Ark UI is also available for other frameworks. The part names and the `ids` and `invalid` props are identical there, so this wiring ports with only the framework API changing. See our <Link href="/react/guides/ark-ui/">React</Link> and <Link href="/solid/guides/ark-ui/">Solid</Link> guides.
+Ark UI is also available for other frameworks. The part names and the `ids` and `invalid` props are identical there, so this wiring ports with only the framework API changing. See our <Link href="/react/guides/ark-ui/">React</Link>, <Link href="/solid/guides/ark-ui/">Solid</Link> and <Link href="/svelte/guides/ark-ui/">Svelte</Link> guides.
 
 If you prefer a library where native elements stay plain elements, our <Link href="/vue/guides/reka-ui/">Reka UI guide</Link> covers that style, at the cost of writing the accessibility attributes yourself.
 

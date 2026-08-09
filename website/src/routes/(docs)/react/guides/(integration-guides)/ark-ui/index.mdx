@@ -293,24 +293,26 @@ const frameworkCollection = createListCollection({
       name={field.props.name}
       value={field.input ? [field.input] : []}
       onValueChange={(details) =>
-        field.onChange(details.value[0] as 'angular' | 'react')
+        field.onChange(details.value[0] as typeof field.input)
       }
       invalid={field.errors !== null}
     >
       <Select.Label>Framework</Select.Label>
       <Select.Control>
-        <Select.Trigger aria-errormessage="project-framework-error">
+        <Select.Trigger
+          autoFocus={field.props.autoFocus}
+          onFocus={field.props.onFocus}
+          onBlur={field.props.onBlur}
+          aria-errormessage="project-framework-error"
+        >
           <Select.ValueText placeholder="Select a framework" />
           <Select.Indicator>▾</Select.Indicator>
         </Select.Trigger>
       </Select.Control>
-      <Select.HiddenSelect
-        ref={field.props.ref}
-        autoFocus={field.props.autoFocus}
-        onFocus={field.props.onFocus}
-        onBlur={field.props.onBlur}
-      />
-      <span id="project-framework-error">{field.errors?.[0]}</span>
+      <Select.HiddenSelect ref={field.props.ref} />
+      {field.errors && (
+        <span id="project-framework-error">{field.errors[0]}</span>
+      )}
       <Portal>
         <Select.Positioner>
           <Select.Content>
@@ -327,7 +329,7 @@ const frameworkCollection = createListCollection({
 </Field>
 ```
 
-The hidden select forwards focus to the visible trigger on its own, so `focus` lands on the button the user sees.
+Put the focus handlers on the trigger rather than on the hidden select, because that is the element a keyboard user lands on. `focus` still works, since Ark forwards focus from the hidden select to the visible trigger.
 
 ### Radio group
 
@@ -359,7 +361,7 @@ Register every item's hidden input. Formisch keeps a list of registered elements
           <RadioGroup.ItemText>{PLAN_LABELS[plan]}</RadioGroup.ItemText>
         </RadioGroup.Item>
       ))}
-      <span id="plan-error">{field.errors?.[0]}</span>
+      {field.errors && <span id="plan-error">{field.errors[0]}</span>}
     </RadioGroup.Root>
   )}
 </Field>
@@ -387,15 +389,18 @@ Ark's slider is array based like its select, and it uses `min` and `max` rather 
         <Slider.Track>
           <Slider.Range />
         </Slider.Track>
-        <Slider.Thumb index={0} aria-errormessage="settings-volume-error">
-          <Slider.HiddenInput
-            ref={field.props.ref}
-            onFocus={field.props.onFocus}
-            onBlur={field.props.onBlur}
-          />
+        <Slider.Thumb
+          index={0}
+          onFocus={field.props.onFocus}
+          onBlur={field.props.onBlur}
+          aria-errormessage="settings-volume-error"
+        >
+          <Slider.HiddenInput ref={field.props.ref} />
         </Slider.Thumb>
       </Slider.Control>
-      <span id="settings-volume-error">{field.errors?.[0]}</span>
+      {field.errors && (
+        <span id="settings-volume-error">{field.errors[0]}</span>
+      )}
     </Slider.Root>
   )}
 </Field>

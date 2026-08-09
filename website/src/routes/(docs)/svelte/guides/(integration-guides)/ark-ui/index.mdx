@@ -295,7 +295,7 @@ const frameworkCollection = createListCollection({
       {name}
       value={field.input ? [field.input] : []}
       onValueChange={(details) =>
-        field.onInput(details.value[0] as 'angular' | 'vue')}
+        field.onInput(details.value[0] as typeof field.input)}
       invalid={!!field.errors}
     >
       <Select.Label>Framework</Select.Label>
