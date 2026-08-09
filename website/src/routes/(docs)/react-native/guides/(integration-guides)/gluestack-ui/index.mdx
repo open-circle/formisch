@@ -390,7 +390,7 @@ Use `Textarea` with `TextareaInput` for a longer text field. The wiring is ident
 
 ### Slider
 
-The slider works with numbers directly, so `field.onChange` can be passed as is. Its thumb is the focusable part, and `onChangeEnd` marks the end of an interaction:
+The slider works with numbers directly, so `field.onChange` can be passed as is. Its thumb is the focusable part, and `onChangeEnd` marks the end of an interaction. There is no native input to register, so `focus` cannot reach this field; do not register the surrounding `View` instead, because React Native cannot verify whether an element took focus and Formisch would treat the failed attempt as successful:
 
 ```tsx
 <Field of={form} path={['volume']}>
@@ -399,7 +399,7 @@ The slider works with numbers directly, so `field.onChange` can be passed as is.
       <FormControlLabel>
         <FormControlLabelText>Volume: {field.input}</FormControlLabelText>
       </FormControlLabel>
-      <View ref={field.props.ref}>
+      <View>
         <Slider
           value={field.input}
           minValue={0}

@@ -165,6 +165,7 @@ Component libraries don't expose their underlying native element, so `v-bind="fi
     <DatePicker
       :ref="(instance) => field.props.ref(instance?.$el ?? instance)"
       :name="field.props.name"
+      :autofocus="field.props.autofocus"
       v-model="field.input"
       @focus="field.props.onFocus"
       @blur="field.props.onBlur"
@@ -178,7 +179,7 @@ This is useful for:
 - **Component libraries** that wrap native elements without exposing them
 - **Complex custom inputs** like date pickers, rich text editors, or color pickers
 
-Assigning `field.input` updates the field value and triggers validation, just like a native input would. Registering the element keeps <Link href="/methods/api/focus/">`focus`</Link> working, and the focus handler is what marks the field as touched.
+Assigning `field.input` updates the field value and triggers validation, just like a native input would. Registering the element keeps <Link href="/methods/api/focus/">`focus`</Link> working, and the focus handler is what marks the field as touched. Unwrapping `$el` only helps when the component's root is the focusable element; if it wraps its control in a container, reach for the library's own input ref instead.
 
 For ready-made wiring recipes, check out our integration guides:
 

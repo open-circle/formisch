@@ -344,7 +344,9 @@ const frameworks = createListCollection({
 
 ### Slider
 
-Pass `field.input` wrapped in a one-element array for a single thumb and unwrap the details value in the callback. `Slider.Label` gives the slider its accessible name, and the lifecycle handlers go on the thumb, which is the keyboard focus target:
+Pass `field.input` wrapped in a one-element array for a single thumb and unwrap the details value in the callback. `Slider.Label` gives the slider its accessible name, and the lifecycle handlers go on the thumb, which is the keyboard focus target.
+
+Chakra's slider keeps its focusable thumb as a `div` and renders its hidden input with `display: none`, so there is no element Formisch can register and focus. That means `focus` and submit-time error focusing cannot reach this field, while its value, validation and blur handling work normally:
 
 ```tsx
 <Field of={form} path={['volume']}>

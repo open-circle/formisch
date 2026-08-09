@@ -40,7 +40,7 @@ function elementRef(register: (element: Element | null) => void) {
 }
 ```
 
-Note also that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation. Keep the slot undestructured as `v-slot="field"`, since destructuring copies the value out of the accessor and assignments would go nowhere.
+Note also that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation. Do not destructure the slot: write `v-slot="field"` rather than `v-slot="{ input }"`, because destructuring copies the value out of the accessor and assignments would go nowhere.
 
 ### Text fields
 

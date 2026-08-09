@@ -28,7 +28,7 @@ Choose the wiring from where the component keeps its focusable element:
 - `InputText` and `Textarea` render the native element as their root, so `v-model` plus the individual props reaches it directly.
 - `Checkbox`, `RadioButton`, `Select`, `Slider` and `Password` wrap their control in a styled element, so the element reference has to reach the inner control and some props travel through `pt`.
 
-Note that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation, so `v-model` and an explicit `@update:model-value` handler are equivalent. Keep the slot undestructured as `v-slot="field"`, since destructuring copies the value out of the accessor and assignments would go nowhere.
+Note that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation, so `v-model` and an explicit `@update:model-value` handler are equivalent. Do not destructure the slot: write `v-slot="field"` rather than `v-slot="{ input }"`, because destructuring copies the value out of the accessor and assignments would go nowhere.
 
 ### Spreading field.props
 

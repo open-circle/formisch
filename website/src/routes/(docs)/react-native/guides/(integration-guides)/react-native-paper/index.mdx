@@ -21,6 +21,12 @@ Install Formisch, Valibot and React Native Paper, then wrap your app in `PaperPr
 npx expo install @formisch/react-native valibot react-native-paper react-native-safe-area-context
 ```
 
+The slider section below additionally uses `@react-native-community/slider`, which is a separate package rather than part of Paper:
+
+```bash
+npx expo install @react-native-community/slider
+```
+
 Import everything from `@formisch/react-native`. That package bundles the core and the methods, so importing from `@formisch/methods/react-native` alongside it would load a second copy of Formisch's reactive state and break updates in field arrays.
 
 ## Wiring patterns
@@ -45,31 +51,29 @@ Paper's `TextInput` forwards the spread to the underlying native input:
       label="Email"
       value={field.input ?? ''}
       error={!!field.errors}
-      aria-invalid={!!field.errors}
     />
   )}
 </Field>
 ```
 
-Paper's `error` prop only changes the styling, so set `aria-invalid` as well to expose the state to assistive technology.
+Paper's `error` prop switches the input to its error styling. React Native has no equivalent of the `aria-invalid` attribute, so the visible `HelperText` below the input is what conveys the error.
 
 ### Controlled components
 
-`Checkbox.Item` accepts no `ref`, so register a wrapping `View` to keep the field reachable for <Link href="/methods/api/focus/">`focus`</Link>, and mark the field as touched in the press handler:
+`Checkbox.Item` accepts no `ref`, so there is no element to register and <Link href="/methods/api/focus/">`focus`</Link> cannot reach this field. Do not register a wrapping `View` to work around it: React Native cannot verify whether an element took focus, so Formisch trusts any registered element that cannot report its focus state and stops there, which makes a failed focus look successful. Mark the field as touched in the press handler instead:
 
 ```tsx
 <Field of={loginForm} path={['rememberMe']}>
   {(field) => (
-    <View ref={field.props.ref}>
-      <Checkbox.Item
-        label="Remember me"
-        status={field.input ? 'checked' : 'unchecked'}
-        onPress={() => {
-          field.props.onFocus();
-          field.onChange(!field.input);
-        }}
-      />
-    </View>
+    <Checkbox.Item
+      label="Remember me"
+      status={field.input ? 'checked' : 'unchecked'}
+      onPress={() => {
+        // Press does not trigger focus, so mark the field as touched here
+        field.props.onFocus();
+        field.onChange(!field.input);
+      }}
+    />
   )}
 </Field>
 ```
@@ -86,7 +90,6 @@ Formisch exposes errors as `[string, ...string[]] | null`. Paper's `HelperText` 
   label="Email"
   value={field.input ?? ''}
   error={!!field.errors}
-  aria-invalid={!!field.errors}
 />
 <HelperText type="error" visible={!!field.errors}>
   {field.errors?.[0]}
@@ -143,7 +146,6 @@ export function LoginForm() {
               placeholder="example@email.com"
               value={field.input ?? ''}
               error={!!field.errors}
-              aria-invalid={!!field.errors}
               keyboardType="email-address"
               autoCapitalize="none"
               autoComplete="email"
@@ -164,7 +166,6 @@ export function LoginForm() {
               label="Password"
               value={field.input ?? ''}
               error={!!field.errors}
-              aria-invalid={!!field.errors}
               secureTextEntry
               autoComplete="current-password"
             />
@@ -177,19 +178,16 @@ export function LoginForm() {
 
       <Field of={loginForm} path={['rememberMe']}>
         {(field) => (
-          // `Checkbox.Item` accepts no ref, so the field ref goes on a wrapping
-          // `View` to keep the field reachable for `focus(form, { path })`
-          <View ref={field.props.ref}>
-            <Checkbox.Item
-              label="Remember me"
-              status={field.input ? 'checked' : 'unchecked'}
-              onPress={() => {
-                // Press does not trigger focus, so mark the field as touched here
-                field.props.onFocus();
-                field.onChange(!field.input);
-              }}
-            />
-          </View>
+          // `Checkbox.Item` accepts no ref, so `focus` cannot reach this field
+          <Checkbox.Item
+            label="Remember me"
+            status={field.input ? 'checked' : 'unchecked'}
+            onPress={() => {
+              // Press does not trigger focus, so mark the field as touched here
+              field.props.onFocus();
+              field.onChange(!field.input);
+            }}
+          />
         )}
       </Field>
 
@@ -224,7 +222,6 @@ The following snippets assume a form store named `form` and initialized values t
         label="Email"
         value={field.input ?? ''}
         error={!!field.errors}
-        aria-invalid={!!field.errors}
       />
       <HelperText type="error" visible={!!field.errors}>
         {field.errors?.[0]}
@@ -241,33 +238,32 @@ Add `multiline` for a longer text field. The wiring stays the same.
 ```tsx
 <Field of={form} path={['newsletter']}>
   {(field) => (
-    <View ref={field.props.ref}>
-      <Checkbox.Item
-        label="Newsletter"
-        status={field.input ? 'checked' : 'unchecked'}
-        onPress={() => {
-          field.props.onFocus();
-          field.onChange(!field.input);
-        }}
-      />
-    </View>
+    <Checkbox.Item
+      label="Newsletter"
+      status={field.input ? 'checked' : 'unchecked'}
+      onPress={() => {
+        field.props.onFocus();
+        field.onChange(!field.input);
+      }}
+    />
   )}
 </Field>
 ```
 
 ### Select
 
-Paper has no select component. Build one from `Menu` with a pressable anchor, and expose a `FieldElement` through `useImperativeHandle` so `focus` can open it:
+Paper has no select component. Build one from `Menu` with a pressable anchor, and expose a `FieldElement` through `useImperativeHandle` so `focus` can open it. The component below reads `ref` from its props, which requires React 19; on React 18 wrap it in `forwardRef` instead:
 
 ```tsx
 function MenuSelect<TValue extends string>({
   ref,
   onFocus,
+  onBlur,
   label,
   value,
   options,
   onValueChange,
-}: Pick<FieldElementProps, 'ref' | 'onFocus'> & {
+}: Pick<FieldElementProps, 'ref' | 'onFocus' | 'onBlur'> & {
   label: string;
   value: TValue | undefined;
   options: readonly { label: string; value: TValue }[];
@@ -275,18 +271,24 @@ function MenuSelect<TValue extends string>({
 }) {
   const [visible, setVisible] = useState(false);
 
+  // The menu closing ends the interaction, so report it as a blur
+  const close = () => {
+    setVisible(false);
+    onBlur();
+  };
+
   // Expose a `FieldElement` so `focus(form, { path })` can reach this control.
   // `isFocused` is deliberately omitted: Formisch treats an element without it
   // as successfully focused, instead of skipping to the next errored field.
   useImperativeHandle(ref, () => ({
     focus: () => setVisible(true),
-    blur: () => setVisible(false),
+    blur: close,
   }));
 
   return (
     <Menu
       visible={visible}
-      onDismiss={() => setVisible(false)}
+      onDismiss={close}
       anchor={
         <Button
           mode="outlined"
@@ -305,7 +307,7 @@ function MenuSelect<TValue extends string>({
           title={option.label}
           onPress={() => {
             onValueChange(option.value);
-            setVisible(false);
+            close();
           }}
         />
       ))}
@@ -322,6 +324,7 @@ Making the component generic over `TValue` keeps it assignable to `field.onChang
     <MenuSelect
       ref={field.props.ref}
       onFocus={field.props.onFocus}
+      onBlur={field.props.onBlur}
       label="Select a framework"
       value={field.input}
       options={FRAMEWORKS}
@@ -340,7 +343,7 @@ For a small set of options, `SegmentedButtons` is a simpler alternative.
 ```tsx
 <Field of={form} path={['plan']}>
   {(field) => (
-    <View ref={field.props.ref} role="radiogroup">
+    <View role="radiogroup">
       <RadioButton.Group
         value={field.input ?? ''}
         onValueChange={(value) => {
@@ -366,7 +369,7 @@ Paper has no slider. The community package `@react-native-community/slider` work
 ```tsx
 <Field of={form} path={['volume']}>
   {(field) => (
-    <View ref={field.props.ref}>
+    <View>
       <Text>Volume: {field.input}</Text>
       <Slider
         style={{ width: '100%', height: 40 }}

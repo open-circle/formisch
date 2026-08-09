@@ -30,7 +30,7 @@ Choose the wiring from what you are rendering:
 - On a native element, spread `field.props` and bind the value with `v-model="field.input"`.
 - On a component, bind the props individually and normalize the element reference, because a spread would register the component instance instead of a DOM node.
 
-Note that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation, so `v-model` and an explicit `@update:model-value` handler are equivalent. Keep the slot undestructured as `v-slot="field"`, since destructuring copies the value out of the accessor and assignments would go nowhere.
+Note that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation, so `v-model` and an explicit `@update:model-value` handler are equivalent. Do not destructure the slot: write `v-slot="field"` rather than `v-slot="{ input }"`, because destructuring copies the value out of the accessor and assignments would go nowhere.
 
 ### Spreading field.props
 

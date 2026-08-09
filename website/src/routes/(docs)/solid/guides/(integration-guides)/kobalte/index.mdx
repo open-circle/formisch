@@ -378,7 +378,7 @@ Register every item's input. Formisch keeps a list of registered elements, so ea
 
 ### Slider
 
-Kobalte's slider works with an array of values, so wrap the number for the single thumb and unwrap it in the callback. `Slider.Input` is a real range input that is only visually hidden, so mark it `aria-hidden` to keep a single `slider` role in the accessibility tree. The thumb is the element assistive technology should see:
+Kobalte's slider works with an array of values, so wrap the number for the single thumb and unwrap it in the callback. `Slider.Input` is a real range input that is only visually hidden, so mark it `aria-hidden` to keep a single `slider` role in the accessibility tree. The thumb is the element assistive technology should see. Kobalte already gives that input `tabindex="-1"`, so hiding it does not leave a focusable element out of the accessibility tree, and it stays available as the target for `focus`:
 
 ```tsx
 <Field of={form} path={['volume']}>

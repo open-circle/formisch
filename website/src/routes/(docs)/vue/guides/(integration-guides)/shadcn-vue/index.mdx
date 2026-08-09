@@ -32,7 +32,7 @@ Choose the wiring from what the generated component renders:
 - `Input` and `Textarea` keep the native element as their root and pass attributes through, so `v-model` plus the individual props reaches it directly.
 - `Checkbox`, `Select`, `RadioGroup` and `Slider` wrap Reka UI primitives, so bind their value through `v-model` and forward the remaining props individually.
 
-Note that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation, so `v-model` and an explicit `@update:model-value` handler are equivalent. Keep the slot undestructured as `v-slot="field"`, since destructuring copies the value out of the accessor and assignments would go nowhere.
+Note that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation, so `v-model` and an explicit `@update:model-value` handler are equivalent. Do not destructure the slot: write `v-slot="field"` rather than `v-slot="{ input }"`, because destructuring copies the value out of the accessor and assignments would go nowhere.
 
 ### Spreading field.props
 
@@ -361,12 +361,10 @@ Register every item. Formisch keeps a list of registered elements, so each radio
 
 ### Slider
 
-The generated `Slider` renders its thumbs internally without a slot, so attributes placed on it land on the track container rather than on the element that carries the `slider` role. Since the component lives in your project, add a `thumbProps` passthrough to it:
+The generated `Slider` renders its thumbs internally without a slot, so attributes placed on it land on the track container rather than on the element that carries the `slider` role. Since the component lives in your project, add a `thumbProps` passthrough to `src/components/ui/slider/Slider.vue`. Extend its existing `defineProps` and keep the new prop out of what is forwarded to the root:
 
-```vue
-<script setup lang="ts">
-import type { HTMLAttributes, VNodeRef } from 'vue';
-
+```ts
+// Add `VNodeRef` to the existing `vue` type import
 const props = defineProps<
   SliderRootProps & {
     class?: HTMLAttributes['class'];
@@ -375,10 +373,9 @@ const props = defineProps<
 >();
 
 const delegatedProps = reactiveOmit(props, 'class', 'thumbProps');
-</script>
 ```
 
-Then spread it onto the thumb inside the same file:
+Then spread it onto the thumb in the same file:
 
 ```vue
 <SliderThumb

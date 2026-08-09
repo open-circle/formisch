@@ -290,7 +290,9 @@ const frameworks = [
 
 ### Slider
 
-`Slider` works with a single number, so `field.onChange` can be passed directly. It has no `error` prop, so wrap it in `Input.Wrapper`, and use `thumbLabel` for the accessible name because the visible wrapper label is not associated with the thumb:
+`Slider` works with a single number, so `field.onChange` can be passed directly. It has no `error` prop, so wrap it in `Input.Wrapper`, and use `thumbLabel` for the accessible name because the visible wrapper label is not associated with the thumb.
+
+Mantine's slider keeps its focusable thumb as a `div` and only renders a hidden input of type `hidden`, so there is no element Formisch can register. That means `focus` and submit-time error focusing cannot reach this field, while its value, validation and blur handling work normally:
 
 ```tsx
 <Field of={form} path={['volume']}>
