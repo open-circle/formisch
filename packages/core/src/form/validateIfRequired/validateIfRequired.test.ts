@@ -17,7 +17,7 @@ describe('validateIfRequired', () => {
       validateIfRequired(store, store.children.name, 'input');
 
       // Validation triggered because mode matches revalidate
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
 
     test('should not validate when mode does not match revalidate', () => {
@@ -29,7 +29,7 @@ describe('validateIfRequired', () => {
 
       validateIfRequired(store, store.children.name, 'blur');
 
-      expect(store.validators).toBe(0);
+      expect(store.validationId).toBe(0);
     });
   });
 
@@ -46,7 +46,7 @@ describe('validateIfRequired', () => {
 
       validateIfRequired(store, store.children.name, 'input');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
 
     test('should use validate mode when form is not submitted', () => {
@@ -59,7 +59,7 @@ describe('validateIfRequired', () => {
       // Form is not submitted (default)
       validateIfRequired(store, store.children.name, 'submit');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
 
     test('should not validate when mode does not match and not submitted', () => {
@@ -72,7 +72,7 @@ describe('validateIfRequired', () => {
       // Form is not submitted, mode is 'input' but validate='submit'
       validateIfRequired(store, store.children.name, 'input');
 
-      expect(store.validators).toBe(0);
+      expect(store.validationId).toBe(0);
     });
   });
 
@@ -89,7 +89,7 @@ describe('validateIfRequired', () => {
 
       validateIfRequired(store, store.children.name, 'blur');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
 
     test('should use validate mode when field has no errors', () => {
@@ -102,7 +102,7 @@ describe('validateIfRequired', () => {
       // No errors on field
       validateIfRequired(store, store.children.name, 'input');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
 
     test('should not validate when mode does not match and no errors', () => {
@@ -115,7 +115,7 @@ describe('validateIfRequired', () => {
       // No errors, mode is 'blur' but validate='input'
       validateIfRequired(store, store.children.name, 'blur');
 
-      expect(store.validators).toBe(0);
+      expect(store.validationId).toBe(0);
     });
   });
 
@@ -129,7 +129,7 @@ describe('validateIfRequired', () => {
 
       validateIfRequired(store, store.children.name, 'blur');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
 
     test('should validate on input when has errors (revalidate)', () => {
@@ -143,7 +143,7 @@ describe('validateIfRequired', () => {
 
       validateIfRequired(store, store.children.name, 'input');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
   });
 
@@ -157,7 +157,7 @@ describe('validateIfRequired', () => {
 
       validateIfRequired(store, store.children.name, 'touch');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
 
     test('should validate on change when has errors (revalidate)', () => {
@@ -171,7 +171,7 @@ describe('validateIfRequired', () => {
 
       validateIfRequired(store, store.children.name, 'change');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
   });
 
@@ -185,7 +185,7 @@ describe('validateIfRequired', () => {
 
       validateIfRequired(store, store.children.name, 'change');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
 
     test('should validate on blur when has errors (revalidate)', () => {
@@ -199,7 +199,7 @@ describe('validateIfRequired', () => {
 
       validateIfRequired(store, store.children.name, 'blur');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
   });
 
@@ -224,7 +224,7 @@ describe('validateIfRequired', () => {
       // getFieldBool should detect nested error
       validateIfRequired(store, store.children.items, 'input');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
 
     test('should check nested field errors for objects', () => {
@@ -249,7 +249,7 @@ describe('validateIfRequired', () => {
       // getFieldBool should detect nested error
       validateIfRequired(store, store.children.user, 'input');
 
-      expect(store.validators).toBe(1);
+      expect(store.validationId).toBe(1);
     });
   });
 
@@ -268,7 +268,7 @@ describe('validateIfRequired', () => {
 
         validateIfRequired(store, store.children.name, mode);
 
-        expect(store.validators).toBe(1);
+        expect(store.validationId).toBe(1);
       }
     );
 
@@ -289,7 +289,7 @@ describe('validateIfRequired', () => {
 
         validateIfRequired(store, store.children.name, mode);
 
-        expect(store.validators).toBe(1);
+        expect(store.validationId).toBe(1);
       }
     );
   });

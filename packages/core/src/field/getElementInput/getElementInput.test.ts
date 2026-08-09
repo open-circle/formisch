@@ -90,6 +90,45 @@ describe('getElementInput', () => {
         'green',
       ]);
     });
+
+    test('should return an array for a checkbox group with one option', () => {
+      const store = createTestStore(v.object({ colors: v.array(v.string()) }));
+      const checkbox = createInput('checkbox', 'red', {
+        name: 'colors',
+        checked: true,
+      });
+      document.body.appendChild(checkbox);
+
+      expect(getElementInput(checkbox, store.children.colors)).toStrictEqual([
+        'red',
+      ]);
+    });
+
+    test('should only group enabled checkboxes owned by the same form', () => {
+      const store = createTestStore(v.object({ colors: v.array(v.string()) }));
+      const firstForm = document.createElement('form');
+      const secondForm = document.createElement('form');
+      const red = createInput('checkbox', 'red', {
+        name: 'colors',
+        checked: true,
+      });
+      const blue = createInput('checkbox', 'blue', {
+        name: 'colors',
+        checked: true,
+        disabled: true,
+      });
+      const green = createInput('checkbox', 'green', {
+        name: 'colors',
+        checked: true,
+      });
+      firstForm.append(red, blue);
+      secondForm.append(green);
+      document.body.append(firstForm, secondForm);
+
+      expect(getElementInput(red, store.children.colors)).toStrictEqual([
+        'red',
+      ]);
+    });
   });
 
   describe('radio inputs', () => {
@@ -138,6 +177,20 @@ describe('getElementInput', () => {
       ).toStrictEqual(['us', 'de']);
     });
 
+    test('should return array for select bound to array field without multiple attribute', () => {
+      const store = createTestStore(
+        v.object({ countries: v.array(v.string()) })
+      );
+      const select = document.createElement('select');
+      select.innerHTML = `
+        <option value="us" selected>US</option>
+        <option value="uk">UK</option>
+      `;
+      expect(
+        getElementInput(select, getChild(store, 'countries'))
+      ).toStrictEqual(['us']);
+    });
+
     test('should exclude disabled options from multiple select', () => {
       const store = createTestStore(
         v.object({ countries: v.array(v.string()) })
@@ -164,16 +217,25 @@ describe('getElementInput', () => {
     });
 
     test('should return files array for multiple file input', () => {
-      const store = createTestStore(v.object({ documents: v.any() }));
+      const store = createTestStore(v.object({ documents: v.array(v.any()) }));
       const input = createInput('file', '');
       input.multiple = true;
       const file1 = new File(['content1'], 'test1.txt');
       const file2 = new File(['content2'], 'test2.txt');
       Object.defineProperty(input, 'files', { value: [file1, file2] });
-      expect(getElementInput(input, store.children.documents)).toStrictEqual([
-        file1,
-        file2,
-      ]);
+      expect(
+        getElementInput(input, getChild(store, 'documents'))
+      ).toStrictEqual([file1, file2]);
+    });
+
+    test('should return files array for array field without multiple attribute', () => {
+      const store = createTestStore(v.object({ documents: v.array(v.any()) }));
+      const input = createInput('file', '');
+      const file = new File(['content'], 'test.txt');
+      Object.defineProperty(input, 'files', { value: [file] });
+      expect(
+        getElementInput(input, getChild(store, 'documents'))
+      ).toStrictEqual([file]);
     });
   });
 

@@ -33,19 +33,9 @@ export const properties: Record<string, PropertyProps> = {
         {
           key: 'onFocus',
           value: {
-            type: 'custom',
-            name: 'EventHandler',
-            generics: [
-              {
-                type: 'custom',
-                name: 'FieldElement',
-                href: '/core/api/FieldElement/',
-              },
-              {
-                type: 'custom',
-                name: 'FocusEvent',
-              },
-            ],
+            type: 'function',
+            params: [],
+            return: 'void',
           },
         },
         {
@@ -87,19 +77,9 @@ export const properties: Record<string, PropertyProps> = {
         {
           key: 'onBlur',
           value: {
-            type: 'custom',
-            name: 'EventHandler',
-            generics: [
-              {
-                type: 'custom',
-                name: 'FieldElement',
-                href: '/core/api/FieldElement/',
-              },
-              {
-                type: 'custom',
-                name: 'FocusEvent',
-              },
-            ],
+            type: 'function',
+            params: [],
+            return: 'void',
           },
         },
       ],
@@ -129,19 +109,9 @@ export const properties: Record<string, PropertyProps> = {
   },
   onFocus: {
     type: {
-      type: 'custom',
-      name: 'EventHandler',
-      generics: [
-        {
-          type: 'custom',
-          name: 'FieldElement',
-          href: '/core/api/FieldElement/',
-        },
-        {
-          type: 'custom',
-          name: 'FocusEvent',
-        },
-      ],
+      type: 'function',
+      params: [],
+      return: 'void',
     },
   },
   onInput: {
@@ -180,19 +150,9 @@ export const properties: Record<string, PropertyProps> = {
   },
   onBlur: {
     type: {
-      type: 'custom',
-      name: 'EventHandler',
-      generics: [
-        {
-          type: 'custom',
-          name: 'FieldElement',
-          href: '/core/api/FieldElement/',
-        },
-        {
-          type: 'custom',
-          name: 'FocusEvent',
-        },
-      ],
+      type: 'function',
+      params: [],
+      return: 'void',
     },
   },
 };

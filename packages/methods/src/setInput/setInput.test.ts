@@ -83,8 +83,8 @@ describe('setInput', () => {
 
     setInput(store, { path: ['name'], input: 'John' });
 
-    // Check that validators count increased, indicating validation was triggered
-    expect(store.validators).toBe(1);
+    // Check that validation ID increased, indicating validation was triggered
+    expect(store.validationId).toBe(1);
   });
 
   test('should keep dirty state from swap when setting nested field', () => {

@@ -16,9 +16,11 @@ export function getElementInput(
   element: FieldElement,
   internalFieldStore: InternalFieldStore
 ): unknown {
-  // If element is select with multiple option, return selected values
+  // If a select element is bound to an array field, return selected values
+  // Hint: The schema decides the value shape instead of the `multiple`
+  // attribute so a misconfigured element cannot corrupt the field input.
   // @ts-expect-error
-  if (element.options && element.multiple) {
+  if (element.options && internalFieldStore.kind === 'array') {
     // @ts-expect-error
     return [...element.options]
       .filter((option) => option.selected && !option.disabled)
@@ -27,14 +29,20 @@ export function getElementInput(
 
   // If element is checkbox, handle single or group
   if (element.type === 'checkbox') {
-    // Get all checkboxes with same name
-    const options = document.getElementsByName(element.name);
-
-    // If checkbox group, return array of checked values
-    if (options.length > 1) {
-      // @ts-expect-error
-      return [...options]
-        .filter((option) => option.checked)
+    // If field is array, return array of checked values
+    // Hint: The schema decides that the checkbox is part of a group, even if
+    // only one option is currently rendered.
+    if (internalFieldStore.kind === 'array') {
+      return Array.from(
+        document.getElementsByName(element.name) as NodeListOf<HTMLInputElement>
+      )
+        .filter(
+          (option) =>
+            // Only input elements can have a truthy `checked`, so no further
+            // type checks are necessary to filter out other elements sharing
+            // the same name.
+            option.checked && !option.disabled && option.form === element.form
+        )
         .map((option) => option.value);
     }
 
@@ -57,9 +65,10 @@ export function getElementInput(
 
   // If element is file input, handle single or multiple
   if (element.type === 'file') {
-    // If multiple files allowed, return files array
-    // @ts-expect-error
-    if (element.multiple) {
+    // If field is array, return files array
+    // Hint: The schema decides the value shape, so an array field returns a
+    // list of files even if the element is missing the `multiple` attribute.
+    if (internalFieldStore.kind === 'array') {
       return [
         // @ts-expect-error
         ...element.files,

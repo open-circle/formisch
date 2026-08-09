@@ -7,7 +7,7 @@ import type {
   ValidArrayPath,
   ValidPath,
 } from '@formisch/core/react';
-import type { ChangeEventHandler, FocusEventHandler } from 'react';
+import type { ChangeEventHandler } from 'react';
 import type * as v from 'valibot';
 
 /**
@@ -29,7 +29,7 @@ export interface FieldElementProps {
   /**
    * The focus event handler of the field element.
    */
-  readonly onFocus: FocusEventHandler<FieldElement>;
+  readonly onFocus: () => void;
   /**
    * The change event handler of the field element.
    */
@@ -37,7 +37,7 @@ export interface FieldElementProps {
   /**
    * The blur event handler of the field element.
    */
-  readonly onBlur: FocusEventHandler<FieldElement>;
+  readonly onBlur: () => void;
 }
 
 /**

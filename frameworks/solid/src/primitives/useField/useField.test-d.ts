@@ -13,6 +13,14 @@ describe('useField', () => {
     expectTypeOf(field).toEqualTypeOf<FieldStore<typeof schema, ['name']>>();
   });
 
+  test('should expose focus and blur handlers without event parameters', () => {
+    const form = createForm({ schema: v.object({ name: v.string() }) });
+    const field = useField(form, { path: ['name'] });
+
+    expectTypeOf(field.props.onFocus).toEqualTypeOf<() => void>();
+    expectTypeOf(field.props.onBlur).toEqualTypeOf<() => void>();
+  });
+
   test('should narrow input type for primitive leaves', () => {
     const schema = v.object({ name: v.string(), age: v.number() });
     const form = createForm({ schema });
