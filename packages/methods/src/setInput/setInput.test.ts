@@ -1,6 +1,7 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
 import { createTestStore } from '../vitest/index.ts';
+import { swap } from '../swap/swap.ts';
 import { setInput } from './setInput.ts';
 
 describe('setInput', () => {
@@ -84,5 +85,21 @@ describe('setInput', () => {
 
     // Check that validators count increased, indicating validation was triggered
     expect(store.validators).toBe(1);
+  });
+
+  test('should keep dirty state from swap when setting nested field', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [{ name: 'a' }, { name: 'b' }] } }
+    );
+
+    swap(store, { path: ['items'], at: 0, and: 1 });
+    expect(store.children.items.isDirty.value).toBe(true);
+
+    // Setting a nested field must not clear the dirty state of the array, as
+    // its item order still differs from the baseline
+    setInput(store, { path: ['items', 0, 'name'], input: 'b' });
+
+    expect(store.children.items.isDirty.value).toBe(true);
   });
 });

@@ -146,6 +146,27 @@ describe('setFieldInput', () => {
       expect(store.children.items.isDirty.value).toBe(true);
     });
 
+    test('should keep array dirty from reordering when setting nested child', () => {
+      const store = createTestStore(
+        v.object({ items: v.array(v.object({ name: v.string() })) }),
+        { initialInput: { items: [{ name: 'a' }, { name: 'b' }] } }
+      );
+
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+      if (itemsStore.kind === 'array') {
+        // Simulate a swap by reversing the item IDs and marking the array as
+        // dirty, like the `swap` method of `@formisch/methods` does
+        itemsStore.items.value = [...itemsStore.items.value].reverse();
+        itemsStore.isDirty.value = true;
+
+        // Setting a nested child must not reset the identity-based dirty
+        // state, as the item order still differs from the baseline
+        setFieldInput(store, ['items', 0, 'name'], 'a');
+        expect(itemsStore.isDirty.value).toBe(true);
+      }
+    });
+
     test('should set null for nullish array', () => {
       const store = createTestStore(
         v.object({ items: v.nullish(v.array(v.string())) }),
