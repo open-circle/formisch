@@ -31,3 +31,8 @@
 
 - [From Felte](/solid/guides/migrate-from-felte/)
 - [From TanStack Form](/solid/guides/migrate-from-tanstack-form/)
+
+## Integration guides
+
+- [Kobalte](/solid/guides/kobalte/)
+- [Ark UI](/solid/guides/ark-ui/)

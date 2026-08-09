@@ -148,6 +148,34 @@ const model = defineModel<string | number | undefined>({ required: true });
 </template>
 ```
 
+## Using component libraries
+
+Component libraries render their own components instead of plain elements, so you cannot use `v-bind="field.props"` on them. Vue treats the `ref` entry inside that object as a real template ref, which would register the component instance rather than a DOM element. Bind the entries individually and set the value through `v-model`:
+
+```vue
+<template>
+  <Field :of="form" :path="['date']" v-slot="field">
+    <DatePicker
+      :ref="(instance) => field.props.ref(instance?.$el ?? instance)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      v-model="field.input"
+      @focus="field.props.onFocus"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
+```
+
+Assigning `field.input` updates the field value and triggers validation, while the focus handler is what marks the field as touched. Unwrapping `$el` only helps when the component's root is the focusable element; if it wraps its control in a container, reach for the library's own input ref instead, or accept that <Link href="/methods/api/focus/">`focus`</Link> cannot target that field. For more details, see the <Link href="/vue/guides/controlled-fields/">controlled fields</Link> guide.
+
+For ready-made wiring recipes, check out our integration guides:
+
+- <Link href="/vue/guides/shadcn-vue/">shadcn-vue</Link>
+- <Link href="/vue/guides/ark-ui/">Ark UI</Link>
+- <Link href="/vue/guides/reka-ui/">Reka UI</Link>
+- <Link href="/vue/guides/primevue/">PrimeVue</Link>
+
 ## Next steps
 
 Now that you know how to create reusable input components, continue to the <Link href="/vue/guides/handle-submission/">handle submission</Link> guide to learn how to process form data when the user submits the form.

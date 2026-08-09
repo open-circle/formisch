@@ -1,0 +1,457 @@
+---
+title: shadcn-vue
+description: >-
+  Learn how to connect Formisch fields to shadcn-vue inputs, selects, radio
+  groups, sliders and other form components.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# shadcn-vue
+
+[shadcn-vue](https://shadcn-vue.com) generates accessible components into your own project, where you can adapt them to your needs. This guide targets shadcn-vue v2 with its Reka UI v2 based components. No adapter package is needed: the input components behave like native elements, while the composite components take their value through `v-model` and the remaining field props individually.
+
+## Installation
+
+Install Formisch and Valibot, then initialize shadcn-vue and add the components used below:
+
+```bash
+npm install @formisch/vue valibot
+npx shadcn-vue@latest init
+npx shadcn-vue@latest add button input textarea label checkbox select radio-group slider
+```
+
+If your `tsconfig.json` sets both `baseUrl` and `paths`, drop `baseUrl` and keep `paths` alone, since recent TypeScript versions report the combination as deprecated.
+
+## Wiring patterns
+
+Choose the wiring from what the generated component renders:
+
+- `Input` and `Textarea` keep the native element as their root and pass attributes through, so `v-model` plus the individual props reaches it directly.
+- `Checkbox`, `Select`, `RadioGroup` and `Slider` wrap Reka UI primitives, so bind their value through `v-model` and forward the remaining props individually.
+
+Note that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation, so `v-model` and an explicit `@update:model-value` handler are equivalent. Do not destructure the slot: write `v-slot="field"` rather than `v-slot="{ input }"`, because destructuring copies the value out of the accessor and assignments would go nowhere.
+
+### Spreading field.props
+
+Never spread `field.props` onto a component. Vue treats the `ref` entry inside a `v-bind` object as a real template ref, so the spread would hand Formisch the component instance, and `focus` would fail on an object that has no `focus` method. Bind the entries individually and unwrap the root element for the reference:
+
+```ts
+function elementRef(register: (element: Element | null) => void) {
+  return (instance: Element | ComponentPublicInstance | null) =>
+    register(
+      instance && '$el' in instance
+        ? ((instance as ComponentPublicInstance).$el as Element | null)
+        : (instance as Element | null)
+    );
+}
+```
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <Input
+      id="login-email"
+      type="email"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      v-model="field.input"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
+```
+
+### Controlled components
+
+The composite components are thin wrappers that forward both attributes and the element reference, so the same shape applies. Because each of them renders the focusable element as its root, unwrapping `$el` is enough for <Link href="/methods/api/focus/">`focus`</Link> and submit-time error focusing to reach the control:
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['rememberMe']" v-slot="field">
+    <Checkbox
+      id="login-remember-me"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      :model-value="field.input ?? false"
+      @update:model-value="
+        (value) => (field.input = value === 'indeterminate' ? false : value)
+      "
+      @focus="field.props.onFocus"
+      @blur="field.props.onBlur"
+    />
+    <Label for="login-remember-me">Remember me</Label>
+  </Field>
+</template>
+```
+
+Forwarding `@focus` matters, because assigning `field.input` updates the value but only the focus handler marks the field as touched.
+
+Assigning `field.input` runs input-mode validation, so a form configured with `validate: 'change'` does not validate these controls until submit. Use `validate: 'input'` if you want them validated as the value changes.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Render the message yourself, give it a stable id and point the control at it while errors exist. `aria-invalid` also switches the generated components to their destructive styling:
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <Input
+      id="login-email"
+      :ref="elementRef(field.props.ref)"
+      v-model="field.input"
+      :aria-invalid="!!field.errors"
+      aria-errormessage="login-email-error"
+    />
+    <p
+      v-if="field.errors"
+      id="login-email-error"
+      class="text-destructive text-sm"
+    >
+      {{ field.errors[0] }}
+    </p>
+  </Field>
+</template>
+```
+
+Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/vue/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines two inputs, a controlled checkbox and accessible errors:
+
+```vue
+<script setup lang="ts">
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Field, Form, type SubmitHandler, useForm } from '@formisch/vue';
+import * as v from 'valibot';
+import type { ComponentPublicInstance } from 'vue';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+  rememberMe: v.optional(v.boolean(), false),
+});
+
+const loginForm = useForm({
+  schema: LoginSchema,
+  initialInput: { email: '', password: '', rememberMe: false },
+});
+
+const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+  console.log(output);
+};
+
+// shadcn-vue components are wrappers, so the ref callback receives a component
+// instance instead of a DOM node. Formisch calls `.focus()` on whatever it is
+// given, so unwrap the root element before registering it.
+function elementRef(register: (element: Element | null) => void) {
+  return (instance: Element | ComponentPublicInstance | null) =>
+    register(
+      instance && '$el' in instance
+        ? ((instance as ComponentPublicInstance).$el as Element | null)
+        : (instance as Element | null)
+    );
+}
+</script>
+
+<template>
+  <Form :of="loginForm" class="flex flex-col gap-4" @submit="handleSubmit">
+    <Field :of="loginForm" :path="['email']" v-slot="field">
+      <div class="flex flex-col gap-1">
+        <Label for="login-email">Email</Label>
+        <Input
+          id="login-email"
+          type="email"
+          :ref="elementRef(field.props.ref)"
+          :name="field.props.name"
+          :autofocus="field.props.autofocus"
+          v-model="field.input"
+          :aria-invalid="!!field.errors"
+          aria-errormessage="login-email-error"
+          @focus="field.props.onFocus"
+          @change="field.props.onChange"
+          @blur="field.props.onBlur"
+        />
+        <p
+          v-if="field.errors"
+          id="login-email-error"
+          class="text-destructive text-sm"
+        >
+          {{ field.errors[0] }}
+        </p>
+      </div>
+    </Field>
+
+    <Field :of="loginForm" :path="['password']" v-slot="field">
+      <div class="flex flex-col gap-1">
+        <Label for="login-password">Password</Label>
+        <Input
+          id="login-password"
+          type="password"
+          :ref="elementRef(field.props.ref)"
+          :name="field.props.name"
+          :autofocus="field.props.autofocus"
+          v-model="field.input"
+          :aria-invalid="!!field.errors"
+          aria-errormessage="login-password-error"
+          @focus="field.props.onFocus"
+          @change="field.props.onChange"
+          @blur="field.props.onBlur"
+        />
+        <p
+          v-if="field.errors"
+          id="login-password-error"
+          class="text-destructive text-sm"
+        >
+          {{ field.errors[0] }}
+        </p>
+      </div>
+    </Field>
+
+    <Field :of="loginForm" :path="['rememberMe']" v-slot="field">
+      <div class="flex items-center gap-2">
+        <Checkbox
+          id="login-remember-me"
+          :ref="elementRef(field.props.ref)"
+          :name="field.props.name"
+          :autofocus="field.props.autofocus"
+          :model-value="field.input ?? false"
+          :aria-invalid="!!field.errors"
+          @update:model-value="
+            (value) => (field.input = value === 'indeterminate' ? false : value)
+          "
+          @focus="field.props.onFocus"
+          @blur="field.props.onBlur"
+        />
+        <Label for="login-remember-me">Remember me</Label>
+      </div>
+    </Field>
+
+    <Button type="submit" :disabled="loginForm.isSubmitting">Login</Button>
+  </Form>
+</template>
+```
+
+The initial input keeps every control defined from its first render. The inputs use `v-model` with the individual props, while the checkbox normalizes the indeterminate value before storing it.
+
+## Component reference
+
+The following snippets assume a form store named `form`, initialized values that match the schema, and the `elementRef` helper from above.
+
+### Text input
+
+`Input` keeps the native element as its root, so attributes and the reference reach it directly:
+
+```vue
+<template>
+  <Field :of="form" :path="['email']" v-slot="field">
+    <Label for="profile-email">Email</Label>
+    <Input
+      id="profile-email"
+      type="email"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      v-model="field.input"
+      :aria-invalid="!!field.errors"
+      aria-errormessage="profile-email-error"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
+```
+
+`Textarea` works the same way.
+
+### Checkbox
+
+The component reports `boolean | 'indeterminate'`, so normalize the value before storing it:
+
+```vue
+<template>
+  <Field :of="form" :path="['newsletter']" v-slot="field">
+    <Checkbox
+      id="settings-newsletter"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      :model-value="field.input ?? false"
+      :aria-invalid="!!field.errors"
+      @update:model-value="
+        (value) => (field.input = value === 'indeterminate' ? false : value)
+      "
+      @focus="field.props.onFocus"
+      @blur="field.props.onBlur"
+    />
+    <Label for="settings-newsletter">Newsletter</Label>
+  </Field>
+</template>
+```
+
+### Select
+
+Put the element reference and the lifecycle handlers on the trigger, which is the focusable part. Unlike Reka UI's primitive, the generated component drops the value type parameter, so narrow the payload to the schema union:
+
+```vue
+<template>
+  <Field :of="form" :path="['framework']" v-slot="field">
+    <Label id="project-framework-label" for="project-framework"
+      >Framework</Label
+    >
+    <Select
+      :name="field.props.name"
+      :model-value="field.input"
+      @update:model-value="(value) => (field.input = value as typeof field.input)"
+    >
+      <SelectTrigger
+        id="project-framework"
+        :ref="elementRef(field.props.ref)"
+        :autofocus="field.props.autofocus"
+        aria-labelledby="project-framework-label project-framework"
+        :aria-invalid="!!field.errors"
+        aria-errormessage="project-framework-error"
+        @focus="field.props.onFocus"
+        @blur="field.props.onBlur"
+      >
+        <SelectValue placeholder="Select a framework" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem
+          v-for="framework in frameworks"
+          :key="framework.value"
+          :value="framework.value"
+        >
+          {{ framework.label }}
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  </Field>
+</template>
+```
+
+### Radio group
+
+Register every item. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group:
+
+```vue
+<template>
+  <Field :of="form" :path="['plan']" v-slot="field">
+    <span id="plan-label" class="text-sm font-medium">Plan</span>
+    <RadioGroup
+      :name="field.props.name"
+      :model-value="field.input"
+      aria-labelledby="plan-label"
+      :aria-invalid="!!field.errors"
+      aria-errormessage="plan-error"
+      @update:model-value="(value) => (field.input = value as 'hobby' | 'pro')"
+    >
+      <div
+        v-for="plan in plans"
+        :key="plan.value"
+        class="flex items-center gap-2"
+      >
+        <RadioGroupItem
+          :id="`plan-${plan.value}`"
+          :ref="elementRef(field.props.ref)"
+          :value="plan.value"
+          :autofocus="field.props.autofocus"
+          @focus="field.props.onFocus"
+          @blur="field.props.onBlur"
+        />
+        <Label :for="`plan-${plan.value}`">{{ plan.label }}</Label>
+      </div>
+    </RadioGroup>
+  </Field>
+</template>
+```
+
+### Slider
+
+The generated `Slider` renders its thumbs internally without a slot, so attributes placed on it land on the track container rather than on the element that carries the `slider` role. Since the component lives in your project, add a `thumbProps` passthrough to `src/components/ui/slider/Slider.vue`. Extend its existing `defineProps` and keep the new prop out of what is forwarded to the root:
+
+```ts
+// Add `VNodeRef` to the existing `vue` type import
+const props = defineProps<
+  SliderRootProps & {
+    class?: HTMLAttributes['class'];
+    thumbProps?: HTMLAttributes & { autofocus?: boolean; ref?: VNodeRef };
+  }
+>();
+
+const delegatedProps = reactiveOmit(props, 'class', 'thumbProps');
+```
+
+Then spread it onto the thumb in the same file:
+
+```vue
+<template>
+  <SliderThumb
+    v-for="(_, key) in modelValue"
+    :key="key"
+    data-slot="slider-thumb"
+    v-bind="props.thumbProps"
+  />
+</template>
+```
+
+With that in place, the field wiring reads naturally. The value is an array, so wrap the number and unwrap it in the handler:
+
+```vue
+<template>
+  <Field :of="form" :path="['volume']" v-slot="field">
+    <Label for="settings-volume">Volume</Label>
+    <Slider
+      :name="field.props.name"
+      :model-value="[field.input ?? 0]"
+      :min="0"
+      :max="100"
+      :step="1"
+      :thumb-props="{
+        id: 'settings-volume',
+        ref: elementRef(field.props.ref),
+        autofocus: field.props.autofocus,
+        'aria-label': 'Volume',
+        'aria-invalid': !!field.errors,
+        'aria-errormessage': 'settings-volume-error',
+        onFocus: field.props.onFocus,
+        onBlur: field.props.onBlur,
+      }"
+      @update:model-value="(value) => (field.input = value?.[0])"
+    />
+  </Field>
+</template>
+```
+
+## Library-specific notes
+
+shadcn-vue also generates a `form` component, but it is built on VeeValidate and Zod. You do not need it with Formisch: use Formisch's <Link href="/vue/api/Form/">`Form`</Link> and <Link href="/vue/api/Field/">`Field`</Link> together with `Label` and your own error paragraph.
+
+Because shadcn-vue builds on Reka UI, the wiring in our <Link href="/vue/guides/reka-ui/">Reka UI guide</Link> applies to the primitives underneath. The difference is that you own the generated source, so a missing prop can be forwarded rather than worked around.
+
+`field.props.autofocus` is a snapshot taken when the field mounts, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own.
+
+## Next steps
+
+Read the <Link href="/vue/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/vue/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/vue/guides/validation/">validation</Link> guide for validation timing.

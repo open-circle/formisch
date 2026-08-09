@@ -72,20 +72,24 @@ These examples wire fields directly so you can see the complete integration. Onc
 Formisch exposes errors as `[string, ...string[]] | null`. shadcn's `FieldError` expects objects with a `message` property, so map the strings before passing them. Give the error a stable ID and reference it from the input when an error is present:
 
 ```tsx
-<UIField data-invalid={field.errors !== null}>
-  <FieldLabel htmlFor="login-email">Email</FieldLabel>
-  <Input
-    {...field.props}
-    id="login-email"
-    value={field.input ?? ''}
-    aria-invalid={field.errors !== null}
-    aria-errormessage={field.errors ? 'login-email-error' : undefined}
-  />
-  <FieldError
-    id="login-email-error"
-    errors={field.errors?.map((message) => ({ message }))}
-  />
-</UIField>
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <UIField data-invalid={field.errors !== null}>
+      <FieldLabel htmlFor="login-email">Email</FieldLabel>
+      <Input
+        {...field.props}
+        id="login-email"
+        value={field.input ?? ''}
+        aria-invalid={field.errors !== null}
+        aria-errormessage={field.errors ? 'login-email-error' : undefined}
+      />
+      <FieldError
+        id="login-email-error"
+        errors={field.errors?.map((message) => ({ message }))}
+      />
+    </UIField>
+  )}
+</Field>
 ```
 
 Use page-unique IDs for labels and errors instead of assuming that a field name is unique in the DOM. By default, Formisch validates on submit and revalidates on input. The <Link href="/react/guides/validation/">validation guide</Link> explains how to change that timing.

@@ -31,3 +31,9 @@
 
 - [From Superforms](/svelte/guides/migrate-from-superforms/)
 - [From TanStack Form](/svelte/guides/migrate-from-tanstack-form/)
+
+## Integration guides
+
+- [shadcn-svelte](/svelte/guides/shadcn-svelte/)
+- [Ark UI](/svelte/guides/ark-ui/)
+- [Bits UI](/svelte/guides/bits-ui/)
