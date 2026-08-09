@@ -79,6 +79,18 @@ describe('setFieldInput', () => {
       setFieldInput(store, ['user', 'name'], 'John');
       expect(store.children.user.input.value).toBe(true);
     });
+
+    test('should mark a nullish parent dirty when its empty child is set', () => {
+      const store = createTestStore(
+        v.object({ user: v.nullish(v.object({ name: v.string() })) })
+      );
+
+      setFieldInput(store, ['user', 'name'], '');
+
+      expect(store.children.user.input.value).toBe(true);
+      expect(store.children.user.isDirty.value).toBe(true);
+      expect(getFieldBool(store, 'isDirty')).toBe(true);
+    });
   });
 
   describe('array fields', () => {
@@ -117,6 +129,21 @@ describe('setFieldInput', () => {
         expect(itemsStore.items.value).toHaveLength(3);
         expect(getFieldInput(itemsStore)).toStrictEqual(['x', 'y', 'z']);
       }
+    });
+
+    test('should keep array dirty from length change when setting nested child', () => {
+      const store = createTestStore(
+        v.object({ items: v.array(v.object({ name: v.string() })) }),
+        { initialInput: { items: [{ name: 'a' }] } }
+      );
+
+      // Grow the array so its dirty state is based on the length change
+      setFieldInput(store, ['items'], [{ name: 'a' }, { name: 'b' }]);
+      expect(store.children.items.isDirty.value).toBe(true);
+
+      // Setting a nested child must not reset the length-based dirty state
+      setFieldInput(store, ['items', 0, 'name'], 'a');
+      expect(store.children.items.isDirty.value).toBe(true);
     });
 
     test('should set null for nullish array', () => {
