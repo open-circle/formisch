@@ -423,6 +423,7 @@ Ark's slider is array based like its select, and it uses `min` and `max` rather 
       </Slider.Track>
       <Slider.Thumb
         :index="0"
+        :autofocus="field.props.autofocus"
         aria-errormessage="settings-volume-error"
         @focus="field.props.onFocus"
         @blur="field.props.onBlur"

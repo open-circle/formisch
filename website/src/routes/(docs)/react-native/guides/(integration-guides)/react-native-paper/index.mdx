@@ -338,12 +338,12 @@ For a small set of options, `SegmentedButtons` is a simpler alternative.
 
 ### Radio group
 
-`RadioButton.Group` reports the new value, so mark the field as touched there:
+`RadioButton.Group` reports the new value, so mark the field as touched there. The group needs its own accessible name, since the individual options only announce their own labels:
 
 ```tsx
 <Field of={form} path={['plan']}>
   {(field) => (
-    <View role="radiogroup">
+    <View role="radiogroup" accessibilityLabel="Plan">
       <RadioButton.Group
         value={field.input ?? ''}
         onValueChange={(value) => {
