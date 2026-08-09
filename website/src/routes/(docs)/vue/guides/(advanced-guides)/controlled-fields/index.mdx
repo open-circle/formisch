@@ -155,6 +155,37 @@ For select elements, you control the value with `v-model`:
 
 The HTML `<input type="file" />` element is an exception because it cannot be controlled in the traditional way. However, you can control the UI around it. For inspiration, check out our <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/blob/main/playgrounds/vue/src/components/FileInput.vue`} target={'\_blank'} rel="noreferrer">`FileInput`</a> component from the <Link href="/playground/special/">playground</Link>.
 
+## Custom inputs and component libraries
+
+Component libraries don't expose their underlying native element, so `v-bind="field.props"` does not work on them. Vue treats the `ref` entry inside that object as a real template ref, which would register the component instance instead of a DOM element. Bind the entries individually and let `v-model` write the value:
+
+```vue
+<template>
+  <Field :of="form" :path="['date']" v-slot="field">
+    <DatePicker
+      :ref="(instance) => field.props.ref(instance?.$el ?? instance)"
+      :name="field.props.name"
+      v-model="field.input"
+      @focus="field.props.onFocus"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
+```
+
+This is useful for:
+
+- **Component libraries** that wrap native elements without exposing them
+- **Complex custom inputs** like date pickers, rich text editors, or color pickers
+
+Assigning `field.input` updates the field value and triggers validation, just like a native input would. Registering the element keeps <Link href="/methods/api/focus/">`focus`</Link> working, and the focus handler is what marks the field as touched.
+
+For ready-made wiring recipes, check out our integration guides:
+
+- <Link href="/vue/guides/shadcn-vue/">shadcn-vue</Link>
+- <Link href="/vue/guides/reka-ui/">Reka UI</Link>
+- <Link href="/vue/guides/primevue/">PrimeVue</Link>
+
 ## Next steps
 
 Now that you understand controlled fields, you can explore more advanced topics like <Link href="/vue/guides/nested-fields/">nested fields</Link> and <Link href="/vue/guides/field-arrays/">field arrays</Link> to handle complex form structures.

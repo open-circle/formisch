@@ -1,0 +1,392 @@
+---
+title: React Native Paper
+description: >-
+  Learn how to connect Formisch fields to React Native Paper text inputs,
+  checkboxes, radio buttons and other form components.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# React Native Paper
+
+[React Native Paper](https://callstack.github.io/react-native-paper/) is a Material Design component library for React Native. This guide targets Paper v5. No adapter package is needed: `TextInput` accepts the whole `field.props` spread, while every other control reports its value through its own callback and marks the field as touched on press.
+
+## Installation
+
+Install Formisch, Valibot and React Native Paper, then wrap your app in `PaperProvider` as described in the [Paper getting started guide](https://callstack.github.io/react-native-paper/docs/guides/getting-started):
+
+```bash
+npx expo install @formisch/react-native valibot react-native-paper react-native-safe-area-context
+```
+
+Import everything from `@formisch/react-native`. That package bundles the core and the methods, so importing from `@formisch/methods/react-native` alongside it would load a second copy of Formisch's reactive state and break updates in field arrays.
+
+## Wiring patterns
+
+React Native has no DOM, so `field.props` is only `{ ref, onFocus, onBlur, onChangeText }`. There is no `name` and no `autoFocus` to forward:
+
+- On a text input, spread `field.props` and pass `field.input` as the value.
+- On any other control, pass `field.input` as the value, send the control's callback to `field.onChange`, and call `field.props.onFocus()` in the press handler.
+
+That last point is the important one. A press does not raise a focus event in React Native, so without calling `field.props.onFocus()` yourself the field never becomes touched and touch validation never runs.
+
+### Spreading field.props
+
+Paper's `TextInput` forwards the spread to the underlying native input:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <TextInput
+      {...field.props}
+      mode="outlined"
+      label="Email"
+      value={field.input ?? ''}
+      error={!!field.errors}
+      aria-invalid={!!field.errors}
+    />
+  )}
+</Field>
+```
+
+Paper's `error` prop only changes the styling, so set `aria-invalid` as well to expose the state to assistive technology.
+
+### Controlled components
+
+`Checkbox.Item` accepts no `ref`, so register a wrapping `View` to keep the field reachable for <Link href="/methods/api/focus/">`focus`</Link>, and mark the field as touched in the press handler:
+
+```tsx
+<Field of={loginForm} path={['rememberMe']}>
+  {(field) => (
+    <View ref={field.props.ref}>
+      <Checkbox.Item
+        label="Remember me"
+        status={field.input ? 'checked' : 'unchecked'}
+        onPress={() => {
+          field.props.onFocus();
+          field.onChange(!field.input);
+        }}
+      />
+    </View>
+  )}
+</Field>
+```
+
+Note that the programmatic setter is `field.onChange(value)`. In React Native, `field.props` carries only `onChangeText`, which is meant for text input.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Paper's `HelperText` renders the message and unmounts it when the field becomes valid again:
+
+```tsx
+<TextInput
+  {...field.props}
+  label="Email"
+  value={field.input ?? ''}
+  error={!!field.errors}
+  aria-invalid={!!field.errors}
+/>
+<HelperText type="error" visible={!!field.errors}>
+  {field.errors?.[0]}
+</HelperText>
+```
+
+Paper does not associate the helper text with the input, so there is no equivalent of `aria-errormessage` here.
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/react-native/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+React Native has no `Form` component. Wrap the fields in a `View` and pass `handleSubmit` straight to a button, since it returns a function that takes no arguments:
+
+```tsx
+import { Field, handleSubmit, useForm } from '@formisch/react-native';
+import { View } from 'react-native';
+import { Button, Checkbox, HelperText, TextInput } from 'react-native-paper';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+  rememberMe: v.optional(v.boolean(), false),
+});
+
+export function LoginForm() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+    initialInput: { email: '', password: '', rememberMe: false },
+  });
+
+  const submitForm = handleSubmit(loginForm, (output) => {
+    console.log(output);
+  });
+
+  return (
+    <View style={{ gap: 8 }}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <View>
+            <TextInput
+              {...field.props}
+              mode="outlined"
+              label="Email"
+              placeholder="example@email.com"
+              value={field.input ?? ''}
+              error={!!field.errors}
+              aria-invalid={!!field.errors}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+            />
+            <HelperText type="error" visible={!!field.errors}>
+              {field.errors?.[0]}
+            </HelperText>
+          </View>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <View>
+            <TextInput
+              {...field.props}
+              mode="outlined"
+              label="Password"
+              value={field.input ?? ''}
+              error={!!field.errors}
+              aria-invalid={!!field.errors}
+              secureTextEntry
+              autoComplete="current-password"
+            />
+            <HelperText type="error" visible={!!field.errors}>
+              {field.errors?.[0]}
+            </HelperText>
+          </View>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['rememberMe']}>
+        {(field) => (
+          // `Checkbox.Item` accepts no ref, so the field ref goes on a wrapping
+          // `View` to keep the field reachable for `focus(form, { path })`
+          <View ref={field.props.ref}>
+            <Checkbox.Item
+              label="Remember me"
+              status={field.input ? 'checked' : 'unchecked'}
+              onPress={() => {
+                // Press does not trigger focus, so mark the field as touched here
+                field.props.onFocus();
+                field.onChange(!field.input);
+              }}
+            />
+          </View>
+        )}
+      </Field>
+
+      <Button
+        mode="contained"
+        onPress={submitForm}
+        loading={loginForm.isSubmitting}
+        disabled={loginForm.isSubmitting}
+      >
+        Login
+      </Button>
+    </View>
+  );
+}
+```
+
+The initial input keeps every control defined from its first render. A failed submit moves focus to the first invalid field on its own, so no extra wiring is needed for that.
+
+## Component reference
+
+The following snippets assume a form store named `form` and initialized values that match the schema.
+
+### Text input
+
+```tsx
+<Field of={form} path={['email']}>
+  {(field) => (
+    <View>
+      <TextInput
+        {...field.props}
+        mode="outlined"
+        label="Email"
+        value={field.input ?? ''}
+        error={!!field.errors}
+        aria-invalid={!!field.errors}
+      />
+      <HelperText type="error" visible={!!field.errors}>
+        {field.errors?.[0]}
+      </HelperText>
+    </View>
+  )}
+</Field>
+```
+
+Add `multiline` for a longer text field. The wiring stays the same.
+
+### Checkbox
+
+```tsx
+<Field of={form} path={['newsletter']}>
+  {(field) => (
+    <View ref={field.props.ref}>
+      <Checkbox.Item
+        label="Newsletter"
+        status={field.input ? 'checked' : 'unchecked'}
+        onPress={() => {
+          field.props.onFocus();
+          field.onChange(!field.input);
+        }}
+      />
+    </View>
+  )}
+</Field>
+```
+
+### Select
+
+Paper has no select component. Build one from `Menu` with a pressable anchor, and expose a `FieldElement` through `useImperativeHandle` so `focus` can open it:
+
+```tsx
+function MenuSelect<TValue extends string>({
+  ref,
+  onFocus,
+  label,
+  value,
+  options,
+  onValueChange,
+}: Pick<FieldElementProps, 'ref' | 'onFocus'> & {
+  label: string;
+  value: TValue | undefined;
+  options: readonly { label: string; value: TValue }[];
+  onValueChange: (value: TValue) => void;
+}) {
+  const [visible, setVisible] = useState(false);
+
+  // Expose a `FieldElement` so `focus(form, { path })` can reach this control.
+  // `isFocused` is deliberately omitted: Formisch treats an element without it
+  // as successfully focused, instead of skipping to the next errored field.
+  useImperativeHandle(ref, () => ({
+    focus: () => setVisible(true),
+    blur: () => setVisible(false),
+  }));
+
+  return (
+    <Menu
+      visible={visible}
+      onDismiss={() => setVisible(false)}
+      anchor={
+        <Button
+          mode="outlined"
+          onPress={() => {
+            onFocus();
+            setVisible(true);
+          }}
+        >
+          {options.find((option) => option.value === value)?.label ?? label}
+        </Button>
+      }
+    >
+      {options.map((option) => (
+        <Menu.Item
+          key={option.value}
+          title={option.label}
+          onPress={() => {
+            onValueChange(option.value);
+            setVisible(false);
+          }}
+        />
+      ))}
+    </Menu>
+  );
+}
+```
+
+Making the component generic over `TValue` keeps it assignable to `field.onChange`, which expects the schema's union rather than a plain string:
+
+```tsx
+<Field of={form} path={['framework']}>
+  {(field) => (
+    <MenuSelect
+      ref={field.props.ref}
+      onFocus={field.props.onFocus}
+      label="Select a framework"
+      value={field.input}
+      options={FRAMEWORKS}
+      onValueChange={field.onChange}
+    />
+  )}
+</Field>
+```
+
+For a small set of options, `SegmentedButtons` is a simpler alternative.
+
+### Radio group
+
+`RadioButton.Group` reports the new value, so mark the field as touched there:
+
+```tsx
+<Field of={form} path={['plan']}>
+  {(field) => (
+    <View ref={field.props.ref} role="radiogroup">
+      <RadioButton.Group
+        value={field.input ?? ''}
+        onValueChange={(value) => {
+          field.props.onFocus();
+          field.onChange(value as 'hobby' | 'pro');
+        }}
+      >
+        <RadioButton.Item label="Hobby" value="hobby" />
+        <RadioButton.Item label="Pro" value="pro" />
+      </RadioButton.Group>
+      <HelperText type="error" visible={!!field.errors}>
+        {field.errors?.[0]}
+      </HelperText>
+    </View>
+  )}
+</Field>
+```
+
+### Slider
+
+Paper has no slider. The community package `@react-native-community/slider` works with numbers directly, so `field.onChange` can be passed as is, and its drag events map onto the focus and blur handlers:
+
+```tsx
+<Field of={form} path={['volume']}>
+  {(field) => (
+    <View ref={field.props.ref}>
+      <Text>Volume: {field.input}</Text>
+      <Slider
+        style={{ width: '100%', height: 40 }}
+        value={field.input}
+        minimumValue={0}
+        maximumValue={100}
+        step={1}
+        onSlidingStart={() => field.props.onFocus()}
+        onSlidingComplete={() => field.props.onBlur()}
+        onValueChange={field.onChange}
+      />
+    </View>
+  )}
+</Field>
+```
+
+## Library-specific notes
+
+When you write a custom control, only expose `isFocused` from its `FieldElement` if it reports the truth. Formisch treats an element without `isFocused` as focused, but one that returns `false` is treated as a failed focus, and it moves on to the next invalid field.
+
+## Next steps
+
+Read the <Link href="/react-native/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/react-native/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/react-native/guides/validation/">validation</Link> guide for validation timing.

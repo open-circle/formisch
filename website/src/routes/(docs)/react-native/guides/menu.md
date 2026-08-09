@@ -32,3 +32,8 @@
 - [From React Hook Form](/react-native/guides/migrate-from-react-hook-form/)
 - [From TanStack Form](/react-native/guides/migrate-from-tanstack-form/)
 - [From Formik](/react-native/guides/migrate-from-formik/)
+
+## Integration guides
+
+- [gluestack-ui](/react-native/guides/gluestack-ui/)
+- [React Native Paper](/react-native/guides/react-native-paper/)

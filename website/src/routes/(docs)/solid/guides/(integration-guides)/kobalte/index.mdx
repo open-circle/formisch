@@ -1,0 +1,444 @@
+---
+title: Kobalte
+description: >-
+  Learn how to connect Formisch fields to Kobalte text fields, checkboxes,
+  selects, radio groups and sliders.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Kobalte
+
+[Kobalte](https://kobalte.dev) is a headless, accessible UI toolkit for Solid. This guide targets Kobalte v0.13. No adapter package is needed: each component exposes the native element as one of its parts, so you spread `field.props` onto that part and let the component root handle the value.
+
+## Installation
+
+Install Formisch, Valibot and Kobalte:
+
+```bash
+npm install @formisch/solid valibot @kobalte/core
+```
+
+Kobalte ships unstyled, so every example below leaves styling to you.
+
+## Wiring patterns
+
+Choose the wiring from the part you are rendering:
+
+- If the part is a native `<input>`, `<textarea>` or `<select>`, spread `field.props` onto it and pass `field.input` as the value.
+- If the component owns the value, such as a checkbox or select, pass `field.input` to the root and send the root's `onChange` to `field.onInput`, then forward the lifecycle props to the component's hidden native part.
+
+`field.onInput` and `field.props.onInput` are different functions and mixing them up is the easiest mistake to make here. `field.onInput(value)` stores a value, while `field.props.onInput(event)` reads the value from a DOM element. Because it reads from the element, it always produces a string, so a number, boolean or enum field must go through the component's own callback rather than the spread.
+
+### Spreading field.props
+
+`TextField.Input` renders a native input and composes its handlers with the ones you pass, so the whole spread works. Kobalte applies its own value first and yours second, which is why the explicit `value` wins:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <TextField validationState={field.errors ? 'invalid' : 'valid'}>
+      <TextField.Label>Email</TextField.Label>
+      <TextField.Input
+        {...field.props}
+        id="login-email"
+        type="email"
+        value={field.input ?? ''}
+      />
+    </TextField>
+  )}
+</Field>
+```
+
+### Controlled components
+
+A checkbox owns its value, so the root takes `checked` and `onChange`, while the hidden `Checkbox.Input` takes the element reference and the lifecycle handlers. Registering that input is what keeps <Link href="/methods/api/focus/">`focus`</Link> and submit-time error focusing working:
+
+```tsx
+<Field of={loginForm} path={['rememberMe']}>
+  {(field) => (
+    <Checkbox
+      name={field.props.name}
+      checked={field.input ?? false}
+      onChange={field.onInput}
+      validationState={field.errors ? 'invalid' : 'valid'}
+    >
+      <Checkbox.Input
+        id="login-remember-me"
+        ref={field.props.ref}
+        autofocus={field.props.autofocus}
+        onFocus={field.props.onFocus}
+        onBlur={field.props.onBlur}
+      />
+      <Checkbox.Control>
+        <Checkbox.Indicator>✓</Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label>Remember me</Checkbox.Label>
+    </Checkbox>
+  )}
+</Field>
+```
+
+Note that the compound components are the root themselves. There is no `Checkbox.Root` or `TextField.Root` in Kobalte v0.13.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Pass `validationState` to the root and render the message in the component's `ErrorMessage` part, which only appears while the state is invalid:
+
+```tsx
+<TextField validationState={field.errors ? 'invalid' : 'valid'}>
+  <TextField.Label>Email</TextField.Label>
+  <TextField.Input
+    {...field.props}
+    id="login-email"
+    value={field.input ?? ''}
+    aria-errormessage="login-email-error"
+  />
+  <TextField.ErrorMessage id="login-email-error">
+    {field.errors?.[0]}
+  </TextField.ErrorMessage>
+</TextField>
+```
+
+Kobalte sets `aria-invalid` on the native parts, but not on a select trigger or a slider thumb, so add it yourself on those two. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/solid/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines two text fields, a controlled checkbox and accessible errors:
+
+```tsx
+import { createForm, Field, Form, type SubmitHandler } from '@formisch/solid';
+import { Checkbox } from '@kobalte/core/checkbox';
+import { TextField } from '@kobalte/core/text-field';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+  rememberMe: v.optional(v.boolean(), false),
+});
+
+export default function LoginPage() {
+  const loginForm = createForm({
+    schema: LoginSchema,
+    initialInput: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  });
+
+  const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+    console.log(output);
+  };
+
+  return (
+    <Form of={loginForm} onSubmit={handleSubmit}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <TextField validationState={field.errors ? 'invalid' : 'valid'}>
+            <TextField.Label>Email</TextField.Label>
+            <TextField.Input
+              {...field.props}
+              id="login-email"
+              type="email"
+              autocomplete="email"
+              placeholder="jane@example.com"
+              value={field.input ?? ''}
+              aria-errormessage="login-email-error"
+            />
+            <TextField.ErrorMessage id="login-email-error">
+              {field.errors?.[0]}
+            </TextField.ErrorMessage>
+          </TextField>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <TextField validationState={field.errors ? 'invalid' : 'valid'}>
+            <TextField.Label>Password</TextField.Label>
+            <TextField.Input
+              {...field.props}
+              id="login-password"
+              type="password"
+              autocomplete="current-password"
+              value={field.input ?? ''}
+              aria-errormessage="login-password-error"
+            />
+            <TextField.ErrorMessage id="login-password-error">
+              {field.errors?.[0]}
+            </TextField.ErrorMessage>
+          </TextField>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['rememberMe']}>
+        {(field) => (
+          <Checkbox
+            name={field.props.name}
+            checked={field.input ?? false}
+            onChange={field.onInput}
+            validationState={field.errors ? 'invalid' : 'valid'}
+          >
+            <Checkbox.Input
+              id="login-remember-me"
+              ref={field.props.ref}
+              autofocus={field.props.autofocus}
+              onFocus={field.props.onFocus}
+              onBlur={field.props.onBlur}
+            />
+            <Checkbox.Control>
+              <Checkbox.Indicator>✓</Checkbox.Indicator>
+            </Checkbox.Control>
+            <Checkbox.Label>Remember me</Checkbox.Label>
+          </Checkbox>
+        )}
+      </Field>
+
+      <button type="submit" disabled={loginForm.isSubmitting}>
+        Login
+      </button>
+    </Form>
+  );
+}
+```
+
+The initial input keeps every control defined from its first render. The two text fields use the spread, while the checkbox routes its value through the root and its lifecycle props through the hidden input.
+
+## Component reference
+
+The following snippets assume a form store named `form` and initialized values that match the schema. Never destructure the field store, and read `field.input` and `field.errors` inside JSX so Solid tracks them.
+
+### Text input
+
+```tsx
+<Field of={form} path={['email']}>
+  {(field) => (
+    <TextField validationState={field.errors ? 'invalid' : 'valid'}>
+      <TextField.Label>Email</TextField.Label>
+      <TextField.Input
+        {...field.props}
+        id="profile-email"
+        type="email"
+        value={field.input ?? ''}
+        aria-errormessage="profile-email-error"
+      />
+      <TextField.ErrorMessage id="profile-email-error">
+        {field.errors?.[0]}
+      </TextField.ErrorMessage>
+    </TextField>
+  )}
+</Field>
+```
+
+Swap `TextField.Input` for `TextField.TextArea` to get a multiline field with the same wiring.
+
+### Checkbox
+
+```tsx
+<Field of={form} path={['newsletter']}>
+  {(field) => (
+    <Checkbox
+      name={field.props.name}
+      checked={field.input ?? false}
+      onChange={field.onInput}
+      validationState={field.errors ? 'invalid' : 'valid'}
+    >
+      <Checkbox.Input
+        id="settings-newsletter"
+        ref={field.props.ref}
+        autofocus={field.props.autofocus}
+        onFocus={field.props.onFocus}
+        onBlur={field.props.onBlur}
+      />
+      <Checkbox.Control>
+        <Checkbox.Indicator>✓</Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label>Newsletter</Checkbox.Label>
+    </Checkbox>
+  )}
+</Field>
+```
+
+### Select
+
+Kobalte represents no selection as `null`, while an optional Formisch value is `undefined`, so convert in both directions. Passing `undefined` to a controlled `value` would silently turn the component uncontrolled. Using plain string options with a label map avoids option identity problems, and `Select.Value` needs its own type argument:
+
+```tsx
+const FRAMEWORKS = ['angular', 'react', 'solid', 'vue'] as const;
+type Framework = (typeof FRAMEWORKS)[number];
+const FRAMEWORK_LABELS: Record<Framework, string> = {
+  angular: 'Angular',
+  react: 'React',
+  solid: 'Solid',
+  vue: 'Vue',
+};
+```
+
+```tsx
+<Field of={form} path={['framework']}>
+  {(field) => (
+    <Select<Framework>
+      name={field.props.name}
+      options={[...FRAMEWORKS]}
+      value={field.input ?? null}
+      onChange={(value) => field.onInput(value ?? undefined)}
+      validationState={field.errors ? 'invalid' : 'valid'}
+      placeholder="Select a framework"
+      itemComponent={(props) => (
+        <Select.Item item={props.item}>
+          <Select.ItemLabel>
+            {FRAMEWORK_LABELS[props.item.rawValue]}
+          </Select.ItemLabel>
+        </Select.Item>
+      )}
+    >
+      <Select.Label>Framework</Select.Label>
+      <Select.HiddenSelect
+        id="project-framework-select"
+        ref={field.props.ref}
+        autofocus={field.props.autofocus}
+        onFocus={field.props.onFocus}
+        onBlur={field.props.onBlur}
+      />
+      <Select.Trigger
+        id="project-framework"
+        aria-invalid={field.errors ? true : undefined}
+        aria-errormessage="project-framework-error"
+      >
+        <Select.Value<Framework>>
+          {(state) => FRAMEWORK_LABELS[state.selectedOption()]}
+        </Select.Value>
+      </Select.Trigger>
+      <Select.ErrorMessage id="project-framework-error">
+        {field.errors?.[0]}
+      </Select.ErrorMessage>
+      <Select.Portal>
+        <Select.Content>
+          <Select.Listbox />
+        </Select.Content>
+      </Select.Portal>
+    </Select>
+  )}
+</Field>
+```
+
+### Radio group
+
+Register every item's input. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group. Put `autofocus` on the first item only, otherwise every radio competes for focus:
+
+```tsx
+<Field of={form} path={['plan']}>
+  {(field) => (
+    <RadioGroup
+      name={field.props.name}
+      value={field.input}
+      onChange={(value) => field.onInput(value as 'hobby' | 'pro')}
+      validationState={field.errors ? 'invalid' : 'valid'}
+      aria-errormessage="plan-error"
+    >
+      <RadioGroup.Label>Plan</RadioGroup.Label>
+      <For each={PLANS}>
+        {(plan, index) => (
+          <RadioGroup.Item value={plan}>
+            <RadioGroup.ItemInput
+              id={`plan-${plan}`}
+              ref={field.props.ref}
+              autofocus={index() === 0 && field.props.autofocus}
+              onFocus={field.props.onFocus}
+              onBlur={field.props.onBlur}
+            />
+            <RadioGroup.ItemControl>
+              <RadioGroup.ItemIndicator />
+            </RadioGroup.ItemControl>
+            <RadioGroup.ItemLabel>{PLAN_LABELS[plan]}</RadioGroup.ItemLabel>
+          </RadioGroup.Item>
+        )}
+      </For>
+      <RadioGroup.ErrorMessage id="plan-error">
+        {field.errors?.[0]}
+      </RadioGroup.ErrorMessage>
+    </RadioGroup>
+  )}
+</Field>
+```
+
+### Slider
+
+Kobalte's slider works with an array of values, so wrap the number for the single thumb and unwrap it in the callback. `Slider.Input` is a real range input that is only visually hidden, so mark it `aria-hidden` to keep a single `slider` role in the accessibility tree. The thumb is the element assistive technology should see:
+
+```tsx
+<Field of={form} path={['volume']}>
+  {(field) => (
+    <Slider
+      name={field.props.name}
+      minValue={0}
+      maxValue={100}
+      value={[field.input ?? 50]}
+      onChange={(values) => field.onInput(values[0])}
+      validationState={field.errors ? 'invalid' : 'valid'}
+    >
+      <Slider.Label>Volume</Slider.Label>
+      <Slider.ValueLabel />
+      <Slider.Track>
+        <Slider.Fill />
+        <Slider.Thumb
+          aria-invalid={field.errors ? true : undefined}
+          aria-errormessage="settings-volume-error"
+        >
+          <Slider.Input
+            id="settings-volume"
+            aria-hidden="true"
+            ref={field.props.ref}
+            autofocus={field.props.autofocus}
+            onFocus={field.props.onFocus}
+            onBlur={field.props.onBlur}
+          />
+        </Slider.Thumb>
+      </Slider.Track>
+      <Slider.ErrorMessage id="settings-volume-error">
+        {field.errors?.[0]}
+      </Slider.ErrorMessage>
+    </Slider>
+  )}
+</Field>
+```
+
+## Library-specific notes
+
+`Select.HiddenSelect` renders its native select inside an `aria-hidden` wrapper and does not forward focus to the visible trigger, so `focus` moves focus into that hidden element rather than to the button the user sees. Validation, `isTouched` and blur validation are unaffected. If you want the visible affordance, keep a reference to the trigger and forward focus yourself:
+
+```tsx
+let triggerElement: HTMLButtonElement | undefined;
+```
+
+```tsx
+<Select.HiddenSelect
+  ref={field.props.ref}
+  onFocus={() => {
+    field.props.onFocus();
+    triggerElement?.focus();
+  }}
+  onBlur={field.props.onBlur}
+/>
+<Select.Trigger ref={triggerElement}>{/* ... */}</Select.Trigger>
+```
+
+`field.props.autofocus` is a snapshot taken when the field is created, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own, so you rarely need to read it directly.
+
+## Next steps
+
+Read the <Link href="/solid/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/solid/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/solid/guides/validation/">validation</Link> guide for validation timing.

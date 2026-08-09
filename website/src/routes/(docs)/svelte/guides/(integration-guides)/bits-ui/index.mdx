@@ -1,0 +1,375 @@
+---
+title: Bits UI
+description: >-
+  Learn how to connect Formisch fields to Bits UI checkboxes, selects, radio
+  groups, sliders and other form primitives.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Bits UI
+
+[Bits UI](https://bits-ui.com) is a collection of headless, accessible primitives for Svelte 5. This guide targets Bits UI v2. No adapter package is needed: native elements take the whole `field.props` spread, while a primitive built on a button or span receives the value plus the lifecycle props it can forward.
+
+## Installation
+
+Install Formisch, Valibot and Bits UI:
+
+```bash
+npm install @formisch/svelte valibot bits-ui
+```
+
+Bits UI ships primitives only, so text inputs, textareas and buttons stay native elements that you style yourself.
+
+## Wiring patterns
+
+Choose the wiring from the element the primitive renders:
+
+- If it is a native `<input>`, `<textarea>` or `<select>`, spread `field.props` and pass `field.input` as the value.
+- If it renders a button or span, pass `field.input` as the value, forward the remaining props, and send the primitive's value callback to `field.onInput`.
+
+### Spreading field.props
+
+An `<input>` accepts every entry of `field.props`, including the element reference, which Formisch passes as a Svelte attachment:
+
+```svelte
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <input {...field.props} id="login-email" type="email" value={field.input} />
+  {/snippet}
+</Field>
+```
+
+Do not reach for `bind:value={field.input}` here. It compiles and passes `svelte-check`, then throws at runtime because `field.input` is a getter rather than a `$state` reference, and the input silently drifts out of sync with the form. Use `value={field.input}` as above, or a function binding if you prefer that shape:
+
+```svelte
+<input
+  {...field.props}
+  bind:value={() => field.input ?? '', (value) => field.onInput(value)}
+/>
+```
+
+### Controlled components
+
+`Checkbox.Root` renders a button, so drop `oninput` and `onchange` from the spread and let the primitive report its value instead. Those two handlers read the value from the event target, which only exists on a native form element, and `svelte-check` rejects them on a button for the same reason:
+
+```svelte
+<Field of={loginForm} path={['rememberMe']}>
+  {#snippet children(field)}
+    {@const { oninput, onchange, ...fieldProps } = field.props}
+    <Checkbox.Root
+      {...fieldProps}
+      id="login-remember"
+      aria-labelledby="login-remember-label"
+      checked={field.input ?? false}
+      onCheckedChange={(checked) => field.onInput(checked)}
+    >
+      {#snippet children({ checked })}
+        <span aria-hidden="true">{checked ? '✔' : ''}</span>
+      {/snippet}
+    </Checkbox.Root>
+    <label id="login-remember-label" for="login-remember">Remember me</label>
+  {/snippet}
+</Field>
+```
+
+The rest of the spread still carries its weight: the attachment reaches the visible button through Bits UI's prop merging, so <Link href="/methods/api/focus/">`focus`</Link> and submit-time error focusing land on the control the user sees, and `onfocus` and `onblur` keep `isTouched` and blur validation working. `{@const}` has to be the first thing inside the snippet, before the surrounding markup.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Bits UI has no error primitive, so render the message yourself, give it a stable id and point the control at it while errors exist:
+
+```svelte
+<input
+  {...field.props}
+  id="login-email"
+  value={field.input}
+  aria-invalid={!!field.errors}
+  aria-errormessage="login-email-error"
+/>
+{#if field.errors}
+  <div id="login-email-error">{field.errors[0]}</div>
+{/if}
+```
+
+Use page-unique ids rather than the field name. `field.props.name` is the JSON encoded path, such as `["email"]`, which is meant for form submission and not for `for` and `id` attributes.
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/svelte/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines native inputs, a controlled checkbox and accessible errors:
+
+```svelte
+<script lang="ts">
+  import {
+    createForm,
+    Field,
+    Form,
+    type SubmitHandler,
+  } from '@formisch/svelte';
+  import { Checkbox } from 'bits-ui';
+  import * as v from 'valibot';
+
+  const LoginSchema = v.object({
+    email: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your email.'),
+      v.email('The email address is badly formatted.')
+    ),
+    password: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your password.'),
+      v.minLength(8, 'Your password must have 8 characters or more.')
+    ),
+    rememberMe: v.optional(v.boolean(), false),
+  });
+
+  const loginForm = createForm({
+    schema: LoginSchema,
+    initialInput: { email: '', password: '', rememberMe: false },
+  });
+
+  const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+    console.log(output);
+  };
+</script>
+
+<Form of={loginForm} onsubmit={handleSubmit}>
+  <Field of={loginForm} path={['email']}>
+    {#snippet children(field)}
+      <div>
+        <label for="login-email">Email</label>
+        <input
+          {...field.props}
+          id="login-email"
+          type="email"
+          value={field.input}
+          aria-invalid={!!field.errors}
+          aria-errormessage="login-email-error"
+        />
+        {#if field.errors}
+          <div id="login-email-error">{field.errors[0]}</div>
+        {/if}
+      </div>
+    {/snippet}
+  </Field>
+
+  <Field of={loginForm} path={['password']}>
+    {#snippet children(field)}
+      <div>
+        <label for="login-password">Password</label>
+        <input
+          {...field.props}
+          id="login-password"
+          type="password"
+          value={field.input}
+          aria-invalid={!!field.errors}
+          aria-errormessage="login-password-error"
+        />
+        {#if field.errors}
+          <div id="login-password-error">{field.errors[0]}</div>
+        {/if}
+      </div>
+    {/snippet}
+  </Field>
+
+  <Field of={loginForm} path={['rememberMe']}>
+    {#snippet children(field)}
+      {@const { oninput, onchange, ...fieldProps } = field.props}
+      <div>
+        <Checkbox.Root
+          {...fieldProps}
+          id="login-remember"
+          aria-labelledby="login-remember-label"
+          checked={field.input ?? false}
+          onCheckedChange={(checked) => field.onInput(checked)}
+        >
+          {#snippet children({ checked })}
+            <span aria-hidden="true">{checked ? '✔' : ''}</span>
+          {/snippet}
+        </Checkbox.Root>
+        <label id="login-remember-label" for="login-remember">
+          Remember me
+        </label>
+      </div>
+    {/snippet}
+  </Field>
+
+  <button type="submit" disabled={loginForm.isSubmitting}>Login</button>
+</Form>
+```
+
+The initial input keeps every control defined from its first render. The two text inputs use the full spread, while the checkbox maps Bits UI's value callback and forwards the remaining props.
+
+## Component reference
+
+The following snippets assume a form store named `form` and initialized values that match the schema.
+
+### Text input
+
+Native elements take the whole spread:
+
+```svelte
+<Field of={form} path={['email']}>
+  {#snippet children(field)}
+    <label for="profile-email">Email</label>
+    <input
+      {...field.props}
+      id="profile-email"
+      type="email"
+      value={field.input}
+      aria-invalid={!!field.errors}
+      aria-errormessage="profile-email-error"
+    />
+    {#if field.errors}
+      <div id="profile-email-error">{field.errors[0]}</div>
+    {/if}
+  {/snippet}
+</Field>
+```
+
+A `<textarea>` works the same way.
+
+### Checkbox
+
+Since `Checkbox.Root` renders a button, name it with `aria-labelledby` in addition to the label's `for` attribute. A button is labelable, but not every browser derives its accessible name from a `<label>`:
+
+```svelte
+<Field of={form} path={['newsletter']}>
+  {#snippet children(field)}
+    {@const { oninput, onchange, ...fieldProps } = field.props}
+    <Checkbox.Root
+      {...fieldProps}
+      id="settings-newsletter"
+      aria-labelledby="settings-newsletter-label"
+      checked={field.input ?? false}
+      onCheckedChange={(checked) => field.onInput(checked)}
+    >
+      {#snippet children({ checked })}
+        <span aria-hidden="true">{checked ? '✔' : ''}</span>
+      {/snippet}
+    </Checkbox.Root>
+    <label id="settings-newsletter-label" for="settings-newsletter">
+      Newsletter
+    </label>
+  {/snippet}
+</Field>
+```
+
+Bits UI declares `name` as its own prop and renders a hidden native checkbox with it, so the button itself carries no `name` attribute.
+
+### Select
+
+Use `type="single"` so the value is a plain string, and normalize the empty value in both directions, since `onValueChange` hands you a bare `string` while an unselected Formisch field is `undefined`:
+
+```svelte
+<Field of={form} path={['framework']}>
+  {#snippet children(field)}
+    {@const { oninput, onchange, ...fieldProps } = field.props}
+    <span id="project-framework-label">Framework</span>
+    <Select.Root
+      type="single"
+      value={field.input ?? ''}
+      onValueChange={(value) => field.onInput(value as 'angular' | 'react')}
+    >
+      <Select.Trigger
+        {...fieldProps}
+        id="project-framework"
+        aria-labelledby="project-framework-label"
+        aria-invalid={!!field.errors}
+      >
+        {frameworks.find((item) => item.value === field.input)?.label ??
+          'Select a framework'}
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Content>
+          {#each frameworks as framework (framework.value)}
+            <Select.Item value={framework.value} label={framework.label}>
+              {framework.label}
+            </Select.Item>
+          {/each}
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+  {/snippet}
+</Field>
+```
+
+The trigger is a button without a `combobox` role, so name it with `aria-labelledby` rather than a `<label>` element.
+
+### Radio group
+
+Spread the remaining props onto every item. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group, and the first one becomes the focus target:
+
+```svelte
+<Field of={form} path={['plan']}>
+  {#snippet children(field)}
+    {@const { oninput, onchange, ...fieldProps } = field.props}
+    <span id="plan-label">Plan</span>
+    <RadioGroup.Root
+      aria-labelledby="plan-label"
+      aria-invalid={!!field.errors}
+      value={field.input ?? 'hobby'}
+      onValueChange={(value) => field.onInput(value as 'hobby' | 'pro')}
+    >
+      {#each plans as plan (plan.value)}
+        <RadioGroup.Item
+          {...fieldProps}
+          id="plan-{plan.value}"
+          value={plan.value}
+          aria-labelledby="plan-{plan.value}-label"
+        >
+          {#snippet children({ checked })}
+            <span aria-hidden="true">{checked ? '●' : ''}</span>
+          {/snippet}
+        </RadioGroup.Item>
+        <label id="plan-{plan.value}-label" for="plan-{plan.value}">
+          {plan.label}
+        </label>
+      {/each}
+    </RadioGroup.Root>
+  {/snippet}
+</Field>
+```
+
+### Slider
+
+`type="single"` keeps the value a number and renders exactly one thumb. The thumb carries the `slider` role, so the remaining props and the accessible name belong there rather than on the root:
+
+```svelte
+<Field of={form} path={['volume']}>
+  {#snippet children(field)}
+    {@const { oninput, onchange, ...fieldProps } = field.props}
+    <Slider.Root
+      type="single"
+      min={0}
+      max={100}
+      step={1}
+      value={field.input ?? 50}
+      onValueChange={(value) => field.onInput(value)}
+    >
+      {#snippet children()}
+        <Slider.Range />
+        <Slider.Thumb
+          {...fieldProps}
+          index={0}
+          id="settings-volume"
+          aria-label="Volume"
+          aria-invalid={!!field.errors}
+        />
+      {/snippet}
+    </Slider.Root>
+  {/snippet}
+</Field>
+```
+
+## Library-specific notes
+
+`field.props.autofocus` is a snapshot taken when the field is created, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own, so you rarely need to read it directly.
+
+## Next steps
+
+Read the <Link href="/svelte/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/svelte/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/svelte/guides/validation/">validation</Link> guide for validation timing.

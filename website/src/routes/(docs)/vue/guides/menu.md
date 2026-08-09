@@ -32,3 +32,9 @@
 - [From VeeValidate](/vue/guides/migrate-from-vee-validate/)
 - [From FormKit](/vue/guides/migrate-from-formkit/)
 - [From TanStack Form](/vue/guides/migrate-from-tanstack-form/)
+
+## Integration guides
+
+- [shadcn-vue](/vue/guides/shadcn-vue/)
+- [Reka UI](/vue/guides/reka-ui/)
+- [PrimeVue](/vue/guides/primevue/)

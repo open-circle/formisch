@@ -1,0 +1,433 @@
+---
+title: gluestack-ui
+description: >-
+  Learn how to connect Formisch fields to gluestack-ui inputs, selects, radio
+  groups, sliders and other form components.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# gluestack-ui
+
+[gluestack-ui](https://gluestack.io) generates universal components into your own project, where you can adapt them to your needs. This guide targets gluestack-ui v5. No adapter package is needed: the input components accept the whole `field.props` spread, while every other control reports its value through its own callback and marks the field as touched on press.
+
+## Installation
+
+Create the project, add the web dependencies, then initialize gluestack-ui and add the components used below:
+
+```bash
+npx create-expo-app@latest my-app --template blank-typescript
+npx expo install react-native-web react-dom @expo/metro-runtime react-native-safe-area-context
+npx gluestack-ui init --use-npm --uniwind
+npx gluestack-ui add input textarea select slider checkbox radio form-control button icon
+npm install @formisch/react-native valibot
+```
+
+Three things are worth knowing about that setup. The `init` command writes a Babel config that requires `babel-preset-expo` without adding it as a dependency, so install it yourself. Adding `checkbox`, `radio` or `select` does not pull in `icon`, which their documented usage needs, so add it explicitly. Finally, verify the app in a browser rather than trusting a successful `expo export`, since a bundle can build and still fail to boot.
+
+Import everything from `@formisch/react-native`. That package bundles the core and the methods, so importing from `@formisch/methods/react-native` alongside it would load a second copy of Formisch's reactive state and break updates in field arrays.
+
+## Wiring patterns
+
+React Native has no DOM, so `field.props` is only `{ ref, onFocus, onBlur, onChangeText }`. There is no `name` and no `autoFocus` to forward:
+
+- On `InputField` or `TextareaInput`, spread `field.props` and pass `field.input` as the value.
+- On any other control, pass `field.input` as the value, send the control's callback to `field.onChange`, and call `field.props.onFocus()` when the control is pressed or opened.
+
+That last point is the important one. A press does not raise a focus event in React Native, so without calling `field.props.onFocus()` yourself the field never becomes touched and touch validation never runs.
+
+### Spreading field.props
+
+`InputField` forwards the spread to the underlying native input. gluestack types its component refs against the props type rather than the element instance, so the reference needs a cast even though it is forwarded correctly at runtime:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <Input>
+      <InputField
+        {...field.props}
+        // gluestack types its component refs against the props type
+        // instead of the element instance, so the field ref, which is
+        // forwarded to a real element at runtime, needs a cast
+        ref={field.props.ref as never}
+        placeholder="example@email.com"
+        value={field.input ?? ''}
+      />
+    </Input>
+  )}
+</Field>
+```
+
+### Controlled components
+
+The checkbox reports its new state, so mark the field as touched in the same handler:
+
+```tsx
+<Field of={loginForm} path={['rememberMe']}>
+  {(field) => (
+    <Checkbox
+      ref={field.props.ref as never}
+      value="rememberMe"
+      isChecked={!!field.input}
+      onChange={(isChecked: boolean) => {
+        // Press does not trigger focus, so mark the field as touched here
+        field.props.onFocus();
+        field.onChange(isChecked);
+      }}
+    >
+      <CheckboxIndicator>
+        <CheckboxIcon as={CheckIcon} />
+      </CheckboxIndicator>
+      <CheckboxLabel>Remember me</CheckboxLabel>
+    </Checkbox>
+  )}
+</Field>
+```
+
+Note that the programmatic setter is `field.onChange(value)`. In React Native, `field.props` carries only `onChangeText`, which is meant for text input.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Wrap a control in `FormControl` and pass `isInvalid`, then render the message in `FormControlError`. The wrapper also applies the invalid state to the nested control, so setting `aria-invalid` yourself has no effect:
+
+```tsx
+<FormControl isInvalid={!!field.errors}>
+  <FormControlLabel>
+    <FormControlLabelText>Email</FormControlLabelText>
+  </FormControlLabel>
+  <Input>
+    <InputField
+      {...field.props}
+      ref={field.props.ref as never}
+      value={field.input ?? ''}
+    />
+  </Input>
+  <FormControlError>
+    <FormControlErrorText>{field.errors?.[0]}</FormControlErrorText>
+  </FormControlError>
+</FormControl>
+```
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/react-native/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+React Native has no `Form` component. Wrap the fields in a `View` and pass `handleSubmit` straight to a button, since it returns a function that takes no arguments:
+
+```tsx
+import { Button, ButtonText } from '@/components/ui/button';
+import {
+  Checkbox,
+  CheckboxIcon,
+  CheckboxIndicator,
+  CheckboxLabel,
+} from '@/components/ui/checkbox';
+import {
+  FormControl,
+  FormControlError,
+  FormControlErrorText,
+  FormControlLabel,
+  FormControlLabelText,
+} from '@/components/ui/form-control';
+import { CheckIcon } from '@/components/ui/icon';
+import { Input, InputField } from '@/components/ui/input';
+import { Field, handleSubmit, useForm } from '@formisch/react-native';
+import { View } from 'react-native';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+  rememberMe: v.optional(v.boolean(), false),
+});
+
+export function LoginForm() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+    initialInput: { email: '', password: '', rememberMe: false },
+  });
+
+  const submitForm = handleSubmit(loginForm, (output) => {
+    console.log(output);
+  });
+
+  return (
+    <View style={{ gap: 16 }}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <FormControl isInvalid={!!field.errors}>
+            <FormControlLabel>
+              <FormControlLabelText>Email</FormControlLabelText>
+            </FormControlLabel>
+            <Input>
+              <InputField
+                {...field.props}
+                // gluestack types its component refs against the props type
+                // instead of the element instance, so the field ref, which is
+                // forwarded to a real element at runtime, needs a cast
+                ref={field.props.ref as never}
+                placeholder="example@email.com"
+                value={field.input ?? ''}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+              />
+            </Input>
+            <FormControlError>
+              <FormControlErrorText>{field.errors?.[0]}</FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <FormControl isInvalid={!!field.errors}>
+            <FormControlLabel>
+              <FormControlLabelText>Password</FormControlLabelText>
+            </FormControlLabel>
+            <Input>
+              <InputField
+                {...field.props}
+                ref={field.props.ref as never}
+                placeholder="********"
+                value={field.input ?? ''}
+                type="password"
+                autoComplete="current-password"
+              />
+            </Input>
+            <FormControlError>
+              <FormControlErrorText>{field.errors?.[0]}</FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['rememberMe']}>
+        {(field) => (
+          <Checkbox
+            ref={field.props.ref as never}
+            value="rememberMe"
+            isChecked={!!field.input}
+            onChange={(isChecked: boolean) => {
+              // Press does not trigger focus, so mark the field as touched here
+              field.props.onFocus();
+              field.onChange(isChecked);
+            }}
+          >
+            <CheckboxIndicator>
+              <CheckboxIcon as={CheckIcon} />
+            </CheckboxIndicator>
+            <CheckboxLabel>Remember me</CheckboxLabel>
+          </Checkbox>
+        )}
+      </Field>
+
+      <Button onPress={submitForm} isDisabled={loginForm.isSubmitting}>
+        <ButtonText>Login</ButtonText>
+      </Button>
+    </View>
+  );
+}
+```
+
+The initial input keeps every control defined from its first render. A failed submit moves focus to the first invalid field on its own, so no extra wiring is needed for that.
+
+## Component reference
+
+The following snippets assume a form store named `form` and initialized values that match the schema.
+
+### Text input
+
+```tsx
+<Field of={form} path={['email']}>
+  {(field) => (
+    <FormControl isInvalid={!!field.errors}>
+      <FormControlLabel>
+        <FormControlLabelText>Email</FormControlLabelText>
+      </FormControlLabel>
+      <Input>
+        <InputField
+          {...field.props}
+          ref={field.props.ref as never}
+          value={field.input ?? ''}
+        />
+      </Input>
+      <FormControlError>
+        <FormControlErrorText>{field.errors?.[0]}</FormControlErrorText>
+      </FormControlError>
+    </FormControl>
+  )}
+</Field>
+```
+
+Use `Textarea` with `TextareaInput` for a longer text field. The wiring is identical.
+
+### Checkbox
+
+```tsx
+<Field of={form} path={['newsletter']}>
+  {(field) => (
+    <Checkbox
+      ref={field.props.ref as never}
+      value="newsletter"
+      isChecked={!!field.input}
+      onChange={(isChecked: boolean) => {
+        field.props.onFocus();
+        field.onChange(isChecked);
+      }}
+    >
+      <CheckboxIndicator>
+        <CheckboxIcon as={CheckIcon} />
+      </CheckboxIndicator>
+      <CheckboxLabel>Newsletter</CheckboxLabel>
+    </Checkbox>
+  )}
+</Field>
+```
+
+### Select
+
+`Select` has no imperative API for opening its menu, so route the element reference to the trigger. `onOpen` is where the field becomes touched, since focusing the control alone does not count as an interaction:
+
+```tsx
+<Field of={form} path={['framework']}>
+  {(field) => {
+    // gluestack's `Select` has no imperative open API, so `focus(form, { path })`
+    // is routed to the trigger element. `isFocused` is deliberately omitted:
+    // Formisch treats an element without it as successfully focused instead
+    // of skipping on to the next errored field.
+    const setFieldRef = (element: { focus?: () => void } | null) =>
+      field.props.ref(element ? { focus: () => element.focus?.() } : null);
+
+    return (
+      <FormControl isInvalid={!!field.errors}>
+        <FormControlLabel>
+          <FormControlLabelText>Framework</FormControlLabelText>
+        </FormControlLabel>
+        <Select
+          selectedValue={field.input}
+          onOpen={() => field.props.onFocus()}
+          onValueChange={(value) => field.onChange(value as 'angular' | 'vue')}
+        >
+          <SelectTrigger ref={setFieldRef as never}>
+            <SelectInput placeholder="Select a framework" />
+            <SelectIcon as={ChevronDownIcon} />
+          </SelectTrigger>
+          <SelectPortal>
+            <SelectBackdrop />
+            <SelectContent>
+              {FRAMEWORKS.map((option) => (
+                <SelectItem
+                  key={option.value}
+                  label={option.label}
+                  value={option.value}
+                />
+              ))}
+            </SelectContent>
+          </SelectPortal>
+        </Select>
+        <FormControlError>
+          <FormControlErrorText>{field.errors?.[0]}</FormControlErrorText>
+        </FormControlError>
+      </FormControl>
+    );
+  }}
+</Field>
+```
+
+### Radio group
+
+`RadioGroup` reports the new value, so mark the field as touched there:
+
+```tsx
+<Field of={form} path={['plan']}>
+  {(field) => (
+    <FormControl isInvalid={!!field.errors}>
+      <FormControlLabel>
+        <FormControlLabelText>Plan</FormControlLabelText>
+      </FormControlLabel>
+      <RadioGroup
+        ref={field.props.ref as never}
+        value={field.input ?? ''}
+        onChange={(value: string) => {
+          field.props.onFocus();
+          field.onChange(value as 'hobby' | 'pro');
+        }}
+      >
+        <View style={{ flexDirection: 'row', gap: 24 }}>
+          <Radio value="hobby">
+            <RadioIndicator>
+              <RadioIcon as={CircleIcon} />
+            </RadioIndicator>
+            <RadioLabel>Hobby</RadioLabel>
+          </Radio>
+          <Radio value="pro">
+            <RadioIndicator>
+              <RadioIcon as={CircleIcon} />
+            </RadioIndicator>
+            <RadioLabel>Pro</RadioLabel>
+          </Radio>
+        </View>
+      </RadioGroup>
+      <FormControlError>
+        <FormControlErrorText>{field.errors?.[0]}</FormControlErrorText>
+      </FormControlError>
+    </FormControl>
+  )}
+</Field>
+```
+
+### Slider
+
+The slider works with numbers directly, so `field.onChange` can be passed as is. Its thumb is the focusable part, and `onChangeEnd` marks the end of an interaction:
+
+```tsx
+<Field of={form} path={['volume']}>
+  {(field) => (
+    <FormControl isInvalid={!!field.errors}>
+      <FormControlLabel>
+        <FormControlLabelText>Volume: {field.input}</FormControlLabelText>
+      </FormControlLabel>
+      <View ref={field.props.ref}>
+        <Slider
+          value={field.input}
+          minValue={0}
+          maxValue={100}
+          step={1}
+          onChange={field.onChange}
+          onChangeEnd={() => field.props.onBlur()}
+        >
+          <SliderTrack>
+            <SliderFilledTrack />
+          </SliderTrack>
+          <SliderThumb onFocus={() => field.props.onFocus()} />
+        </Slider>
+      </View>
+      <FormControlError>
+        <FormControlErrorText>{field.errors?.[0]}</FormControlErrorText>
+      </FormControlError>
+    </FormControl>
+  )}
+</Field>
+```
+
+## Library-specific notes
+
+When you write a custom control, only expose `isFocused` from its `FieldElement` if it reports the truth. Formisch treats an element without `isFocused` as focused, but one that returns `false` is treated as a failed focus, and it moves on to the next invalid field.
+
+The generated components do not typecheck cleanly under `strict` on a fresh scaffold. Those errors are in the generated source rather than in your field wiring, and you can fix them in place since the components live in your project.
+
+## Next steps
+
+Read the <Link href="/react-native/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/react-native/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/react-native/guides/validation/">validation</Link> guide for validation timing.
