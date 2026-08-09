@@ -29,7 +29,7 @@ To retrieve values from your form, you can use:
 - <Link href="/methods/api/getDeepError/">`getDeepError`</Link>: Get the first
   error message within a field or the form
 - <Link href="/methods/api/getDeepErrorEntry/">`getDeepErrorEntry`</Link>: Get
-  the first error message paired with the path of the field it belongs to
+  the error messages of the first erroring field paired with its path
 
 Formisch uses Angular Signals internally, which means that reading values with these methods is reactive. When you call them inside a `computed`, an `effect` or a template expression, they re-run automatically as soon as the form state changes — including in `OnPush` and zoneless components.
 

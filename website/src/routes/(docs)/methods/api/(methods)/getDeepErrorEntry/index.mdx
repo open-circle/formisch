@@ -30,7 +30,7 @@ const entry = getDeepErrorEntry<TSchema, TFieldPath>(form, config);
 
 ### Explanation
 
-The `form` parameter is the form store to retrieve the error entry from. The optional `config` parameter scopes the search to a specific field's subtree via a `path` (when omitted, the entire form is walked). The function walks through the field store and all its descendants in depth-first order and stops at the first field with errors, so errors of a field surface before errors of its descendants. The returned entry contains the `path` to the field and its non-empty list of `errors`.
+The `form` parameter is the form store to retrieve the error entry from. The optional `config` parameter scopes the search to a specific field's subtree via a `path` (when omitted, the entire form is walked). The function walks through the field store and all its descendants in depth-first order and stops at the first field with errors, so errors of a field surface before errors of its descendants. The returned entry contains the `path` to the field and its non-empty list of `errors`. Form-level errors are included with an empty path.
 
 ## Returns
 

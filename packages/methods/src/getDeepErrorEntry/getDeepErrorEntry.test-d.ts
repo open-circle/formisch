@@ -20,9 +20,9 @@ describe('getDeepErrorEntry', () => {
   };
 
   test('should return an entry typed for the inferred form value or null', () => {
-    expectTypeOf(getDeepErrorEntry(store)).toEqualTypeOf<DeepErrorEntry<
-      Value
-    > | null>();
+    expectTypeOf(
+      getDeepErrorEntry(store)
+    ).toEqualTypeOf<DeepErrorEntry<Value> | null>();
   });
 
   test('should return the same entry type when scoped to a field path', () => {
