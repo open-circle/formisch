@@ -91,6 +91,8 @@ function elementRef(register: (element: Element | null) => void) {
 
 Two PrimeVue conventions show up here. `inputId` puts an id on the real control so a `<label for>` can reach it, while a plain `id` would land on the wrapper. The `pt` object is spread onto an internal element, so it carries any attribute or listener you need to place there. Forwarding `@focus` matters as well, because assigning `field.input` updates the value but only the focus handler marks the field as touched.
 
+Assigning `field.input` runs input-mode validation, so a form configured with `validate: 'change'` does not validate these controls until submit. Use `validate: 'input'` if you want them validated as the value changes.
+
 ## Displaying errors
 
 Formisch exposes errors as `[string, ...string[]] | null`. Prefer PrimeVue's own `invalid` prop over setting `aria-invalid` yourself, since the component writes `aria-invalid` onto the inner control and omits it while the field is valid:

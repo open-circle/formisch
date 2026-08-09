@@ -89,6 +89,8 @@ The composite components are thin wrappers that forward both attributes and the 
 
 Forwarding `@focus` matters, because assigning `field.input` updates the value but only the focus handler marks the field as touched.
 
+Assigning `field.input` runs input-mode validation, so a form configured with `validate: 'change'` does not validate these controls until submit. Use `validate: 'input'` if you want them validated as the value changes.
+
 ## Displaying errors
 
 Formisch exposes errors as `[string, ...string[]] | null`. Render the message yourself, give it a stable id and point the control at it while errors exist. `aria-invalid` also switches the generated components to their destructive styling:

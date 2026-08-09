@@ -100,6 +100,8 @@ Prefer these explicit handlers over `v-model` on a composite root. Vue rejects `
 
 Every Ark root also accepts an `ids` object, which is the supported way to give a hidden part a stable id. Setting `id` directly on a hidden part instead leaves the generated label pointing at the old value.
 
+Assigning `field.input` runs input-mode validation, so a form configured with `validate: 'change'` does not validate these controls until submit. Use `validate: 'input'` if you want them validated as the value changes.
+
 ## Displaying errors
 
 Formisch exposes errors as `[string, ...string[]] | null`. Inside `ArkField.Root`, pass `invalid` and render the message in `ArkField.ErrorText`. Ark adds `aria-invalid` and wires the error reference for you, and the text only renders while the field is invalid:

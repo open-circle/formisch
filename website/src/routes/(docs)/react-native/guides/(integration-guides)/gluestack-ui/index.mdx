@@ -298,7 +298,7 @@ Use `Textarea` with `TextareaInput` for a longer text field. The wiring is ident
 
 ### Select
 
-`Select` has no imperative API for opening its menu, so route the element reference to the trigger. `onOpen` is where the field becomes touched, since focusing the control alone does not count as an interaction:
+`Select` has no imperative API for opening its menu, so route the element reference to the trigger. `onOpen` is where the field becomes touched, since focusing the control alone does not count as an interaction, and `onClose` reports the blur that ends it:
 
 ```tsx
 <Field of={form} path={['framework']}>
@@ -318,6 +318,7 @@ Use `Textarea` with `TextareaInput` for a longer text field. The wiring is ident
         <Select
           selectedValue={field.input}
           onOpen={() => field.props.onFocus()}
+          onClose={() => field.props.onBlur()}
           onValueChange={(value) => field.onChange(value as 'angular' | 'vue')}
         >
           <SelectTrigger ref={setFieldRef as never}>

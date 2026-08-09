@@ -77,7 +77,7 @@ Do not reach for `bind:value={field.input}` here. It compiles and passes `svelte
 
 The rest of the spread still carries its weight: the attachment reaches the visible button through Bits UI's prop merging, so <Link href="/methods/api/focus/">`focus`</Link> and submit-time error focusing land on the control the user sees, and `onfocus` and `onblur` keep `isTouched` and blur validation working.
 
-Dropping `onchange` also means change-mode validation never fires for this control, since `field.onInput` only runs the input mode. If you set `validate: 'change'`, call `field.props.onchange(new Event('change'))` inside the value callback, which ignores its argument. `{@const}` has to be the first thing inside the snippet, before the surrounding markup.
+Dropping `onchange` also means change-mode validation never fires for this control, since `field.onInput` runs the input mode only. Use `validate: 'input'` if you want these controls validated as the value changes. `{@const}` has to be the first thing inside the snippet, before the surrounding markup.
 
 ## Displaying errors
 

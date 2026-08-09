@@ -372,7 +372,7 @@ Register every item. Formisch keeps a list of registered elements, so each radio
 
 Passing `name` makes Reka UI render a hidden native control so the value takes part in a native form submission. Formisch submits from its own store, so these extra nodes are harmless.
 
-`field.props.onChange` only triggers change-mode validation and never writes a value. Under the default settings it never fires, so the primitives above leave it unwired. If you set `validate: 'change'`, call `field.props.onChange(new Event('change'))` inside the value handler, since a button based primitive emits no native `change` event.
+`field.props.onChange` only triggers change-mode validation and never writes a value. Under the default settings it never fires, so the primitives above leave it unwired. Assigning `field.input` runs input-mode validation, so a form configured with `validate: 'change'` does not validate these controls until submit; use `validate: 'input'` if you want them validated as the value changes.
 
 `field.props.autofocus` is a snapshot taken when the field mounts, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own.
 

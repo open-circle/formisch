@@ -81,6 +81,8 @@ The checkbox and the radio group hide a real focusable input, so the whole rest 
 
 Every Ark root also accepts an `ids` object, which is the supported way to give a hidden part a stable id.
 
+The setter runs input-mode validation, so a form configured with `validate: 'change'` does not validate these controls until submit. Use `validate: 'input'` if you want them validated as the value changes.
+
 ## Where the focus handlers belong
 
 For the select and the slider, put `onfocus` and `onblur` on the visible part rather than on the hidden one. Their hidden inputs are not what a keyboard user lands on, so handlers placed there never fire during real interaction and the field would stay untouched:
@@ -90,7 +92,7 @@ For the select and the slider, put `onfocus` and `onblur` on the visible part ra
   field.props}
 ```
 
-The attachment and `autofocus` stay on the hidden part, while `onfocus` and `onblur` move to `Select.Trigger` or `Slider.Thumb`. `focus` keeps working for the select, because Ark forwards focus from the hidden select to the visible trigger.
+The attachment stays on the hidden part, while `onfocus` and `onblur` move to `Select.Trigger` or `Slider.Thumb`. `focus` keeps working for the select, because Ark forwards focus from the hidden select to the visible trigger, and `autofocus` can stay in the spread there for the same reason. The slider is the exception: its hidden input carries the `hidden` attribute and cannot be focused at all, so pass `autofocus` to the thumb as well.
 
 ## Displaying errors
 

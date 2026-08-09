@@ -83,6 +83,8 @@ A checkbox owns its value, so the root takes `checked` and `onChange`, while the
 
 Note that the compound components are the root themselves. There is no `Checkbox.Root` or `TextField.Root` in Kobalte v0.13.
 
+The setter runs input-mode validation, so a form configured with `validate: 'change'` does not validate these controls until submit. Use `validate: 'input'` if you want them validated as the value changes.
+
 ## Displaying errors
 
 Formisch exposes errors as `[string, ...string[]] | null`. Pass `validationState` to the root and render the message in the component's `ErrorMessage` part, which only appears while the state is invalid:
