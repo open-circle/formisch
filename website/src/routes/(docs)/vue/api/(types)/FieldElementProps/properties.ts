@@ -43,15 +43,7 @@ export const properties: Record<string, PropertyProps> = {
           key: 'onFocus',
           value: {
             type: 'function',
-            params: [
-              {
-                name: 'event',
-                type: {
-                  type: 'custom',
-                  name: 'FocusEvent',
-                },
-              },
-            ],
+            params: [],
             return: 'void',
           },
         },
@@ -75,15 +67,7 @@ export const properties: Record<string, PropertyProps> = {
           key: 'onBlur',
           value: {
             type: 'function',
-            params: [
-              {
-                name: 'event',
-                type: {
-                  type: 'custom',
-                  name: 'FocusEvent',
-                },
-              },
-            ],
+            params: [],
             return: 'void',
           },
         },
@@ -124,15 +108,7 @@ export const properties: Record<string, PropertyProps> = {
   onFocus: {
     type: {
       type: 'function',
-      params: [
-        {
-          name: 'event',
-          type: {
-            type: 'custom',
-            name: 'FocusEvent',
-          },
-        },
-      ],
+      params: [],
       return: 'void',
     },
   },
@@ -154,15 +130,7 @@ export const properties: Record<string, PropertyProps> = {
   onBlur: {
     type: {
       type: 'function',
-      params: [
-        {
-          name: 'event',
-          type: {
-            type: 'custom',
-            name: 'FocusEvent',
-          },
-        },
-      ],
+      params: [],
       return: 'void',
     },
   },

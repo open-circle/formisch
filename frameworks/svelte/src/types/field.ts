@@ -7,7 +7,7 @@ import type {
   ValidArrayPath,
   ValidPath,
 } from '@formisch/core/svelte';
-import type { FocusEventHandler, FormEventHandler } from 'svelte/elements';
+import type { FormEventHandler } from 'svelte/elements';
 import type * as v from 'valibot';
 
 /**
@@ -29,7 +29,7 @@ export interface FieldElementProps {
   /**
    * The focus event handler of the field element.
    */
-  readonly onfocus: FocusEventHandler<FieldElement>;
+  readonly onfocus: () => void;
   /**
    * The input event handler of the field element.
    */
@@ -41,7 +41,7 @@ export interface FieldElementProps {
   /**
    * The blur event handler of the field element.
    */
-  readonly onblur: FocusEventHandler<FieldElement>;
+  readonly onblur: () => void;
 }
 
 /**
