@@ -5,6 +5,7 @@ All notable changes to the library will be documented in this file.
 ## vX.X.X (Month DD, YYYY)
 
 - Fix duplicate element registration in `useField` after array reorders
+- Change the `FieldElementProps` focus and blur handlers to parameterless callbacks
 
 ## v1.0.0-rc.0 (June 23, 2026)
 

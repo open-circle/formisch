@@ -39,15 +39,9 @@ export const properties: Record<string, PropertyProps> = {
         {
           key: 'onFocus',
           value: {
-            type: 'custom',
-            name: 'FocusEventHandler',
-            generics: [
-              {
-                type: 'custom',
-                name: 'FieldElement',
-                href: '/core/api/FieldElement/',
-              },
-            ],
+            type: 'function',
+            params: [],
+            return: 'void',
           },
         },
         {
@@ -67,15 +61,9 @@ export const properties: Record<string, PropertyProps> = {
         {
           key: 'onBlur',
           value: {
-            type: 'custom',
-            name: 'FocusEventHandler',
-            generics: [
-              {
-                type: 'custom',
-                name: 'FieldElement',
-                href: '/core/api/FieldElement/',
-              },
-            ],
+            type: 'function',
+            params: [],
+            return: 'void',
           },
         },
       ],
@@ -111,15 +99,9 @@ export const properties: Record<string, PropertyProps> = {
   },
   onFocus: {
     type: {
-      type: 'custom',
-      name: 'FocusEventHandler',
-      generics: [
-        {
-          type: 'custom',
-          name: 'FieldElement',
-          href: '/core/api/FieldElement/',
-        },
-      ],
+      type: 'function',
+      params: [],
+      return: 'void',
     },
   },
   onChange: {
@@ -137,15 +119,9 @@ export const properties: Record<string, PropertyProps> = {
   },
   onBlur: {
     type: {
-      type: 'custom',
-      name: 'FocusEventHandler',
-      generics: [
-        {
-          type: 'custom',
-          name: 'FieldElement',
-          href: '/core/api/FieldElement/',
-        },
-      ],
+      type: 'function',
+      params: [],
+      return: 'void',
     },
   },
 };

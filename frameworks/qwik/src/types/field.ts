@@ -29,7 +29,7 @@ export interface FieldElementProps {
   /**
    * The focus event handler of the field element.
    */
-  readonly onFocus$: QRL<(event: FocusEvent, element: FieldElement) => void>;
+  readonly onFocus$: QRL<() => void>;
   /**
    * The input event handler of the field element.
    */
@@ -41,7 +41,7 @@ export interface FieldElementProps {
   /**
    * The blur event handler of the field element.
    */
-  readonly onBlur$: QRL<(event: FocusEvent, element: FieldElement) => void>;
+  readonly onBlur$: QRL<() => void>;
 }
 
 /**

@@ -22,3 +22,7 @@ Props to spread onto a field element for integration with Vue form handling.
   - `onFocus` <Property {...properties.onFocus} />
   - `onChange` <Property {...properties.onChange} />
   - `onBlur` <Property {...properties.onBlur} />
+
+### Explanation
+
+`onFocus` marks the field as touched and runs the configured `'touch'` validation, while `onBlur` runs the configured `'blur'` validation. Neither handler uses the event object, so both are typed as `() => void` and can be passed to native elements or custom components with different focus event types.
