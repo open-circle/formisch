@@ -515,5 +515,47 @@ describe('validateFormInput', () => {
       expect(store.children.name.errors.value).toStrictEqual(['New error']);
       expect(store.isValidating.value).toBe(false);
     });
+
+    test('should not clear validating state when focusing starts a new validation', async () => {
+      const schema = v.object({
+        name: v.pipe(v.string(), v.nonEmpty('Error')),
+      });
+      type ParseResult = v.SafeParseResult<typeof schema>;
+      let resolveSecond: (value: ParseResult) => void;
+      const secondResult = new Promise<ParseResult>((resolve) => {
+        resolveSecond = resolve;
+      });
+      const parse = vi
+        .fn()
+        .mockResolvedValueOnce(v.safeParse(schema, { name: '' }))
+        .mockReturnValueOnce(secondResult);
+      const store = createFormStore({ schema }, parse);
+
+      // Register an element for the erroring field so it can receive focus
+      const nameInput = document.createElement('input');
+      document.body.appendChild(nameInput);
+      store.children.name.elements.push(nameInput);
+
+      // Focus another element whose blur handler synchronously starts a new
+      // validation when the focus moves to the erroring field
+      let secondValidation: Promise<unknown> | undefined;
+      const otherInput = document.createElement('input');
+      document.body.appendChild(otherInput);
+      otherInput.addEventListener('blur', () => {
+        secondValidation = validateFormInput(store);
+      });
+      otherInput.focus();
+
+      await validateFormInput(store, { shouldFocus: true });
+
+      // The synchronously started validation is still pending, so the older
+      // validation must not clear its validating state
+      expect(secondValidation).toBeDefined();
+      expect(store.isValidating.value).toBe(true);
+
+      resolveSecond!(v.safeParse(schema, { name: '' }));
+      await secondValidation;
+      expect(store.isValidating.value).toBe(false);
+    });
   });
 });

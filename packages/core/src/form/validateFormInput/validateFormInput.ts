@@ -140,7 +140,12 @@ export async function validateFormInput(
       });
 
       // Reset validation state of form
-      internalFormStore.isValidating.value = false;
+      // Hint: The validation ID must be rechecked because focusing an erroring
+      // field can blur another field whose blur handler synchronously starts a
+      // new validation, which must keep its validating state.
+      if (internalFormStore.validationId === validationId) {
+        internalFormStore.isValidating.value = false;
+      }
     });
 
     // Return validation result
