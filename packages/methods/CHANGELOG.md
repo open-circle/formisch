@@ -4,7 +4,6 @@ All notable changes to the library will be documented in this file.
 
 ## vX.X.X (Month DD, YYYY)
 
-- Add `getDeepError` and `getDeepErrorEntry` methods that stop at the first field with errors, to display a single error message for a field whose value is a nested structure (issue #153)
 - Add React Native build output with `@formisch/methods/react-native` export (issue #117)
 - Add React Native specific `handleSubmit` and `setInput` functions that work without a native form element (issue #117)
 - Remove `submit` from the React Native build output as it depends on a native form element (issue #117)
