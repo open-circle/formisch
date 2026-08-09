@@ -177,6 +177,20 @@ describe('getElementInput', () => {
       ).toStrictEqual(['us', 'de']);
     });
 
+    test('should return array for select bound to array field without multiple attribute', () => {
+      const store = createTestStore(
+        v.object({ countries: v.array(v.string()) })
+      );
+      const select = document.createElement('select');
+      select.innerHTML = `
+        <option value="us" selected>US</option>
+        <option value="uk">UK</option>
+      `;
+      expect(
+        getElementInput(select, getChild(store, 'countries'))
+      ).toStrictEqual(['us']);
+    });
+
     test('should exclude disabled options from multiple select', () => {
       const store = createTestStore(
         v.object({ countries: v.array(v.string()) })
@@ -203,16 +217,25 @@ describe('getElementInput', () => {
     });
 
     test('should return files array for multiple file input', () => {
-      const store = createTestStore(v.object({ documents: v.any() }));
+      const store = createTestStore(v.object({ documents: v.array(v.any()) }));
       const input = createInput('file', '');
       input.multiple = true;
       const file1 = new File(['content1'], 'test1.txt');
       const file2 = new File(['content2'], 'test2.txt');
       Object.defineProperty(input, 'files', { value: [file1, file2] });
-      expect(getElementInput(input, store.children.documents)).toStrictEqual([
-        file1,
-        file2,
-      ]);
+      expect(
+        getElementInput(input, getChild(store, 'documents'))
+      ).toStrictEqual([file1, file2]);
+    });
+
+    test('should return files array for array field without multiple attribute', () => {
+      const store = createTestStore(v.object({ documents: v.array(v.any()) }));
+      const input = createInput('file', '');
+      const file = new File(['content'], 'test.txt');
+      Object.defineProperty(input, 'files', { value: [file] });
+      expect(
+        getElementInput(input, getChild(store, 'documents'))
+      ).toStrictEqual([file]);
     });
   });
 
