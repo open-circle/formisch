@@ -10,6 +10,8 @@ All notable changes to the library will be documented in this file.
 - Add missing `createSignal` overload without an initial value to the React framework adapter
 - Fix concurrent validation so an older result cannot overwrite newer errors or reset the validating state
 - Remove internal `validators` counter in favor of the new internal validation ID
+- Fix select and file inputs bound to array fields to always return an array by deriving the value shape from the schema instead of the `multiple` attribute
+- Fix checkbox groups to stay array-valued with one rendered option and to ignore disabled or same-named controls from other forms
 
 ## v1.0.0-rc.0 (June 23, 2026)
 

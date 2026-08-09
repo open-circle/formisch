@@ -44,23 +44,7 @@ export const properties: Record<string, PropertyProps> = {
             generics: [
               {
                 type: 'function',
-                params: [
-                  {
-                    name: 'event',
-                    type: {
-                      type: 'custom',
-                      name: 'FocusEvent',
-                    },
-                  },
-                  {
-                    name: 'element',
-                    type: {
-                      type: 'custom',
-                      name: 'FieldElement',
-                      href: '/core/api/FieldElement/',
-                    },
-                  },
-                ],
+                params: [],
                 return: 'void',
               },
             ],
@@ -134,23 +118,7 @@ export const properties: Record<string, PropertyProps> = {
             generics: [
               {
                 type: 'function',
-                params: [
-                  {
-                    name: 'event',
-                    type: {
-                      type: 'custom',
-                      name: 'FocusEvent',
-                    },
-                  },
-                  {
-                    name: 'element',
-                    type: {
-                      type: 'custom',
-                      name: 'FieldElement',
-                      href: '/core/api/FieldElement/',
-                    },
-                  },
-                ],
+                params: [],
                 return: 'void',
               },
             ],
@@ -194,23 +162,7 @@ export const properties: Record<string, PropertyProps> = {
       generics: [
         {
           type: 'function',
-          params: [
-            {
-              name: 'event',
-              type: {
-                type: 'custom',
-                name: 'FocusEvent',
-              },
-            },
-            {
-              name: 'element',
-              type: {
-                type: 'custom',
-                name: 'FieldElement',
-                href: '/core/api/FieldElement/',
-              },
-            },
-          ],
+          params: [],
           return: 'void',
         },
       ],
@@ -281,23 +233,7 @@ export const properties: Record<string, PropertyProps> = {
       generics: [
         {
           type: 'function',
-          params: [
-            {
-              name: 'event',
-              type: {
-                type: 'custom',
-                name: 'FocusEvent',
-              },
-            },
-            {
-              name: 'element',
-              type: {
-                type: 'custom',
-                name: 'FieldElement',
-                href: '/core/api/FieldElement/',
-              },
-            },
-          ],
+          params: [],
           return: 'void',
         },
       ],

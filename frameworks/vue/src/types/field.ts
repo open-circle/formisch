@@ -28,7 +28,7 @@ export interface FieldElementProps {
   /**
    * The focus event handler of the field element.
    */
-  readonly onFocus: (event: FocusEvent) => void;
+  readonly onFocus: () => void;
   /**
    * The change event handler of the field element.
    */
@@ -36,7 +36,7 @@ export interface FieldElementProps {
   /**
    * The blur event handler of the field element.
    */
-  readonly onBlur: (event: FocusEvent) => void;
+  readonly onBlur: () => void;
 }
 
 /**
