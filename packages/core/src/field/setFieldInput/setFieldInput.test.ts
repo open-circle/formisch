@@ -108,6 +108,21 @@ describe('setFieldInput', () => {
       expect(store.children.user.isDirty.value).toBe(false);
       expect(getFieldBool(store, 'isDirty')).toBe(false);
     });
+
+    test('should clear parent dirty state when nested input restores it', () => {
+      const store = createTestStore(
+        v.object({ user: v.nullish(v.object({ name: v.string() })) }),
+        { initialInput: { user: { name: 'John' } } }
+      );
+
+      setFieldInput(store, ['user'], null);
+      expect(getFieldBool(store, 'isDirty')).toBe(true);
+
+      setFieldInput(store, ['user', 'name'], 'John');
+      expect(getFieldInput(store)).toStrictEqual({ user: { name: 'John' } });
+      expect(store.children.user.isDirty.value).toBe(false);
+      expect(getFieldBool(store, 'isDirty')).toBe(false);
+    });
   });
 
   describe('array fields', () => {

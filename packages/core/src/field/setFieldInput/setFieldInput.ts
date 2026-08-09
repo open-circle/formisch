@@ -176,16 +176,17 @@ export function setFieldInput(
         if (index < path.length - 1) {
           internalFieldStore.input.value = true;
 
-          // Mark parent as dirty if it was not present at its baseline
+          // Update dirty state based on input change
           // Hint: A nullish container becomes present even when the target
           // child's value equals its own baseline (e.g. `undefined` to
-          // `{ name: '' }`). The dirty state is only ever added to and never
-          // recomputed, because dirtiness from other sources, such as a
-          // changed item order or length of an array, cannot be derived from
-          // the presence of the container.
-          internalFieldStore.isDirty.value ||=
+          // `{ name: '' }`). Arrays also compare item IDs so structural dirty
+          // state from a changed length, order or item is preserved.
+          internalFieldStore.isDirty.value =
             internalFieldStore.startInput.value !==
-            internalFieldStore.input.value;
+              internalFieldStore.input.value ||
+            (internalFieldStore.kind === 'array' &&
+              internalFieldStore.startItems.value.join() !==
+                internalFieldStore.items.value.join());
         }
       }
 
