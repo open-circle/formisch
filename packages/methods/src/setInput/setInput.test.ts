@@ -1,7 +1,7 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../vitest/index.ts';
 import { swap } from '../swap/swap.ts';
+import { createTestStore } from '../vitest/index.ts';
 import { setInput } from './setInput.ts';
 
 describe('setInput', () => {
