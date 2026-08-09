@@ -90,6 +90,45 @@ describe('getElementInput', () => {
         'green',
       ]);
     });
+
+    test('should return an array for a checkbox group with one option', () => {
+      const store = createTestStore(v.object({ colors: v.array(v.string()) }));
+      const checkbox = createInput('checkbox', 'red', {
+        name: 'colors',
+        checked: true,
+      });
+      document.body.appendChild(checkbox);
+
+      expect(getElementInput(checkbox, store.children.colors)).toStrictEqual([
+        'red',
+      ]);
+    });
+
+    test('should only group enabled checkboxes owned by the same form', () => {
+      const store = createTestStore(v.object({ colors: v.array(v.string()) }));
+      const firstForm = document.createElement('form');
+      const secondForm = document.createElement('form');
+      const red = createInput('checkbox', 'red', {
+        name: 'colors',
+        checked: true,
+      });
+      const blue = createInput('checkbox', 'blue', {
+        name: 'colors',
+        checked: true,
+        disabled: true,
+      });
+      const green = createInput('checkbox', 'green', {
+        name: 'colors',
+        checked: true,
+      });
+      firstForm.append(red, blue);
+      secondForm.append(green);
+      document.body.append(firstForm, secondForm);
+
+      expect(getElementInput(red, store.children.colors)).toStrictEqual([
+        'red',
+      ]);
+    });
   });
 
   describe('radio inputs', () => {
