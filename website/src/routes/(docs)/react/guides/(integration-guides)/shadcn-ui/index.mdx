@@ -381,48 +381,40 @@ The focus guards treat the composite group as one field, so arrow-key navigation
 
 ### Slider
 
-Pass a one-element array for one thumb. A scalar value makes the generated shadcn wrapper fall back to `[min, max]` and render two thumbs. Also give the visible label an ID because a slider cannot be associated with `htmlFor`:
+The generated `Slider` does not expose Base UI's thumb `inputRef`. Since shadcn adds the component source to your project, update `components/ui/slider.tsx` once: extend `SliderPrimitive.Root.Props` with `inputRef?: SliderPrimitive.Thumb.Props['inputRef']`, destructure it in `Slider`, and pass `inputRef={index === 0 ? inputRef : undefined}` to the generated `SliderPrimitive.Thumb`.
+
+The Formisch wiring then stays simple. Pass a one-element array for one thumb because a scalar value makes the generated wrapper fall back to `[min, max]` and render two thumbs. Also give the visible label an ID because a slider cannot be associated with `htmlFor`:
 
 ```tsx
-const field = useField(form, { path: ['volume'] });
-const { autoFocus, ref } = field.props;
-const sliderRef = useCallback(
-  (root: HTMLElement | null) => {
-    const input =
-      root?.querySelector<HTMLInputElement>('input[type="range"]') ?? null;
-    ref(input);
-    if (autoFocus) input?.focus();
-  },
-  [autoFocus, ref]
-);
-
-return (
-  <UIField data-invalid={field.errors !== null}>
-    <FieldLabel id="volume-label">Volume</FieldLabel>
-    <Slider
-      aria-labelledby="volume-label"
-      aria-invalid={field.errors !== null}
-      aria-errormessage={field.errors ? 'volume-error' : undefined}
-      name={field.props.name}
-      value={[field.input ?? 50]}
-      onValueChange={(value) =>
-        field.onChange(Array.isArray(value) ? (value[0] ?? 50) : value)
-      }
-      onFocus={field.props.onFocus}
-      onBlur={field.props.onBlur}
-      ref={sliderRef}
-      min={0}
-      max={100}
-    />
-    <FieldError
-      id="volume-error"
-      errors={field.errors?.map((message) => ({ message }))}
-    />
-  </UIField>
-);
+<Field of={form} path={['volume']}>
+  {(field) => (
+    <UIField data-invalid={field.errors !== null}>
+      <FieldLabel id="volume-label">Volume</FieldLabel>
+      <Slider
+        aria-labelledby="volume-label"
+        aria-invalid={field.errors !== null}
+        aria-errormessage={field.errors ? 'volume-error' : undefined}
+        name={field.props.name}
+        inputRef={field.props.ref}
+        value={[field.input ?? 50]}
+        onValueChange={(value) =>
+          field.onChange(Array.isArray(value) ? (value[0] ?? 50) : value)
+        }
+        onFocus={field.props.onFocus}
+        onBlur={field.props.onBlur}
+        min={0}
+        max={100}
+      />
+      <FieldError
+        id="volume-error"
+        errors={field.errors?.map((message) => ({ message }))}
+      />
+    </UIField>
+  )}
+</Field>
 ```
 
-The generated `Slider` does not expose Base UI's thumb `inputRef`, so the ref callback registers its nested range input. `useCallback` keeps that ref stable when the controlled value updates. If sliders appear throughout your app, expose the input ref from your local shadcn component once and reuse the simpler API.
+The ref registers the thumb's nested range input, so Formisch's `focus()` method and submit-time error focusing work without querying the DOM. Base UI's slider thumb does not expose an input-level `autoFocus` prop, but registering the input preserves Formisch's programmatic focusing.
 
 ## Library-specific notes
 
