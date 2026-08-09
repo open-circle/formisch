@@ -3,7 +3,7 @@ name: repo-website-integration-guide-create
 description: Add integration guides for using Formisch with UI component libraries (e.g. shadcn/ui, Mantine, Chakra UI) to the Formisch website. Use when documenting how to wire Formisch fields to a component library's inputs.
 metadata:
   author: formisch
-  version: '1.1'
+  version: '1.2'
 ---
 
 # Adding Integration Guides
@@ -104,12 +104,14 @@ If a component exposes `onCheckedChange`, `onValueChange` or another value callb
 | Formisch behavior       | Typical component-library target                        |
 | ----------------------- | ------------------------------------------------------- |
 | `field.input`           | `value` or `checked`                                    |
-| `field.onChange`        | custom value callback                                   |
+| programmatic setter     | custom value callback                                   |
 | `field.props.name`      | root `name` or hidden native input                      |
 | `field.props.ref`       | public `inputRef` or another focusable native target    |
 | `field.props.autoFocus` | visible trigger, first group item or registered input   |
 | `field.props.onFocus`   | focus event on the visible interactive control or group |
 | `field.props.onBlur`    | blur event on the visible interactive control or group  |
+
+The setter is named differently per framework; see the porting table below.
 
 The lifecycle mapping keeps `isTouched`, touch/blur validation, `focus()` and submit-time error focusing working. Prefer the library's public API or a local adapter when a component hides an essential ref or event prop. Only adapt the component itself when its source belongs to the reader. A scoped ref lookup inside owned source is an acceptable fallback when the structure has been runtime-verified.
 
@@ -123,7 +125,7 @@ Field API source of truth: `frameworks/{framework}/src/types/field.ts`.
 | ----------------------------------------------------- | -------------------------------------------------- |
 | `field.props`                                         | Native name, ref, autofocus and lifecycle handlers |
 | `field.input`                                         | Current controlled value                           |
-| `field.onChange`                                      | Programmatic update and input/change validation    |
+| programmatic setter                                   | Programmatic update and validation                 |
 | `field.errors`                                        | `[string, ...string[]] \| null` error messages     |
 | `field.isTouched` / `field.isDirty` / `field.isValid` | Current field state                                |
 
@@ -162,6 +164,33 @@ Transcribe only the verified, minimal wiring into the guide. Delete the temporar
 ## Porting to Other Frameworks
 
 Use the same skeleton and schema, then replace package and API names according to the framework terminology table in `repo-website-guide-create`. Confirm that the UI library supports the framework before creating the guide. Register it under the same `## Integration guides` heading for that framework.
+
+The field contract is the same everywhere, but its spelling is not. Verify against `frameworks/{framework}/src/types/field.ts`, then use:
+
+| Framework    | Form and field                                | Native binding                                   | Programmatic setter          | Lifecycle props                         |
+| ------------ | --------------------------------------------- | ------------------------------------------------ | ---------------------------- | --------------------------------------- |
+| React        | `useForm`, `<Form>`, `<Field>` render prop    | `{...field.props}` + `value`                     | `field.onChange(value)`      | `onFocus`, `onBlur`, `autoFocus`        |
+| Preact       | `useForm`, `<Field>` render prop              | `{...field.props}` + `value={field.input.value}` | `field.onInput(value)`       | `onFocus`, `onBlur`, `autofocus`        |
+| Solid        | `createForm`, `<Field>` render prop           | `{...field.props}` + `value`                     | `field.onInput(value)`       | `onFocus`, `onBlur`, `autofocus`        |
+| Svelte       | `createForm`, `<Field>` snippet, `onsubmit`   | `{...field.props}` + `value`                     | `field.onInput(value)`       | `onfocus`, `onblur`, `autofocus`        |
+| Vue          | `useForm`, `<Field v-slot>`                   | `v-bind="field.props"` + `v-model="field.input"` | assign `field.input = ...`   | `onFocus`, `onBlur`, `autofocus`        |
+| Qwik         | `useForm$`, `<Field>` render prop             | `{...field.props}` + `value={field.input.value}` | `field.onInput(value)` (QRL) | `onFocus$`, `onBlur$` (QRLs)            |
+| React Native | `useForm`, `<Field>` render prop, no `<Form>` | `{...field.props}` + `value`                     | `field.onChange(value)`      | `onFocus`, `onBlur` (no name/autofocus) |
+| Angular      | `injectForm`, `*formischField`                | `[formischControl]="field"`                      | `field.setInput(value)`      | handled by the directive                |
+
+Two consequences worth checking before writing: Svelte spells every handler in lowercase and passes its ref as an attachment symbol, so a spread only registers the element when it lands on real DOM. Vue has no setter method and its `props.onChange` only triggers change-mode validation, so the value must flow through `v-model` or an explicit assignment.
+
+### React Native
+
+React Native has no DOM, so the skeleton changes:
+
+- There is no `<Form>` component. Wrap fields in a `View` and submit with a `Pressable` calling `handleSubmit(form, callback)`.
+- `field.props` is only `{ ref, onFocus, onBlur, onChangeText }`. Spread it onto `TextInput`; there is no `name` or `autofocus` to forward.
+- Controls that cannot receive focus, such as a checkbox, radio or select trigger, call `field.props.onFocus()` in their press handler to mark the field touched.
+- `FieldElement` is structural (`focus`, optional `blur` and `isFocused`). Expose it from a custom control with `useImperativeHandle` so `focus()` and submit-time error focusing work.
+- Import everything from `@formisch/react-native`, which bundles core and methods. Mixing it with `@formisch/methods/react-native` creates a second reactive graph, so state updates without re-rendering.
+- Accessibility uses `accessibilityLabel`, `aria-invalid` and the library's error component instead of `htmlFor`, `aria-errormessage` and ids.
+- Verify in a browser through `react-native-web` and drop the DOM-only checks from the browser checklist.
 
 ## Cross-Linking
 
