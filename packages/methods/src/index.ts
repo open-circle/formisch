@@ -1,5 +1,7 @@
 export * from './focus/index.ts';
+export * from './getDeepError/index.ts';
 export * from './getDeepErrorEntries/index.ts';
+export * from './getDeepErrorEntry/index.ts';
 export * from './getDeepErrors/index.ts';
 export * from './getDirtyInput/index.ts';
 export * from './getDirtyPaths/index.ts';

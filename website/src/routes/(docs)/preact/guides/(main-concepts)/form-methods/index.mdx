@@ -26,6 +26,10 @@ To retrieve values from your form, you can use:
   messages across the entire form
 - <Link href="/methods/api/getDeepErrorEntries/">`getDeepErrorEntries`</Link>:
   Get all error messages paired with the path of the field they belong to
+- <Link href="/methods/api/getDeepError/">`getDeepError`</Link>: Get the first
+  error message within a field or the form
+- <Link href="/methods/api/getDeepErrorEntry/">`getDeepErrorEntry`</Link>: Get
+  the first error message paired with the path of the field it belongs to
 
 Formisch uses Preact signals internally, which means that reading values with these methods is reactive. When the form state changes, any component that uses these methods will automatically update to reflect the new state.
 

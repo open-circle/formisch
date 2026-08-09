@@ -11,7 +11,7 @@ import { properties } from './properties';
 
 # DeepErrorEntry
 
-Entry that pairs the `path` to a field with its error messages. Returned by the `getDeepErrorEntries` method. Form-level errors are included with an empty path.
+Entry that pairs the `path` to a field with its error messages. Returned by the `getDeepErrorEntries` and `getDeepErrorEntry` methods. Form-level errors are included with an empty path.
 
 ## Generics
 
@@ -28,5 +28,8 @@ Entry that pairs the `path` to a field with its error messages. Returned by the 
 ### Methods
 
 <ApiList
-  items={[{ text: 'getDeepErrorEntries', href: '../getDeepErrorEntries/' }]}
+  items={[
+    { text: 'getDeepErrorEntries', href: '../getDeepErrorEntries/' },
+    { text: 'getDeepErrorEntry', href: '../getDeepErrorEntry/' },
+  ]}
 />

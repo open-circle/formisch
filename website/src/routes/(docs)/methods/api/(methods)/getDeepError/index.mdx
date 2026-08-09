@@ -1,0 +1,54 @@
+---
+title: getDeepError
+description: Retrieves the first error message of a specific field or the entire form.
+source: /packages/methods/src/getDeepError/getDeepError.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# getDeepError
+
+Retrieves the first error message of a specific field or the entire form by walking through the field store and all its descendants and stopping at the first field with errors. This is useful for displaying a single error message for a field whose value is a nested structure, such as a rich text editor or tags input.
+
+```ts
+const error = getDeepError<TSchema>(form);
+const error = getDeepError<TSchema, TFieldPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+The `form` parameter is the form store to retrieve the error from. The optional `config` parameter scopes the search to a specific field's subtree via a `path` (when omitted, the entire form is walked). The function walks through the field store and all its descendants in depth-first order and stops at the first field with errors, so errors of a field surface before errors of its descendants.
+
+## Returns
+
+- `result` <Property {...properties.result} />
+
+## Related
+
+### Primitives
+
+<ApiList items={[{ text: 'useForm', href: '/react/api/useForm/' }]} />
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'getErrors', href: '../getErrors/' },
+    { text: 'getDeepErrors', href: '../getDeepErrors/' },
+    { text: 'getDeepErrorEntry', href: '../getDeepErrorEntry/' },
+    { text: 'validate', href: '../validate/' },
+  ]}
+/>
