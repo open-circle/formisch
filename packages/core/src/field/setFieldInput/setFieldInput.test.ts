@@ -91,6 +91,23 @@ describe('setFieldInput', () => {
       expect(store.children.user.isDirty.value).toBe(true);
       expect(getFieldBool(store, 'isDirty')).toBe(true);
     });
+
+    test('should not mark a present parent dirty when setting nested field', () => {
+      const store = createTestStore(
+        v.object({ user: v.object({ name: v.string() }) }),
+        { initialInput: { user: { name: 'John' } } }
+      );
+
+      setFieldInput(store, ['user', 'name'], 'Jane');
+      expect(store.children.user.isDirty.value).toBe(false);
+      expect(getFieldBool(store, 'isDirty')).toBe(true);
+
+      // Reverting the nested field leaves the whole form pristine, as the
+      // parent was present at its baseline and never became dirty itself
+      setFieldInput(store, ['user', 'name'], 'John');
+      expect(store.children.user.isDirty.value).toBe(false);
+      expect(getFieldBool(store, 'isDirty')).toBe(false);
+    });
   });
 
   describe('array fields', () => {
