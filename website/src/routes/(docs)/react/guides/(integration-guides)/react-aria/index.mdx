@@ -1,0 +1,408 @@
+---
+title: React Aria
+description: >-
+  Learn how to connect Formisch fields to React Aria Components text fields,
+  selects, radio groups, sliders and other form controls.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# React Aria
+
+[React Aria Components](https://react-aria.adobe.com) is Adobe's library of unstyled, accessible components with built-in behavior and internationalization. This guide targets react-aria-components v1. No adapter package is needed: every component is value-controlled, so fields are wired with `field.input` and `field.onChange`, plus Formisch's lifecycle props. Set `validationBehavior="aria"` on each form component so your Valibot schema controls validation instead of the browser.
+
+## Installation
+
+Install Formisch, Valibot and React Aria Components:
+
+```bash
+npm install @formisch/react valibot react-aria-components
+```
+
+## Wiring patterns
+
+React Aria Components never expose their native element for a props spread. Instead, every form component is controlled through a value callback, and labels, errors and `aria` attributes are wired automatically from the composition:
+
+- Pass `field.input` as `value` (or `isSelected` for checkboxes) and `field.onChange` as the change handler. The callbacks receive plain values, so `field.onChange` often works directly.
+- Forward `field.props` individually: `name` on the component, `ref` on the nested native element, and the focus, blur and autofocus props on the component.
+
+### Text field
+
+`TextField` manages a nested native `<Input>`. Control the value on the root and register the native element through the `Input` ref:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <TextField
+      name={field.props.name}
+      value={field.input ?? ''}
+      onChange={field.onChange}
+      onFocus={field.props.onFocus}
+      onBlur={field.props.onBlur}
+      autoFocus={field.props.autoFocus}
+      type="email"
+      validationBehavior="aria"
+      isInvalid={field.errors !== null}
+    >
+      <Label>Email</Label>
+      <Input ref={field.props.ref} />
+      <FieldError>{field.errors?.[0]}</FieldError>
+    </TextField>
+  )}
+</Field>
+```
+
+Formisch's focus and blur handlers are parameterless because they only update field lifecycle state, so you can pass them directly even when the component supplies an event argument.
+
+### Ref objects
+
+Components that hide their native input, such as `Checkbox`, `Radio` and `SliderThumb`, expose it through an `inputRef` prop instead. That prop only accepts ref objects, while `field.props.ref` is a ref callback, so bridge the two with a small utility that you define once:
+
+```ts
+import type { RefObject } from 'react';
+
+export function toRefObject<T>(
+  callback: (element: T | null) => void
+): RefObject<T | null> {
+  let element: T | null = null;
+  return {
+    get current() {
+      return element;
+    },
+    set current(value) {
+      element = value;
+      callback(value);
+    },
+  };
+}
+```
+
+```tsx
+<Field of={loginForm} path={['rememberMe']}>
+  {(field) => (
+    <Checkbox
+      name={field.props.name}
+      inputRef={toRefObject<HTMLInputElement>(field.props.ref)}
+      autoFocus={field.props.autoFocus}
+      onFocus={field.props.onFocus}
+      onBlur={field.props.onBlur}
+      isSelected={field.input ?? false}
+      onChange={field.onChange}
+      validationBehavior="aria"
+    >
+      Remember me
+    </Checkbox>
+  )}
+</Field>
+```
+
+These examples wire fields directly so you can see the complete integration. Once a pattern repeats, wrap the composition in your own input component. The <Link href="/react/guides/input-components/">input components guide</Link> shows how.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Pass `isInvalid` to the form component and render the first message inside `FieldError`, which only appears while the field is invalid and is associated with the control automatically:
+
+```tsx
+<TextField
+  /* ... */
+  validationBehavior="aria"
+  isInvalid={field.errors !== null}
+>
+  <Label>Email</Label>
+  <Input ref={field.props.ref} />
+  <FieldError>{field.errors?.[0]}</FieldError>
+</TextField>
+```
+
+`validationBehavior="aria"` matters: without it, React Aria defaults to native browser validation, which would compete with your schema. By default, Formisch validates on submit and revalidates on input. The <Link href="/react/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines two text fields and a checkbox with accessible errors:
+
+```tsx
+import { Field, Form, type SubmitHandler, useForm } from '@formisch/react';
+import {
+  Button,
+  Checkbox,
+  FieldError,
+  Input,
+  Label,
+  TextField,
+} from 'react-aria-components';
+import * as v from 'valibot';
+import { toRefObject } from './toRefObject';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+  rememberMe: v.optional(v.boolean(), false),
+});
+
+export default function LoginPage() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+    initialInput: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  });
+
+  const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+    console.log(output);
+  };
+
+  return (
+    <Form of={loginForm} onSubmit={handleSubmit}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <TextField
+            name={field.props.name}
+            value={field.input ?? ''}
+            onChange={field.onChange}
+            onFocus={field.props.onFocus}
+            onBlur={field.props.onBlur}
+            autoFocus={field.props.autoFocus}
+            type="email"
+            autoComplete="email"
+            validationBehavior="aria"
+            isInvalid={field.errors !== null}
+          >
+            <Label>Email</Label>
+            <Input ref={field.props.ref} placeholder="jane@example.com" />
+            <FieldError>{field.errors?.[0]}</FieldError>
+          </TextField>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <TextField
+            name={field.props.name}
+            value={field.input ?? ''}
+            onChange={field.onChange}
+            onFocus={field.props.onFocus}
+            onBlur={field.props.onBlur}
+            autoFocus={field.props.autoFocus}
+            type="password"
+            autoComplete="current-password"
+            validationBehavior="aria"
+            isInvalid={field.errors !== null}
+          >
+            <Label>Password</Label>
+            <Input ref={field.props.ref} />
+            <FieldError>{field.errors?.[0]}</FieldError>
+          </TextField>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['rememberMe']}>
+        {(field) => (
+          <Checkbox
+            name={field.props.name}
+            inputRef={toRefObject<HTMLInputElement>(field.props.ref)}
+            autoFocus={field.props.autoFocus}
+            onFocus={field.props.onFocus}
+            onBlur={field.props.onBlur}
+            isSelected={field.input ?? false}
+            onChange={field.onChange}
+            validationBehavior="aria"
+          >
+            Remember me
+          </Checkbox>
+        )}
+      </Field>
+
+      <Button type="submit" isDisabled={loginForm.isSubmitting}>
+        Login
+      </Button>
+    </Form>
+  );
+}
+```
+
+The initial input keeps every control defined from its first render. Both patterns appear here: the text fields register the nested `Input` directly, while the checkbox bridges its `inputRef` prop with `toRefObject`.
+
+## Component reference
+
+The following snippets assume a form store named `form`, initialized values that match the schema, and the `toRefObject` utility from above.
+
+### Text input
+
+`TextField` with a nested `Input`, controlled on the root:
+
+```tsx
+<Field of={form} path={['email']}>
+  {(field) => (
+    <TextField
+      name={field.props.name}
+      value={field.input ?? ''}
+      onChange={field.onChange}
+      onFocus={field.props.onFocus}
+      onBlur={field.props.onBlur}
+      autoFocus={field.props.autoFocus}
+      type="email"
+      validationBehavior="aria"
+      isInvalid={field.errors !== null}
+    >
+      <Label>Email</Label>
+      <Input ref={field.props.ref} />
+      <FieldError>{field.errors?.[0]}</FieldError>
+    </TextField>
+  )}
+</Field>
+```
+
+For multiline text, replace `Input` with `TextArea` inside the same `TextField` composition.
+
+### Checkbox
+
+For a boolean field, use `isSelected` and bridge the input ref:
+
+```tsx
+<Field of={form} path={['newsletter']}>
+  {(field) => (
+    <Checkbox
+      name={field.props.name}
+      inputRef={toRefObject<HTMLInputElement>(field.props.ref)}
+      autoFocus={field.props.autoFocus}
+      onFocus={field.props.onFocus}
+      onBlur={field.props.onBlur}
+      isSelected={field.input ?? false}
+      onChange={field.onChange}
+      validationBehavior="aria"
+    >
+      Newsletter
+    </Checkbox>
+  )}
+</Field>
+```
+
+### Select
+
+`Select` is controlled through `selectedKey` and `onSelectionChange`. Convert between React Aria's `null` and Formisch's `undefined`, and narrow the key back to the schema union:
+
+```tsx
+const frameworks = [
+  { id: 'angular', label: 'Angular' },
+  { id: 'react', label: 'React' },
+  { id: 'solid', label: 'Solid' },
+  { id: 'vue', label: 'Vue' },
+];
+```
+
+```tsx
+<Field of={form} path={['framework']}>
+  {(field) => (
+    <Select
+      name={field.props.name}
+      selectedKey={field.input ?? null}
+      onSelectionChange={(key) =>
+        field.onChange((key ?? undefined) as typeof field.input)
+      }
+      onFocus={field.props.onFocus}
+      onBlur={field.props.onBlur}
+      autoFocus={field.props.autoFocus}
+      validationBehavior="aria"
+      isInvalid={field.errors !== null}
+      placeholder="Select a framework"
+    >
+      <Label>Framework</Label>
+      <Button>
+        <SelectValue />
+      </Button>
+      <FieldError>{field.errors?.[0]}</FieldError>
+      <Popover>
+        <ListBox items={frameworks}>
+          {(item) => <ListBoxItem>{item.label}</ListBoxItem>}
+        </ListBox>
+      </Popover>
+    </Select>
+  )}
+</Field>
+```
+
+`Select` does not expose its hidden native element, so Formisch's `focus()` method cannot target this field. Focus, touched state and blur validation still work through the visible trigger's lifecycle props.
+
+### Radio group
+
+`RadioGroup` is controlled through `onChange(value)`. Bridge the first radio's `inputRef` so Formisch can move focus into the group:
+
+```tsx
+<Field of={form} path={['plan']}>
+  {(field) => (
+    <RadioGroup
+      name={field.props.name}
+      value={field.input ?? null}
+      onChange={(value) =>
+        field.onChange((value ?? undefined) as typeof field.input)
+      }
+      onFocus={field.props.onFocus}
+      onBlur={field.props.onBlur}
+      validationBehavior="aria"
+      isInvalid={field.errors !== null}
+    >
+      <Label>Plan</Label>
+      <Radio
+        value="hobby"
+        inputRef={toRefObject<HTMLInputElement>(field.props.ref)}
+        autoFocus={field.props.autoFocus}
+      >
+        Hobby
+      </Radio>
+      <Radio value="pro">Pro</Radio>
+      <FieldError>{field.errors?.[0]}</FieldError>
+    </RadioGroup>
+  )}
+</Field>
+```
+
+### Slider
+
+`Slider` supports single number values directly, so no array conversion is needed. The lifecycle props and the input ref bridge go on `SliderThumb`:
+
+```tsx
+<Field of={form} path={['volume']}>
+  {(field) => (
+    <Slider
+      value={field.input ?? 50}
+      onChange={(value) =>
+        field.onChange(Array.isArray(value) ? (value[0] ?? 50) : value)
+      }
+      minValue={0}
+      maxValue={100}
+    >
+      <Label>Volume</Label>
+      <SliderOutput />
+      <SliderTrack>
+        <SliderThumb
+          name={field.props.name}
+          inputRef={toRefObject<HTMLInputElement>(field.props.ref)}
+          autoFocus={field.props.autoFocus}
+          onFocus={field.props.onFocus}
+          onBlur={field.props.onBlur}
+        />
+      </SliderTrack>
+    </Slider>
+  )}
+</Field>
+```
+
+## Library-specific notes
+
+React Aria's own form documentation demonstrates integration through React Hook Form's `Controller`. You do not need it with Formisch: the <Link href="/react/api/Field/">`Field`</Link> component provides the same render-prop wiring. React Aria Components ship unstyled, so all examples assume you style them following the [React Aria styling guide](https://react-aria.adobe.com/styling).
+
+## Next steps
+
+Read the <Link href="/react/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/react/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/react/guides/validation/">validation</Link> guide for validation timing.

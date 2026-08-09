@@ -36,3 +36,7 @@
 ## Integration guides
 
 - [shadcn/ui](/react/guides/shadcn-ui/)
+- [Base UI](/react/guides/base-ui/)
+- [Chakra UI](/react/guides/chakra-ui/)
+- [Mantine](/react/guides/mantine/)
+- [React Aria](/react/guides/react-aria/)

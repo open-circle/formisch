@@ -1,0 +1,320 @@
+---
+title: Mantine
+description: >-
+  Learn how to connect Formisch fields to Mantine inputs, selects, radio
+  groups, sliders and other form controls.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Mantine
+
+[Mantine](https://mantine.dev) is a fully featured React components library with more than 100 customizable components. This guide targets Mantine v9. No adapter package is needed: most Mantine inputs forward their props to a native element, so they receive `field.props` directly, and every input handles labels and error accessibility through its built-in `label` and `error` props.
+
+## Installation
+
+Install Formisch, Valibot and Mantine, and follow the [Mantine getting started guide](https://mantine.dev/getting-started/) to set up `MantineProvider` and the core styles:
+
+```bash
+npm install @formisch/react valibot @mantine/core @mantine/hooks
+```
+
+## Wiring patterns
+
+Choose the wiring from the component's public API:
+
+- If it forwards props and a ref to a native form element, spread `field.props` and pass `field.input` as its value.
+- If it exposes a value callback such as `onChange(value)`, control it with `field.input` and `field.onChange`, then forward the remaining lifecycle props separately.
+
+### Spreading field.props
+
+`TextInput`, `PasswordInput`, `Textarea` and `Checkbox` render native elements and forward their ref to them, so the `field.props` spread works directly. The `label` prop associates the label for you:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <TextInput
+      {...field.props}
+      value={field.input ?? ''}
+      type="email"
+      label="Email"
+      error={field.errors?.[0]}
+    />
+  )}
+</Field>
+```
+
+### Controlled components
+
+`Select` hides the native element behind a readonly combobox input, but its public props still cover the complete field contract. Pass the field name and ref, forward focus, blur and autofocus behavior, and normalize the value in both directions, since Mantine represents no selection as `null` and types every value as a plain string:
+
+```tsx
+<Field of={form} path={['framework']}>
+  {(field) => (
+    <Select
+      name={field.props.name}
+      ref={field.props.ref}
+      autoFocus={field.props.autoFocus}
+      onFocus={field.props.onFocus}
+      onBlur={field.props.onBlur}
+      value={field.input ?? null}
+      onChange={(value) =>
+        field.onChange((value ?? undefined) as typeof field.input)
+      }
+      label="Framework"
+      placeholder="Select a framework"
+      data={frameworks}
+      error={field.errors?.[0]}
+    />
+  )}
+</Field>
+```
+
+`ref` registers the combobox input so Formisch can focus the field, and the cast narrows Mantine's `string` value back to the schema's union type. Formisch's focus and blur handlers are parameterless because they only update field lifecycle state, so you can pass them directly even when the component supplies an event argument.
+
+These examples wire fields directly so you can see the complete integration. Once a pattern repeats, wrap the control, lifecycle props and errors in your own input component. The <Link href="/react/guides/input-components/">input components guide</Link> shows how.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Mantine inputs display an error message through their `error` prop and set `aria-invalid` and `aria-describedby` on the input automatically, so a single expression covers the visual and accessible error state:
+
+```tsx
+<TextInput
+  {...field.props}
+  value={field.input ?? ''}
+  error={field.errors?.[0]}
+/>
+```
+
+For widgets without an `error` prop, such as `Slider`, wrap the control in `Input.Wrapper`, which renders the same label and error markup:
+
+```tsx
+<Input.Wrapper label="Volume" error={field.errors?.[0]}>
+  <Slider {/* ... */} />
+</Input.Wrapper>
+```
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/react/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines native inputs and a checkbox with accessible errors:
+
+```tsx
+import { Field, Form, type SubmitHandler, useForm } from '@formisch/react';
+import { Button, Checkbox, PasswordInput, TextInput } from '@mantine/core';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+  rememberMe: v.optional(v.boolean(), false),
+});
+
+export default function LoginPage() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+    initialInput: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  });
+
+  const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+    console.log(output);
+  };
+
+  return (
+    <Form of={loginForm} onSubmit={handleSubmit}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <TextInput
+            {...field.props}
+            value={field.input ?? ''}
+            type="email"
+            label="Email"
+            placeholder="jane@example.com"
+            autoComplete="email"
+            error={field.errors?.[0]}
+          />
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <PasswordInput
+            {...field.props}
+            value={field.input ?? ''}
+            label="Password"
+            autoComplete="current-password"
+            error={field.errors?.[0]}
+          />
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['rememberMe']}>
+        {(field) => (
+          <Checkbox
+            {...field.props}
+            checked={field.input ?? false}
+            label="Remember me"
+            error={field.errors?.[0]}
+          />
+        )}
+      </Field>
+
+      <Button type="submit" disabled={loginForm.isSubmitting}>
+        Login
+      </Button>
+    </Form>
+  );
+}
+```
+
+The initial input keeps every control defined from its first render. All three fields use the `field.props` spread because Mantine forwards their props and refs to native elements, including the checkbox.
+
+## Component reference
+
+The following snippets assume a form store named `form` and initialized values that match the schema.
+
+### Text input
+
+`TextInput` forwards to a native `<input>`, so spread `field.props` directly:
+
+```tsx
+<Field of={form} path={['email']}>
+  {(field) => (
+    <TextInput
+      {...field.props}
+      value={field.input ?? ''}
+      type="email"
+      label="Email"
+      error={field.errors?.[0]}
+    />
+  )}
+</Field>
+```
+
+`Textarea` works the same way because it also renders a native element.
+
+### Checkbox
+
+`Checkbox` also wraps a native input, so a boolean field only adds `checked`:
+
+```tsx
+<Field of={form} path={['newsletter']}>
+  {(field) => (
+    <Checkbox
+      {...field.props}
+      checked={field.input ?? false}
+      label="Newsletter"
+      error={field.errors?.[0]}
+    />
+  )}
+</Field>
+```
+
+### Select
+
+`Select` is controlled. Convert between Mantine's `null` and Formisch's `undefined`, and narrow the plain string value back to the schema union:
+
+```tsx
+const frameworks = [
+  { value: 'angular', label: 'Angular' },
+  { value: 'react', label: 'React' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'vue', label: 'Vue' },
+];
+```
+
+```tsx
+<Field of={form} path={['framework']}>
+  {(field) => (
+    <Select
+      name={field.props.name}
+      ref={field.props.ref}
+      autoFocus={field.props.autoFocus}
+      onFocus={field.props.onFocus}
+      onBlur={field.props.onBlur}
+      value={field.input ?? null}
+      onChange={(value) =>
+        field.onChange((value ?? undefined) as typeof field.input)
+      }
+      label="Framework"
+      placeholder="Select a framework"
+      data={frameworks}
+      error={field.errors?.[0]}
+    />
+  )}
+</Field>
+```
+
+### Radio group
+
+`Radio.Group` is controlled through `onChange(value)`. Its `label` and `error` props handle the group accessibility, while the individual `Radio` components wrap native inputs. Register the first radio so Formisch can move focus into the group:
+
+```tsx
+<Field of={form} path={['plan']}>
+  {(field) => (
+    <Radio.Group
+      name={field.props.name}
+      value={field.input}
+      onChange={(value) => field.onChange(value as 'hobby' | 'pro')}
+      label="Plan"
+      error={field.errors?.[0]}
+    >
+      <Radio
+        value="hobby"
+        label="Hobby"
+        ref={field.props.ref}
+        autoFocus={field.props.autoFocus}
+        onFocus={field.props.onFocus}
+        onBlur={field.props.onBlur}
+      />
+      <Radio value="pro" label="Pro" />
+    </Radio.Group>
+  )}
+</Field>
+```
+
+### Slider
+
+`Slider` works with a single number, so `field.onChange` can be passed directly. It has no `error` prop, so wrap it in `Input.Wrapper`, and use `thumbLabel` for the accessible name because the visible wrapper label is not associated with the thumb:
+
+```tsx
+<Field of={form} path={['volume']}>
+  {(field) => (
+    <Input.Wrapper label="Volume" error={field.errors?.[0]}>
+      <Slider
+        name={field.props.name}
+        value={field.input ?? 50}
+        onChange={field.onChange}
+        onFocus={field.props.onFocus}
+        onBlur={field.props.onBlur}
+        thumbLabel="Volume"
+        min={0}
+        max={100}
+      />
+    </Input.Wrapper>
+  )}
+</Field>
+```
+
+## Library-specific notes
+
+Mantine's own `use-form` hook and its `getInputProps` helper are not needed with Formisch. The <Link href="/react/api/Field/">`Field`</Link> component provides the same wiring through its render prop, with validation coming from your Valibot schema.
+
+## Next steps
+
+Read the <Link href="/react/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/react/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/react/guides/validation/">validation</Link> guide for validation timing.
