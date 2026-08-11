@@ -92,7 +92,7 @@ describe('getElementInput', () => {
     });
 
     test('should return an array for a checkbox group with one option', () => {
-      const store = createTestStore(v.object({ colors: v.array(v.string()) }));
+      const store = createTestStore(toFormisch(v.object({ colors: v.array(v.string()) })));
       const checkbox = createInput('checkbox', 'red', {
         name: 'colors',
         checked: true,
@@ -105,7 +105,7 @@ describe('getElementInput', () => {
     });
 
     test('should only group enabled checkboxes owned by the same form', () => {
-      const store = createTestStore(v.object({ colors: v.array(v.string()) }));
+      const store = createTestStore(toFormisch(v.object({ colors: v.array(v.string()) })));
       const firstForm = document.createElement('form');
       const secondForm = document.createElement('form');
       const red = createInput('checkbox', 'red', {
@@ -179,7 +179,7 @@ describe('getElementInput', () => {
 
     test('should return array for select bound to array field without multiple attribute', () => {
       const store = createTestStore(
-        v.object({ countries: v.array(v.string()) })
+        toFormisch(v.object({ countries: v.array(v.string()) }))
       );
       const select = document.createElement('select');
       select.innerHTML = `
@@ -229,7 +229,7 @@ describe('getElementInput', () => {
     });
 
     test('should return files array for array field without multiple attribute', () => {
-      const store = createTestStore(v.object({ documents: v.array(v.any()) }));
+      const store = createTestStore(toFormisch(v.object({ documents: v.array(v.any()) })));
       const input = createInput('file', '');
       const file = new File(['content'], 'test.txt');
       Object.defineProperty(input, 'files', { value: [file] });

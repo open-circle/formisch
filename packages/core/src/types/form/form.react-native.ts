@@ -1,4 +1,3 @@
-import type * as v from 'valibot';
 import type { INTERNAL } from '../../values.ts';
 import type { InternalObjectStore } from '../field/field.react-native.ts';
 import type { FormSchema } from '../schema/index.ts';
@@ -7,9 +6,26 @@ import type { MaybePromise } from '../utils/index.ts';
 import type {
   EmptyInput,
   FormConfig,
+  StandardParseResult,
   SubmitHandler,
   ValidationMode,
 } from './form.ts';
+
+/**
+ * Extracts the input type from a Standard Schema.
+ */
+type InferStandardInput<T> =
+  T extends { readonly '~standard': { readonly types?: { readonly input: infer I } } }
+    ? I
+    : unknown;
+
+/**
+ * Extracts the output type from a Standard Schema.
+ */
+type InferStandardOutput<T> =
+  T extends { readonly '~standard': { readonly types?: { readonly output: infer O } } }
+    ? O
+    : unknown;
 
 /**
  * Internal form store interface.
@@ -35,7 +51,7 @@ export interface InternalFormStore<TSchema extends FormSchema = FormSchema>
   /**
    * The parse function of the form.
    */
-  parse: (input: unknown) => Promise<v.SafeParseResult<TSchema>>;
+  parse: (input: unknown) => Promise<StandardParseResult<InferStandardOutput<TSchema>>>;
 
   /**
    * The submitting state of the form.
@@ -70,7 +86,13 @@ export interface BaseFormStore<TSchema extends FormSchema = FormSchema> {
  * handler only receives the validated output.
  */
 export type SubmitEventHandler<TSchema extends FormSchema> = (
-  output: v.InferOutput<TSchema>
+  output: InferStandardOutput<TSchema>
 ) => MaybePromise<unknown>;
 
-export type { EmptyInput, FormConfig, SubmitHandler, ValidationMode };
+export type {
+  EmptyInput,
+  FormConfig,
+  StandardParseResult,
+  SubmitHandler,
+  ValidationMode,
+};

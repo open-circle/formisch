@@ -82,7 +82,7 @@ describe('setFieldInput', () => {
 
     test('should mark a nullish parent dirty when its empty child is set', () => {
       const store = createTestStore(
-        v.object({ user: v.nullish(v.object({ name: v.string() })) })
+        toFormisch(v.object({ user: v.nullish(v.object({ name: v.string() })) }))
       );
 
       setFieldInput(store, ['user', 'name'], '');
@@ -94,7 +94,7 @@ describe('setFieldInput', () => {
 
     test('should not mark a present parent dirty when setting nested field', () => {
       const store = createTestStore(
-        v.object({ user: v.object({ name: v.string() }) }),
+        toFormisch(v.object({ user: v.object({ name: v.string() }) })),
         { initialInput: { user: { name: 'John' } } }
       );
 
@@ -111,7 +111,7 @@ describe('setFieldInput', () => {
 
     test('should clear parent dirty state when nested input restores it', () => {
       const store = createTestStore(
-        v.object({ user: v.nullish(v.object({ name: v.string() })) }),
+        toFormisch(v.object({ user: v.nullish(v.object({ name: v.string() })) })),
         { initialInput: { user: { name: 'John' } } }
       );
 
@@ -165,7 +165,7 @@ describe('setFieldInput', () => {
 
     test('should keep array dirty from length change when setting nested child', () => {
       const store = createTestStore(
-        v.object({ items: v.array(v.object({ name: v.string() })) }),
+        toFormisch(v.object({ items: v.array(v.object({ name: v.string() })) })),
         { initialInput: { items: [{ name: 'a' }] } }
       );
 
@@ -180,7 +180,7 @@ describe('setFieldInput', () => {
 
     test('should keep array dirty from reordering when setting nested child', () => {
       const store = createTestStore(
-        v.object({ items: v.array(v.object({ name: v.string() })) }),
+        toFormisch(v.object({ items: v.array(v.object({ name: v.string() })) })),
         { initialInput: { items: [{ name: 'a' }, { name: 'b' }] } }
       );
 

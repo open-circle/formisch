@@ -418,10 +418,10 @@ describe('validateFormInput', () => {
     });
 
     test('should not let an older validation overwrite newer errors', async () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         name: v.pipe(v.string(), v.nonEmpty('New error')),
-      });
-      type ParseResult = v.SafeParseResult<typeof schema>;
+      }));
+      type ParseResult = StandardParseResult;
       let resolveFirst: (value: ParseResult) => void;
       let resolveSecond: (value: ParseResult) => void;
       const firstResult = new Promise<ParseResult>((resolve) => {
@@ -439,15 +439,15 @@ describe('validateFormInput', () => {
       const firstValidation = validateFormInput(store);
       const secondValidation = validateFormInput(store);
 
-      resolveSecond!(v.safeParse(schema, { name: '' }));
+      resolveSecond!({
+        issues: [{ message: 'New error', path: [{ key: 'name' }] }],
+      });
       await secondValidation;
       expect(store.children.name.errors.value).toStrictEqual(['New error']);
 
       resolveFirst!({
-        typed: true,
-        success: true,
-        output: { name: 'valid' },
         issues: undefined,
+        value: { name: 'valid' },
       });
       await firstValidation;
 
@@ -456,17 +456,19 @@ describe('validateFormInput', () => {
     });
 
     test('should not clear validating state when focusing starts a new validation', async () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         name: v.pipe(v.string(), v.nonEmpty('Error')),
-      });
-      type ParseResult = v.SafeParseResult<typeof schema>;
+      }));
+      type ParseResult = StandardParseResult;
       let resolveSecond: (value: ParseResult) => void;
       const secondResult = new Promise<ParseResult>((resolve) => {
         resolveSecond = resolve;
       });
       const parse = vi
         .fn()
-        .mockResolvedValueOnce(v.safeParse(schema, { name: '' }))
+        .mockResolvedValueOnce({
+          issues: [{ message: 'Error', path: [{ key: 'name' }] }],
+        })
         .mockReturnValueOnce(secondResult);
       const store = createFormStore({ schema }, parse);
 
@@ -492,7 +494,9 @@ describe('validateFormInput', () => {
       expect(secondValidation).toBeDefined();
       expect(store.isValidating.value).toBe(true);
 
-      resolveSecond!(v.safeParse(schema, { name: '' }));
+      resolveSecond!({
+        issues: [{ message: 'Error', path: [{ key: 'name' }] }],
+      });
       await secondValidation;
       expect(store.isValidating.value).toBe(false);
     });
