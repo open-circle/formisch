@@ -1,0 +1,97 @@
+---
+cover: Coding Agents
+title: 'Making Formisch easier for coding agents to use'
+description: >-
+  How we reworked the Formisch documentation for coding agents, with two agent
+  skills, a framework-aware MCP server, a Markdown version of every page, and
+  per-framework LLMs.txt routes.
+published: 2026-08-11
+authors:
+  - flySewa
+---
+
+import { Link } from '~/components';
+
+We assume a lot of people use coding agents when they're building with Formisch, and because the library is new, there isn't much code for models to have learned from yet. That makes good documentation even more important, so we spent the last few weeks reworking it to make it easier for agents to use.
+
+## We now run an MCP server
+
+It's at `https://formisch.dev/mcp`, free, needs no authentication, and gives your agent three tools:
+
+- `search_docs` searches the documentation and returns matching pages
+- `get_doc` reads a specific page and returns it as Markdown
+- `list_docs` lists all pages grouped by framework and area
+
+Add it to Claude Code with this:
+
+```bash
+claude mcp add --transport http formisch https://formisch.dev/mcp
+```
+
+For Cursor and other tools that use a JSON configuration file, add this entry:
+
+```json
+{
+  "mcpServers": {
+    "formisch": {
+      "url": "https://formisch.dev/mcp"
+    }
+  }
+}
+```
+
+All three tools take a framework. Set it to `react` and you get React pages plus the shared form methods and core types, with the other seven excluded. `get_doc` also tells your agent when the page it asked for exists for other frameworks and links those versions, so moving between them is a decision rather than an accident.
+
+## Agents can find the skill now
+
+Formisch defines form values and validation with Valibot schemas, so an agent building a form needs both skills. The Formisch skill covers form state, field paths and array fields, and the Valibot skill covers the schemas those fields are typed by.
+
+Both live in `open-circle/agent-skills`, and until recently that was the only place they lived. Nothing on formisch.dev served them or linked to them, so you had to know the repo existed to point your agent at them. The site now publishes the Formisch skill at `/.well-known/agent-skills/formisch/SKILL.md` and lists it in a discovery index, so an agent looking for one can find it without being told.
+
+Installing is still one command.
+
+```bash
+npx skills add open-circle/agent-skills --skill formisch valibot
+```
+
+We still recommend being specific in prompts. When several approaches are valid, a model picks the one it has seen most often, and telling it which one you want usually settles it.
+
+## The Markdown is generated from the page now
+
+We were already publishing a `.md` file for every page, but it was a copy of the source file, and our source files have components in them. Where the page showed a full type signature or a list of related links, the `.md` file just had the tag that produces them, so an agent reading it got less than you would. Now the Markdown is generated the way the page is, with those components turned into content.
+
+That's worth having because of what an HTML page carries. When your agent fetches one it gets the navigation, the scripts and the styling along with it, and pays for all of that in context without using any of it. The Markdown version has the content and none of the rest, so your agent can read several pages for what one used to cost.
+
+We also added an `X-Markdown-Tokens` header to every Markdown response, so a tool can check what a page costs before loading it. API pages keep their full type signatures, and the links between pages point at Markdown, so an agent following a reference between pages never has to switch formats.
+
+## Every page now points to llms.txt
+
+We'd been publishing `llms.txt` for a while, and nothing on the site pointed at it, so an agent had to already know it was there. Every Markdown page now links back to it, and the file opens with a summary saying what's in it and where the rest of the files are.
+
+There are four for each of the eight frameworks, because handing a Vue developer's agent the React documentation is a slower way of getting the wrong answer. For React that's `llms-react.txt` as a table of contents, `llms-react-full.txt` for the entire React documentation, and `llms-react-guides.txt` and `llms-react-api.txt` for the guides and the API reference on their own. `llms-blog.txt` sits alongside them. An agent working in Vue loads Vue documentation plus the shared form methods and core types, without the other seven frameworks.
+
+## The code examples now work
+
+We went through the examples against the source and corrected 239 pages, 112 of them guides. A lot of what we found was framework-specific. Vue's file input example, for instance, bound `field.props` directly to the input, which Vue doesn't allow on file inputs, so the field never received the selection.
+
+The examples now run as written, in whichever framework you're using.
+
+## The API reference matches the source
+
+We checked the API reference against the library as well. `getDirtyPaths`, for instance, had the wrong return type documented, so an agent writing against it produced code that didn't type-check.
+
+An agent reading the reference now gets the actual types and behaviour.
+
+## The whole site is static now
+
+None of this helps much if the pages are slow, so every page is generated ahead of time and served as a file. That's more than 340 pre-rendered pages, so every page an agent asks for is already built and comes back in around 80 ms from the edge cache.
+
+Thanks to the [ZanReal](https://zanreal.com/) team for making that possible. They wrote about the [migration](https://zanreal.com/case-studies/valibot-formisch-static-docs) if you want the detail.
+
+## The API design helps too
+
+We think a lot of this works because of how Formisch is built, which is the part we didn't have to change.
+
+Formisch is one framework-agnostic core with a thin adapter per framework and no abstraction layer in between. Our <Link href="/blog/one-core-six-frameworks/">architecture post</Link> covers how that works. What it means for a model is that the form it writes for React and the form it writes for Svelte are the same form, with the same schema, field paths, store and methods, and only the reactivity syntax changing. So a model learns one set of primitives and applies them eight times over instead of learning eight libraries.
+
+The skill, the MCP server, the LLMs.txt files and the Markdown versions are all documented on the coding agents page for <Link href="/angular/guides/coding-agents/">Angular</Link>, <Link href="/preact/guides/coding-agents/">Preact</Link>, <Link href="/qwik/guides/coding-agents/">Qwik</Link>, <Link href="/react/guides/coding-agents/">React</Link>, <Link href="/react-native/guides/coding-agents/">React Native</Link>, <Link href="/solid/guides/coding-agents/">Solid</Link>, <Link href="/svelte/guides/coding-agents/">Svelte</Link> and <Link href="/vue/guides/coding-agents/">Vue</Link>. [Valibot](https://valibot.dev/guides/coding-agents/), which Formisch uses for schemas, has the same setup.
