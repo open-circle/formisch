@@ -1,0 +1,42 @@
+{
+  "name": "@formisch/zod",
+  "description": "Zod adapter for Formisch — transforms Zod schemas into the Formisch IR",
+  "version": "1.0.0-alpha.0",
+  "license": "MIT",
+  "author": "Formisch",
+  "homepage": "https://formisch.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-circle/formisch.git"
+  },
+  "keywords": ["form", "forms", "zod", "schema", "validation", "typescript"],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run --typecheck",
+    "lint": "eslint \"src/**/*.ts\" && tsc --noEmit",
+    "format": "prettier --write ./src"
+  },
+  "devDependencies": {
+    "@formisch/core": "workspace:*",
+    "@formisch/eslint-config": "workspace:*",
+    "tsdown": "^0.16.8",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.7",
+    "zod": "^3.24.0"
+  },
+  "peerDependencies": {
+    "zod": "^3.24.0"
+  }
+}
