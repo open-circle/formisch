@@ -1,6 +1,7 @@
 packages:
   - 'frameworks/*'
   - 'packages/*'
+  - 'packages/adapters/*'
   - 'playgrounds/*'
   - 'scripts'
   - 'website'
