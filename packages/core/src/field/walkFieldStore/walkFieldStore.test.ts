@@ -1,11 +1,11 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../../vitest/index.ts';
+import { createTestStore, toFormisch } from '../../vitest/index.ts';
 import { walkFieldStore } from './walkFieldStore.ts';
 
 describe('walkFieldStore', () => {
   test('should call callback for single value field', () => {
-    const store = createTestStore(v.object({ name: v.string() }));
+    const store = createTestStore(toFormisch(v.object({ name: v.string() })));
     const names: string[] = [];
     walkFieldStore(store.children.name, (field) => {
       names.push(field.name);
@@ -14,7 +14,7 @@ describe('walkFieldStore', () => {
   });
 
   test('should walk object fields in depth-first order', () => {
-    const store = createTestStore(v.object({ a: v.string(), b: v.string() }));
+    const store = createTestStore(toFormisch(v.object({ a: v.string(), b: v.string() })));
     const names: string[] = [];
     walkFieldStore(store, (field) => {
       names.push(field.name);
@@ -23,7 +23,7 @@ describe('walkFieldStore', () => {
   });
 
   test('should walk array fields in depth-first order', () => {
-    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+    const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
       initialInput: { items: ['a', 'b'] },
     });
     const names: string[] = [];
@@ -35,7 +35,7 @@ describe('walkFieldStore', () => {
 
   test('should walk nested structures', () => {
     const store = createTestStore(
-      v.object({ user: v.object({ name: v.string(), age: v.number() }) })
+      toFormisch(v.object({ user: v.object({ name: v.string(), age: v.number() }) }))
     );
     const names: string[] = [];
     walkFieldStore(store, (field) => {
@@ -51,9 +51,9 @@ describe('walkFieldStore', () => {
 
   test('should walk mixed array and object structures', () => {
     const store = createTestStore(
-      v.object({
+      toFormisch(v.object({
         users: v.array(v.object({ name: v.string() })),
-      }),
+      })),
       { initialInput: { users: [{ name: 'John' }] } }
     );
     const names: string[] = [];
@@ -70,7 +70,7 @@ describe('walkFieldStore', () => {
 
   test('should stop early and return true when callback returns true', () => {
     const store = createTestStore(
-      v.object({ a: v.string(), b: v.string(), c: v.string() })
+      toFormisch(v.object({ a: v.string(), b: v.string(), c: v.string() }))
     );
     const names: string[] = [];
     const stopped = walkFieldStore(store, (field) => {
@@ -82,17 +82,17 @@ describe('walkFieldStore', () => {
   });
 
   test('should return false when callback never stops the walk', () => {
-    const store = createTestStore(v.object({ a: v.string(), b: v.string() }));
+    const store = createTestStore(toFormisch(v.object({ a: v.string(), b: v.string() })));
     const stopped = walkFieldStore(store, () => false);
     expect(stopped).toBe(false);
   });
 
   test('should stop early within nested structures', () => {
     const store = createTestStore(
-      v.object({
+      toFormisch(v.object({
         user: v.object({ name: v.string(), age: v.number() }),
         email: v.string(),
-      })
+      }))
     );
     const names: string[] = [];
     const stopped = walkFieldStore(store, (field) => {

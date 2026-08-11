@@ -1,11 +1,11 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../../vitest/index.ts';
+import { createTestStore, toFormisch } from '../../vitest/index.ts';
 
 describe('initializeFieldStore', () => {
   describe('value fields', () => {
     test('should initialize with correct properties', () => {
-      const store = createTestStore(v.object({ name: v.string() }), {
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })), {
         initialInput: { name: 'John' },
       });
       const field = store.children.name;
@@ -24,7 +24,7 @@ describe('initializeFieldStore', () => {
 
   describe('empty input config', () => {
     test('should default required string to empty string', () => {
-      const store = createTestStore(v.object({ name: v.string() }));
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })));
       expect(store.children.name.input.value).toBe('');
       expect(store.children.name.initialInput.value).toBe('');
       expect(store.children.name.startInput.value).toBe('');
@@ -32,42 +32,42 @@ describe('initializeFieldStore', () => {
 
     test('should default required piped string to empty string', () => {
       const store = createTestStore(
-        v.object({ name: v.pipe(v.string(), v.nonEmpty()) })
+        toFormisch(v.object({ name: v.pipe(v.string(), v.nonEmpty()) }))
       );
       expect(store.children.name.input.value).toBe('');
     });
 
     test('should not default required non-string to empty string', () => {
-      const store = createTestStore(v.object({ age: v.number() }));
+      const store = createTestStore(toFormisch(v.object({ age: v.number() })));
       expect(store.children.age.input.value).toBeUndefined();
     });
 
     test('should keep optional string as undefined', () => {
-      const store = createTestStore(v.object({ name: v.optional(v.string()) }));
+      const store = createTestStore(toFormisch(v.object({ name: v.optional(v.string()) })));
       expect(store.children.name.input.value).toBeUndefined();
     });
 
     test('should keep nullable string as undefined', () => {
-      const store = createTestStore(v.object({ name: v.nullable(v.string()) }));
+      const store = createTestStore(toFormisch(v.object({ name: v.nullable(v.string()) })));
       expect(store.children.name.input.value).toBeUndefined();
     });
 
     test('should keep a non-optional inside an optional as undefined', () => {
       const store = createTestStore(
-        v.object({ name: v.optional(v.nonOptional(v.string())) })
+        toFormisch(v.object({ name: v.optional(v.nonOptional(v.string())) }))
       );
       expect(store.children.name.input.value).toBeUndefined();
     });
 
     test('should keep a non-nullish inside a nullish as undefined', () => {
       const store = createTestStore(
-        v.object({ name: v.nullish(v.nonNullish(v.string())) })
+        toFormisch(v.object({ name: v.nullish(v.nonNullish(v.string())) }))
       );
       expect(store.children.name.input.value).toBeUndefined();
     });
 
     test('should use explicit initial input over empty string default', () => {
-      const store = createTestStore(v.object({ name: v.string() }), {
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })), {
         initialInput: { name: 'John' },
       });
       expect(store.children.name.input.value).toBe('John');
@@ -75,7 +75,7 @@ describe('initializeFieldStore', () => {
 
     test('should default nested required string to empty string', () => {
       const store = createTestStore(
-        v.object({ user: v.object({ name: v.string() }) })
+        toFormisch(v.object({ user: v.object({ name: v.string() }) }))
       );
       const userStore = store.children.user;
       expect(userStore.kind).toBe('object');
@@ -86,7 +86,7 @@ describe('initializeFieldStore', () => {
 
     test('should default number and boolean to undefined', () => {
       const store = createTestStore(
-        v.object({ age: v.number(), active: v.boolean() })
+        toFormisch(v.object({ age: v.number(), active: v.boolean() }))
       );
       expect(store.children.age.input.value).toBeUndefined();
       expect(store.children.active.input.value).toBeUndefined();
@@ -95,12 +95,12 @@ describe('initializeFieldStore', () => {
     test('should apply configured empty input per type', () => {
       const date = new Date('2020-01-01');
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           name: v.string(),
           age: v.number(),
           active: v.boolean(),
           birthday: v.date(),
-        }),
+        })),
         { emptyInput: { number: 0, boolean: false, date } }
       );
       expect(store.children.name.input.value).toBe('');
@@ -110,7 +110,7 @@ describe('initializeFieldStore', () => {
     });
 
     test('should opt out of the empty string default', () => {
-      const store = createTestStore(v.object({ name: v.string() }), {
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })), {
         emptyInput: { string: undefined },
       });
       expect(store.children.name.input.value).toBeUndefined();
@@ -118,10 +118,10 @@ describe('initializeFieldStore', () => {
 
     test('should apply configured empty input to nested and array children', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           user: v.object({ age: v.number() }),
           scores: v.array(v.number()),
-        }),
+        })),
         { initialInput: { scores: [undefined] }, emptyInput: { number: 0 } }
       );
       const userStore = store.children.user;
@@ -138,7 +138,7 @@ describe('initializeFieldStore', () => {
 
     test('should store whether a value field is nullish for resetting', () => {
       const store = createTestStore(
-        v.object({ name: v.string(), nickname: v.optional(v.string()) })
+        toFormisch(v.object({ name: v.string(), nickname: v.optional(v.string()) }))
       );
       const nameStore = store.children.name;
       const nicknameStore = store.children.nickname;
@@ -151,7 +151,7 @@ describe('initializeFieldStore', () => {
 
   describe('object fields', () => {
     test('should initialize with children', () => {
-      const store = createTestStore(v.object({ a: v.string(), b: v.number() }));
+      const store = createTestStore(toFormisch(v.object({ a: v.string(), b: v.number() })));
       expect(store.kind).toBe('object');
       expect(store.name).toBe('[]');
       expect(store.path).toStrictEqual([]);
@@ -161,11 +161,11 @@ describe('initializeFieldStore', () => {
 
     test('should set the path for deeply nested fields', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           groups: v.array(
             v.object({ tags: v.array(v.object({ label: v.string() })) })
           ),
-        }),
+        })),
         { initialInput: { groups: [{ tags: [{ label: 'a' }] }] } }
       );
 
@@ -203,7 +203,7 @@ describe('initializeFieldStore', () => {
 
     test('should initialize nested object', () => {
       const store = createTestStore(
-        v.object({ user: v.object({ name: v.string() }) })
+        toFormisch(v.object({ user: v.object({ name: v.string() }) }))
       );
       const userStore = store.children.user;
       expect(userStore.kind).toBe('object');
@@ -213,14 +213,14 @@ describe('initializeFieldStore', () => {
     });
 
     test('should set input to true for object fields', () => {
-      const store = createTestStore(v.object({ name: v.string() }));
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })));
       expect(store.input.value).toBe(true);
     });
   });
 
   describe('array fields', () => {
     test('should initialize with children for each item', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['a', 'b', 'c'] },
       });
       const itemsStore = store.children.items;
@@ -232,7 +232,7 @@ describe('initializeFieldStore', () => {
     });
 
     test('should initialize empty array', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: [] },
       });
       const itemsStore = store.children.items;
@@ -244,7 +244,7 @@ describe('initializeFieldStore', () => {
     });
 
     test('should set input to true for array fields', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['a'] },
       });
       expect(store.children.items.input.value).toBe(true);
@@ -253,18 +253,18 @@ describe('initializeFieldStore', () => {
 
   describe('wrapped schemas', () => {
     test('should unwrap optional schema', () => {
-      const store = createTestStore(v.object({ name: v.optional(v.string()) }));
+      const store = createTestStore(toFormisch(v.object({ name: v.optional(v.string()) })));
       expect(store.children.name.kind).toBe('value');
     });
 
     test('should unwrap nullable schema', () => {
-      const store = createTestStore(v.object({ name: v.nullable(v.string()) }));
+      const store = createTestStore(toFormisch(v.object({ name: v.nullable(v.string()) })));
       expect(store.children.name.kind).toBe('value');
     });
 
     test('should unwrap nullish schema with null input', () => {
       const store = createTestStore(
-        v.object({ user: v.nullish(v.object({ name: v.string() })) }),
+        toFormisch(v.object({ user: v.nullish(v.object({ name: v.string() })) })),
         { initialInput: { user: null } }
       );
       expect(store.children.user.input.value).toBeNull();
@@ -272,7 +272,7 @@ describe('initializeFieldStore', () => {
 
     test('should unwrap non_optional schema', () => {
       const store = createTestStore(
-        v.object({ name: v.nonOptional(v.optional(v.string())) })
+        toFormisch(v.object({ name: v.nonOptional(v.optional(v.string())) }))
       );
       expect(store.children.name.kind).toBe('value');
     });
@@ -281,12 +281,12 @@ describe('initializeFieldStore', () => {
   describe('union schemas', () => {
     test('should initialize for each union option', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           field: v.union([
             v.object({ a: v.string() }),
             v.object({ b: v.number() }),
           ]),
-        })
+        }))
       );
       const fieldStore = store.children.field;
       expect(fieldStore.kind).toBe('object');
@@ -300,7 +300,7 @@ describe('initializeFieldStore', () => {
   describe('tuple schemas', () => {
     test('should initialize fixed tuple items', () => {
       const store = createTestStore(
-        v.object({ tuple: v.tuple([v.string(), v.number()]) })
+        toFormisch(v.object({ tuple: v.tuple([v.string(), v.number()]) }))
       );
       const tupleStore = store.children.tuple;
       expect(tupleStore.kind).toBe('array');
@@ -313,14 +313,14 @@ describe('initializeFieldStore', () => {
   describe('lazy schemas', () => {
     test('should unwrap lazy schema', () => {
       const store = createTestStore(
-        v.object({ name: v.lazy(() => v.string()) })
+        toFormisch(v.object({ name: v.lazy(() => v.string()) }))
       );
       expect(store.children.name.kind).toBe('value');
     });
 
     test('should unwrap nested lazy schema', () => {
       const store = createTestStore(
-        v.object({ user: v.lazy(() => v.object({ name: v.string() })) })
+        toFormisch(v.object({ user: v.lazy(() => v.object({ name: v.string() })) }))
       );
       const userStore = store.children.user;
       expect(userStore.kind).toBe('object');
@@ -333,14 +333,14 @@ describe('initializeFieldStore', () => {
   describe('nullable/nullish + option schemas', () => {
     test('should preserve null input for nullable variant', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           nest: v.nullable(
             v.variant('type', [
               v.object({ type: v.literal('a'), value: v.string() }),
               v.object({ type: v.literal('b'), count: v.number() }),
             ])
           ),
-        }),
+        })),
         { initialInput: { nest: null } }
       );
       const nestStore = store.children.nest;
@@ -352,11 +352,11 @@ describe('initializeFieldStore', () => {
 
     test('should preserve null input for nullable union', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           nest: v.nullable(
             v.union([v.object({ a: v.string() }), v.object({ b: v.number() })])
           ),
-        }),
+        })),
         { initialInput: { nest: null } }
       );
       const nestStore = store.children.nest;
@@ -368,13 +368,13 @@ describe('initializeFieldStore', () => {
 
     test('should preserve null input for nullish variant', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           nest: v.nullish(
             v.variant('type', [
               v.object({ type: v.literal('a'), value: v.string() }),
             ])
           ),
-        }),
+        })),
         { initialInput: { nest: null } }
       );
       const nestStore = store.children.nest;
@@ -386,13 +386,13 @@ describe('initializeFieldStore', () => {
 
     test('should preserve undefined input for nullish variant', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           nest: v.nullish(
             v.variant('type', [
               v.object({ type: v.literal('a'), value: v.string() }),
             ])
           ),
-        }),
+        })),
         { initialInput: { nest: undefined } }
       );
       const nestStore = store.children.nest;
@@ -404,13 +404,13 @@ describe('initializeFieldStore', () => {
 
     test('should initialize normally for nullable variant with value', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           nest: v.nullable(
             v.variant('type', [
               v.object({ type: v.literal('a'), value: v.string() }),
             ])
           ),
-        }),
+        })),
         { initialInput: { nest: { type: 'a', value: 'hello' } } }
       );
       const nestStore = store.children.nest;
@@ -423,14 +423,14 @@ describe('initializeFieldStore', () => {
 
     test('should preserve null input for nullable intersect', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           nest: v.nullable(
             v.intersect([
               v.object({ a: v.string() }),
               v.object({ b: v.number() }),
             ])
           ),
-        }),
+        })),
         { initialInput: { nest: null } }
       );
       const nestStore = store.children.nest;
@@ -444,7 +444,7 @@ describe('initializeFieldStore', () => {
   describe('nullable/nullish + lazy + option schemas', () => {
     test('should preserve null input for nullable lazy variant', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           nest: v.nullable(
             v.lazy(() =>
               v.variant('type', [
@@ -452,7 +452,7 @@ describe('initializeFieldStore', () => {
               ])
             )
           ),
-        }),
+        })),
         { initialInput: { nest: null } }
       );
       const nestStore = store.children.nest;
@@ -464,7 +464,7 @@ describe('initializeFieldStore', () => {
 
     test('should preserve null input for nullable lazy union', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           nest: v.nullable(
             v.lazy(() =>
               v.union([
@@ -473,7 +473,7 @@ describe('initializeFieldStore', () => {
               ])
             )
           ),
-        }),
+        })),
         { initialInput: { nest: null } }
       );
       const nestStore = store.children.nest;
@@ -485,7 +485,7 @@ describe('initializeFieldStore', () => {
 
     test('should initialize normally for nullable lazy variant with value', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           nest: v.nullable(
             v.lazy(() =>
               v.variant('type', [
@@ -493,7 +493,7 @@ describe('initializeFieldStore', () => {
               ])
             )
           ),
-        }),
+        })),
         { initialInput: { nest: { type: 'a', value: 'hello' } } }
       );
       const nestStore = store.children.nest;
@@ -508,14 +508,14 @@ describe('initializeFieldStore', () => {
   describe('unsupported schemas', () => {
     test('should throw for record schema', () => {
       expect(() => {
-        createTestStore(v.object({ data: v.record(v.string(), v.number()) }));
+        createTestStore(toFormisch(v.object({ data: v.record(v.string(), v.number()) })));
       }).toThrow('"record" schema is not supported');
     });
 
     test('should throw for object_with_rest schema', () => {
       expect(() => {
         createTestStore(
-          v.object({ data: v.objectWithRest({ a: v.string() }, v.number()) })
+          toFormisch(v.object({ data: v.objectWithRest({ a: v.string() }, v.number()) }))
         );
       }).toThrow('"object_with_rest" schema is not supported');
     });
@@ -525,12 +525,12 @@ describe('initializeFieldStore', () => {
     test('should throw when reinitializing object as array', () => {
       expect(() => {
         createTestStore(
-          v.object({
+          toFormisch(v.object({
             field: v.union([
               v.object({ name: v.string() }),
               v.array(v.string()),
             ]),
-          })
+          }))
         );
       }).toThrow('cannot be reinitialized as "array"');
     });
@@ -538,12 +538,12 @@ describe('initializeFieldStore', () => {
     test('should throw when reinitializing array as object', () => {
       expect(() => {
         createTestStore(
-          v.object({
+          toFormisch(v.object({
             field: v.union([
               v.array(v.string()),
               v.object({ name: v.string() }),
             ]),
-          })
+          }))
         );
       }).toThrow('cannot be reinitialized as "object"');
     });
@@ -551,7 +551,7 @@ describe('initializeFieldStore', () => {
     test('should throw when variant branches have same key as value and array', () => {
       expect(() => {
         createTestStore(
-          v.object({
+          toFormisch(v.object({
             a: v.variant('type', [
               v.object({ type: v.literal('string'), value: v.string() }),
               v.object({
@@ -559,7 +559,7 @@ describe('initializeFieldStore', () => {
                 value: v.array(v.string()),
               }),
             ]),
-          }),
+          })),
           { initialInput: { a: { type: 'string', value: '' } } }
         );
       }).toThrow('cannot be reinitialized as "array"');
@@ -568,7 +568,7 @@ describe('initializeFieldStore', () => {
     test('should throw when variant branches have same key as array and value', () => {
       expect(() => {
         createTestStore(
-          v.object({
+          toFormisch(v.object({
             a: v.variant('type', [
               v.object({
                 type: v.literal('array'),
@@ -576,7 +576,7 @@ describe('initializeFieldStore', () => {
               }),
               v.object({ type: v.literal('string'), value: v.string() }),
             ]),
-          }),
+          })),
           { initialInput: { a: { type: 'array', value: [] } } }
         );
       }).toThrow('cannot be reinitialized as "value"');
@@ -585,7 +585,7 @@ describe('initializeFieldStore', () => {
     test('should throw when variant branches have same key as value and object', () => {
       expect(() => {
         createTestStore(
-          v.object({
+          toFormisch(v.object({
             a: v.variant('type', [
               v.object({
                 type: v.literal('string'),
@@ -596,7 +596,7 @@ describe('initializeFieldStore', () => {
                 value: v.object({ x: v.number() }),
               }),
             ]),
-          }),
+          })),
           { initialInput: { a: { type: 'string', value: '' } } }
         );
       }).toThrow('cannot be reinitialized as "object"');
@@ -605,7 +605,7 @@ describe('initializeFieldStore', () => {
     test('should throw when variant branches have same key as object and value', () => {
       expect(() => {
         createTestStore(
-          v.object({
+          toFormisch(v.object({
             a: v.variant('type', [
               v.object({
                 type: v.literal('nested'),
@@ -616,7 +616,7 @@ describe('initializeFieldStore', () => {
                 value: v.string(),
               }),
             ]),
-          }),
+          })),
           { initialInput: { a: { type: 'nested', value: { x: 1 } } } }
         );
       }).toThrow('cannot be reinitialized as "value"');

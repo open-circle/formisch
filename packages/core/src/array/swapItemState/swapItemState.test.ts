@@ -1,13 +1,13 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../../vitest/index.ts';
+import { createTestStore, toFormisch } from '../../vitest/index.ts';
 import { swapItemState } from './swapItemState.ts';
 
 describe('swapItemState', () => {
   describe('value fields', () => {
     test('should swap basic state between value fields', () => {
       const store = createTestStore(
-        v.object({ first: v.string(), second: v.string() }),
+        toFormisch(v.object({ first: v.string(), second: v.string() })),
         { initialInput: { first: 'hello', second: 'world' } }
       );
 
@@ -35,7 +35,7 @@ describe('swapItemState', () => {
 
     test('should swap elements arrays', () => {
       const store = createTestStore(
-        v.object({ first: v.string(), second: v.string() })
+        toFormisch(v.object({ first: v.string(), second: v.string() }))
       );
 
       const firstStore = store.children.first;
@@ -56,10 +56,10 @@ describe('swapItemState', () => {
   describe('object fields', () => {
     test('should swap nested object state recursively', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           first: v.object({ name: v.string() }),
           second: v.object({ name: v.string() }),
-        }),
+        })),
         {
           initialInput: {
             first: { name: 'John' },
@@ -90,10 +90,10 @@ describe('swapItemState', () => {
   describe('array fields', () => {
     test('should swap array state including items', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           first: v.array(v.string()),
           second: v.array(v.string()),
-        }),
+        })),
         {
           initialInput: {
             first: ['a', 'b'],
@@ -123,10 +123,10 @@ describe('swapItemState', () => {
 
     test('should initialize missing children in first array when second has more items', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           first: v.array(v.string()),
           second: v.array(v.string()),
-        }),
+        })),
         {
           initialInput: {
             first: ['a'],
@@ -155,10 +155,10 @@ describe('swapItemState', () => {
 
     test('should initialize missing children in second array when first has more items', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           first: v.array(v.string()),
           second: v.array(v.string()),
-        }),
+        })),
         {
           initialInput: {
             first: ['a', 'b', 'c'],
@@ -191,7 +191,7 @@ describe('swapItemState', () => {
   describe('edge cases', () => {
     test('should handle swapping startInput values', () => {
       const store = createTestStore(
-        v.object({ first: v.string(), second: v.string() }),
+        toFormisch(v.object({ first: v.string(), second: v.string() })),
         { initialInput: { first: 'start-first', second: 'start-second' } }
       );
 
@@ -206,9 +206,9 @@ describe('swapItemState', () => {
 
     test('should swap nested objects within array items', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           items: v.array(v.object({ name: v.string(), score: v.number() })),
-        }),
+        })),
         {
           initialInput: {
             items: [
@@ -245,7 +245,7 @@ describe('swapItemState', () => {
     });
 
     test('should swap items within same array (typical array reorder use case)', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['first', 'second', 'third'] },
       });
 

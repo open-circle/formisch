@@ -76,8 +76,7 @@ export function copyItemState(
             initializeFieldStore(
               internalFormStore,
               toInternalFieldStore.children[index],
-              // @ts-expect-error
-              toInternalFieldStore.schema.item,
+              toInternalFieldStore.ir.item!,
               undefined,
               [...toInternalFieldStore.path, index]
             );

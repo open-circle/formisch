@@ -1,5 +1,6 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
+import { toFormisch } from '../../vitest/index.ts';
 import { decodeFormData } from './decodeFormData.ts';
 
 // Creates form data object from list of entries
@@ -14,13 +15,13 @@ function createFormData(entries: [string, string | File][]): FormData {
 describe('decodeFormData', () => {
   describe('value decoding', () => {
     test('should keep strings as strings', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const formData = createFormData([['["name"]', 'Jane']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({ name: 'Jane' });
     });
 
     test('should decode numbers', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         int: v.number(),
         float: v.number(),
         negative: v.number(),
@@ -28,7 +29,7 @@ describe('decodeFormData', () => {
         leadingDot: v.number(),
         scientific: v.number(),
         scientificNegative: v.number(),
-      });
+      }));
       const formData = createFormData([
         ['["int"]', '42'],
         ['["float"]', '3.14'],
@@ -50,13 +51,13 @@ describe('decodeFormData', () => {
     });
 
     test('should decode empty number to null', () => {
-      const schema = v.object({ age: v.number() });
+      const schema = toFormisch(v.object({ age: v.number() }));
       const formData = createFormData([['["age"]', '']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({ age: null });
     });
 
     test('should decode "null" and "undefined" numbers', () => {
-      const schema = v.object({ a: v.number(), b: v.number() });
+      const schema = toFormisch(v.object({ a: v.number(), b: v.number() }));
       const formData = createFormData([
         ['["a"]', 'null'],
         ['["b"]', 'undefined'],
@@ -68,20 +69,20 @@ describe('decodeFormData', () => {
     });
 
     test('should decode non-numeric number values to NaN', () => {
-      const schema = v.object({ value: v.number() });
+      const schema = toFormisch(v.object({ value: v.number() }));
       const formData = createFormData([['["value"]', 'not-a-number']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({ value: NaN });
     });
 
     test('should decode booleans', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         on: v.boolean(),
         truthy: v.boolean(),
         one: v.boolean(),
         off: v.boolean(),
         falsy: v.boolean(),
         zero: v.boolean(),
-      });
+      }));
       const formData = createFormData([
         ['["on"]', 'on'],
         ['["truthy"]', 'true'],
@@ -103,7 +104,7 @@ describe('decodeFormData', () => {
     test('should default absent and "undefined" booleans to false', () => {
       // Unchecked checkboxes are absent from the form data, and the "undefined"
       // string decodes to `undefined`; both are filled to `false`
-      const schema = v.object({ a: v.boolean(), b: v.boolean() });
+      const schema = toFormisch(v.object({ a: v.boolean(), b: v.boolean() }));
       const formData = createFormData([['["b"]', 'undefined']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         a: false,
@@ -115,10 +116,10 @@ describe('decodeFormData', () => {
       // A nullable boolean keeps its decoded `null` (from an empty string or
       // the "null" string) instead of being coerced to `false` by default
       // filling
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         a: v.nullable(v.boolean()),
         b: v.nullable(v.boolean()),
-      });
+      }));
       const formData = createFormData([
         ['["a"]', ''],
         ['["b"]', 'null'],
@@ -130,14 +131,14 @@ describe('decodeFormData', () => {
     });
 
     test('should decode the common date and date-time formats', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         date: v.date(),
         month: v.date(),
         dateTime: v.date(),
         dateTimeSecond: v.date(),
         dateTimeMs: v.date(),
         timestamp: v.date(),
-      });
+      }));
       const formData = createFormData([
         ['["date"]', '2023-06-15'],
         ['["month"]', '2023-06'],
@@ -161,11 +162,11 @@ describe('decodeFormData', () => {
     });
 
     test('should decode empty, "null" and "undefined" dates', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         a: v.date(),
         b: v.date(),
         c: v.date(),
-      });
+      }));
       const formData = createFormData([
         ['["a"]', ''],
         ['["b"]', 'null'],
@@ -179,13 +180,13 @@ describe('decodeFormData', () => {
     });
 
     test('should decode bigints', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         valid: v.bigint(),
         invalid: v.bigint(),
         empty: v.bigint(),
         nullish: v.bigint(),
         undef: v.bigint(),
-      });
+      }));
       const formData = createFormData([
         ['["valid"]', '9007199254740993'],
         ['["invalid"]', 'not-a-bigint'],
@@ -203,11 +204,11 @@ describe('decodeFormData', () => {
     });
 
     test('should keep enum, picklist and literal values as strings', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         enum: v.enum({ Light: 'light', Dark: 'dark' }),
         picklist: v.picklist(['a', 'b']),
         literal: v.literal('x'),
-      });
+      }));
       const formData = createFormData([
         ['["enum"]', 'dark'],
         ['["picklist"]', 'b'],
@@ -223,7 +224,7 @@ describe('decodeFormData', () => {
 
   describe('files', () => {
     test('should keep selected files unchanged', () => {
-      const schema = v.object({ avatar: v.file() });
+      const schema = toFormisch(v.object({ avatar: v.file() }));
       const file = new File(['content'], 'avatar.png', { type: 'image/png' });
       const formData = createFormData([['["avatar"]', file]]);
       const result = decodeFormData(schema, formData) as { avatar: File };
@@ -231,7 +232,7 @@ describe('decodeFormData', () => {
     });
 
     test('should keep files for non-file schemas unchanged', () => {
-      const schema = v.object({ data: v.string() });
+      const schema = toFormisch(v.object({ data: v.string() }));
       const file = new File(['content'], 'data.bin');
       const formData = createFormData([['["data"]', file]]);
       const result = decodeFormData(schema, formData) as { data: File };
@@ -239,14 +240,14 @@ describe('decodeFormData', () => {
     });
 
     test('should skip empty file inputs of unselected files', () => {
-      const schema = v.object({ avatar: v.file() });
+      const schema = toFormisch(v.object({ avatar: v.file() }));
       const emptyFile = new File([], '');
       const formData = createFormData([['["avatar"]', emptyFile]]);
       expect(decodeFormData(schema, formData)).toStrictEqual({});
     });
 
     test('should keep empty files that have a name', () => {
-      const schema = v.object({ avatar: v.file() });
+      const schema = toFormisch(v.object({ avatar: v.file() }));
       const namedEmptyFile = new File([], 'empty.txt');
       const formData = createFormData([['["avatar"]', namedEmptyFile]]);
       const result = decodeFormData(schema, formData) as { avatar: File };
@@ -256,9 +257,9 @@ describe('decodeFormData', () => {
 
   describe('nested objects', () => {
     test('should decode nested objects and reuse containers', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         user: v.object({ name: v.string(), age: v.number() }),
-      });
+      }));
       const formData = createFormData([
         ['["user","name"]', 'Jane'],
         ['["user","age"]', '30'],
@@ -269,9 +270,9 @@ describe('decodeFormData', () => {
     });
 
     test('should leave absent objects absent', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         settings: v.object({ darkMode: v.boolean() }),
-      });
+      }));
       const result = decodeFormData(schema, createFormData([])) as Record<
         string,
         unknown
@@ -280,9 +281,9 @@ describe('decodeFormData', () => {
     });
 
     test('should not crash when an object is replaced by a primitive', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         nested: v.object({ flag: v.boolean() }),
-      });
+      }));
       const formData = createFormData([['["nested"]', 'hello']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         nested: 'hello',
@@ -290,7 +291,7 @@ describe('decodeFormData', () => {
     });
 
     test('should not crash on a scalar entry before a nested entry', () => {
-      const schema = v.object({ user: v.object({ age: v.number() }) });
+      const schema = toFormisch(v.object({ user: v.object({ age: v.number() }) }));
       const formData = createFormData([
         ['["user"]', 'x'],
         ['["user","age"]', '1'],
@@ -301,9 +302,9 @@ describe('decodeFormData', () => {
 
   describe('arrays', () => {
     test('should decode indexed arrays of objects', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         todos: v.array(v.object({ label: v.string(), done: v.boolean() })),
-      });
+      }));
       const formData = createFormData([
         ['["todos",0,"label"]', 'First'],
         ['["todos",0,"done"]', 'on'],
@@ -318,7 +319,7 @@ describe('decodeFormData', () => {
     });
 
     test('should decode indexed arrays of primitives', () => {
-      const schema = v.object({ scores: v.array(v.number()) });
+      const schema = toFormisch(v.object({ scores: v.array(v.number()) }));
       const formData = createFormData([
         ['["scores",0]', '10'],
         ['["scores",1]', '20'],
@@ -329,7 +330,7 @@ describe('decodeFormData', () => {
     });
 
     test('should collect repeated keys into an array', () => {
-      const schema = v.object({ tags: v.array(v.string()) });
+      const schema = toFormisch(v.object({ tags: v.array(v.string()) }));
       const formData = createFormData([
         ['["tags"]', 'a'],
         ['["tags"]', 'b'],
@@ -341,22 +342,22 @@ describe('decodeFormData', () => {
     });
 
     test('should decode a single repeated key into an array', () => {
-      const schema = v.object({ ids: v.array(v.number()) });
+      const schema = toFormisch(v.object({ ids: v.array(v.number()) }));
       const formData = createFormData([['["ids"]', '5']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({ ids: [5] });
     });
 
     test('should default absent arrays to empty arrays', () => {
-      const schema = v.object({ tags: v.array(v.string()) });
+      const schema = toFormisch(v.object({ tags: v.array(v.string()) }));
       expect(decodeFormData(schema, createFormData([]))).toStrictEqual({
         tags: [],
       });
     });
 
     test('should fill boolean defaults within array items', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         items: v.array(v.object({ name: v.string(), active: v.boolean() })),
-      });
+      }));
       const formData = createFormData([
         ['["items",0,"name"]', 'A'],
         ['["items",0,"active"]', 'on'],
@@ -373,9 +374,9 @@ describe('decodeFormData', () => {
 
   describe('tuples', () => {
     test('should decode tuples', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         point: v.tuple([v.number(), v.number()]),
-      });
+      }));
       const formData = createFormData([
         ['["point",0]', '1'],
         ['["point",1]', '2'],
@@ -386,9 +387,9 @@ describe('decodeFormData', () => {
     });
 
     test('should fill boolean holes within tuples', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         entry: v.tuple([v.boolean(), v.number()]),
-      });
+      }));
       const formData = createFormData([['["entry",1]', '5']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         entry: [false, 5],
@@ -396,9 +397,9 @@ describe('decodeFormData', () => {
     });
 
     test('should complete missing trailing tuple items', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         entry: v.tuple([v.number(), v.boolean()]),
-      });
+      }));
       const formData = createFormData([['["entry",0]', '5']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         entry: [5, false],
@@ -406,9 +407,9 @@ describe('decodeFormData', () => {
     });
 
     test('should complete absent array at end of tuple', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         entry: v.tuple([v.number(), v.array(v.string())]),
-      });
+      }));
       const formData = createFormData([['["entry",0]', '5']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         entry: [5, []],
@@ -416,9 +417,9 @@ describe('decodeFormData', () => {
     });
 
     test('should leave absent tuples absent', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         entry: v.optional(v.tuple([v.number(), v.number()])),
-      });
+      }));
       const result = decodeFormData(schema, createFormData([])) as Record<
         string,
         unknown
@@ -427,10 +428,10 @@ describe('decodeFormData', () => {
     });
 
     test('should support loose and strict tuples', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         loose: v.looseTuple([v.number()]),
         strict: v.strictTuple([v.boolean()]),
-      });
+      }));
       const formData = createFormData([
         ['["loose",0]', '1'],
         ['["strict",0]', 'on'],
@@ -444,12 +445,12 @@ describe('decodeFormData', () => {
 
   describe('combinators', () => {
     test('should descend into union options', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         value: v.union([
           v.object({ a: v.number() }),
           v.object({ b: v.boolean() }),
         ]),
-      });
+      }));
       const formData = createFormData([['["value","a"]', '5']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         value: { a: 5, b: false },
@@ -457,12 +458,12 @@ describe('decodeFormData', () => {
     });
 
     test('should fall back to a string when no union option matches', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         value: v.union([
           v.object({ a: v.number() }),
           v.object({ b: v.boolean() }),
         ]),
-      });
+      }));
       const formData = createFormData([['["value","c"]', 'raw']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         value: { c: 'raw', b: false },
@@ -470,12 +471,12 @@ describe('decodeFormData', () => {
     });
 
     test('should descend into intersect options', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         value: v.intersect([
           v.object({ a: v.number() }),
           v.object({ b: v.boolean() }),
         ]),
-      });
+      }));
       const formData = createFormData([
         ['["value","a"]', '5'],
         ['["value","b"]', 'on'],
@@ -486,12 +487,12 @@ describe('decodeFormData', () => {
     });
 
     test('should descend into variant options', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         value: v.variant('type', [
           v.object({ type: v.literal('a'), count: v.number() }),
           v.object({ type: v.literal('b'), flag: v.boolean() }),
         ]),
-      });
+      }));
       const formData = createFormData([
         ['["value","type"]', 'a'],
         ['["value","count"]', '3'],
@@ -502,10 +503,10 @@ describe('decodeFormData', () => {
     });
 
     test('should support an intersect root schema', () => {
-      const schema = v.intersect([
+      const schema = toFormisch(v.intersect([
         v.object({ name: v.string() }),
         v.object({ active: v.boolean() }),
-      ]);
+      ]));
       const formData = createFormData([['["name"]', 'Jane']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         name: 'Jane',
@@ -516,7 +517,7 @@ describe('decodeFormData', () => {
 
   describe('wrappers', () => {
     test('should unwrap every wrapper schema for decoding', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         opt: v.optional(v.number()),
         nul: v.nullable(v.number()),
         nsh: v.nullish(v.number()),
@@ -525,7 +526,7 @@ describe('decodeFormData', () => {
         nonOpt: v.nonOptional(v.optional(v.number())),
         nonNul: v.nonNullable(v.nullable(v.number())),
         nonNsh: v.nonNullish(v.nullish(v.number())),
-      });
+      }));
       const formData = createFormData([
         ['["opt"]', '1'],
         ['["nul"]', '2'],
@@ -549,10 +550,10 @@ describe('decodeFormData', () => {
     });
 
     test('should unwrap wrapped containers', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         user: v.optional(v.object({ name: v.string() })),
         tags: v.nullable(v.array(v.string())),
-      });
+      }));
       const formData = createFormData([
         ['["user","name"]', 'Jane'],
         ['["tags"]', 'a'],
@@ -567,9 +568,9 @@ describe('decodeFormData', () => {
 
   describe('lazy schemas', () => {
     test('should unwrap lazy schemas', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         node: v.lazy(() => v.object({ value: v.number() })),
-      });
+      }));
       const formData = createFormData([['["node","value"]', '42']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         node: { value: 42 },
@@ -579,14 +580,14 @@ describe('decodeFormData', () => {
 
   describe('pipelines', () => {
     test('should decode values through pipe schemas', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         age: v.pipe(v.number(), v.minValue(0)),
         nested: v.pipe(
           v.object({ active: v.boolean() }),
           v.check(() => true)
         ),
         tags: v.pipe(v.array(v.string()), v.minLength(0)),
-      });
+      }));
       const formData = createFormData([
         ['["age"]', '25'],
         ['["nested","active"]', 'on'],
@@ -602,10 +603,10 @@ describe('decodeFormData', () => {
 
   describe('booleans defaults', () => {
     test('should default absent booleans to false', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         subscribe: v.boolean(),
         terms: v.boolean(),
-      });
+      }));
       const formData = createFormData([['["subscribe"]', 'on']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         subscribe: true,
@@ -614,9 +615,9 @@ describe('decodeFormData', () => {
     });
 
     test('should default booleans inside present nested objects', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         prefs: v.object({ darkMode: v.boolean(), name: v.string() }),
-      });
+      }));
       const formData = createFormData([['["prefs","name"]', 'Jane']]);
       expect(decodeFormData(schema, formData)).toStrictEqual({
         prefs: { darkMode: false, name: 'Jane' },
@@ -626,7 +627,7 @@ describe('decodeFormData', () => {
 
   describe('extra and unknown fields', () => {
     test('should build unknown nested fields as objects', () => {
-      const schema = v.object({ known: v.string() });
+      const schema = toFormisch(v.object({ known: v.string() }));
       const formData = createFormData([
         ['["known"]', 'value'],
         ['["extra","sub"]', 'deep'],
@@ -638,7 +639,7 @@ describe('decodeFormData', () => {
     });
 
     test('should decode unknown leaf values as strings', () => {
-      const schema = v.object({ known: v.string() });
+      const schema = toFormisch(v.object({ known: v.string() }));
       const formData = createFormData([['["unknown"]', 'raw']]);
       const result = decodeFormData(schema, formData) as Record<
         string,
@@ -650,7 +651,7 @@ describe('decodeFormData', () => {
 
   describe('prototype pollution', () => {
     test('should ignore __proto__ keys', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const formData = createFormData([
         ['["__proto__"]', 'polluted'],
         ['["__proto__","polluted"]', 'true'],
@@ -661,7 +662,7 @@ describe('decodeFormData', () => {
     });
 
     test('should ignore constructor and prototype keys', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const formData = createFormData([
         ['["constructor","x"]', 'a'],
         ['["prototype","y"]', 'b'],
@@ -670,9 +671,9 @@ describe('decodeFormData', () => {
     });
 
     test('should stop at a dangerous key deeper in the path', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         config: v.object({}),
-      });
+      }));
       const formData = createFormData([['["config","__proto__","x"]', 'a']]);
       const result = decodeFormData(schema, formData) as Record<
         string,
@@ -685,7 +686,7 @@ describe('decodeFormData', () => {
 
   describe('invalid keys', () => {
     test('should ignore keys that are not valid JSON', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const formData = createFormData([
         ['not json{', 'x'],
         ['["name"]', 'Jane'],
@@ -694,7 +695,7 @@ describe('decodeFormData', () => {
     });
 
     test('should ignore keys that do not parse to an array', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const formData = createFormData([
         ['"name"', 'x'],
         ['5', 'y'],
@@ -704,7 +705,7 @@ describe('decodeFormData', () => {
     });
 
     test('should ignore empty array keys', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const formData = createFormData([
         ['[]', 'x'],
         ['["name"]', 'Jane'],
@@ -713,7 +714,7 @@ describe('decodeFormData', () => {
     });
 
     test('should ignore keys with non-string or non-number segments', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const formData = createFormData([
         ['[true]', 'x'],
         ['[null]', 'y'],
@@ -723,7 +724,7 @@ describe('decodeFormData', () => {
     });
 
     test('should ignore keys with empty segments', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const formData = createFormData([
         ['[""]', 'x'],
         ['["name"]', 'Jane'],
@@ -734,7 +735,7 @@ describe('decodeFormData', () => {
 
   describe('limits', () => {
     test('should throw when an array index exceeds the maximum length', () => {
-      const schema = v.object({ flags: v.array(v.boolean()) });
+      const schema = toFormisch(v.object({ flags: v.array(v.boolean()) }));
       const formData = createFormData([['["flags",1000000000]', 'on']]);
       expect(() => decodeFormData(schema, formData)).toThrowError(
         'Array exceeds the maximum length of 5000'
@@ -742,7 +743,7 @@ describe('decodeFormData', () => {
     });
 
     test('should ignore string properties on arrays', () => {
-      const schema = v.object({ flags: v.array(v.string()) });
+      const schema = toFormisch(v.object({ flags: v.array(v.string()) }));
       const formData = createFormData([
         ['["flags","length"]', '1000000000'], // would inflate via `length`
         ['["flags","push"]', 'x'], // would clobber the `push` method
@@ -756,8 +757,8 @@ describe('decodeFormData', () => {
   });
 
   describe('integration', () => {
-    test('should produce values that validate against the schema', () => {
-      const schema = v.object({
+    test('should produce values that validate against the schema', async () => {
+      const schema = toFormisch(v.object({
         heading: v.string(),
         published: v.boolean(),
         views: v.number(),
@@ -768,7 +769,7 @@ describe('decodeFormData', () => {
           })
         ),
         tags: v.array(v.string()),
-      });
+      }));
       const formData = createFormData([
         ['["heading"]', 'My Post'],
         ['["published"]', 'on'],
@@ -779,9 +780,12 @@ describe('decodeFormData', () => {
         ['["tags"]', 'tech'],
         ['["tags"]', 'news'],
       ]);
-      const result = v.safeParse(schema, decodeFormData(schema, formData));
-      expect(result.success).toBe(true);
-      expect(result.output).toStrictEqual({
+      const validateResult = await Promise.resolve(
+        schema['~standard'].validate(decodeFormData(schema, formData))
+      );
+      expect(validateResult.issues).toBeUndefined();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((validateResult as any).value).toStrictEqual({
         heading: 'My Post',
         published: true,
         views: 128,

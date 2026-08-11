@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config';
+import { resolve } from 'node:path';
 
 export default defineConfig({
   test: {
@@ -17,6 +18,18 @@ export default defineConfig({
         '**/*.test.ts',
         '**/*.test-d.ts',
       ],
+    },
+  },
+  resolve: {
+    alias: {
+      '@formisch/valibot': resolve(
+        import.meta.dirname,
+        '../adapters/valibot/src/index.ts'
+      ),
+      '@formisch/zod': resolve(
+        import.meta.dirname,
+        '../adapters/zod/src/index.ts'
+      ),
     },
   },
 });

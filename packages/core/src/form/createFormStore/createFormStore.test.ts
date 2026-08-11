@@ -1,11 +1,12 @@
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
+import { toFormisch } from '../../vitest/index.ts';
 import { createFormStore } from './createFormStore.ts';
 
 describe('createFormStore', () => {
   describe('default configuration', () => {
     test('should use default validation modes when not specified', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const parse = vi.fn();
       const store = createFormStore({ schema }, parse);
 
@@ -14,7 +15,7 @@ describe('createFormStore', () => {
     });
 
     test('should initialize validation ID to 0', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const parse = vi.fn();
       const store = createFormStore({ schema }, parse);
 
@@ -22,7 +23,7 @@ describe('createFormStore', () => {
     });
 
     test('should initialize all boolean signals to false', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const parse = vi.fn();
       const store = createFormStore({ schema }, parse);
 
@@ -32,7 +33,7 @@ describe('createFormStore', () => {
     });
 
     test('should assign the parse function', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const parse = vi.fn();
       const store = createFormStore({ schema }, parse);
 
@@ -42,7 +43,7 @@ describe('createFormStore', () => {
 
   describe('custom configuration', () => {
     test('should use custom validate mode', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const parse = vi.fn();
       const store = createFormStore({ schema, validate: 'blur' }, parse);
 
@@ -50,7 +51,7 @@ describe('createFormStore', () => {
     });
 
     test('should use custom revalidate mode', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const parse = vi.fn();
       const store = createFormStore({ schema, revalidate: 'change' }, parse);
 
@@ -58,7 +59,7 @@ describe('createFormStore', () => {
     });
 
     test('should use both custom validation modes', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const parse = vi.fn();
       const store = createFormStore(
         { schema, validate: 'touch', revalidate: 'blur' },
@@ -72,7 +73,7 @@ describe('createFormStore', () => {
 
   describe('field store initialization', () => {
     test('should initialize simple object schema', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const parse = vi.fn();
       const store = createFormStore({ schema }, parse);
 
@@ -83,7 +84,7 @@ describe('createFormStore', () => {
     });
 
     test('should initialize with initial input', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const parse = vi.fn();
       const store = createFormStore(
         { schema, initialInput: { name: 'John' } },
@@ -94,12 +95,12 @@ describe('createFormStore', () => {
     });
 
     test('should initialize nested object schema', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         user: v.object({
           name: v.string(),
           age: v.number(),
         }),
-      });
+      }));
       const parse = vi.fn();
       const store = createFormStore({ schema }, parse);
 
@@ -113,9 +114,9 @@ describe('createFormStore', () => {
     });
 
     test('should initialize array schema', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         items: v.array(v.string()),
-      });
+      }));
       const parse = vi.fn();
       const store = createFormStore(
         { schema, initialInput: { items: ['a', 'b'] } },
@@ -141,7 +142,7 @@ describe('createFormStore', () => {
       'blur',
       'submit',
     ] as const)('should accept "%s" as validate mode', (mode) => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const parse = vi.fn();
       const store = createFormStore({ schema, validate: mode }, parse);
 
@@ -151,7 +152,7 @@ describe('createFormStore', () => {
     test.each(['touch', 'input', 'change', 'blur', 'submit'] as const)(
       'should accept "%s" as revalidate mode',
       (mode) => {
-        const schema = v.object({ name: v.string() });
+        const schema = toFormisch(v.object({ name: v.string() }));
         const parse = vi.fn();
         const store = createFormStore({ schema, revalidate: mode }, parse);
 

@@ -75,7 +75,7 @@ export function resetItemState(
         // Tuples have a fixed number of children that the schema cannot
         // recreate (no `item`), so they keep them even when the input is
         // nullish, just like `initializeFieldStore`
-        const isTuple = internalFieldStore.schema.type !== 'array';
+        const isTuple = internalFieldStore.ir.type !== 'array';
 
         // If input is provided or store is a tuple, (re)create items with IDs
         if (input || isTuple) {
@@ -122,8 +122,7 @@ export function resetItemState(
               initializeFieldStore(
                 internalFormStore,
                 internalFieldStore.children[index],
-                // @ts-expect-error
-                internalFieldStore.schema.item,
+                internalFieldStore.ir.item!,
                 itemInput,
                 [...internalFieldStore.path, index]
               );
@@ -164,7 +163,7 @@ export function resetItemState(
       const valueInput =
         input === undefined && !internalFieldStore.isNullish
           ? internalFormStore.emptyInput[
-              internalFieldStore.schema.type as keyof EmptyInput
+              internalFieldStore.ir.type as keyof EmptyInput
             ]
           : input;
 

@@ -1,14 +1,14 @@
 // @vitest-environment jsdom
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../../vitest/index.ts';
+import { createTestStore, toFormisch } from '../../vitest/index.ts';
 import { copyItemState } from './copyItemState.ts';
 
 describe('copyItemState', () => {
   describe('value fields', () => {
     test('should copy basic state between value fields', () => {
       const store = createTestStore(
-        v.object({ source: v.string(), target: v.string() }),
+        toFormisch(v.object({ source: v.string(), target: v.string() })),
         { initialInput: { source: 'hello', target: '' } }
       );
 
@@ -34,7 +34,7 @@ describe('copyItemState', () => {
 
     test('should copy elements array', () => {
       const store = createTestStore(
-        v.object({ source: v.string(), target: v.string() })
+        toFormisch(v.object({ source: v.string(), target: v.string() }))
       );
 
       const sourceStore = store.children.source;
@@ -52,10 +52,10 @@ describe('copyItemState', () => {
   describe('object fields', () => {
     test('should copy nested object state recursively', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           source: v.object({ name: v.string(), age: v.number() }),
           target: v.object({ name: v.string(), age: v.number() }),
-        }),
+        })),
         {
           initialInput: {
             source: { name: 'John', age: 30 },
@@ -87,10 +87,10 @@ describe('copyItemState', () => {
   describe('array fields', () => {
     test('should copy array state including items', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           source: v.array(v.string()),
           target: v.array(v.string()),
-        }),
+        })),
         {
           initialInput: {
             source: ['a', 'b'],
@@ -122,10 +122,10 @@ describe('copyItemState', () => {
 
     test('should initialize missing children when copying larger array', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           source: v.array(v.string()),
           target: v.array(v.string()),
-        }),
+        })),
         {
           initialInput: {
             source: ['a', 'b', 'c'],
@@ -154,7 +154,7 @@ describe('copyItemState', () => {
   describe('edge cases', () => {
     test('should handle null errors', () => {
       const store = createTestStore(
-        v.object({ source: v.string(), target: v.string() })
+        toFormisch(v.object({ source: v.string(), target: v.string() }))
       );
 
       const sourceStore = store.children.source;

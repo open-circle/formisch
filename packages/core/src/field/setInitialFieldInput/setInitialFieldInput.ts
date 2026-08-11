@@ -35,7 +35,7 @@ export function setInitialFieldInput(
       // instead of growing them (they have no `item` schema to initialize
       // additional children, unlike dynamic arrays)
       const length =
-        internalFieldStore.schema.type === 'array'
+        internalFieldStore.ir.type === 'array'
           ? (initialArrayInput as unknown[]).length
           : internalFieldStore.children.length;
 
@@ -55,8 +55,7 @@ export function setInitialFieldInput(
           initializeFieldStore(
             internalFormStore,
             internalFieldStore.children[index],
-            // @ts-expect-error
-            internalFieldStore.schema.item,
+            internalFieldStore.ir.item!,
             // @ts-expect-error
             initialArrayInput[index],
             [...internalFieldStore.path, index]
@@ -103,7 +102,7 @@ export function setInitialFieldInput(
       internalFieldStore.initialInput.value =
         initialInput === undefined && !internalFieldStore.isNullish
           ? internalFormStore.emptyInput[
-              internalFieldStore.schema.type as keyof EmptyInput
+              internalFieldStore.ir.type as keyof EmptyInput
             ]
           : initialInput;
     }

@@ -6,29 +6,29 @@ import {
   createTestStore,
   objectPath,
   schemaIssue,
+  toFormisch,
   validationIssue,
 } from '../../vitest/index.ts';
+import type { StandardParseResult } from '../../types/index.ts';
 import { createFormStore } from '../createFormStore/createFormStore.ts';
 import { validateFormInput } from './validateFormInput.ts';
 
 describe('validateFormInput', () => {
   describe('successful validation', () => {
     test('should return success result when no issues', async () => {
-      const schema = v.object({ name: v.string() });
-      const store = createTestStore(schema, { initialInput: { name: 'John' } });
+      const schema = toFormisch(v.object({ name: v.string() }));
+      const store = createTestStore(schema, {
+        initialInput: { name: 'John' },
+      });
 
       const result = await validateFormInput(store);
 
-      expect(result).toStrictEqual({
-        typed: true,
-        success: true,
-        output: { name: 'John' },
-        issues: undefined,
-      });
+      expect(result.issues).toBeUndefined();
+      expect(result.value).toStrictEqual({ name: 'John' });
     });
 
     test('should set all field errors to null on success', async () => {
-      const schema = v.object({ name: v.string(), email: v.string() });
+      const schema = toFormisch(v.object({ name: v.string(), email: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { name: 'John', email: 'a@b.c' },
       });
@@ -47,7 +47,7 @@ describe('validateFormInput', () => {
 
   describe('validation with errors', () => {
     test('should assign root errors for issues without path', async () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { name: 'John' },
         issues: [schemaIssue('Invalid type')],
@@ -59,7 +59,7 @@ describe('validateFormInput', () => {
     });
 
     test('should assign nested errors for issues with path', async () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { name: '' },
         issues: [validationIssue('Name is required', [objectPath('name')])],
@@ -73,7 +73,7 @@ describe('validateFormInput', () => {
     });
 
     test('should accumulate multiple errors on same field', async () => {
-      const schema = v.object({ email: v.string() });
+      const schema = toFormisch(v.object({ email: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { email: '' },
         issues: [
@@ -91,12 +91,14 @@ describe('validateFormInput', () => {
     });
 
     test('should handle nested object path', async () => {
-      const schema = v.object({ user: v.object({ name: v.string() }) });
+      const schema = toFormisch(
+        v.object({ user: v.object({ name: v.string() }) })
+      );
       const store = createTestStore(schema, {
         initialInput: { user: { name: '' } },
         issues: [
           validationIssue('Name is required', [
-            objectPath('user', {}),
+            objectPath('user'),
             objectPath('name'),
           ]),
         ],
@@ -114,12 +116,12 @@ describe('validateFormInput', () => {
     });
 
     test('should handle array path with index', async () => {
-      const schema = v.object({ items: v.array(v.string()) });
+      const schema = toFormisch(v.object({ items: v.array(v.string()) }));
       const store = createTestStore(schema, {
         initialInput: { items: ['a', ''] },
         issues: [
           validationIssue('Item is required', [
-            objectPath('items', []),
+            objectPath('items'),
             arrayPath(1),
           ]),
         ],
@@ -137,7 +139,7 @@ describe('validateFormInput', () => {
     });
 
     test('should handle multiple root errors', async () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { name: '' },
         issues: [
@@ -157,18 +159,14 @@ describe('validateFormInput', () => {
 
   describe('edge cases for path handling', () => {
     test('should stop path building at symbol keys', async () => {
-      const schema = v.object({ name: v.string() });
-      const symbolPath: v.UnknownPathItem = {
-        type: 'unknown',
-        origin: 'value',
-        input: {},
-        key: Symbol('test'),
-        value: '',
-      };
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { name: '' },
         issues: [
-          validationIssue('Symbol key error', [symbolPath, objectPath('name')]),
+          validationIssue('Symbol key error', [
+            { key: Symbol('test') },
+            objectPath('name'),
+          ]),
         ],
       });
 
@@ -179,61 +177,16 @@ describe('validateFormInput', () => {
       expect(store.children.name.errors.value).toBeNull();
     });
 
-    test('should stop path building at map type path items', async () => {
-      const schema = v.object({ name: v.string() });
-      const mapPath: v.MapPathItem = {
-        type: 'map',
-        origin: 'value',
-        input: new Map(),
-        key: 'key',
-        value: '',
-      };
-      const store = createTestStore(schema, {
-        initialInput: { name: '' },
-        issues: [validationIssue('Map error', [mapPath])],
-      });
-
-      await validateFormInput(store);
-
-      // Map paths are not supported
-      expect(store.errors.value).toBeNull();
-    });
-
-    test('should stop path building at set type path items', async () => {
-      const schema = v.object({ name: v.string() });
-      const setPath: v.SetPathItem = {
-        type: 'set',
-        origin: 'value',
-        input: new Set(),
-        key: null,
-        value: '',
-      };
-      const store = createTestStore(schema, {
-        initialInput: { name: '' },
-        issues: [validationIssue('Set error', [setPath])],
-      });
-
-      await validateFormInput(store);
-
-      // Set paths are not supported
-      expect(store.errors.value).toBeNull();
-    });
-
-    test('should build partial path when unsupported type appears mid-path', async () => {
-      const schema = v.object({ user: v.object({ name: v.string() }) });
-      const mapPath: v.MapPathItem = {
-        type: 'map',
-        origin: 'value',
-        input: new Map(),
-        key: 'key',
-        value: '',
-      };
+    test('should build partial path when unsupported key appears mid-path', async () => {
+      const schema = toFormisch(
+        v.object({ user: v.object({ name: v.string() }) })
+      );
       const store = createTestStore(schema, {
         initialInput: { user: { name: '' } },
         issues: [
           validationIssue('Mid-path error', [
-            objectPath('user', {}),
-            mapPath,
+            objectPath('user'),
+            { key: Symbol('mid') },
             objectPath('name'),
           ]),
         ],
@@ -241,7 +194,7 @@ describe('validateFormInput', () => {
 
       await validateFormInput(store);
 
-      // Path building stops at map, so only ['user'] is built
+      // Path building stops at symbol key, so only ['user'] is built
       expect(store.children.user.errors.value).toStrictEqual([
         'Mid-path error',
       ]);
@@ -254,7 +207,7 @@ describe('validateFormInput', () => {
     });
 
     test('should focus first error field when shouldFocus is true', async () => {
-      const schema = v.object({ name: v.string(), email: v.string() });
+      const schema = toFormisch(v.object({ name: v.string(), email: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { name: '', email: '' },
         issues: [
@@ -273,7 +226,7 @@ describe('validateFormInput', () => {
     });
 
     test('should not focus when shouldFocus is false', async () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { name: '' },
         issues: [validationIssue('Name is required', [objectPath('name')])],
@@ -290,7 +243,7 @@ describe('validateFormInput', () => {
     });
 
     test('should not focus when shouldFocus is undefined', async () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { name: '' },
         issues: [validationIssue('Name is required', [objectPath('name')])],
@@ -307,7 +260,7 @@ describe('validateFormInput', () => {
     });
 
     test('should focus next error field when the first has no element', async () => {
-      const schema = v.object({ name: v.string(), email: v.string() });
+      const schema = toFormisch(v.object({ name: v.string(), email: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { name: '', email: '' },
         issues: [
@@ -316,8 +269,6 @@ describe('validateFormInput', () => {
         ],
       });
 
-      // The first erroring field (name) has no registered element, so focus
-      // must fall through to the second erroring field (email)
       const emailInput = document.createElement('input');
       document.body.appendChild(emailInput);
       store.children.email.elements = [emailInput];
@@ -328,7 +279,7 @@ describe('validateFormInput', () => {
     });
 
     test('should skip an erroring field whose element cannot be focused', async () => {
-      const schema = v.object({ name: v.string(), email: v.string() });
+      const schema = toFormisch(v.object({ name: v.string(), email: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { name: '', email: '' },
         issues: [
@@ -337,8 +288,6 @@ describe('validateFormInput', () => {
         ],
       });
 
-      // The first erroring field has a disabled (unfocusable) element, so the
-      // focus must fall through to the second erroring field
       const nameInput = document.createElement('input');
       nameInput.disabled = true;
       const emailInput = document.createElement('input');
@@ -353,7 +302,7 @@ describe('validateFormInput', () => {
     });
 
     test('should only focus first field with error', async () => {
-      const schema = v.object({ name: v.string(), email: v.string() });
+      const schema = toFormisch(v.object({ name: v.string(), email: v.string() }));
       const store = createTestStore(schema, {
         initialInput: { name: '', email: '' },
         issues: [
@@ -381,12 +330,12 @@ describe('validateFormInput', () => {
 
   describe('validation state management', () => {
     test('should set isValidating to true during validation', async () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       let isValidatingDuringParse = false;
 
       const parse = vi.fn().mockImplementation(async () => {
         isValidatingDuringParse = true;
-        return { typed: true, success: true, output: {}, issues: undefined };
+        return { issues: undefined, value: {} } as StandardParseResult;
       });
 
       const store = createFormStore({ schema }, parse);
@@ -396,7 +345,7 @@ describe('validateFormInput', () => {
     });
 
     test('should set isValidating to false after validation', async () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, { initialInput: { name: 'John' } });
 
       await validateFormInput(store);
@@ -405,7 +354,7 @@ describe('validateFormInput', () => {
     });
 
     test('should increment validation ID for each validation', async () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, { initialInput: { name: 'John' } });
 
       expect(store.validationId).toBe(0);
@@ -416,7 +365,7 @@ describe('validateFormInput', () => {
     });
 
     test('should reset validation state when parse rejects', async () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const parse = vi.fn().mockRejectedValue(new Error('Parse failed'));
       const store = createFormStore({ schema }, parse);
 
@@ -427,10 +376,10 @@ describe('validateFormInput', () => {
     });
 
     test('should handle concurrent validations', async () => {
-      const schema = v.object({ name: v.string() });
-      type ParseResult = v.SafeParseResult<typeof schema>;
-      let resolveFirst: (value: ParseResult) => void;
-      let resolveSecond: (value: ParseResult) => void;
+      const schema = toFormisch(v.object({ name: v.string() }));
+      type ParseResult = StandardParseResult;
+      let resolveFirst!: (value: ParseResult) => void;
+      let resolveSecond!: (value: ParseResult) => void;
 
       const parseFirst = new Promise<ParseResult>((resolve) => {
         resolveFirst = resolve;
@@ -454,12 +403,7 @@ describe('validateFormInput', () => {
       expect(store.isValidating.value).toBe(true);
 
       // Resolve first validation
-      resolveFirst!({
-        typed: true,
-        success: true,
-        output: { name: 'John' },
-        issues: undefined,
-      });
+      resolveFirst({ issues: undefined, value: { name: 'John' } });
       await validation1;
 
       // The first validation is stale, so it must not reset the validating
@@ -467,12 +411,7 @@ describe('validateFormInput', () => {
       expect(store.isValidating.value).toBe(true);
 
       // Resolve second validation
-      resolveSecond!({
-        typed: true,
-        success: true,
-        output: { name: 'Jane' },
-        issues: undefined,
-      });
+      resolveSecond({ issues: undefined, value: { name: 'Jane' } });
       await validation2;
 
       expect(store.isValidating.value).toBe(false);

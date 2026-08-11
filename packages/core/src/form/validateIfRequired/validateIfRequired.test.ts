@@ -1,12 +1,12 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../../vitest/index.ts';
+import { createTestStore, toFormisch } from '../../vitest/index.ts';
 import { validateIfRequired } from './validateIfRequired.ts';
 
 describe('validateIfRequired', () => {
   describe('validate = initial', () => {
     test('should use revalidate mode when validate is initial', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'initial',
         revalidate: 'input',
@@ -21,7 +21,7 @@ describe('validateIfRequired', () => {
     });
 
     test('should not validate when mode does not match revalidate', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'initial',
         revalidate: 'input',
@@ -35,7 +35,7 @@ describe('validateIfRequired', () => {
 
   describe('validate = submit', () => {
     test('should use revalidate mode when form is submitted', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'submit',
         revalidate: 'input',
@@ -50,7 +50,7 @@ describe('validateIfRequired', () => {
     });
 
     test('should use validate mode when form is not submitted', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'submit',
         revalidate: 'input',
@@ -63,7 +63,7 @@ describe('validateIfRequired', () => {
     });
 
     test('should not validate when mode does not match and not submitted', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'submit',
         revalidate: 'input',
@@ -78,7 +78,7 @@ describe('validateIfRequired', () => {
 
   describe('validate = input (non-submit, non-initial)', () => {
     test('should use revalidate mode when field has errors', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'input',
         revalidate: 'blur',
@@ -93,7 +93,7 @@ describe('validateIfRequired', () => {
     });
 
     test('should use validate mode when field has no errors', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'input',
         revalidate: 'blur',
@@ -106,7 +106,7 @@ describe('validateIfRequired', () => {
     });
 
     test('should not validate when mode does not match and no errors', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'input',
         revalidate: 'blur',
@@ -121,7 +121,7 @@ describe('validateIfRequired', () => {
 
   describe('validate = blur', () => {
     test('should validate on blur when no errors', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'blur',
         revalidate: 'input',
@@ -133,7 +133,7 @@ describe('validateIfRequired', () => {
     });
 
     test('should validate on input when has errors (revalidate)', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'blur',
         revalidate: 'input',
@@ -149,7 +149,7 @@ describe('validateIfRequired', () => {
 
   describe('validate = touch', () => {
     test('should validate on touch when no errors', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'touch',
         revalidate: 'change',
@@ -161,7 +161,7 @@ describe('validateIfRequired', () => {
     });
 
     test('should validate on change when has errors (revalidate)', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'touch',
         revalidate: 'change',
@@ -177,7 +177,7 @@ describe('validateIfRequired', () => {
 
   describe('validate = change', () => {
     test('should validate on change when no errors', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'change',
         revalidate: 'blur',
@@ -189,7 +189,7 @@ describe('validateIfRequired', () => {
     });
 
     test('should validate on blur when has errors (revalidate)', () => {
-      const schema = v.object({ name: v.string() });
+      const schema = toFormisch(v.object({ name: v.string() }));
       const store = createTestStore(schema, {
         validate: 'change',
         revalidate: 'blur',
@@ -205,9 +205,9 @@ describe('validateIfRequired', () => {
 
   describe('nested field errors', () => {
     test('should check nested field errors for arrays', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         items: v.array(v.string()),
-      });
+      }));
       const store = createTestStore(schema, {
         validate: 'blur',
         revalidate: 'input',
@@ -228,11 +228,11 @@ describe('validateIfRequired', () => {
     });
 
     test('should check nested field errors for objects', () => {
-      const schema = v.object({
+      const schema = toFormisch(v.object({
         user: v.object({
           name: v.string(),
         }),
-      });
+      }));
       const store = createTestStore(schema, {
         validate: 'blur',
         revalidate: 'input',
@@ -263,7 +263,7 @@ describe('validateIfRequired', () => {
     ] as const)(
       'validate=%s with revalidate=%s should match mode=%s',
       (validate, revalidate, mode) => {
-        const schema = v.object({ name: v.string() });
+        const schema = toFormisch(v.object({ name: v.string() }));
         const store = createTestStore(schema, { validate, revalidate });
 
         validateIfRequired(store, store.children.name, mode);
@@ -281,7 +281,7 @@ describe('validateIfRequired', () => {
     ] as const)(
       'validate=%s (no errors) should match mode=%s',
       (validate, mode) => {
-        const schema = v.object({ name: v.string() });
+        const schema = toFormisch(v.object({ name: v.string() }));
         const store = createTestStore(schema, {
           validate,
           revalidate: 'input',

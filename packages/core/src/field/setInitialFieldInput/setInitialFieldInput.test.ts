@@ -1,12 +1,12 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../../vitest/index.ts';
+import { createTestStore, toFormisch } from '../../vitest/index.ts';
 import { setInitialFieldInput } from './setInitialFieldInput.ts';
 
 describe('setInitialFieldInput', () => {
   describe('value fields', () => {
     test('should set initial input', () => {
-      const store = createTestStore(v.object({ name: v.string() }));
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })));
       setInitialFieldInput(store, store.children.name, 'John');
       expect(store.children.name.initialInput.value).toBe('John');
     });
@@ -15,7 +15,7 @@ describe('setInitialFieldInput', () => {
   describe('object fields', () => {
     test('should set initial input on nested children', () => {
       const store = createTestStore(
-        v.object({ user: v.object({ name: v.string() }) })
+        toFormisch(v.object({ user: v.object({ name: v.string() }) }))
       );
       setInitialFieldInput(store, store.children.user, { name: 'John' });
       const userStore = store.children.user;
@@ -28,7 +28,7 @@ describe('setInitialFieldInput', () => {
 
     test('should set null initial input for nullish object', () => {
       const store = createTestStore(
-        v.object({ user: v.nullish(v.object({ name: v.string() })) }),
+        toFormisch(v.object({ user: v.nullish(v.object({ name: v.string() })) })),
         { initialInput: { user: { name: 'John' } } }
       );
       setInitialFieldInput(store, store.children.user, null);
@@ -40,7 +40,7 @@ describe('setInitialFieldInput', () => {
 
   describe('array fields', () => {
     test('should set initial items', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['a'] },
       });
       setInitialFieldInput(store, store.children.items, ['x', 'y']);
@@ -53,7 +53,7 @@ describe('setInitialFieldInput', () => {
     });
 
     test('should initialize new children when array grows', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['a'] },
       });
       setInitialFieldInput(store, store.children.items, ['x', 'y', 'z']);
@@ -67,7 +67,7 @@ describe('setInitialFieldInput', () => {
 
     test('should set null initial input for nullish array', () => {
       const store = createTestStore(
-        v.object({ items: v.nullish(v.array(v.string())) }),
+        toFormisch(v.object({ items: v.nullish(v.array(v.string())) })),
         { initialInput: { items: ['a'] } }
       );
       setInitialFieldInput(store, store.children.items, null);
@@ -77,7 +77,7 @@ describe('setInitialFieldInput', () => {
     });
 
     test('should set initial input on existing children', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['a', 'b'] },
       });
       const itemsStore = store.children.items;
@@ -91,7 +91,7 @@ describe('setInitialFieldInput', () => {
 
     test('should keep a tuple at its fixed length when given a longer input', () => {
       const store = createTestStore(
-        v.object({ pair: v.tuple([v.string(), v.number()]) }),
+        toFormisch(v.object({ pair: v.tuple([v.string(), v.number()]) })),
         { initialInput: { pair: ['a', 1] } }
       );
       const pairStore = store.children.pair;
