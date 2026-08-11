@@ -4,10 +4,10 @@ import {
   type FormSchema,
   getFieldBool,
   INTERNAL,
+  type StandardParseResult,
   validateFormInput,
 } from '@formisch/core/react';
 import { useLayoutEffect, useMemo } from 'react';
-import * as v from 'valibot';
 import type { FormStore } from '../../types/index.ts';
 import { useSignals } from '../useSignals/index.ts';
 
@@ -29,9 +29,13 @@ export function useForm(config: FormConfig): FormStore {
 
   const internalFormStore = useMemo(
     () =>
-      createFormStore(config, (input) =>
-        v.safeParseAsync(config.schema, input)
-      ),
+      createFormStore(config, async (input) => {
+        const result = await config.schema['~standard'].validate(input);
+        if (result.issues) {
+          return { issues: result.issues } as StandardParseResult;
+        }
+        return { value: result.value } as StandardParseResult;
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
