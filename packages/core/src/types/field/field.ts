@@ -1,5 +1,5 @@
 import type { Path } from '../path/index.ts';
-import type { Schema } from '../schema/index.ts';
+import type { FormischFieldIR } from '../schema/index.ts';
 import type { Signal } from '../signal/index.ts';
 
 /**
@@ -27,9 +27,9 @@ export interface InternalBaseStore {
    */
   path: Path;
   /**
-   * The schema of the field.
+   * The IR (intermediate representation) of the field schema.
    */
-  schema: Schema;
+  ir: FormischFieldIR;
   /**
    * Whether the schema is wrapped in a nullish schema.
    *

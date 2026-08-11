@@ -1,4 +1,4 @@
-import type * as v from 'valibot';
+import type { StandardSchemaV1 } from '@standard-schema/spec';
 import type { INTERNAL } from '../../values.ts';
 import type { InternalObjectStore } from '../field/index.ts';
 import type { FormSchema } from '../schema/index.ts';
@@ -46,6 +46,60 @@ export interface EmptyInput {
 }
 
 /**
+ * Extracts the input type from a Standard Schema.
+ */
+type InferStandardInput<T> =
+  T extends { readonly '~standard': { readonly types?: { readonly input: infer I } } }
+    ? I
+    : unknown;
+
+/**
+ * Extracts the output type from a Standard Schema.
+ */
+type InferStandardOutput<T> =
+  T extends { readonly '~standard': { readonly types?: { readonly output: infer O } } }
+    ? O
+    : unknown;
+
+/**
+ * A path segment in a Standard Schema validation issue.
+ */
+export interface StandardIssuePathItem {
+  /**
+   * The key representing a path segment (string or number).
+   */
+  readonly key: PropertyKey;
+}
+
+/**
+ * A validation issue from a Standard Schema validate call.
+ */
+export interface StandardIssue {
+  /**
+   * The error message.
+   */
+  readonly message: string;
+  /**
+   * The path to the field with the error, if any.
+   */
+  readonly path?: ReadonlyArray<PropertyKey | StandardIssuePathItem> | undefined;
+}
+
+/**
+ * The result of a Standard Schema validation.
+ */
+export interface StandardParseResult<T = unknown> {
+  /**
+   * The issues if validation failed; `undefined` if it succeeded.
+   */
+  readonly issues?: readonly StandardIssue[] | undefined;
+  /**
+   * The parsed output value if validation succeeded.
+   */
+  readonly value?: T | undefined;
+}
+
+/**
  * Form config interface.
  */
 export interface FormConfig<TSchema extends FormSchema = FormSchema> {
@@ -56,7 +110,7 @@ export interface FormConfig<TSchema extends FormSchema = FormSchema> {
   /**
    * The initial input of the form.
    */
-  readonly initialInput?: DeepPartial<v.InferInput<TSchema>> | undefined;
+  readonly initialInput?: DeepPartial<InferStandardInput<TSchema>> | undefined;
   /**
    * The empty input of the form, keyed by field type. Merged on top of the
    * defaults, so `{ string: '' }` stays in effect unless overridden.
@@ -99,9 +153,10 @@ export interface InternalFormStore<TSchema extends FormSchema = FormSchema>
    */
   revalidate: Exclude<ValidationMode, 'initial'>;
   /**
-   * The parse function of the form.
+   * The parse function of the form. Validates input via the Standard Schema
+   * `~standard.validate` entry point and returns a standard result.
    */
-  parse: (input: unknown) => Promise<v.SafeParseResult<TSchema>>;
+  parse: (input: unknown) => Promise<StandardParseResult<InferStandardOutput<TSchema>>>;
 
   /**
    * The submitting state of the form.
@@ -133,13 +188,13 @@ export interface BaseFormStore<TSchema extends FormSchema = FormSchema> {
  * Submit handler type.
  */
 export type SubmitHandler<TSchema extends FormSchema> = (
-  output: v.InferOutput<TSchema>
+  output: InferStandardOutput<TSchema>
 ) => MaybePromise<unknown>;
 
 /**
  * Submit event handler type.
  */
 export type SubmitEventHandler<TSchema extends FormSchema> = (
-  output: v.InferOutput<TSchema>,
+  output: InferStandardOutput<TSchema>,
   event: SubmitEvent
 ) => MaybePromise<unknown>;
