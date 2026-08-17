@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd ../packages/core && pnpm build && cd ../methods && pnpm build && cd ../../frameworks/qwik && pnpm build && cd ../../website && pnpm sitemap && pnpm llms && pnpm agents && pnpm og && pnpm build",
+  "buildCommand": "cd ../packages/core && pnpm build && cd ../methods && pnpm build && cd ../../frameworks/qwik && pnpm build && cd ../../website && pnpm sitemap && pnpm llms && pnpm agents && pnpm og && pnpm rss && pnpm build",
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": true,
@@ -209,6 +209,19 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=86400, s-maxage=86400"
+        }
+      ]
+    },
+    {
+      "source": "/feed.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/atom+xml; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
         }
       ]
     },
