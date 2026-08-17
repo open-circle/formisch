@@ -1,13 +1,13 @@
 // @vitest-environment jsdom
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../../vitest/index.ts';
+import { createTestStore, toFormisch } from '../../vitest/index.ts';
 import { resetItemState } from './resetItemState.ts';
 
 describe('resetItemState', () => {
   describe('value fields', () => {
     test('should reset value field to new input', () => {
-      const store = createTestStore(v.object({ name: v.string() }), {
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })), {
         initialInput: { name: 'John' },
       });
 
@@ -34,7 +34,7 @@ describe('resetItemState', () => {
 
     test('should handle undefined input', () => {
       const store = createTestStore(
-        v.object({ name: v.optional(v.string()) }),
+        toFormisch(v.object({ name: v.optional(v.string()) })),
         { initialInput: { name: 'John' } }
       );
 
@@ -51,7 +51,7 @@ describe('resetItemState', () => {
   describe('object fields', () => {
     test('should reset object field and children', () => {
       const store = createTestStore(
-        v.object({ user: v.object({ name: v.string(), age: v.number() }) }),
+        toFormisch(v.object({ user: v.object({ name: v.string(), age: v.number() }) })),
         { initialInput: { user: { name: 'John', age: 30 } } }
       );
 
@@ -77,7 +77,7 @@ describe('resetItemState', () => {
 
     test('should handle null input for object', () => {
       const store = createTestStore(
-        v.object({ user: v.optional(v.object({ name: v.string() })) }),
+        toFormisch(v.object({ user: v.optional(v.object({ name: v.string() })) })),
         { initialInput: { user: { name: 'John' } } }
       );
 
@@ -95,7 +95,7 @@ describe('resetItemState', () => {
 
   describe('array fields', () => {
     test('should reset array field with new items', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['a', 'b'] },
       });
 
@@ -119,7 +119,7 @@ describe('resetItemState', () => {
     });
 
     test('should reset non-nullish array to present empty when input is nullish', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['a', 'b'] },
       });
 
@@ -139,7 +139,7 @@ describe('resetItemState', () => {
 
     test('should reset nullish array to null when input is null', () => {
       const store = createTestStore(
-        v.object({ items: v.nullish(v.array(v.string())) }),
+        toFormisch(v.object({ items: v.nullish(v.array(v.string())) })),
         { initialInput: { items: ['a', 'b'] } }
       );
 
@@ -156,7 +156,7 @@ describe('resetItemState', () => {
     });
 
     test('should generate new IDs for items', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['a'] },
       });
 
@@ -175,7 +175,7 @@ describe('resetItemState', () => {
 
   describe('keepStart', () => {
     test('should keep start input as the dirty baseline for value fields', () => {
-      const store = createTestStore(v.object({ name: v.string() }), {
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })), {
         initialInput: { name: 'John' },
       });
 
@@ -192,7 +192,7 @@ describe('resetItemState', () => {
     });
 
     test('should keep start items as the dirty baseline for array fields', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['a', 'b'] },
       });
 
@@ -215,7 +215,7 @@ describe('resetItemState', () => {
 
   describe('elements', () => {
     test('should keep initialElements in sync when the store owns its array', () => {
-      const store = createTestStore(v.object({ name: v.string() }), {
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })), {
         initialInput: { name: 'a' },
       });
       const field = store.children.name;
@@ -235,7 +235,7 @@ describe('resetItemState', () => {
     });
 
     test('should not touch initialElements when a reorder moved the elements', () => {
-      const store = createTestStore(v.object({ name: v.string() }), {
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })), {
         initialInput: { name: 'a' },
       });
       const field = store.children.name;
@@ -253,7 +253,7 @@ describe('resetItemState', () => {
 
   describe('edge cases', () => {
     test('should initialize missing array children', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['a'] },
       });
 
@@ -276,7 +276,7 @@ describe('resetItemState', () => {
 
     test('should not grow a tuple beyond its fixed children', () => {
       const store = createTestStore(
-        v.object({ pair: v.tuple([v.string(), v.number()]) }),
+        toFormisch(v.object({ pair: v.tuple([v.string(), v.number()]) })),
         { initialInput: { pair: ['a', 1] } }
       );
 
@@ -300,7 +300,7 @@ describe('resetItemState', () => {
 
     test('should keep a non-nullish tuple at its fixed length when input is nullish', () => {
       const store = createTestStore(
-        v.object({ pair: v.tuple([v.string(), v.number()]) }),
+        toFormisch(v.object({ pair: v.tuple([v.string(), v.number()]) })),
         { initialInput: { pair: ['a', 1] } }
       );
 

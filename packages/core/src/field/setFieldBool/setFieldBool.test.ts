@@ -1,25 +1,25 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../../vitest/index.ts';
+import { createTestStore, toFormisch } from '../../vitest/index.ts';
 import { setFieldBool } from './setFieldBool.ts';
 
 describe('setFieldBool', () => {
   describe('value fields', () => {
     test('should set isTouched to true', () => {
-      const store = createTestStore(v.object({ name: v.string() }));
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })));
       setFieldBool(store.children.name, 'isTouched', true);
       expect(store.children.name.isTouched.value).toBe(true);
     });
 
     test('should set isTouched to false', () => {
-      const store = createTestStore(v.object({ name: v.string() }));
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })));
       store.children.name.isTouched.value = true;
       setFieldBool(store.children.name, 'isTouched', false);
       expect(store.children.name.isTouched.value).toBe(false);
     });
 
     test('should set isDirty', () => {
-      const store = createTestStore(v.object({ name: v.string() }));
+      const store = createTestStore(toFormisch(v.object({ name: v.string() })));
       setFieldBool(store.children.name, 'isDirty', true);
       expect(store.children.name.isDirty.value).toBe(true);
     });
@@ -28,7 +28,7 @@ describe('setFieldBool', () => {
   describe('object fields', () => {
     test('should set property on all nested children', () => {
       const store = createTestStore(
-        v.object({ user: v.object({ name: v.string(), age: v.number() }) })
+        toFormisch(v.object({ user: v.object({ name: v.string(), age: v.number() }) }))
       );
       setFieldBool(store.children.user, 'isTouched', true);
       const userStore = store.children.user;
@@ -41,7 +41,7 @@ describe('setFieldBool', () => {
 
     test('should set property on object itself', () => {
       const store = createTestStore(
-        v.object({ user: v.object({ name: v.string() }) })
+        toFormisch(v.object({ user: v.object({ name: v.string() }) }))
       );
       setFieldBool(store.children.user, 'isTouched', true);
       expect(store.children.user.isTouched.value).toBe(true);
@@ -50,7 +50,7 @@ describe('setFieldBool', () => {
 
   describe('array fields', () => {
     test('should set property on array and all items', () => {
-      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
         initialInput: { items: ['a', 'b'] },
       });
       setFieldBool(store.children.items, 'isTouched', true);
@@ -67,9 +67,9 @@ describe('setFieldBool', () => {
   describe('deeply nested', () => {
     test('should set property on all descendants', () => {
       const store = createTestStore(
-        v.object({
+        toFormisch(v.object({
           users: v.array(v.object({ profile: v.object({ name: v.string() }) })),
-        }),
+        })),
         { initialInput: { users: [{ profile: { name: 'John' } }] } }
       );
       setFieldBool(store.children.users, 'isDirty', true);

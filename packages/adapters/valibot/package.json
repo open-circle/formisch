@@ -1,0 +1,53 @@
+{
+  "name": "@formisch/valibot",
+  "description": "Valibot adapter for Formisch — transforms Valibot schemas into the Formisch IR",
+  "version": "1.0.0-alpha.0",
+  "license": "MIT",
+  "author": "Formisch",
+  "homepage": "https://formisch.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-circle/formisch.git"
+  },
+  "keywords": [
+    "form",
+    "forms",
+    "valibot",
+    "schema",
+    "validation",
+    "typescript"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "sideEffects": false,
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run --typecheck",
+    "lint": "eslint \"src/**/*.ts\" && tsc --noEmit",
+    "format": "prettier --write ./src"
+  },
+  "devDependencies": {
+    "@formisch/core": "workspace:*",
+    "@formisch/eslint-config": "workspace:*",
+    "@formisch/zod": "workspace:*",
+    "tsdown": "^0.16.8",
+    "typescript": "~5.9.3",
+    "valibot": "^1.4.1",
+    "vitest": "^4.1.7",
+    "zod": "^3.24.0"
+  },
+  "peerDependencies": {
+    "valibot": "^1.4.1"
+  }
+}

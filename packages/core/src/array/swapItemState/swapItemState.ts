@@ -99,8 +99,7 @@ export function swapItemState(
             initializeFieldStore(
               internalFormStore,
               firstInternalFieldStore.children[index],
-              // @ts-expect-error
-              firstInternalFieldStore.schema.item,
+              firstInternalFieldStore.ir.item!,
               undefined,
               [...firstInternalFieldStore.path, index]
             );
@@ -116,8 +115,7 @@ export function swapItemState(
             initializeFieldStore(
               internalFormStore,
               secondInternalFieldStore.children[index],
-              // @ts-expect-error
-              secondInternalFieldStore.schema.item,
+              secondInternalFieldStore.ir.item!,
               undefined,
               [...secondInternalFieldStore.path, index]
             );

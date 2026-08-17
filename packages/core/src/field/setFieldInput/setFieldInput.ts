@@ -34,7 +34,7 @@ function setNestedInput(
     // instead of growing them (they have no `item` schema to initialize
     // additional children, unlike dynamic arrays)
     const length =
-      internalFieldStore.schema.type === 'array'
+      internalFieldStore.ir.type === 'array'
         ? (arrayInput as unknown[]).length
         : internalFieldStore.children.length;
 
@@ -71,8 +71,7 @@ function setNestedInput(
           initializeFieldStore(
             internalFormStore,
             internalFieldStore.children[index],
-            // @ts-expect-error
-            internalFieldStore.schema.item,
+            internalFieldStore.ir.item!,
             // @ts-expect-error
             arrayInput[index],
             [...internalFieldStore.path, index]

@@ -1,5 +1,4 @@
 import type { QRL } from '@qwik.dev/core';
-import type * as v from 'valibot';
 import type { INTERNAL } from '../../values.ts';
 import type { InternalObjectStore } from '../field/field.qwik.ts';
 import type { FormSchema } from '../schema/index.ts';
@@ -7,10 +6,27 @@ import type { Signal } from '../signal/index.ts';
 import type { DeepPartial } from '../utils/index.ts';
 import type {
   EmptyInput,
+  StandardParseResult,
   SubmitEventHandler,
   SubmitHandler,
   ValidationMode,
 } from './form.ts';
+
+/**
+ * Extracts the input type from a Standard Schema.
+ */
+type InferStandardInput<T> =
+  T extends { readonly '~standard': { readonly types?: { readonly input: infer I } } }
+    ? I
+    : unknown;
+
+/**
+ * Extracts the output type from a Standard Schema.
+ */
+type InferStandardOutput<T> =
+  T extends { readonly '~standard': { readonly types?: { readonly output: infer O } } }
+    ? O
+    : unknown;
 
 /**
  * Form config interface.
@@ -23,7 +39,7 @@ export interface FormConfig<TSchema extends FormSchema = FormSchema> {
   /**
    * The initial input of the form.
    */
-  readonly initialInput?: DeepPartial<v.InferInput<TSchema>> | undefined;
+  readonly initialInput?: DeepPartial<InferStandardInput<TSchema>> | undefined;
   /**
    * The empty input of the form, keyed by field type. Merged on top of the
    * defaults, so `{ string: '' }` stays in effect unless overridden.
@@ -68,7 +84,9 @@ export interface InternalFormStore<TSchema extends FormSchema = FormSchema>
   /**
    * The parse function of the form.
    */
-  parse: QRL<(input: unknown) => Promise<v.SafeParseResult<TSchema>>>;
+  parse: QRL<
+    (input: unknown) => Promise<StandardParseResult<InferStandardOutput<TSchema>>>
+  >;
 
   /**
    * The submitting state of the form.
@@ -96,4 +114,10 @@ export interface BaseFormStore<TSchema extends FormSchema = FormSchema> {
   readonly [INTERNAL]: InternalFormStore<TSchema>;
 }
 
-export type { EmptyInput, ValidationMode, SubmitHandler, SubmitEventHandler };
+export type {
+  EmptyInput,
+  StandardParseResult,
+  ValidationMode,
+  SubmitHandler,
+  SubmitEventHandler,
+};

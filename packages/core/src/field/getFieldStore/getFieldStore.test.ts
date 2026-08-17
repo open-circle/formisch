@@ -1,22 +1,22 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { createTestStore } from '../../vitest/index.ts';
+import { createTestStore, toFormisch } from '../../vitest/index.ts';
 import { getFieldStore } from './getFieldStore.ts';
 
 describe('getFieldStore', () => {
   test('should return root store for empty path', () => {
-    const store = createTestStore(v.object({ name: v.string() }));
+    const store = createTestStore(toFormisch(v.object({ name: v.string() })));
     expect(getFieldStore(store, [])).toBe(store);
   });
 
   test('should return child store for single-key path', () => {
-    const store = createTestStore(v.object({ name: v.string() }));
+    const store = createTestStore(toFormisch(v.object({ name: v.string() })));
     expect(getFieldStore(store, ['name'])).toBe(store.children.name);
   });
 
   test('should return nested store for multi-key path', () => {
     const store = createTestStore(
-      v.object({ user: v.object({ name: v.string() }) })
+      toFormisch(v.object({ user: v.object({ name: v.string() }) }))
     );
     const userStore = store.children.user;
     expect(userStore.kind).toBe('object');
@@ -28,7 +28,7 @@ describe('getFieldStore', () => {
   });
 
   test('should return array item store', () => {
-    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+    const store = createTestStore(toFormisch(v.object({ items: v.array(v.string()) })), {
       initialInput: { items: ['a', 'b'] },
     });
     const itemsStore = store.children.items;
@@ -41,9 +41,9 @@ describe('getFieldStore', () => {
 
   test('should return deeply nested array item store', () => {
     const store = createTestStore(
-      v.object({
+      toFormisch(v.object({
         users: v.array(v.object({ name: v.string() })),
-      }),
+      })),
       { initialInput: { users: [{ name: 'John' }] } }
     );
     const usersStore = store.children.users;
