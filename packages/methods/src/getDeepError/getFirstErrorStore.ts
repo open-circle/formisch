@@ -27,7 +27,11 @@ export function getFirstErrorStore(
       return undefined;
     }
     if (internalFieldStore.kind === 'array') {
-      if (typeof key !== 'number') {
+      if (
+        typeof key !== 'number' ||
+        key < 0 ||
+        key >= internalFieldStore.items.value.length
+      ) {
         return undefined;
       }
       internalFieldStore = internalFieldStore.children[key];

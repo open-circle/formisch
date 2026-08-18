@@ -1,5 +1,6 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
+import { remove } from '../remove/remove.ts';
 import { createTestStore } from '../vitest/index.ts';
 import { getDeepErrorEntry } from './getDeepErrorEntry.ts';
 
@@ -18,6 +19,26 @@ describe('getDeepErrorEntry', () => {
 
     expect(getDeepErrorEntry(store, { path: ['items', 0] })).toBeNull();
     expect(getDeepErrorEntry(store, { path: ['items', 0, 'name'] })).toBeNull();
+  });
+
+  test('should return null for removed array item paths', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [{ name: '' }, { name: '' }] } }
+    );
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+    if (itemsStore.kind === 'array') {
+      const removedItemStore = itemsStore.children[1];
+      if (removedItemStore.kind === 'object') {
+        removedItemStore.children.name.errors.value = ['Name is required'];
+      }
+    }
+
+    remove(store, { path: ['items'], at: 1 });
+
+    expect(getDeepErrorEntry(store, { path: ['items', 1] })).toBeNull();
+    expect(getDeepErrorEntry(store, { path: ['items', 1, 'name'] })).toBeNull();
   });
 
   test('should return entry for a top-level field', () => {
