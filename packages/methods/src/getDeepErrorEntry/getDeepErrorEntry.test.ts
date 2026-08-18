@@ -10,6 +10,14 @@ describe('getDeepErrorEntry', () => {
     expect(getDeepErrorEntry(store)).toBeNull();
   });
 
+  test('should return null for a missing array item path', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: [] },
+    });
+
+    expect(getDeepErrorEntry(store, { path: ['items', 0] })).toBeNull();
+  });
+
   test('should return entry for a top-level field', () => {
     const store = createTestStore(v.object({ name: v.string() }));
     store.children.name.errors.value = ['Name is required'];

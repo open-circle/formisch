@@ -1,6 +1,6 @@
 ---
 title: getDeepErrorEntry
-description: Retrieves the errors of the first erroring field of a specific field or the entire form as a path and error message entry.
+description: Retrieves an entry containing the path and error messages of the first erroring field of a specific field or the entire form.
 source: /packages/methods/src/getDeepErrorEntry/getDeepErrorEntry.ts
 contributors:
   - fabian-hiller
@@ -11,7 +11,7 @@ import { properties } from './properties';
 
 # getDeepErrorEntry
 
-Retrieves the errors of the first erroring field of a specific field or the entire form as an entry pairing the path to the field with its error messages, by walking through the field store and all its descendants and stopping at the first field with errors. This is useful for displaying a single error message for a field whose value is a nested structure while still knowing where the error occurred.
+Retrieves the errors of the first erroring field of a specific field or the entire form as an entry pairing the path to the field with its error messages, by walking through the field store and all its descendants and stopping at the first field with errors. This is useful for locating the first erroring descendant of a field whose value is a nested structure while retaining all errors at that path.
 
 ```ts
 const entry = getDeepErrorEntry<TSchema>(form);

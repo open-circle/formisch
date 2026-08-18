@@ -37,14 +37,15 @@ export interface GetFieldDeepErrorEntryConfig<
  * Retrieves the errors of the first erroring field of a specific field or the
  * entire form as an entry pairing the path to the field with its error
  * messages, by walking through the field store and all its descendants and
- * stopping at the first field with errors. This is useful for displaying a
- * single error message for a field whose value is a nested structure while
- * still knowing where the error occurred. Form-level errors are included with
- * an empty path.
+ * stopping at the first field with errors. This is useful for locating the
+ * first erroring descendant of a field whose value is a nested structure while
+ * retaining all errors at that path. Form-level errors are included with an
+ * empty path.
  *
  * @param form The form store to retrieve the error entry from.
  *
- * @returns A path and error message entry, or null if no errors exist.
+ * @returns An entry containing the path and error messages, or null if no
+ * errors exist.
  */
 export function getDeepErrorEntry<TSchema extends FormSchema>(
   form: BaseFormStore<TSchema>
@@ -54,15 +55,16 @@ export function getDeepErrorEntry<TSchema extends FormSchema>(
  * Retrieves the errors of the first erroring field of a specific field or the
  * entire form as an entry pairing the path to the field with its error
  * messages, by walking through the field store and all its descendants and
- * stopping at the first field with errors. This is useful for displaying a
- * single error message for a field whose value is a nested structure while
- * still knowing where the error occurred. Form-level errors are included with
- * an empty path.
+ * stopping at the first field with errors. This is useful for locating the
+ * first erroring descendant of a field whose value is a nested structure while
+ * retaining all errors at that path. Form-level errors are included with an
+ * empty path.
  *
  * @param form The form store to retrieve the error entry from.
  * @param config The get deep error entry configuration.
  *
- * @returns A path and error message entry, or null if no errors exist.
+ * @returns An entry containing the path and error messages, or null if no
+ * errors exist.
  */
 export function getDeepErrorEntry<
   TSchema extends FormSchema,
@@ -81,21 +83,25 @@ export function getDeepErrorEntry(
     | GetFormDeepErrorEntryConfig
     | GetFieldDeepErrorEntryConfig<FormSchema, RequiredPath>
 ): DeepErrorEntry | null {
+  const internalFieldStore = config?.path
+    ? getFieldStore(form[INTERNAL], config.path)
+    : form[INTERNAL];
+  if (!internalFieldStore) {
+    return null;
+  }
+
   // Walk the field store tree in depth-first order and stop at the first
   // field with errors, so errors of a field surface before its descendants
   let entry: DeepErrorEntry | null = null;
-  walkFieldStore(
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
-    (internalFieldStore) => {
-      const errors = internalFieldStore.errors.value;
-      if (errors) {
-        entry = {
-          path: internalFieldStore.path,
-          errors,
-        };
-        return true;
-      }
+  walkFieldStore(internalFieldStore, (internalFieldStore) => {
+    const errors = internalFieldStore.errors.value;
+    if (errors) {
+      entry = {
+        path: internalFieldStore.path,
+        errors,
+      };
+      return true;
     }
-  );
+  });
   return entry;
 }
