@@ -1,0 +1,32 @@
+---
+title: GetFieldDeepErrorEntryConfig
+description: Configuration interface for retrieving the first error entry of a specific field.
+source: /packages/methods/src/getDeepErrorEntry/getDeepErrorEntry.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# GetFieldDeepErrorEntryConfig
+
+Configuration interface for retrieving the first error entry of a specific field. Used by the `getDeepErrorEntry` method when a specific field path is provided.
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Definition
+
+- `GetFieldDeepErrorEntryConfig`
+  - `path` <Property {...properties.path} />
+
+## Related
+
+### Methods
+
+<ApiList
+  items={[{ text: 'getDeepErrorEntry', href: '../getDeepErrorEntry/' }]}
+/>
