@@ -22,14 +22,14 @@ To retrieve values from your form, you can use:
   of a specific field
 - <Link href="/methods/api/getErrors/">`getErrors`</Link>: Get error messages
   for a specific field
-- <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>: Get all error
-  messages across the entire form
-- <Link href="/methods/api/getDeepErrorEntries/">`getDeepErrorEntries`</Link>:
-  Get all error messages paired with the path of the field they belong to
 - <Link href="/methods/api/getDeepError/">`getDeepError`</Link>: Get the first
   error message within a field or the form
+- <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>: Get all error
+  messages across the entire form
 - <Link href="/methods/api/getDeepErrorEntry/">`getDeepErrorEntry`</Link>: Get
   the error messages of the first erroring field paired with its path
+- <Link href="/methods/api/getDeepErrorEntries/">`getDeepErrorEntries`</Link>:
+  Get all error messages paired with the path of the field they belong to
 
 Formisch plugs into React's render cycle, so reading values with these methods inside components stays reactive. When the form state changes, components that rely on these values automatically re-render without manual subscriptions.
 
