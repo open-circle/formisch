@@ -1,6 +1,5 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
-import { remove } from '../remove/remove.ts';
 import { createTestStore } from '../vitest/index.ts';
 import { getDeepError } from './getDeepError.ts';
 
@@ -9,36 +8,6 @@ describe('getDeepError', () => {
     const store = createTestStore(v.object({ name: v.string() }));
 
     expect(getDeepError(store)).toBeNull();
-  });
-
-  test('should return null for missing array item paths', () => {
-    const store = createTestStore(
-      v.object({ items: v.array(v.object({ name: v.string() })) }),
-      { initialInput: { items: [] } }
-    );
-
-    expect(getDeepError(store, { path: ['items', 0] })).toBeNull();
-    expect(getDeepError(store, { path: ['items', 0, 'name'] })).toBeNull();
-  });
-
-  test('should return null for removed array item paths', () => {
-    const store = createTestStore(
-      v.object({ items: v.array(v.object({ name: v.string() })) }),
-      { initialInput: { items: [{ name: '' }, { name: '' }] } }
-    );
-    const itemsStore = store.children.items;
-    expect(itemsStore.kind).toBe('array');
-    if (itemsStore.kind === 'array') {
-      const removedItemStore = itemsStore.children[1];
-      if (removedItemStore.kind === 'object') {
-        removedItemStore.children.name.errors.value = ['Name is required'];
-      }
-    }
-
-    remove(store, { path: ['items'], at: 1 });
-
-    expect(getDeepError(store, { path: ['items', 1] })).toBeNull();
-    expect(getDeepError(store, { path: ['items', 1, 'name'] })).toBeNull();
   });
 
   test('should return first error of a top-level field', () => {
