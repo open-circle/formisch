@@ -11,7 +11,7 @@
   "compatibility_date": "2026-06-04",
   "main": "./worker/index.ts",
   "observability": {
-    "enabled": false,
+    "enabled": true,
     "head_sampling_rate": 1,
     "logs": {
       "enabled": true,
