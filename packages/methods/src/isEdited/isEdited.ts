@@ -70,8 +70,10 @@ export function isEdited(
   form: BaseFormStore,
   config?: IsFormEditedConfig | IsFieldEditedConfig<FormSchema, RequiredPath>
 ): boolean {
-  return getFieldBool(
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
-    'isEdited'
-  );
+  const internalFieldStore = config?.path
+    ? getFieldStore(form[INTERNAL], config.path)
+    : form[INTERNAL];
+  return internalFieldStore
+    ? getFieldBool(internalFieldStore, 'isEdited')
+    : false;
 }

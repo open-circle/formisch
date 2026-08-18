@@ -92,21 +92,25 @@ export function getDeepErrorEntries(
     | GetFormDeepErrorEntriesConfig
     | GetFieldDeepErrorEntriesConfig<FormSchema, RequiredPath>
 ): DeepErrorEntry[] {
+  const internalFieldStore = config?.path
+    ? getFieldStore(form[INTERNAL], config.path)
+    : form[INTERNAL];
+  if (!internalFieldStore) {
+    return [];
+  }
+
   // Collect entries of errored fields by walking the field store tree, reading
   // each field's own path instead of reconstructing it during the walk
   const entries: DeepErrorEntry[] = [];
-  walkFieldStore(
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
-    (internalFieldStore) => {
-      // Emit an entry if field has errors; form-level errors are emitted
-      const errors = internalFieldStore.errors.value;
-      if (errors) {
-        entries.push({
-          path: internalFieldStore.path,
-          errors,
-        });
-      }
+  walkFieldStore(internalFieldStore, (internalFieldStore) => {
+    // Emit an entry if field has errors; form-level errors are emitted
+    const errors = internalFieldStore.errors.value;
+    if (errors) {
+      entries.push({
+        path: internalFieldStore.path,
+        errors,
+      });
     }
-  );
+  });
   return entries;
 }

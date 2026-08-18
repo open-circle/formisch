@@ -62,6 +62,17 @@ describe('setInput', () => {
     }
   });
 
+  test('should ignore missing dynamic array item path', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [] } }
+    );
+
+    expect(() =>
+      setInput(store, { path: ['items', 0, 'name'], input: 'foo' })
+    ).not.toThrow();
+  });
+
   test('should set full form input', () => {
     const store = createTestStore(
       v.object({ name: v.string(), age: v.number() }),

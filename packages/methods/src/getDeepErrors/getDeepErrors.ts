@@ -74,19 +74,23 @@ export function getDeepErrors(
     | GetFormDeepErrorsConfig
     | GetFieldDeepErrorsConfig<FormSchema, RequiredPath>
 ): [string, ...string[]] | null {
+  const internalFieldStore = config?.path
+    ? getFieldStore(form[INTERNAL], config.path)
+    : form[INTERNAL];
+  if (!internalFieldStore) {
+    return null;
+  }
+
   let deepErrors: [string, ...string[]] | null = null;
-  walkFieldStore(
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
-    (internalFieldStore) => {
-      const errors = internalFieldStore.errors.value;
-      if (errors) {
-        if (deepErrors) {
-          deepErrors.push(...errors);
-        } else {
-          deepErrors = [...errors];
-        }
+  walkFieldStore(internalFieldStore, (internalFieldStore) => {
+    const errors = internalFieldStore.errors.value;
+    if (errors) {
+      if (deepErrors) {
+        deepErrors.push(...errors);
+      } else {
+        deepErrors = [...errors];
       }
     }
-  );
+  });
   return deepErrors;
 }

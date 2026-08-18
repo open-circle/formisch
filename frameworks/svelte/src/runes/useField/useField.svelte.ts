@@ -52,7 +52,7 @@ export function useField(
 ): FieldStore {
   const path = $derived(unwrap(config).path);
   const internalFormStore = $derived(unwrap(form)[INTERNAL]);
-  const internalFieldStore = $derived(getFieldStore(internalFormStore, path));
+  const internalFieldStore = $derived(getFieldStore(internalFormStore, path)!);
 
   const input = $derived(getFieldInput(internalFieldStore));
   const isTouched = $derived(getFieldBool(internalFieldStore, 'isTouched'));

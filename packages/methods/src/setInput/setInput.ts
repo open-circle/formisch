@@ -82,14 +82,13 @@ export function setInput(
 ): void {
   batch(() => {
     const internalFormStore = form[INTERNAL];
-    setFieldInput(internalFormStore, config.path ?? [], config.input);
-    // TODO: Should we validate on touch, change and blur too?
-    validateIfRequired(
-      internalFormStore,
-      config.path
-        ? getFieldStore(internalFormStore, config.path)
-        : internalFormStore,
-      'input'
-    );
+    const internalFieldStore = config.path
+      ? getFieldStore(internalFormStore, config.path)
+      : internalFormStore;
+    if (internalFieldStore) {
+      setFieldInput(internalFormStore, config.path ?? [], config.input);
+      // TODO: Should we validate on touch, change and blur too?
+      validateIfRequired(internalFormStore, internalFieldStore, 'input');
+    }
   });
 }

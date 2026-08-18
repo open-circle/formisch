@@ -70,8 +70,8 @@ export function injectField(
   const destroyRef = inject(DestroyRef);
   const path = computed(() => readSignalOrValue(config.path));
   const internalFormStore = computed(() => readSignalOrValue(form)[INTERNAL]);
-  const internalFieldStore = computed(() =>
-    getFieldStore(internalFormStore(), path())
+  const internalFieldStore = computed(
+    () => getFieldStore(internalFormStore(), path())!
   );
 
   destroyRef.onDestroy(() => {

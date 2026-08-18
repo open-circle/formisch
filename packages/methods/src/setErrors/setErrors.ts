@@ -61,8 +61,10 @@ export function setErrors(
   form: BaseFormStore,
   config: SetFormErrorsConfig | SetFieldErrorsConfig<FormSchema, RequiredPath>
 ): void {
-  (config.path
+  const internalFieldStore = config.path
     ? getFieldStore(form[INTERNAL], config.path)
-    : form[INTERNAL]
-  ).errors.value = config.errors;
+    : form[INTERNAL];
+  if (internalFieldStore) {
+    internalFieldStore.errors.value = config.errors;
+  }
 }

@@ -83,7 +83,10 @@ export function getDirtyInput(
     | GetFormDirtyInputConfig
     | GetFieldDirtyInputConfig<FormSchema, RequiredPath>
 ): unknown {
-  return getDirtyFieldInput(
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL]
-  );
+  const internalFieldStore = config?.path
+    ? getFieldStore(form[INTERNAL], config.path)
+    : form[INTERNAL];
+  return internalFieldStore
+    ? getDirtyFieldInput(internalFieldStore)
+    : undefined;
 }

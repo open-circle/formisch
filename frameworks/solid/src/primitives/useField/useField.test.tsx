@@ -416,7 +416,9 @@ describe('useField', () => {
         const form = createForm({ schema });
         return { form, field: useField(form, { path: ['name'] }) };
       });
-      const internalFieldStore = getFieldStore(result.form[INTERNAL], ['name']);
+      const internalFieldStore = getFieldStore(result.form[INTERNAL], [
+        'name',
+      ])!;
       const element = document.createElement('input');
       // Simulate an array reorder having already transferred the element
       internalFieldStore.elements.push(element);
@@ -457,17 +459,17 @@ describe('useField', () => {
 
       render(() => <Test />);
       expect(
-        getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+        getFieldStore(formStore![INTERNAL], ['todos', 0, 'label'])!.elements
       ).toHaveLength(1);
 
       swap(formStore!, { path: ['todos'], at: 0, and: 1 });
 
       await vi.waitFor(() => {
         expect(
-          getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+          getFieldStore(formStore![INTERNAL], ['todos', 0, 'label'])!.elements
         ).toHaveLength(1);
         expect(
-          getFieldStore(formStore![INTERNAL], ['todos', 1, 'label']).elements
+          getFieldStore(formStore![INTERNAL], ['todos', 1, 'label'])!.elements
         ).toHaveLength(1);
       });
     });
@@ -488,7 +490,7 @@ describe('useField', () => {
       const element = screen.getByTestId('input');
       const internalFieldStore = getFieldStore(capturedForm![INTERNAL], [
         'name',
-      ]);
+      ])!;
       expect(internalFieldStore.initialElements).toContain(element);
 
       // Simulate an array operation moving the elements to another store

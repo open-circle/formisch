@@ -37,5 +37,8 @@ export function focus<
   form: BaseFormStore<TSchema>,
   config: FocusFieldConfig<TSchema, TFieldPath>
 ): void {
-  focusFieldElement(getFieldStore(form[INTERNAL], config.path));
+  const internalFieldStore = getFieldStore(form[INTERNAL], config.path);
+  if (internalFieldStore) {
+    focusFieldElement(internalFieldStore);
+  }
 }

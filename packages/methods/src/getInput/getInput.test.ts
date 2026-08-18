@@ -69,6 +69,15 @@ describe('getInput', () => {
     expect(result).toBe('John');
   });
 
+  test('should return undefined for missing dynamic array item path', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [] } }
+    );
+
+    expect(getInput(store, { path: ['items', 0, 'name'] })).toBeUndefined();
+  });
+
   test('should return undefined for uninitialized field', () => {
     const store = createTestStore(v.object({ name: v.optional(v.string()) }));
 

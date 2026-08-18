@@ -50,7 +50,7 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
   useSignals();
 
   const internalFormStore = form[INTERNAL];
-  const internalFieldStore = getFieldStore(internalFormStore, config.path);
+  const internalFieldStore = getFieldStore(internalFormStore, config.path)!;
 
   // Track the last registered element instance as a fallback for React 18,
   // which ignores ref cleanup functions and calls the ref with `null` instead

@@ -109,6 +109,15 @@ describe('getDeepError', () => {
     expect(getDeepError(store)).toBe('Name is required');
   });
 
+  test('should return null for missing dynamic array item path', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [] } }
+    );
+
+    expect(getDeepError(store, { path: ['items', 0, 'name'] })).toBeNull();
+  });
+
   test('should include form-level errors', () => {
     const store = createTestStore(v.object({ name: v.string() }));
     store.errors.value = ['Form is invalid'];

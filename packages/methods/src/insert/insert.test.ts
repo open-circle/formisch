@@ -265,6 +265,19 @@ describe('insert', () => {
     }
   });
 
+  test('should ignore missing dynamic array item path', () => {
+    const store = createTestStore(
+      v.object({
+        groups: v.array(v.object({ items: v.array(v.string()) })),
+      }),
+      { initialInput: { groups: [] } }
+    );
+
+    expect(() =>
+      insert(store, { path: ['groups', 0, 'items'], initialInput: 'foo' })
+    ).not.toThrow();
+  });
+
   test('should insert into nested array', () => {
     const store = createTestStore(
       v.object({ outer: v.object({ items: v.array(v.string()) }) }),

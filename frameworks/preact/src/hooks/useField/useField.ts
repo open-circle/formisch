@@ -50,8 +50,8 @@ export function useField<
 export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
   const pathSignal = usePathSignal(config.path);
   const internalFormStore = form[INTERNAL];
-  const internalFieldStore = useComputed(() =>
-    getFieldStore(internalFormStore, pathSignal.value)
+  const internalFieldStore = useComputed(
+    () => getFieldStore(internalFormStore, pathSignal.value)!
   );
 
   useSignalEffect(() => {

@@ -49,46 +49,46 @@ export function swap<
 ): void {
   // Get internal form and array store
   const internalFormStore = form[INTERNAL];
-  const internalArrayStore = getFieldStore(
-    internalFormStore,
-    config.path
-  ) as InternalArrayStore;
+  const internalArrayStore = getFieldStore(internalFormStore, config.path) as
+    | InternalArrayStore
+    | undefined;
+  if (internalArrayStore) {
+    // Get current items of field array
+    const items = untrack(() => internalArrayStore.items.value);
 
-  // Get current items of field array
-  const items = untrack(() => internalArrayStore.items.value);
+    // Continue if both specified indices are valid
+    if (
+      config.at >= 0 &&
+      config.at <= items.length - 1 &&
+      config.and >= 0 &&
+      config.and <= items.length - 1 &&
+      config.at !== config.and
+    ) {
+      batch(() => {
+        // Swap item IDs in items array
+        const newItems = [...items];
+        const tempItemId = newItems[config.at];
+        newItems[config.at] = newItems[config.and];
+        newItems[config.and] = tempItemId;
+        internalArrayStore.items.value = newItems;
 
-  // Continue if both specified indices are valid
-  if (
-    config.at >= 0 &&
-    config.at <= items.length - 1 &&
-    config.and >= 0 &&
-    config.and <= items.length - 1 &&
-    config.at !== config.and
-  ) {
-    batch(() => {
-      // Swap item IDs in items array
-      const newItems = [...items];
-      const tempItemId = newItems[config.at];
-      newItems[config.at] = newItems[config.and];
-      newItems[config.and] = tempItemId;
-      internalArrayStore.items.value = newItems;
+        // Swap child stores directly
+        swapItemState(
+          internalFormStore,
+          internalArrayStore.children[config.at],
+          internalArrayStore.children[config.and]
+        );
 
-      // Swap child stores directly
-      swapItemState(
-        internalFormStore,
-        internalArrayStore.children[config.at],
-        internalArrayStore.children[config.and]
-      );
+        // Mark field array as touched and edited and update dirty state
+        internalArrayStore.isTouched.value = true;
+        internalArrayStore.isEdited.value = true;
+        internalArrayStore.isDirty.value =
+          internalArrayStore.startItems.value.join() !== newItems.join();
 
-      // Mark field array as touched and edited and update dirty state
-      internalArrayStore.isTouched.value = true;
-      internalArrayStore.isEdited.value = true;
-      internalArrayStore.isDirty.value =
-        internalArrayStore.startItems.value.join() !== newItems.join();
-
-      // Validate if required
-      // TODO: Should we validate on touch, change and blur too?
-      validateIfRequired(internalFormStore, internalArrayStore, 'input');
-    });
+        // Validate if required
+        // TODO: Should we validate on touch, change and blur too?
+        validateIfRequired(internalFormStore, internalArrayStore, 'input');
+      });
+    }
   }
 }

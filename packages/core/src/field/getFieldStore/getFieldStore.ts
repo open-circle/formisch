@@ -1,3 +1,4 @@
+import { untrack } from '../../framework/index.ts';
 import type {
   InternalFieldStore,
   InternalFormStore,
@@ -11,23 +12,28 @@ import type {
  * @param internalFormStore The form store to traverse.
  * @param path The path to the field store.
  *
- * @returns The field store.
+ * @returns The field store, or `undefined` if a dynamic array item in the path
+ * does not exist at runtime.
  */
 // @__NO_SIDE_EFFECTS__
 export function getFieldStore(
   internalFormStore: InternalFormStore,
   path: Path
-): InternalFieldStore {
+): InternalFieldStore | undefined {
   // Start at form store root
   let internalFieldStore: InternalFieldStore = internalFormStore;
 
   // Traverse path to find target field store
-  // TODO: This does not guard against paths that exist in the type but not at
-  // runtime (e.g. a not-yet-created dynamic array index), so navigating into a
-  // missing child returns `undefined` and crashes consumers like the deep error
-  // methods. A clean fix likely throws an error or returns `undefined` here
-  // and handles it in all callers.
   for (const key of path) {
+    // Return early if array item does not exist at runtime
+    if (
+      internalFieldStore.kind === 'array' &&
+      // @ts-expect-error
+      !untrack(() => internalFieldStore.items.value)[key]
+    ) {
+      return undefined;
+    }
+
     // Navigate to child at current path key
     // @ts-expect-error
     internalFieldStore = internalFieldStore.children[key];

@@ -83,7 +83,7 @@ describe('FormischField', () => {
     const internalFieldStore = getFieldStore(
       fixture.componentInstance.form[INTERNAL],
       ['email']
-    );
+    )!;
     expect(internalFieldStore.elements).toContain(input);
   });
 
