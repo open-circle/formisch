@@ -10,12 +10,14 @@ describe('getDeepError', () => {
     expect(getDeepError(store)).toBeNull();
   });
 
-  test('should return null for a missing array item path', () => {
-    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
-      initialInput: { items: [] },
-    });
+  test('should return null for missing array item paths', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [] } }
+    );
 
     expect(getDeepError(store, { path: ['items', 0] })).toBeNull();
+    expect(getDeepError(store, { path: ['items', 0, 'name'] })).toBeNull();
   });
 
   test('should return first error of a top-level field', () => {

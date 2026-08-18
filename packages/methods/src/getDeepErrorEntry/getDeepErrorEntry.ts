@@ -1,13 +1,12 @@
 import {
   type BaseFormStore,
   type FormSchema,
-  getFieldStore,
   INTERNAL,
   type RequiredPath,
   type ValidPath,
-  walkFieldStore,
 } from '@formisch/core';
 import type * as v from 'valibot';
+import { getFirstErrorStore } from '../getDeepError/getFirstErrorStore.ts';
 import type { DeepErrorEntry } from '../getDeepErrorEntries/index.ts';
 
 /**
@@ -83,25 +82,9 @@ export function getDeepErrorEntry(
     | GetFormDeepErrorEntryConfig
     | GetFieldDeepErrorEntryConfig<FormSchema, RequiredPath>
 ): DeepErrorEntry | null {
-  const internalFieldStore = config?.path
-    ? getFieldStore(form[INTERNAL], config.path)
-    : form[INTERNAL];
-  if (!internalFieldStore) {
-    return null;
-  }
-
-  // Walk the field store tree in depth-first order and stop at the first
-  // field with errors, so errors of a field surface before its descendants
-  let entry: DeepErrorEntry | null = null;
-  walkFieldStore(internalFieldStore, (internalFieldStore) => {
-    const errors = internalFieldStore.errors.value;
-    if (errors) {
-      entry = {
-        path: internalFieldStore.path,
-        errors,
-      };
-      return true;
-    }
-  });
-  return entry;
+  const internalFieldStore = getFirstErrorStore(form[INTERNAL], config?.path);
+  const errors = internalFieldStore?.errors.value;
+  return internalFieldStore && errors
+    ? { path: internalFieldStore.path, errors }
+    : null;
 }
