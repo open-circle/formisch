@@ -1,0 +1,433 @@
+---
+title: Ark UI
+description: >-
+  Learn how to connect Formisch fields to Ark UI inputs, checkboxes, selects,
+  radio groups and sliders in Svelte.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Ark UI
+
+[Ark UI](https://ark-ui.com) is a headless component library built on state machines, available for Svelte among other frameworks. This guide targets Ark UI v5 for Svelte. No adapter package is needed, and Ark handles more of the accessibility wiring than most libraries: inside its `Field`, the label association, `aria-invalid` and the error message reference are derived for you.
+
+## Installation
+
+Install Formisch, Valibot and Ark UI:
+
+```bash
+npm install @formisch/svelte valibot @ark-ui/svelte
+```
+
+Ark UI ships unstyled, so every example below leaves styling to you.
+
+## Wiring patterns
+
+Choose the wiring from the part you are rendering:
+
+- If the part wraps a native `<input>`, `<textarea>` or `<select>`, spread `field.props` onto it.
+- If the component owns the value, pass `field.input` to the root and send the root's value callback to `field.onInput`, then distribute the remaining props across its parts.
+
+In Svelte, Formisch passes the element reference as an attachment under a symbol key, so it can only travel by spreading. There is no `ref` prop to place by hand, which makes the spread the backbone of every binding here. Ark merges symbol keys through all of its parts, so the reference reaches the element even through several component layers.
+
+### Spreading field.props
+
+`Field.Input` wraps a native input, so it takes the whole spread. Since Formisch and Ark UI both export a `Field`, the Ark one is imported as `ArkField`:
+
+```svelte
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <ArkField.Root id="login-email" invalid={!!field.errors}>
+      <ArkField.Label>Email</ArkField.Label>
+      <ArkField.Input {...field.props} type="email" value={field.input} />
+      <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+    </ArkField.Root>
+  {/snippet}
+</Field>
+```
+
+Set the `id` on `ArkField.Root` rather than on the input. Ark derives the control id and the label's `for` from it, and the root requires an `id` anyway.
+
+Do not reach for `bind:value={field.input}` here. On an Ark part it passes `svelte-check` and even mounts cleanly, then throws on the first keystroke because `field.input` is a getter rather than a `$state` reference. Pass `value={field.input}` as above.
+
+### Controlled components
+
+A composite component owns its value, so the root takes the value and the change callback while the remaining props are split across its parts. Pull `name` out for the root, drop `oninput` and `onchange` so the value flows only through the component's own callback, and keep the focus handlers for the part the user actually interacts with:
+
+```svelte
+<Field of={loginForm} path={['rememberMe']}>
+  {#snippet children(field)}
+    {@const { name, oninput, onchange, ...fieldProps } = field.props}
+    <Checkbox.Root
+      ids={{ hiddenInput: 'login-remember-me' }}
+      {name}
+      checked={field.input ?? false}
+      onCheckedChange={(details) => field.onInput(details.checked === true)}
+      invalid={!!field.errors}
+    >
+      <Checkbox.HiddenInput {...fieldProps} />
+      <Checkbox.Control>
+        <Checkbox.Indicator>✓</Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label>Remember me</Checkbox.Label>
+    </Checkbox.Root>
+  {/snippet}
+</Field>
+```
+
+The checkbox and the radio group hide a real focusable input, so the whole rest object belongs on that hidden part, and <Link href="/methods/api/focus/">`focus`</Link> reaches it directly. The select and the slider are different, as the next section shows. `{@const}` has to be the first thing inside the snippet, before the surrounding markup.
+
+Every Ark root also accepts an `ids` object, which is the supported way to give a hidden part a stable id.
+
+The setter runs input-mode validation, so a form configured with `validate: 'change'` does not validate these controls until submit. Use `validate: 'input'` if you want them validated as the value changes.
+
+## Where the focus handlers belong
+
+For the select and the slider, put `onfocus` and `onblur` on the visible part rather than on the hidden one. Their hidden inputs are not what a keyboard user lands on, so handlers placed there never fire during real interaction and the field would stay untouched:
+
+```svelte
+<Field of={form} path={['framework']}>
+  {#snippet children(field)}
+    {@const { name, oninput, onchange, onfocus, onblur, ...fieldProps } =
+      field.props}
+    <!-- ... -->
+  {/snippet}
+</Field>
+```
+
+The attachment stays on the hidden part, while `onfocus` and `onblur` move to `Select.Trigger` or `Slider.Thumb`. `focus` keeps working for the select, because Ark forwards focus from the hidden select to the visible trigger, and `autofocus` can stay in the spread there for the same reason. The slider is the exception: its hidden input carries the `hidden` attribute and cannot be focused at all, so pass `autofocus` to the thumb as well.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Inside `ArkField.Root`, pass `invalid` and render the message in `ArkField.ErrorText`. Ark adds `aria-invalid` and wires the error reference for you, and the text only renders while the field is invalid:
+
+```svelte
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <ArkField.Root
+      id="login-email"
+      ids={{ errorText: 'login-email-error' }}
+      invalid={!!field.errors}
+    >
+      <ArkField.Label>Email</ArkField.Label>
+      <ArkField.Input {...field.props} value={field.input} />
+      <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+    </ArkField.Root>
+  {/snippet}
+</Field>
+```
+
+Only `Field` has an error part. `Select`, `RadioGroup` and `Slider` have none, so render the message yourself and point the visible control at it with `aria-errormessage`. The select, checkbox and radio group derive `aria-invalid` from their root's `invalid` prop, but the slider does not, so set it on the thumb yourself.
+
+Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/svelte/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines two text fields, a controlled checkbox and accessible errors:
+
+```svelte
+<script lang="ts">
+  import { Checkbox } from '@ark-ui/svelte/checkbox';
+  import { Field as ArkField } from '@ark-ui/svelte/field';
+  import {
+    createForm,
+    Field,
+    Form,
+    type SubmitHandler,
+  } from '@formisch/svelte';
+  import * as v from 'valibot';
+
+  const LoginSchema = v.object({
+    email: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your email.'),
+      v.email('The email address is badly formatted.')
+    ),
+    password: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your password.'),
+      v.minLength(8, 'Your password must have 8 characters or more.')
+    ),
+    rememberMe: v.optional(v.boolean(), false),
+  });
+
+  const loginForm = createForm({
+    schema: LoginSchema,
+    initialInput: { email: '', password: '', rememberMe: false },
+  });
+
+  const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+    console.log(output);
+  };
+</script>
+
+<Form of={loginForm} onsubmit={handleSubmit}>
+  <Field of={loginForm} path={['email']}>
+    {#snippet children(field)}
+      <ArkField.Root
+        id="login-email"
+        ids={{ errorText: 'login-email-error' }}
+        invalid={!!field.errors}
+      >
+        <ArkField.Label>Email</ArkField.Label>
+        <ArkField.Input
+          {...field.props}
+          type="email"
+          autocomplete="email"
+          placeholder="jane@example.com"
+          value={field.input}
+        />
+        <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+      </ArkField.Root>
+    {/snippet}
+  </Field>
+
+  <Field of={loginForm} path={['password']}>
+    {#snippet children(field)}
+      <ArkField.Root
+        id="login-password"
+        ids={{ errorText: 'login-password-error' }}
+        invalid={!!field.errors}
+      >
+        <ArkField.Label>Password</ArkField.Label>
+        <ArkField.Input
+          {...field.props}
+          type="password"
+          autocomplete="current-password"
+          value={field.input}
+        />
+        <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+      </ArkField.Root>
+    {/snippet}
+  </Field>
+
+  <Field of={loginForm} path={['rememberMe']}>
+    {#snippet children(field)}
+      {@const { name, oninput, onchange, ...fieldProps } = field.props}
+      <Checkbox.Root
+        ids={{ hiddenInput: 'login-remember-me' }}
+        {name}
+        checked={field.input ?? false}
+        onCheckedChange={(details) => field.onInput(details.checked === true)}
+        invalid={!!field.errors}
+      >
+        <Checkbox.HiddenInput {...fieldProps} />
+        <Checkbox.Control>
+          <Checkbox.Indicator>✓</Checkbox.Indicator>
+        </Checkbox.Control>
+        <Checkbox.Label>Remember me</Checkbox.Label>
+      </Checkbox.Root>
+    {/snippet}
+  </Field>
+
+  <button type="submit" disabled={loginForm.isSubmitting}>Login</button>
+</Form>
+```
+
+The initial input keeps every control defined from its first render. The two text fields take the whole spread, while the checkbox splits it between the root and its hidden input.
+
+## Component reference
+
+The following snippets assume a form store named `form` and initialized values that match the schema.
+
+### Text input
+
+```svelte
+<Field of={form} path={['email']}>
+  {#snippet children(field)}
+    <ArkField.Root
+      id="profile-email"
+      ids={{ errorText: 'profile-email-error' }}
+      invalid={!!field.errors}
+    >
+      <ArkField.Label>Email</ArkField.Label>
+      <ArkField.Input {...field.props} type="email" value={field.input} />
+      <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+    </ArkField.Root>
+  {/snippet}
+</Field>
+```
+
+Swap `ArkField.Input` for `ArkField.Textarea` to get a multiline field with the same wiring.
+
+### Checkbox
+
+```svelte
+<Field of={form} path={['newsletter']}>
+  {#snippet children(field)}
+    {@const { name, oninput, onchange, ...fieldProps } = field.props}
+    <Checkbox.Root
+      ids={{ hiddenInput: 'settings-newsletter' }}
+      {name}
+      checked={field.input ?? false}
+      onCheckedChange={(details) => field.onInput(details.checked === true)}
+      invalid={!!field.errors}
+    >
+      <Checkbox.HiddenInput {...fieldProps} />
+      <Checkbox.Control>
+        <Checkbox.Indicator>✓</Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label>Newsletter</Checkbox.Label>
+    </Checkbox.Root>
+  {/snippet}
+</Field>
+```
+
+### Select
+
+Ark's select is array based even for a single selection, so wrap the value and unwrap the payload, narrowing it to the schema union. The focus handlers go on the trigger, while the attachment stays on the hidden select:
+
+```ts
+const frameworkCollection = createListCollection({
+  items: [
+    { label: 'Angular', value: 'angular' },
+    { label: 'React', value: 'react' },
+    { label: 'Solid', value: 'solid' },
+    { label: 'Vue', value: 'vue' },
+  ],
+});
+```
+
+```svelte
+<Field of={form} path={['framework']}>
+  {#snippet children(field)}
+    {@const { name, oninput, onchange, onfocus, onblur, ...fieldProps } =
+      field.props}
+    <Select.Root
+      ids={{
+        trigger: 'project-framework',
+        hiddenSelect: 'project-framework-select',
+      }}
+      collection={frameworkCollection}
+      {name}
+      value={field.input ? [field.input] : []}
+      onValueChange={(details) =>
+        field.onInput(details.value[0] as typeof field.input)}
+      invalid={!!field.errors}
+    >
+      <Select.Label>Framework</Select.Label>
+      <Select.Control>
+        <Select.Trigger
+          {onfocus}
+          {onblur}
+          aria-errormessage="project-framework-error"
+        >
+          <Select.ValueText placeholder="Select a framework" />
+          <Select.Indicator>▾</Select.Indicator>
+        </Select.Trigger>
+      </Select.Control>
+      <Select.HiddenSelect {...fieldProps} />
+      {#if field.errors}
+        <span id="project-framework-error">{field.errors[0]}</span>
+      {/if}
+      <Portal>
+        <Select.Positioner>
+          <Select.Content>
+            {#each frameworkCollection.items as item (item.value)}
+              <Select.Item {item}>
+                <Select.ItemText>{item.label}</Select.ItemText>
+              </Select.Item>
+            {/each}
+          </Select.Content>
+        </Select.Positioner>
+      </Portal>
+    </Select.Root>
+  {/snippet}
+</Field>
+```
+
+### Radio group
+
+Spread the rest object onto every item's hidden input. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group. Put `autofocus` on the first item only, otherwise every radio competes for focus. The root's `invalid` prop already marks each item, so no per-item `aria-invalid` is needed:
+
+```svelte
+<Field of={form} path={['plan']}>
+  {#snippet children(field)}
+    {@const { name, oninput, onchange, ...fieldProps } = field.props}
+    <RadioGroup.Root
+      ids={{ itemHiddenInput: (value) => `plan-${value}` }}
+      {name}
+      value={field.input ?? null}
+      onValueChange={(details) => field.onInput(details.value as 'hobby' | 'pro')}
+      invalid={!!field.errors}
+      aria-errormessage="plan-error"
+    >
+      <RadioGroup.Label>Plan</RadioGroup.Label>
+      {#each plans as plan, index (plan.value)}
+        <RadioGroup.Item value={plan.value}>
+          <RadioGroup.ItemHiddenInput
+            {...fieldProps}
+            autofocus={index === 0 && fieldProps.autofocus}
+          />
+          <RadioGroup.ItemControl />
+          <RadioGroup.ItemText>{plan.label}</RadioGroup.ItemText>
+        </RadioGroup.Item>
+      {/each}
+      {#if field.errors}
+        <span id="plan-error">{field.errors[0]}</span>
+      {/if}
+    </RadioGroup.Root>
+  {/snippet}
+</Field>
+```
+
+### Slider
+
+Ark's slider is array based like its select, and it uses `min` and `max` rather than `minValue` and `maxValue`. One `Slider.Thumb` renders exactly one thumb, and since Ark does not derive `aria-invalid` here, set it on the thumb along with the focus handlers:
+
+```svelte
+<Field of={form} path={['volume']}>
+  {#snippet children(field)}
+    {@const { name, oninput, onchange, onfocus, onblur, ...fieldProps } =
+      field.props}
+    <Slider.Root
+      ids={{ thumb: () => 'settings-volume-thumb' }}
+      {name}
+      min={0}
+      max={100}
+      value={[field.input ?? 50]}
+      onValueChange={(details) => field.onInput(details.value[0])}
+      invalid={!!field.errors}
+    >
+      <Slider.Label>Volume</Slider.Label>
+      <Slider.ValueText />
+      <Slider.Control>
+        <Slider.Track>
+          <Slider.Range />
+        </Slider.Track>
+        <Slider.Thumb
+          index={0}
+          {onfocus}
+          {onblur}
+          autofocus={fieldProps.autofocus}
+          aria-invalid={!!field.errors}
+          aria-errormessage="settings-volume-error"
+        >
+          <Slider.HiddenInput {...fieldProps} />
+        </Slider.Thumb>
+      </Slider.Control>
+      {#if field.errors}
+        <span id="settings-volume-error">{field.errors[0]}</span>
+      {/if}
+    </Slider.Root>
+  {/snippet}
+</Field>
+```
+
+`Slider.HiddenInput` renders with the `hidden` attribute, which makes it unfocusable, so `focus` cannot move focus to this field. Keyboard users still reach the thumb normally, and validation, `isTouched` and blur validation are unaffected.
+
+## Library-specific notes
+
+Spreading the rest object onto a part that is not a native form element, such as `Select.Trigger` or `Slider.Thumb`, fails `svelte-check`, because `oninput` and `onchange` are typed against Formisch's field elements. Destructuring them out, as every snippet above does, is the fix and is also semantically right: those handlers read a value from the event target, which only a native form element has.
+
+`field.props.autofocus` is a snapshot taken when the field is created, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own.
+
+Ark UI is also available for other frameworks. The part names and the `ids` and `invalid` props are identical there, so this wiring ports with only the framework API changing. See our <Link href="/react/guides/ark-ui/">React</Link>, <Link href="/solid/guides/ark-ui/">Solid</Link> and <Link href="/vue/guides/ark-ui/">Vue</Link> guides.
+
+## Next steps
+
+Read the <Link href="/svelte/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/svelte/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/svelte/guides/validation/">validation</Link> guide for validation timing.

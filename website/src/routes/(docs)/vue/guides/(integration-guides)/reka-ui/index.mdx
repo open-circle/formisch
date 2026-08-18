@@ -1,0 +1,408 @@
+---
+title: Reka UI
+description: >-
+  Learn how to connect Formisch fields to Reka UI checkboxes, selects, radio
+  groups, sliders and other form primitives.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Reka UI
+
+[Reka UI](https://reka-ui.com) is a collection of headless, accessible primitives for Vue. This guide targets Reka UI v2. No adapter package is needed: native elements take the `field.props` spread together with `v-model`, while a primitive receives its value through `v-model` and the remaining props individually.
+
+## Installation
+
+Install Formisch, Valibot and Reka UI:
+
+```bash
+npm install @formisch/vue valibot reka-ui
+```
+
+Reka UI ships primitives only, so text inputs, textareas and buttons stay native elements that you style yourself.
+
+## Wiring patterns
+
+Choose the wiring from what you are rendering:
+
+- On a native element, spread `field.props` and bind the value with `v-model="field.input"`.
+- On a component, bind the props individually and normalize the element reference, because a spread would register the component instance instead of a DOM node.
+
+Note that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation, so `v-model` and an explicit `@update:model-value` handler are equivalent. Do not destructure the slot: write `v-slot="field"` rather than `v-slot="{ input }"`, because destructuring copies the value out of the accessor and assignments would go nowhere.
+
+### Spreading field.props
+
+A native input takes both bindings at once. They cannot collide: `v-model` listens for the `input` event, while the spread installs its handler on `change`:
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <input
+      v-bind="field.props"
+      id="login-email"
+      v-model="field.input"
+      type="email"
+    />
+  </Field>
+</template>
+```
+
+### Controlled components
+
+Do not spread `field.props` onto a component. Vue treats the `ref` entry inside a `v-bind` object as a real template ref, so the spread would hand Formisch the component instance, and `focus` would fail on an object that has no `focus` method. Bind the entries individually and unwrap the root element for the reference:
+
+```ts
+function elementRef(register: (element: Element | null) => void) {
+  return (instance: Element | ComponentPublicInstance | null) =>
+    register(
+      instance && '$el' in instance
+        ? ((instance as ComponentPublicInstance).$el as Element | null)
+        : (instance as Element | null)
+    );
+}
+```
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['rememberMe']" v-slot="field">
+    <CheckboxRoot
+      id="login-remember-me"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      :model-value="field.input ?? false"
+      @update:model-value="
+        (value) => (field.input = value === 'indeterminate' ? false : value)
+      "
+      @focus="field.props.onFocus"
+      @blur="field.props.onBlur"
+    >
+      <CheckboxIndicator>✓</CheckboxIndicator>
+    </CheckboxRoot>
+    <label for="login-remember-me">Remember me</label>
+  </Field>
+</template>
+```
+
+Reka UI renders each of these primitives with the focusable element as its root, so unwrapping `$el` is enough for <Link href="/methods/api/focus/">`focus`</Link> and submit-time error focusing to reach the control. Forwarding `@focus` matters too, because assigning `field.input` updates the value but only the focus handler marks the field as touched.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Reka UI has no error primitive, so render the message yourself, give it a stable id and point the control at it while errors exist:
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <input
+      v-bind="field.props"
+      id="login-email"
+      v-model="field.input"
+      :aria-invalid="!!field.errors"
+      aria-errormessage="login-email-error"
+    />
+    <div v-if="field.errors" id="login-email-error">{{ field.errors[0] }}</div>
+  </Field>
+</template>
+```
+
+Use page-unique ids rather than the field name. `field.props.name` is the JSON encoded path, such as `["email"]`, which is meant for form submission and not for `for` and `id` attributes.
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/vue/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines native inputs, a controlled checkbox and accessible errors:
+
+```vue
+<script setup lang="ts">
+import { Field, Form, type SubmitHandler, useForm } from '@formisch/vue';
+import { CheckboxIndicator, CheckboxRoot } from 'reka-ui';
+import * as v from 'valibot';
+import type { ComponentPublicInstance } from 'vue';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+  rememberMe: v.optional(v.boolean(), false),
+});
+
+const loginForm = useForm({
+  schema: LoginSchema,
+  initialInput: { email: '', password: '', rememberMe: false },
+});
+
+const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+  console.log(output);
+};
+
+// Reka UI renders composite controls as components, so the ref callback
+// receives a component instance. Formisch calls `.focus()` on whatever it
+// gets, so unwrap the root DOM element before registering it.
+function elementRef(register: (element: Element | null) => void) {
+  return (instance: Element | ComponentPublicInstance | null) =>
+    register(
+      instance && '$el' in instance
+        ? ((instance as ComponentPublicInstance).$el as Element | null)
+        : (instance as Element | null)
+    );
+}
+</script>
+
+<template>
+  <Form :of="loginForm" @submit="handleSubmit">
+    <Field :of="loginForm" :path="['email']" v-slot="field">
+      <div>
+        <label for="login-email">Email</label>
+        <input
+          v-bind="field.props"
+          id="login-email"
+          v-model="field.input"
+          type="email"
+          :aria-invalid="!!field.errors"
+          aria-errormessage="login-email-error"
+        />
+        <div v-if="field.errors" id="login-email-error">
+          {{ field.errors[0] }}
+        </div>
+      </div>
+    </Field>
+
+    <Field :of="loginForm" :path="['password']" v-slot="field">
+      <div>
+        <label for="login-password">Password</label>
+        <input
+          v-bind="field.props"
+          id="login-password"
+          v-model="field.input"
+          type="password"
+          :aria-invalid="!!field.errors"
+          aria-errormessage="login-password-error"
+        />
+        <div v-if="field.errors" id="login-password-error">
+          {{ field.errors[0] }}
+        </div>
+      </div>
+    </Field>
+
+    <Field :of="loginForm" :path="['rememberMe']" v-slot="field">
+      <div>
+        <CheckboxRoot
+          id="login-remember-me"
+          :ref="elementRef(field.props.ref)"
+          :name="field.props.name"
+          :autofocus="field.props.autofocus"
+          :model-value="field.input ?? false"
+          :aria-invalid="!!field.errors"
+          @update:model-value="
+            (value) => (field.input = value === 'indeterminate' ? false : value)
+          "
+          @focus="field.props.onFocus"
+          @blur="field.props.onBlur"
+        >
+          <CheckboxIndicator>✓</CheckboxIndicator>
+        </CheckboxRoot>
+        <label for="login-remember-me">Remember me</label>
+      </div>
+    </Field>
+
+    <button type="submit" :disabled="loginForm.isSubmitting">Login</button>
+  </Form>
+</template>
+```
+
+The initial input keeps every control defined from its first render. The two inputs use the spread with `v-model`, while the checkbox binds its props individually and normalizes the element reference.
+
+## Component reference
+
+The following snippets assume a form store named `form`, initialized values that match the schema, and the `elementRef` helper from above.
+
+### Text input
+
+Native elements take the whole spread:
+
+```vue
+<template>
+  <Field :of="form" :path="['email']" v-slot="field">
+    <label for="profile-email">Email</label>
+    <input
+      v-bind="field.props"
+      id="profile-email"
+      v-model="field.input"
+      type="email"
+      :aria-invalid="!!field.errors"
+      aria-errormessage="profile-email-error"
+    />
+    <div v-if="field.errors" id="profile-email-error">
+      {{ field.errors[0] }}
+    </div>
+  </Field>
+</template>
+```
+
+A `<textarea>` works the same way. For a `v.number()` field, `v-model` on `<input type="number" />` already stores a number, so the `.number` modifier is unnecessary.
+
+### Checkbox
+
+`CheckboxRoot` reports `boolean | 'indeterminate'`, so normalize the value before storing it:
+
+```vue
+<template>
+  <Field :of="form" :path="['newsletter']" v-slot="field">
+    <CheckboxRoot
+      id="settings-newsletter"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      :model-value="field.input ?? false"
+      :aria-invalid="!!field.errors"
+      @update:model-value="
+        (value) => (field.input = value === 'indeterminate' ? false : value)
+      "
+      @focus="field.props.onFocus"
+      @blur="field.props.onBlur"
+    >
+      <CheckboxIndicator>✓</CheckboxIndicator>
+    </CheckboxRoot>
+    <label for="settings-newsletter">Newsletter</label>
+  </Field>
+</template>
+```
+
+The primitive renders a button, which a `<label>` cannot name on its own. Reka UI solves this for you: given an `id`, it derives the accessible name from the matching label element.
+
+### Select
+
+`SelectRoot` infers its value type from `modelValue`, so no cast is needed. Put the element reference and the lifecycle handlers on the trigger, which is the focusable part:
+
+```vue
+<template>
+  <Field :of="form" :path="['framework']" v-slot="field">
+    <label id="project-framework-label" for="project-framework"
+      >Framework</label
+    >
+    <SelectRoot
+      :name="field.props.name"
+      :model-value="field.input"
+      @update:model-value="(value) => (field.input = value)"
+    >
+      <SelectTrigger
+        id="project-framework"
+        :ref="elementRef(field.props.ref)"
+        :autofocus="field.props.autofocus"
+        aria-labelledby="project-framework-label project-framework"
+        :aria-invalid="!!field.errors"
+        aria-errormessage="project-framework-error"
+        @focus="field.props.onFocus"
+        @blur="field.props.onBlur"
+      >
+        <SelectValue placeholder="Select a framework" />
+      </SelectTrigger>
+      <SelectPortal>
+        <SelectContent position="popper" :side-offset="4">
+          <SelectViewport>
+            <SelectItem
+              v-for="framework in frameworks"
+              :key="framework.value"
+              :value="framework.value"
+            >
+              <SelectItemText>{{ framework.label }}</SelectItemText>
+            </SelectItem>
+          </SelectViewport>
+        </SelectContent>
+      </SelectPortal>
+    </SelectRoot>
+  </Field>
+</template>
+```
+
+`SelectContent` renders in a portal, so give it a background and a stacking context, otherwise the options are unclickable.
+
+### Radio group
+
+Register every item. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group. Unlike the select, the group's payload includes `null`, so narrow it to the schema union:
+
+```vue
+<template>
+  <Field :of="form" :path="['plan']" v-slot="field">
+    <span id="plan-label">Plan</span>
+    <RadioGroupRoot
+      :name="field.props.name"
+      :model-value="field.input"
+      aria-labelledby="plan-label"
+      :aria-invalid="!!field.errors"
+      aria-errormessage="plan-error"
+      @update:model-value="(value) => (field.input = value as 'hobby' | 'pro')"
+    >
+      <div v-for="plan in plans" :key="plan.value">
+        <RadioGroupItem
+          :id="`plan-${plan.value}`"
+          :ref="elementRef(field.props.ref)"
+          :value="plan.value"
+          :autofocus="field.props.autofocus"
+          @focus="field.props.onFocus"
+          @blur="field.props.onBlur"
+        >
+          <RadioGroupIndicator />
+        </RadioGroupItem>
+        <label :for="`plan-${plan.value}`">{{ plan.label }}</label>
+      </div>
+    </RadioGroupRoot>
+  </Field>
+</template>
+```
+
+### Slider
+
+`SliderRoot` works with an array of values, so wrap the number for the single thumb and unwrap it in the handler. One `SliderThumb` renders exactly one `slider` role, and Reka UI does not derive a name for it, so set `aria-label` yourself:
+
+```vue
+<template>
+  <Field :of="form" :path="['volume']" v-slot="field">
+    <label id="settings-volume-label">Volume</label>
+    <SliderRoot
+      :name="field.props.name"
+      :model-value="[field.input ?? 0]"
+      :min="0"
+      :max="100"
+      :step="1"
+      @update:model-value="(value) => (field.input = value?.[0])"
+    >
+      <SliderTrack>
+        <SliderRange />
+      </SliderTrack>
+      <SliderThumb
+        id="settings-volume"
+        :ref="elementRef(field.props.ref)"
+        :autofocus="field.props.autofocus"
+        aria-label="Volume"
+        :aria-invalid="!!field.errors"
+        aria-errormessage="settings-volume-error"
+        @focus="field.props.onFocus"
+        @blur="field.props.onBlur"
+      />
+    </SliderRoot>
+  </Field>
+</template>
+```
+
+## Library-specific notes
+
+Passing `name` makes Reka UI render a hidden native control so the value takes part in a native form submission. Formisch submits from its own store, so these extra nodes are harmless.
+
+`field.props.onChange` only triggers change-mode validation and never writes a value. Under the default settings it never fires, so the primitives above leave it unwired. Assigning `field.input` runs input-mode validation, so a form configured with `validate: 'change'` does not validate these controls until submit; use `validate: 'input'` if you want them validated as the value changes.
+
+`field.props.autofocus` is a snapshot taken when the field mounts, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own.
+
+## Next steps
+
+Read the <Link href="/vue/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/vue/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/vue/guides/validation/">validation</Link> guide for validation timing.

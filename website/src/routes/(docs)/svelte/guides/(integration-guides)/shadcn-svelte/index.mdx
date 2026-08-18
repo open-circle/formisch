@@ -1,0 +1,423 @@
+---
+title: shadcn-svelte
+description: >-
+  Learn how to connect Formisch fields to shadcn-svelte inputs, selects, radio
+  groups, sliders and other form components.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# shadcn-svelte
+
+[shadcn-svelte](https://shadcn-svelte.com) generates accessible components into your own project, where you can adapt them to your needs. This guide targets shadcn-svelte v1 with its Bits UI v2 based components. No adapter package is needed: components that render a native element take the whole `field.props` spread, while the button based primitives receive the value plus the lifecycle props they forward.
+
+## Installation
+
+Install Formisch and Valibot, set up Tailwind CSS, then initialize shadcn-svelte and add the components used below:
+
+```bash
+npm install @formisch/svelte valibot
+npx shadcn-svelte@latest init
+npx shadcn-svelte@latest add button input label textarea checkbox select radio-group slider
+```
+
+The `init` command asks for a design system preset interactively, so run it in a terminal rather than a script. It also expects the `$lib` alias to exist. In a Vite project, add `resolve.alias` for `$lib` in `vite.config.ts` and a matching `paths` entry in `tsconfig.json`.
+
+## Wiring patterns
+
+Choose the wiring from the element the generated component renders:
+
+- If it forwards its props to a native `<input>` or `<textarea>`, spread `field.props` and pass `field.input` as the value.
+- If it wraps a Bits UI primitive built on a button or span, pass `field.input` as the value, forward the remaining props, and send the component's value callback to `field.onInput`.
+
+### Spreading field.props
+
+`Input` and `Textarea` render native elements and accept every entry of `field.props`, including the element reference that Formisch passes as a Svelte attachment:
+
+```svelte
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <Input {...field.props} id="login-email" type="email" value={field.input} />
+  {/snippet}
+</Field>
+```
+
+Do not reach for `bind:value={field.input}` here. It compiles and passes `svelte-check`, then throws at runtime because `field.input` is a getter rather than a `$state` reference, and the input silently drifts out of sync with the form. Use `value={field.input}` as above, or a function binding if you prefer that shape:
+
+```svelte
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <Input
+      {...field.props}
+      bind:value={() => field.input ?? '', (value) => field.onInput(value)}
+    />
+  {/snippet}
+</Field>
+```
+
+### Controlled components
+
+`Checkbox`, `Select`, `RadioGroup` and `Slider` are built on Bits UI primitives that render a button or span. Drop `oninput` and `onchange` from the spread and let the component report its value instead. Those two handlers read the value from the event target, which only exists on a native form element, and `svelte-check` rejects them on a button for the same reason:
+
+```svelte
+<Field of={loginForm} path={['rememberMe']}>
+  {#snippet children(field)}
+    {@const { oninput, onchange, ...fieldProps } = field.props}
+    <Checkbox
+      {...fieldProps}
+      id="login-remember"
+      aria-labelledby="login-remember-label"
+      checked={field.input ?? false}
+      onCheckedChange={(checked) => field.onInput(checked)}
+    />
+    <Label id="login-remember-label" for="login-remember">Remember me</Label>
+  {/snippet}
+</Field>
+```
+
+The rest of the spread still carries its weight: the attachment survives both component hops and reaches the visible button, so <Link href="/methods/api/focus/">`focus`</Link> and submit-time error focusing land on the control the user sees, and `onfocus` and `onblur` keep `isTouched` and blur validation working.
+
+Dropping `onchange` also means change-mode validation never fires for this control, since `field.onInput` runs the input mode only. Use `validate: 'input'` if you want these controls validated as the value changes. `{@const}` has to be the first thing inside the snippet, before the surrounding markup.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. The generated components have no error part, so render the message yourself, give it a stable id and point the control at it while errors exist:
+
+```svelte
+<Field of={loginForm} path={['email']}>
+  {#snippet children(field)}
+    <Input
+      {...field.props}
+      id="login-email"
+      value={field.input}
+      aria-invalid={!!field.errors}
+      aria-errormessage="login-email-error"
+    />
+    {#if field.errors}
+      <p id="login-email-error" class="text-sm text-destructive">
+        {field.errors[0]}
+      </p>
+    {/if}
+  {/snippet}
+</Field>
+```
+
+`aria-invalid` also switches the generated components to their destructive styling. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/svelte/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines native inputs, a controlled checkbox and accessible errors:
+
+```svelte
+<script lang="ts">
+  import {
+    createForm,
+    Field,
+    Form,
+    type SubmitHandler,
+  } from '@formisch/svelte';
+  import { Button } from '$lib/components/ui/button/index.js';
+  import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+  import { Input } from '$lib/components/ui/input/index.js';
+  import { Label } from '$lib/components/ui/label/index.js';
+  import * as v from 'valibot';
+
+  const LoginSchema = v.object({
+    email: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your email.'),
+      v.email('The email address is badly formatted.')
+    ),
+    password: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your password.'),
+      v.minLength(8, 'Your password must have 8 characters or more.')
+    ),
+    rememberMe: v.optional(v.boolean(), false),
+  });
+
+  const loginForm = createForm({
+    schema: LoginSchema,
+    initialInput: { email: '', password: '', rememberMe: false },
+  });
+
+  const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+    console.log(output);
+  };
+</script>
+
+<Form of={loginForm} onsubmit={handleSubmit} class="flex flex-col gap-4">
+  <Field of={loginForm} path={['email']}>
+    {#snippet children(field)}
+      <div class="flex flex-col gap-2">
+        <Label for="login-email">Email</Label>
+        <Input
+          {...field.props}
+          id="login-email"
+          type="email"
+          value={field.input}
+          aria-invalid={!!field.errors}
+          aria-errormessage="login-email-error"
+        />
+        {#if field.errors}
+          <p id="login-email-error" class="text-sm text-destructive">
+            {field.errors[0]}
+          </p>
+        {/if}
+      </div>
+    {/snippet}
+  </Field>
+
+  <Field of={loginForm} path={['password']}>
+    {#snippet children(field)}
+      <div class="flex flex-col gap-2">
+        <Label for="login-password">Password</Label>
+        <Input
+          {...field.props}
+          id="login-password"
+          type="password"
+          value={field.input}
+          aria-invalid={!!field.errors}
+          aria-errormessage="login-password-error"
+        />
+        {#if field.errors}
+          <p id="login-password-error" class="text-sm text-destructive">
+            {field.errors[0]}
+          </p>
+        {/if}
+      </div>
+    {/snippet}
+  </Field>
+
+  <Field of={loginForm} path={['rememberMe']}>
+    {#snippet children(field)}
+      {@const { oninput, onchange, ...fieldProps } = field.props}
+      <div class="flex items-center gap-2">
+        <Checkbox
+          {...fieldProps}
+          id="login-remember"
+          aria-labelledby="login-remember-label"
+          checked={field.input ?? false}
+          onCheckedChange={(checked) => field.onInput(checked)}
+        />
+        <Label id="login-remember-label" for="login-remember">Remember me</Label
+        >
+      </div>
+    {/snippet}
+  </Field>
+
+  <Button type="submit" disabled={loginForm.isSubmitting}>Login</Button>
+</Form>
+```
+
+The initial input keeps every control defined from its first render. The two inputs use the full spread, while the checkbox maps the value callback and forwards the remaining props.
+
+## Component reference
+
+The following snippets assume a form store named `form` and initialized values that match the schema.
+
+### Text input
+
+`Input` forwards to a native `<input>`, so spread `field.props` directly:
+
+```svelte
+<Field of={form} path={['email']}>
+  {#snippet children(field)}
+    <Label for="profile-email">Email</Label>
+    <Input
+      {...field.props}
+      id="profile-email"
+      type="email"
+      value={field.input}
+      aria-invalid={!!field.errors}
+      aria-errormessage="profile-email-error"
+    />
+    {#if field.errors}
+      <p id="profile-email-error" class="text-sm text-destructive">
+        {field.errors[0]}
+      </p>
+    {/if}
+  {/snippet}
+</Field>
+```
+
+`Textarea` works the same way because it also renders a native element.
+
+### Checkbox
+
+Name the checkbox with `aria-labelledby` in addition to the label's `for` attribute. The component renders a button, and not every browser derives a button's accessible name from a `<label>`:
+
+```svelte
+<Field of={form} path={['newsletter']}>
+  {#snippet children(field)}
+    {@const { oninput, onchange, ...fieldProps } = field.props}
+    <Checkbox
+      {...fieldProps}
+      id="settings-newsletter"
+      aria-labelledby="settings-newsletter-label"
+      checked={field.input ?? false}
+      onCheckedChange={(checked) => field.onInput(checked)}
+    />
+    <Label id="settings-newsletter-label" for="settings-newsletter">
+      Newsletter
+    </Label>
+  {/snippet}
+</Field>
+```
+
+### Select
+
+Use `type="single"` so the value is a plain string, and normalize the empty value in both directions, since `onValueChange` hands you a bare `string` while an unselected Formisch field is `undefined`. The trigger renders the current label itself. The snippets below share these option lists:
+
+```ts
+const frameworks = [
+  { value: 'angular', label: 'Angular' },
+  { value: 'react', label: 'React' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'vue', label: 'Vue' },
+];
+
+const plans = [
+  { value: 'hobby', label: 'Hobby' },
+  { value: 'pro', label: 'Pro' },
+];
+```
+
+```svelte
+<Field of={form} path={['framework']}>
+  {#snippet children(field)}
+    {@const { oninput, onchange, ...fieldProps } = field.props}
+    <Label id="project-framework-label" for="project-framework">Framework</Label>
+    <Select.Root
+      type="single"
+      value={field.input ?? ''}
+      onValueChange={(value) => field.onInput(value as typeof field.input)}
+    >
+      <Select.Trigger
+        {...fieldProps}
+        id="project-framework"
+        aria-labelledby="project-framework-label"
+        aria-invalid={!!field.errors}
+        aria-errormessage="project-framework-error"
+      >
+        {frameworks.find((item) => item.value === field.input)?.label ??
+          'Select a framework'}
+      </Select.Trigger>
+      <Select.Content>
+        {#each frameworks as framework (framework.value)}
+          <Select.Item value={framework.value} label={framework.label} />
+        {/each}
+      </Select.Content>
+    </Select.Root>
+    {#if field.errors}
+      <p id="project-framework-error" class="text-destructive text-sm">
+        {field.errors[0]}
+      </p>
+    {/if}
+  {/snippet}
+</Field>
+```
+
+### Radio group
+
+Spread the remaining props onto every item. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group, and the first one becomes the focus target:
+
+```svelte
+<Field of={form} path={['plan']}>
+  {#snippet children(field)}
+    {@const { oninput, onchange, ...fieldProps } = field.props}
+    <span id="plan-label" class="text-sm font-medium">Plan</span>
+    <RadioGroup.Root
+      aria-labelledby="plan-label"
+      aria-invalid={!!field.errors}
+      value={field.input ?? 'hobby'}
+      onValueChange={(value) => field.onInput(value as 'hobby' | 'pro')}
+    >
+      {#each plans as plan (plan.value)}
+        <div class="flex items-center gap-2">
+          <RadioGroup.Item
+            {...fieldProps}
+            id="plan-{plan.value}"
+            value={plan.value}
+            aria-labelledby="plan-{plan.value}-label"
+          />
+          <Label id="plan-{plan.value}-label" for="plan-{plan.value}">
+            {plan.label}
+          </Label>
+        </div>
+      {/each}
+    </RadioGroup.Root>
+  {/snippet}
+</Field>
+```
+
+### Slider
+
+`type="single"` keeps the value a number and renders exactly one thumb. The generated `Slider` passes its remaining props to the root element, while the `slider` role and the accessible name belong on the thumb, so add a `thumbProps` prop to the generated component and forward it:
+
+```svelte
+<Field of={form} path={['volume']}>
+  {#snippet children(field)}
+    {@const { oninput, onchange, ...fieldProps } = field.props}
+    <span id="settings-volume-label" class="text-sm font-medium">Volume</span>
+    <Slider
+      type="single"
+      min={0}
+      max={100}
+      step={1}
+      value={field.input ?? 50}
+      onValueChange={(value) => field.onInput(value)}
+      thumbProps={{
+        ...fieldProps,
+        id: 'settings-volume',
+        'aria-label': 'Volume',
+        'aria-invalid': !!field.errors,
+      }}
+    />
+  {/snippet}
+</Field>
+```
+
+Since the generated components live in your project, add that prop to `src/lib/components/ui/slider/slider.svelte`:
+
+```svelte
+<script lang="ts">
+  let {
+    ref = $bindable(null),
+    value = $bindable(),
+    orientation = 'horizontal',
+    class: className,
+    thumbProps,
+    ...restProps
+  }: WithoutChildrenOrChild<SliderPrimitive.RootProps> & {
+    thumbProps?: Omit<
+      WithoutChildrenOrChild<SliderPrimitive.ThumbProps>,
+      'index'
+    >;
+  } = $props();
+</script>
+```
+
+Then spread it onto the thumb inside the same file:
+
+```svelte
+<SliderPrimitive.Thumb
+  data-slot="slider-thumb"
+  index={thumb.index}
+  {...thumbProps}
+/>
+```
+
+## Library-specific notes
+
+`field.props.autofocus` is a snapshot taken when the field is created, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own, so you rarely need to read it directly.
+
+Because shadcn-svelte builds on Bits UI, the wiring in our <Link href="/svelte/guides/bits-ui/">Bits UI guide</Link> applies to the primitives underneath. The difference is that you own the generated source, so a missing prop can be forwarded rather than worked around.
+
+## Next steps
+
+Read the <Link href="/svelte/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/svelte/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/svelte/guides/validation/">validation</Link> guide for validation timing.

@@ -1,0 +1,424 @@
+---
+title: Ark UI
+description: >-
+  Learn how to connect Formisch fields to Ark UI inputs, checkboxes, selects,
+  radio groups and sliders in Solid.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Ark UI
+
+[Ark UI](https://ark-ui.com) is a headless component library built on state machines, available for Solid among other frameworks. This guide targets Ark UI v5 for Solid. No adapter package is needed: each component exposes the native element as one of its parts, so you spread `field.props` onto that part and let the component root handle the value.
+
+## Installation
+
+Install Formisch, Valibot and Ark UI:
+
+```bash
+npm install @formisch/solid valibot @ark-ui/solid
+```
+
+Ark UI ships unstyled, so every example below leaves styling to you.
+
+## Wiring patterns
+
+Choose the wiring from the part you are rendering:
+
+- If the part is a native `<input>`, `<textarea>` or `<select>`, spread `field.props` onto it and pass `field.input` as the value.
+- If the component owns the value, pass `field.input` to the root and send the root's value callback to `field.onInput`, then forward the lifecycle props to the component's hidden native part.
+
+`field.onInput` and `field.props.onInput` are different functions and mixing them up is the easiest mistake to make here. `field.onInput(value)` stores a value, while `field.props.onInput(event)` reads the value from a DOM element. Because it reads from the element, it always produces a string, so a number, boolean or enum field must go through the component's own callback rather than the spread.
+
+### Spreading field.props
+
+`Field.Input` renders a native input and merges its handlers with yours, so the whole spread works. Since Formisch and Ark UI both export a `Field`, the Ark one is imported as `ArkField`:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <ArkField.Root id="login-email" invalid={!!field.errors}>
+      <ArkField.Label>Email</ArkField.Label>
+      <ArkField.Input {...field.props} type="email" value={field.input ?? ''} />
+      <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+    </ArkField.Root>
+  )}
+</Field>
+```
+
+Set the `id` on `ArkField.Root` rather than on the input. Ark derives the control id and the label's `for` attribute from it, so overriding the part's own `id` would break that association.
+
+### Controlled components
+
+A checkbox owns its value, so the root takes `checked` and `onCheckedChange`, while `Checkbox.HiddenInput` takes the element reference and the lifecycle handlers. Registering that input is what keeps <Link href="/methods/api/focus/">`focus`</Link> and submit-time error focusing working. The callback reports `boolean | 'indeterminate'`, so normalize it before storing:
+
+```tsx
+<Field of={loginForm} path={['rememberMe']}>
+  {(field) => (
+    <Checkbox.Root
+      ids={{ hiddenInput: 'login-remember-me' }}
+      name={field.props.name}
+      checked={field.input ?? false}
+      onCheckedChange={(details) => field.onInput(details.checked === true)}
+      invalid={!!field.errors}
+    >
+      <Checkbox.HiddenInput
+        ref={field.props.ref}
+        autofocus={field.props.autofocus}
+        onFocus={field.props.onFocus}
+        onBlur={field.props.onBlur}
+      />
+      <Checkbox.Control>
+        <Checkbox.Indicator>✓</Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label>Remember me</Checkbox.Label>
+    </Checkbox.Root>
+  )}
+</Field>
+```
+
+Every Ark root accepts an `ids` object, which is the supported way to give a hidden part a stable id. Setting `id` directly on a hidden part instead leaves the generated label pointing at the old value.
+
+The setter runs input-mode validation, so a form configured with `validate: 'change'` does not validate these controls until submit. Use `validate: 'input'` if you want them validated as the value changes.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Inside `ArkField.Root`, pass `invalid` and render the message in `ArkField.ErrorText`. Ark adds `aria-invalid` and wires `aria-errormessage` to that element for you, and the error text only renders while the field is invalid:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <ArkField.Root
+      id="login-email"
+      ids={{ errorText: 'login-email-error' }}
+      invalid={!!field.errors}
+    >
+      <ArkField.Label>Email</ArkField.Label>
+      <ArkField.Input {...field.props} value={field.input ?? ''} />
+      <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+    </ArkField.Root>
+  )}
+</Field>
+```
+
+Only `Field` has an error part. `Select`, `RadioGroup` and `Slider` have none, so render the message yourself and point the visible control at it with `aria-errormessage`. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/solid/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines two text fields, a controlled checkbox and accessible errors:
+
+```tsx
+import { Checkbox } from '@ark-ui/solid/checkbox';
+import { Field as ArkField } from '@ark-ui/solid/field';
+import { createForm, Field, Form, type SubmitHandler } from '@formisch/solid';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+  rememberMe: v.optional(v.boolean(), false),
+});
+
+export default function LoginPage() {
+  const loginForm = createForm({
+    schema: LoginSchema,
+    initialInput: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  });
+
+  const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+    console.log(output);
+  };
+
+  return (
+    <Form of={loginForm} onSubmit={handleSubmit}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <ArkField.Root
+            id="login-email"
+            ids={{ errorText: 'login-email-error' }}
+            invalid={!!field.errors}
+          >
+            <ArkField.Label>Email</ArkField.Label>
+            <ArkField.Input
+              {...field.props}
+              type="email"
+              autocomplete="email"
+              placeholder="jane@example.com"
+              value={field.input ?? ''}
+            />
+            <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+          </ArkField.Root>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <ArkField.Root
+            id="login-password"
+            ids={{ errorText: 'login-password-error' }}
+            invalid={!!field.errors}
+          >
+            <ArkField.Label>Password</ArkField.Label>
+            <ArkField.Input
+              {...field.props}
+              type="password"
+              autocomplete="current-password"
+              value={field.input ?? ''}
+            />
+            <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+          </ArkField.Root>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['rememberMe']}>
+        {(field) => (
+          <Checkbox.Root
+            ids={{ hiddenInput: 'login-remember-me' }}
+            name={field.props.name}
+            checked={field.input ?? false}
+            onCheckedChange={(details) =>
+              field.onInput(details.checked === true)
+            }
+            invalid={!!field.errors}
+          >
+            <Checkbox.HiddenInput
+              ref={field.props.ref}
+              autofocus={field.props.autofocus}
+              onFocus={field.props.onFocus}
+              onBlur={field.props.onBlur}
+            />
+            <Checkbox.Control>
+              <Checkbox.Indicator>✓</Checkbox.Indicator>
+            </Checkbox.Control>
+            <Checkbox.Label>Remember me</Checkbox.Label>
+          </Checkbox.Root>
+        )}
+      </Field>
+
+      <button type="submit" disabled={loginForm.isSubmitting}>
+        Login
+      </button>
+    </Form>
+  );
+}
+```
+
+The initial input keeps every control defined from its first render. The two text fields use the spread, while the checkbox routes its value through the root and its lifecycle props through the hidden input.
+
+## Component reference
+
+The following snippets assume a form store named `form` and initialized values that match the schema. Never destructure the field store, and read `field.input` and `field.errors` inside JSX so Solid tracks them.
+
+### Text input
+
+```tsx
+<Field of={form} path={['email']}>
+  {(field) => (
+    <ArkField.Root
+      id="profile-email"
+      ids={{ errorText: 'profile-email-error' }}
+      invalid={!!field.errors}
+    >
+      <ArkField.Label>Email</ArkField.Label>
+      <ArkField.Input {...field.props} type="email" value={field.input ?? ''} />
+      <ArkField.ErrorText>{field.errors?.[0]}</ArkField.ErrorText>
+    </ArkField.Root>
+  )}
+</Field>
+```
+
+Swap `ArkField.Input` for `ArkField.Textarea` to get a multiline field with the same wiring.
+
+### Checkbox
+
+```tsx
+<Field of={form} path={['newsletter']}>
+  {(field) => (
+    <Checkbox.Root
+      ids={{ hiddenInput: 'settings-newsletter' }}
+      name={field.props.name}
+      checked={field.input ?? false}
+      onCheckedChange={(details) => field.onInput(details.checked === true)}
+      invalid={!!field.errors}
+    >
+      <Checkbox.HiddenInput
+        ref={field.props.ref}
+        autofocus={field.props.autofocus}
+        onFocus={field.props.onFocus}
+        onBlur={field.props.onBlur}
+      />
+      <Checkbox.Control>
+        <Checkbox.Indicator>✓</Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label>Newsletter</Checkbox.Label>
+    </Checkbox.Root>
+  )}
+</Field>
+```
+
+### Select
+
+Ark's select is array based even for a single selection, so wrap the value and unwrap the callback. Items come from a collection:
+
+```tsx
+const frameworkCollection = createListCollection({
+  items: [
+    { label: 'Angular', value: 'angular' },
+    { label: 'React', value: 'react' },
+    { label: 'Solid', value: 'solid' },
+    { label: 'Vue', value: 'vue' },
+  ],
+});
+```
+
+```tsx
+<Field of={form} path={['framework']}>
+  {(field) => (
+    <Select.Root
+      ids={{
+        trigger: 'project-framework',
+        hiddenSelect: 'project-framework-select',
+      }}
+      collection={frameworkCollection}
+      name={field.props.name}
+      value={field.input ? [field.input] : []}
+      onValueChange={(details) =>
+        field.onInput(details.value[0] as 'angular' | 'react')
+      }
+      invalid={!!field.errors}
+    >
+      <Select.Label>Framework</Select.Label>
+      <Select.Control>
+        <Select.Trigger aria-errormessage="project-framework-error">
+          <Select.ValueText placeholder="Select a framework" />
+          <Select.Indicator>▾</Select.Indicator>
+        </Select.Trigger>
+      </Select.Control>
+      <Select.HiddenSelect
+        ref={field.props.ref}
+        autofocus={field.props.autofocus}
+        onFocus={field.props.onFocus}
+        onBlur={field.props.onBlur}
+      />
+      <span id="project-framework-error">{field.errors?.[0]}</span>
+      <Portal>
+        <Select.Positioner>
+          <Select.Content>
+            <For each={frameworkCollection.items}>
+              {(item) => (
+                <Select.Item item={item}>
+                  <Select.ItemText>{item.label}</Select.ItemText>
+                </Select.Item>
+              )}
+            </For>
+          </Select.Content>
+        </Select.Positioner>
+      </Portal>
+    </Select.Root>
+  )}
+</Field>
+```
+
+The hidden select forwards focus to the visible trigger on its own, so `focus` lands on the button the user sees.
+
+### Radio group
+
+Register every item's hidden input. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group. Put `autofocus` on the first item only, otherwise every radio competes for focus:
+
+```tsx
+<Field of={form} path={['plan']}>
+  {(field) => (
+    <RadioGroup.Root
+      ids={{ itemHiddenInput: (value) => `plan-${value}` }}
+      name={field.props.name}
+      value={field.input ?? null}
+      onValueChange={(details) =>
+        field.onInput(details.value as 'hobby' | 'pro')
+      }
+      aria-errormessage="plan-error"
+    >
+      <RadioGroup.Label>Plan</RadioGroup.Label>
+      <For each={PLANS}>
+        {(plan, index) => (
+          <RadioGroup.Item value={plan}>
+            <RadioGroup.ItemHiddenInput
+              ref={field.props.ref}
+              autofocus={index() === 0 && field.props.autofocus}
+              onFocus={field.props.onFocus}
+              onBlur={field.props.onBlur}
+              aria-invalid={field.errors ? true : undefined}
+            />
+            <RadioGroup.ItemControl />
+            <RadioGroup.ItemText>{PLAN_LABELS[plan]}</RadioGroup.ItemText>
+          </RadioGroup.Item>
+        )}
+      </For>
+      <span id="plan-error">{field.errors?.[0]}</span>
+    </RadioGroup.Root>
+  )}
+</Field>
+```
+
+### Slider
+
+Ark's slider is array based like its select, and it uses `min` and `max` rather than `minValue` and `maxValue`. One `Slider.Thumb` renders exactly one thumb:
+
+```tsx
+<Field of={form} path={['volume']}>
+  {(field) => (
+    <Slider.Root
+      ids={{ thumb: () => 'settings-volume-thumb' }}
+      name={field.props.name}
+      min={0}
+      max={100}
+      value={[field.input ?? 50]}
+      onValueChange={(details) => field.onInput(details.value[0])}
+      invalid={!!field.errors}
+    >
+      <Slider.Label>Volume</Slider.Label>
+      <Slider.ValueText />
+      <Slider.Control>
+        <Slider.Track>
+          <Slider.Range />
+        </Slider.Track>
+        <Slider.Thumb index={0} aria-errormessage="settings-volume-error">
+          <Slider.HiddenInput
+            ref={field.props.ref}
+            onFocus={field.props.onFocus}
+            onBlur={field.props.onBlur}
+          />
+        </Slider.Thumb>
+      </Slider.Control>
+      <span id="settings-volume-error">{field.errors?.[0]}</span>
+    </Slider.Root>
+  )}
+</Field>
+```
+
+`Slider.HiddenInput` renders with the `hidden` attribute, which makes it unfocusable, so `focus` cannot move focus to this field. Keyboard users still reach the thumb normally, and validation, `isTouched` and blur validation are unaffected.
+
+## Library-specific notes
+
+`field.props.autofocus` is a snapshot taken when the field is created, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own, so you rarely need to read it directly.
+
+Ark UI is also available for other frameworks. The part names and the `ids` and `invalid` props are identical there, so this wiring ports with only the framework API changing. See our <Link href="/react/guides/ark-ui/">React</Link>, <Link href="/vue/guides/ark-ui/">Vue</Link> and <Link href="/svelte/guides/ark-ui/">Svelte</Link> guides.
+
+## Next steps
+
+Read the <Link href="/solid/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/solid/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/solid/guides/validation/">validation</Link> guide for validation timing.

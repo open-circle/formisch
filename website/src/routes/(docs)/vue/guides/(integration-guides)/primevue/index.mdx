@@ -1,0 +1,432 @@
+---
+title: PrimeVue
+description: >-
+  Learn how to connect Formisch fields to PrimeVue inputs, selects, radio
+  buttons, sliders and other form components.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# PrimeVue
+
+[PrimeVue](https://primevue.org) is a full featured component library for Vue with a large set of styled form controls. This guide targets PrimeVue v5. No adapter package is needed: every component binds its value with `v-model`, and the remaining field props are bound individually, sometimes through the component's pass through API.
+
+## Installation
+
+Install Formisch, Valibot and PrimeVue, then register a theme as described in the [PrimeVue setup guide](https://primevue.org/vite):
+
+```bash
+npm install @formisch/vue valibot primevue @primeuix/themes
+```
+
+## Wiring patterns
+
+Choose the wiring from where the component keeps its focusable element:
+
+- `InputText` and `Textarea` render the native element as their root, so `v-model` plus the individual props reaches it directly.
+- `Checkbox`, `RadioButton`, `Select`, `Slider` and `Password` wrap their control in a styled element, so the element reference has to reach the inner control and some props travel through `pt`.
+
+Note that `field.input` is a getter and setter rather than a method. Assigning it is what stores a value and runs validation, so `v-model` and an explicit `@update:model-value` handler are equivalent. Do not destructure the slot: write `v-slot="field"` rather than `v-slot="{ input }"`, because destructuring copies the value out of the accessor and assignments would go nowhere.
+
+### Spreading field.props
+
+Never spread `field.props` onto a PrimeVue component. Vue treats the `ref` entry inside a `v-bind` object as a real template ref, so the spread would hand Formisch the component instance, and `focus` would fail on an object that has no `focus` method. Bind the entries individually instead:
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <InputText
+      id="login-email"
+      type="email"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      v-model="field.input"
+      :invalid="!!field.errors"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
+```
+
+### Controlled components
+
+Because most PrimeVue components wrap their control, the reference helper looks for the focusable element inside the root. Registering the real control is what keeps <Link href="/methods/api/focus/">`focus`</Link> and submit-time error focusing working:
+
+```ts
+const FOCUSABLE = 'input, select, textarea, [tabindex]';
+
+function elementRef(register: (element: Element | null) => void) {
+  return (instance: Element | ComponentPublicInstance | null) => {
+    const root = (
+      instance && '$el' in instance ? instance.$el : instance
+    ) as HTMLElement | null;
+    register(
+      root?.matches(FOCUSABLE) ? root : (root?.querySelector(FOCUSABLE) ?? root)
+    );
+  };
+}
+```
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['rememberMe']" v-slot="field">
+    <Checkbox
+      input-id="login-remember-me"
+      binary
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :model-value="field.input ?? false"
+      :invalid="!!field.errors"
+      :pt="{ input: { autofocus: field.props.autofocus } }"
+      @update:model-value="(value) => (field.input = value as boolean)"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+    <label for="login-remember-me">Remember me</label>
+  </Field>
+</template>
+```
+
+Two PrimeVue conventions show up here. `inputId` puts an id on the real control so a `<label for>` can reach it, while a plain `id` would land on the wrapper. The `pt` object is spread onto an internal element, so it carries any attribute or listener you need to place there. Forwarding `@focus` matters as well, because assigning `field.input` updates the value but only the focus handler marks the field as touched.
+
+Assigning `field.input` runs input-mode validation, so a form configured with `validate: 'change'` does not validate these controls until submit. Use `validate: 'input'` if you want them validated as the value changes.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Prefer PrimeVue's own `invalid` prop over setting `aria-invalid` yourself, since the component writes `aria-invalid` onto the inner control and omits it while the field is valid:
+
+```vue
+<template>
+  <Field :of="loginForm" :path="['email']" v-slot="field">
+    <InputText
+      id="login-email"
+      :ref="elementRef(field.props.ref)"
+      v-model="field.input"
+      :invalid="!!field.errors"
+      aria-errormessage="login-email-error"
+    />
+    <small v-if="field.errors" id="login-email-error">{{
+      field.errors[0]
+    }}</small>
+  </Field>
+</template>
+```
+
+For a wrapped control, route `aria-errormessage` through `pt` so it lands on the element that carries the role. Use page-unique ids rather than the field name, because `field.props.name` is the JSON encoded path, such as `["email"]`.
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/vue/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines text inputs, a controlled checkbox and accessible errors:
+
+```vue
+<script setup lang="ts">
+import { Field, Form, type SubmitHandler, useForm } from '@formisch/vue';
+import Button from 'primevue/button';
+import Checkbox from 'primevue/checkbox';
+import InputText from 'primevue/inputtext';
+import Password from 'primevue/password';
+import * as v from 'valibot';
+import type { ComponentPublicInstance } from 'vue';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+  rememberMe: v.optional(v.boolean(), false),
+});
+
+const loginForm = useForm({
+  schema: LoginSchema,
+  initialInput: { email: '', password: '', rememberMe: false },
+});
+
+const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+  console.log(output);
+};
+
+// PrimeVue renders its focusable control inside a styled wrapper, so a ref
+// placed on the component yields the wrapper, not the control. Formisch calls
+// `.focus()` on whatever it is given, so hand it the real focusable element.
+const FOCUSABLE = 'input, select, textarea, [tabindex]';
+
+function elementRef(register: (element: Element | null) => void) {
+  return (instance: Element | ComponentPublicInstance | null) => {
+    const root = (
+      instance && '$el' in instance ? instance.$el : instance
+    ) as HTMLElement | null;
+    register(
+      root?.matches(FOCUSABLE) ? root : (root?.querySelector(FOCUSABLE) ?? root)
+    );
+  };
+}
+</script>
+
+<template>
+  <Form :of="loginForm" @submit="handleSubmit">
+    <Field :of="loginForm" :path="['email']" v-slot="field">
+      <div>
+        <label for="login-email">Email</label>
+        <InputText
+          id="login-email"
+          type="email"
+          :ref="elementRef(field.props.ref)"
+          :name="field.props.name"
+          :autofocus="field.props.autofocus"
+          v-model="field.input"
+          :invalid="!!field.errors"
+          aria-errormessage="login-email-error"
+          @focus="field.props.onFocus"
+          @change="field.props.onChange"
+          @blur="field.props.onBlur"
+        />
+        <small v-if="field.errors" id="login-email-error">
+          {{ field.errors[0] }}
+        </small>
+      </div>
+    </Field>
+
+    <Field :of="loginForm" :path="['password']" v-slot="field">
+      <div>
+        <label for="login-password">Password</label>
+        <Password
+          input-id="login-password"
+          :ref="elementRef(field.props.ref)"
+          :name="field.props.name"
+          :autofocus="field.props.autofocus"
+          v-model="field.input"
+          :feedback="false"
+          :invalid="!!field.errors"
+          :input-props="{
+            'aria-errormessage': 'login-password-error',
+            onFocus: field.props.onFocus,
+            onChange: field.props.onChange,
+            onBlur: field.props.onBlur,
+          }"
+        />
+        <small v-if="field.errors" id="login-password-error">
+          {{ field.errors[0] }}
+        </small>
+      </div>
+    </Field>
+
+    <Field :of="loginForm" :path="['rememberMe']" v-slot="field">
+      <div>
+        <Checkbox
+          input-id="login-remember-me"
+          binary
+          :ref="elementRef(field.props.ref)"
+          :name="field.props.name"
+          :model-value="field.input ?? false"
+          :invalid="!!field.errors"
+          :pt="{
+            input: {
+              autofocus: field.props.autofocus,
+              'aria-errormessage': 'login-remember-me-error',
+            },
+          }"
+          @update:model-value="(value) => (field.input = value as boolean)"
+          @focus="field.props.onFocus"
+          @change="field.props.onChange"
+          @blur="field.props.onBlur"
+        />
+        <label for="login-remember-me">Remember me</label>
+        <small v-if="field.errors" id="login-remember-me-error">
+          {{ field.errors[0] }}
+        </small>
+      </div>
+    </Field>
+
+    <Button type="submit" label="Login" :disabled="loginForm.isSubmitting" />
+  </Form>
+</template>
+```
+
+The initial input keeps every control defined from its first render. `Password` takes its handlers through `inputProps`, since that component exposes its inner input that way.
+
+## Component reference
+
+The following snippets assume a form store named `form`, initialized values that match the schema, and the `elementRef` helper from above.
+
+### Text input
+
+`InputText` renders the native element as its root, so the reference reaches it without a lookup:
+
+```vue
+<template>
+  <Field :of="form" :path="['email']" v-slot="field">
+    <label for="profile-email">Email</label>
+    <InputText
+      id="profile-email"
+      type="email"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :autofocus="field.props.autofocus"
+      v-model="field.input"
+      :invalid="!!field.errors"
+      aria-errormessage="profile-email-error"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
+```
+
+`Textarea` works the same way.
+
+### Checkbox
+
+A boolean field needs the `binary` prop, and the payload is typed loosely, so narrow it:
+
+```vue
+<template>
+  <Field :of="form" :path="['newsletter']" v-slot="field">
+    <Checkbox
+      input-id="settings-newsletter"
+      binary
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :model-value="field.input ?? false"
+      :invalid="!!field.errors"
+      :pt="{ input: { autofocus: field.props.autofocus } }"
+      @update:model-value="(value) => (field.input = value as boolean)"
+      @focus="field.props.onFocus"
+      @change="field.props.onChange"
+      @blur="field.props.onBlur"
+    />
+    <label for="settings-newsletter">Newsletter</label>
+  </Field>
+</template>
+```
+
+### Select
+
+The focusable part is a span with a `combobox` role, which a `<label>` cannot name. PrimeVue writes its own `aria-label` from the current selection, so set `aria-label` explicitly to keep the name stable. Its change event is a PrimeVue payload rather than a DOM event, so forward the original:
+
+```vue
+<template>
+  <Field :of="form" :path="['framework']" v-slot="field">
+    <label for="project-framework">Framework</label>
+    <Select
+      label-id="project-framework"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :model-value="field.input"
+      :options="frameworks"
+      option-label="label"
+      option-value="value"
+      placeholder="Select a framework"
+      aria-label="Framework"
+      :invalid="!!field.errors"
+      :pt="{
+        label: {
+          autofocus: field.props.autofocus,
+          'aria-errormessage': 'project-framework-error',
+        },
+      }"
+      @update:model-value="(value) => (field.input = value)"
+      @focus="field.props.onFocus"
+      @change="(event) => field.props.onChange(event.originalEvent)"
+      @blur="field.props.onBlur"
+    />
+  </Field>
+</template>
+```
+
+### Radio group
+
+Register every button. Formisch keeps a list of registered elements, so each radio registers itself just like a native radio group:
+
+```vue
+<template>
+  <Field :of="form" :path="['plan']" v-slot="field">
+    <span id="plan-label">Plan</span>
+    <RadioButtonGroup
+      :name="field.props.name"
+      :model-value="field.input"
+      aria-labelledby="plan-label"
+      @update:model-value="(value) => (field.input = value)"
+    >
+      <div v-for="plan in plans" :key="plan.value">
+        <RadioButton
+          :input-id="`plan-${plan.value}`"
+          :ref="elementRef(field.props.ref)"
+          :value="plan.value"
+          :invalid="!!field.errors"
+          :pt="{
+            input: {
+              autofocus: field.props.autofocus,
+              'aria-errormessage': 'plan-error',
+            },
+          }"
+          @focus="field.props.onFocus"
+          @change="field.props.onChange"
+          @blur="field.props.onBlur"
+        />
+        <label :for="`plan-${plan.value}`">{{ plan.label }}</label>
+      </div>
+    </RadioButtonGroup>
+  </Field>
+</template>
+```
+
+### Slider
+
+`Slider` emits no focus or blur events of its own, so route those handlers through `pt` onto the inner range input. Its change event carries a raw number, so use `slideend` when you need the underlying DOM event:
+
+```vue
+<template>
+  <Field :of="form" :path="['volume']" v-slot="field">
+    <label for="settings-volume">Volume</label>
+    <Slider
+      input-id="settings-volume"
+      :ref="elementRef(field.props.ref)"
+      :name="field.props.name"
+      :model-value="field.input"
+      :min="0"
+      :max="100"
+      :step="1"
+      aria-label="Volume"
+      :invalid="!!field.errors"
+      :pt="{
+        input: {
+          autofocus: field.props.autofocus,
+          'aria-invalid': !!field.errors,
+          'aria-errormessage': 'settings-volume-error',
+          onFocus: field.props.onFocus,
+          onBlur: field.props.onBlur,
+        },
+      }"
+      @update:model-value="(value) => (field.input = value as number)"
+      @slideend="(event) => field.props.onChange(event.originalEvent)"
+    />
+  </Field>
+</template>
+```
+
+The slider's `slider` role sits on a real range input, and the default single-value mode renders exactly one.
+
+## Library-specific notes
+
+PrimeVue v5 ships its own `Form` and `FormField` components built around its resolver based validation. You do not need them with Formisch: use Formisch's <Link href="/vue/api/Form/">`Form`</Link> and <Link href="/vue/api/Field/">`Field`</Link> and let your Valibot schema drive validation.
+
+`field.props.autofocus` is a snapshot taken when the field mounts, not a reactive value. Formisch moves focus to the first invalid field after a failed submit on its own.
+
+## Next steps
+
+Read the <Link href="/vue/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/vue/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/vue/guides/validation/">validation</Link> guide for validation timing.

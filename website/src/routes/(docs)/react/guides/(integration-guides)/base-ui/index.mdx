@@ -1,0 +1,397 @@
+---
+title: Base UI
+description: >-
+  Learn how to connect Formisch fields to Base UI inputs, selects, radio
+  groups, sliders and other form controls.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Base UI
+
+[Base UI](https://base-ui.com) is an unstyled component library from the creators of Radix, Floating UI and Material UI. This guide targets `@base-ui/react` v1. No adapter package is needed: native controls receive `field.props`, while composite components map Formisch's value and lifecycle APIs to their parts. Base UI's `Field` parts handle label and error accessibility for both kinds.
+
+## Installation
+
+Install Formisch, Valibot and Base UI:
+
+```bash
+npm install @formisch/react valibot @base-ui/react
+```
+
+## Wiring patterns
+
+Choose the wiring from the component's public API:
+
+- If it forwards props and a ref to a native form element, spread `field.props` and pass `field.input` as its value.
+- If it exposes a custom callback such as `onCheckedChange` or `onValueChange`, control it with `field.input` and `field.onChange`, then forward the remaining lifecycle props separately.
+
+### Spreading field.props
+
+`Input` renders a native `<input>`, so its wiring is the same as a plain HTML input. Base UI's `Field.Root` wires the label, error and `aria` attributes automatically. Since both Formisch and Base UI export a component named `Field`, the Base UI one is imported as `BaseField`:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <BaseField.Root invalid={field.errors !== null}>
+      <BaseField.Label>Email</BaseField.Label>
+      <Input {...field.props} value={field.input ?? ''} type="email" />
+      <BaseField.Error match={field.errors !== null}>
+        {field.errors?.[0]}
+      </BaseField.Error>
+    </BaseField.Root>
+  )}
+</Field>
+```
+
+For a textarea, use `BaseField.Control render={<textarea />}` with the same spread.
+
+### Controlled components
+
+Composite components expose their value through custom callbacks and render a hidden native element that accepts `inputRef`. Registering that hidden element with `field.props.ref` keeps Formisch's `focus()` working, because Base UI redirects focus from the hidden element to the visible control:
+
+```tsx
+<Field of={loginForm} path={['rememberMe']}>
+  {(field) => (
+    <Checkbox.Root
+      name={field.props.name}
+      inputRef={field.props.ref}
+      autoFocus={field.props.autoFocus}
+      onFocus={field.props.onFocus}
+      onBlur={field.props.onBlur}
+      checked={field.input ?? false}
+      onCheckedChange={(checked) => field.onChange(checked)}
+    >
+      <Checkbox.Indicator />
+    </Checkbox.Root>
+  )}
+</Field>
+```
+
+Formisch's focus and blur handlers are parameterless because they only update field lifecycle state, so you can pass them directly even when the component supplies an event argument.
+
+These examples wire fields directly so you can see the complete integration. Once a pattern repeats, wrap the parts in your own input component. The <Link href="/react/guides/input-components/">input components guide</Link> shows how.
+
+## Displaying errors
+
+Formisch exposes errors as `[string, ...string[]] | null`. Base UI's `Field.Error` normally displays messages from its own validity tracking, so pass `match` to force it whenever Formisch reports errors, and set `invalid` on `Field.Root` for the visual and `aria` invalid state:
+
+```tsx
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <BaseField.Root invalid={field.errors !== null}>
+      <BaseField.Label>Email</BaseField.Label>
+      <Input {...field.props} value={field.input ?? ''} />
+      <BaseField.Error match={field.errors !== null}>
+        {field.errors?.[0]}
+      </BaseField.Error>
+    </BaseField.Root>
+  )}
+</Field>
+```
+
+By default, Formisch validates on submit and revalidates on input. The <Link href="/react/guides/validation/">validation guide</Link> explains how to change that timing.
+
+## Login form example
+
+This complete example combines native inputs, a controlled checkbox and accessible errors:
+
+```tsx
+import { Checkbox } from '@base-ui/react/checkbox';
+import { Field as BaseField } from '@base-ui/react/field';
+import { Input } from '@base-ui/react/input';
+import { Field, Form, type SubmitHandler, useForm } from '@formisch/react';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+  rememberMe: v.optional(v.boolean(), false),
+});
+
+export default function LoginPage() {
+  const loginForm = useForm({
+    schema: LoginSchema,
+    initialInput: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  });
+
+  const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+    console.log(output);
+  };
+
+  return (
+    <Form of={loginForm} onSubmit={handleSubmit}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <BaseField.Root invalid={field.errors !== null}>
+            <BaseField.Label>Email</BaseField.Label>
+            <Input
+              {...field.props}
+              value={field.input ?? ''}
+              type="email"
+              placeholder="jane@example.com"
+              autoComplete="email"
+            />
+            <BaseField.Error match={field.errors !== null}>
+              {field.errors?.[0]}
+            </BaseField.Error>
+          </BaseField.Root>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <BaseField.Root invalid={field.errors !== null}>
+            <BaseField.Label>Password</BaseField.Label>
+            <Input
+              {...field.props}
+              value={field.input ?? ''}
+              type="password"
+              autoComplete="current-password"
+            />
+            <BaseField.Error match={field.errors !== null}>
+              {field.errors?.[0]}
+            </BaseField.Error>
+          </BaseField.Root>
+        )}
+      </Field>
+
+      <Field of={loginForm} path={['rememberMe']}>
+        {(field) => (
+          <BaseField.Root>
+            <BaseField.Label>
+              <Checkbox.Root
+                name={field.props.name}
+                inputRef={field.props.ref}
+                autoFocus={field.props.autoFocus}
+                onFocus={field.props.onFocus}
+                onBlur={field.props.onBlur}
+                checked={field.input ?? false}
+                onCheckedChange={(checked) => field.onChange(checked)}
+              >
+                <Checkbox.Indicator />
+              </Checkbox.Root>
+              Remember me
+            </BaseField.Label>
+          </BaseField.Root>
+        )}
+      </Field>
+
+      <button type="submit" disabled={loginForm.isSubmitting}>
+        Login
+      </button>
+    </Form>
+  );
+}
+```
+
+The initial input keeps every control defined from its first render. The native inputs use the `field.props` spread, while the checkbox maps Base UI's value callback and hidden input explicitly.
+
+## Component reference
+
+The following snippets assume a form store named `form` and initialized values that match the schema.
+
+### Text input
+
+`Input` forwards to a native `<input>`, so spread `field.props` directly:
+
+```tsx
+<Field of={form} path={['email']}>
+  {(field) => (
+    <BaseField.Root invalid={field.errors !== null}>
+      <BaseField.Label>Email</BaseField.Label>
+      <Input {...field.props} value={field.input ?? ''} type="email" />
+      <BaseField.Error match={field.errors !== null}>
+        {field.errors?.[0]}
+      </BaseField.Error>
+    </BaseField.Root>
+  )}
+</Field>
+```
+
+For a textarea, use `BaseField.Control render={<textarea />}` with the same spread.
+
+### Checkbox
+
+For a boolean field, control `checked` and register the hidden input:
+
+```tsx
+<Field of={form} path={['newsletter']}>
+  {(field) => (
+    <BaseField.Root>
+      <BaseField.Label>
+        <Checkbox.Root
+          name={field.props.name}
+          inputRef={field.props.ref}
+          autoFocus={field.props.autoFocus}
+          onFocus={field.props.onFocus}
+          onBlur={field.props.onBlur}
+          checked={field.input ?? false}
+          onCheckedChange={(checked) => field.onChange(checked)}
+        >
+          <Checkbox.Indicator />
+        </Checkbox.Root>
+        Newsletter
+      </BaseField.Label>
+    </BaseField.Root>
+  )}
+</Field>
+```
+
+### Select
+
+`Select` represents no selection as `null`, while an optional Formisch value is `undefined`. Convert between them and narrow the value back to the schema union. The `items` prop lets `Select.Value` display the selected item's label, and the registered hidden select redirects focus to the visible trigger:
+
+```tsx
+const frameworks = [
+  { label: 'Angular', value: 'angular' },
+  { label: 'React', value: 'react' },
+  { label: 'Solid', value: 'solid' },
+  { label: 'Vue', value: 'vue' },
+];
+```
+
+```tsx
+<Field of={form} path={['framework']}>
+  {(field) => (
+    <BaseField.Root invalid={field.errors !== null}>
+      <BaseField.Label id="project-framework-label">Framework</BaseField.Label>
+      <Select.Root
+        items={frameworks}
+        name={field.props.name}
+        inputRef={field.props.ref}
+        value={field.input ?? null}
+        onValueChange={(value) =>
+          field.onChange((value ?? undefined) as typeof field.input)
+        }
+      >
+        <Select.Trigger
+          aria-labelledby="project-framework-label"
+          autoFocus={field.props.autoFocus}
+          onFocus={field.props.onFocus}
+          onBlur={field.props.onBlur}
+        >
+          <Select.Value placeholder="Select a framework" />
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Positioner>
+            <Select.Popup>
+              <Select.List>
+                {frameworks.map((item) => (
+                  <Select.Item key={item.value} value={item.value}>
+                    <Select.ItemText>{item.label}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Select.List>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Portal>
+      </Select.Root>
+      <BaseField.Error match={field.errors !== null}>
+        {field.errors?.[0]}
+      </BaseField.Error>
+    </BaseField.Root>
+  )}
+</Field>
+```
+
+### Radio group
+
+`RadioGroup` is controlled through `onValueChange` and accepts the field name, input ref and lifecycle props directly on the group:
+
+```tsx
+<Field of={form} path={['plan']}>
+  {(field) => (
+    <BaseField.Root invalid={field.errors !== null}>
+      <BaseField.Label id="plan-label">Plan</BaseField.Label>
+      <RadioGroup
+        aria-labelledby="plan-label"
+        name={field.props.name}
+        inputRef={field.props.ref}
+        value={field.input ?? null}
+        onValueChange={(value) =>
+          field.onChange((value ?? undefined) as typeof field.input)
+        }
+        onFocus={field.props.onFocus}
+        onBlur={field.props.onBlur}
+      >
+        <label>
+          <Radio.Root value="hobby" autoFocus={field.props.autoFocus}>
+            <Radio.Indicator />
+          </Radio.Root>
+          Hobby
+        </label>
+        <label>
+          <Radio.Root value="pro">
+            <Radio.Indicator />
+          </Radio.Root>
+          Pro
+        </label>
+      </RadioGroup>
+      <BaseField.Error match={field.errors !== null}>
+        {field.errors?.[0]}
+      </BaseField.Error>
+    </BaseField.Root>
+  )}
+</Field>
+```
+
+### Slider
+
+`Slider.Root` accepts a single number, and the thumb count follows the number of `Slider.Thumb` parts you render, so no array conversion is needed. The callback is still typed as `number | readonly number[]`, so normalize it explicitly. Connect the label with `aria-labelledby`, which Base UI forwards to the thumb's hidden range input:
+
+```tsx
+<Field of={form} path={['volume']}>
+  {(field) => (
+    <BaseField.Root invalid={field.errors !== null}>
+      <BaseField.Label id="volume-label">Volume</BaseField.Label>
+      <Slider.Root
+        aria-labelledby="volume-label"
+        name={field.props.name}
+        value={field.input ?? 50}
+        onValueChange={(value) =>
+          field.onChange(Array.isArray(value) ? (value[0] ?? 50) : value)
+        }
+        onFocus={field.props.onFocus}
+        onBlur={field.props.onBlur}
+        min={0}
+        max={100}
+      >
+        <Slider.Control>
+          <Slider.Track>
+            <Slider.Indicator />
+            <Slider.Thumb inputRef={field.props.ref} />
+          </Slider.Track>
+        </Slider.Control>
+      </Slider.Root>
+      <BaseField.Error match={field.errors !== null}>
+        {field.errors?.[0]}
+      </BaseField.Error>
+    </BaseField.Root>
+  )}
+</Field>
+```
+
+## Library-specific notes
+
+Base UI also ships its own `Form` component and `Field.Root` validation through the `validate` prop. You do not need either with Formisch: use Formisch's <Link href="/react/api/Form/">`Form`</Link> component and let your Valibot schema drive validation, with `Field.Root` reduced to layout and accessibility wiring as shown above.
+
+If you use shadcn/ui, note that its current registry generates styled components on top of these Base UI primitives; see our <Link href="/react/guides/shadcn-ui/">shadcn/ui guide</Link> for the generated-component wiring.
+
+## Next steps
+
+Read the <Link href="/react/guides/input-components/">input components</Link> guide to package repeated wiring into reusable controls, the <Link href="/react/guides/controlled-fields/">controlled fields</Link> guide for the underlying pattern, and the <Link href="/react/guides/validation/">validation</Link> guide for validation timing.
