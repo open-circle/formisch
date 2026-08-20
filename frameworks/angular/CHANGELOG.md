@@ -2,8 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.0.0-rc.0 (August 20, 2026)
 
+- Change `@formisch/core` to v1.0.0-rc.1
+- Change `@formisch/methods` to v1.0.0-rc.1
 - Fix `injectField` destroy cleanup to drop detached elements from the reset baseline
 
 ## v0.1.0 (July 26, 2026)

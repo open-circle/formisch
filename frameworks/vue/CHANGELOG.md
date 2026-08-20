@@ -2,8 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.0.0-rc.1 (August 20, 2026)
 
+- Change `@formisch/core` to v1.0.0-rc.1
+- Change `@formisch/methods` to v1.0.0-rc.1
 - Fix duplicate element registration in `useField` after array reorders
 - Fix `useField` cleanup to drop detached elements from the reset baseline
 - Change the `FieldElementProps` focus and blur handlers to parameterless callbacks
