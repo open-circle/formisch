@@ -1,9 +1,15 @@
-import { untrack } from '../../framework/index.ts';
 import type {
   InternalFieldStore,
   InternalFormStore,
   Path,
 } from '../../types/index.ts';
+
+// This framework-specific implementation exists because Vue does not expose a
+// public `untrack` API. Formisch creates its Vue signals with `shallowRef`,
+// which stores the current value in `_value`. Reading it directly avoids
+// subscribing an enclosing computed or watcher to array item changes. The
+// public `value` fallback preserves the previous behavior if Vue removes this
+// internal property in the future.
 
 /**
  * Returns the field store at the specified path by traversing the form store's
@@ -29,7 +35,9 @@ export function getFieldStore(
     if (
       internalFieldStore.kind === 'array' &&
       // @ts-expect-error
-      untrack(() => internalFieldStore.items.value)[key] === undefined
+      (internalFieldStore.items._value ?? internalFieldStore.items.value)[
+        key
+      ] === undefined
     ) {
       return undefined;
     }

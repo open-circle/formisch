@@ -71,6 +71,13 @@ describe('setInput', () => {
     expect(() =>
       setInput(store, { path: ['items', 0, 'name'], input: 'foo' })
     ).not.toThrow();
+
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+    if (itemsStore.kind === 'array') {
+      expect(itemsStore.items.value).toEqual([]);
+      expect(itemsStore.isDirty.value).toBe(false);
+    }
   });
 
   test('should set full form input', () => {
