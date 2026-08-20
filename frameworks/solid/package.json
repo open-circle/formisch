@@ -83,9 +83,9 @@
     "vitest": "4.1.7"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0",
-    "typescript": ">=5",
-    "valibot": "^1.4.1"
+    "solid-js": ">=1.6 <2",
+    "typescript": ">=5 <8",
+    "valibot": ">=1.4.1 <2"
   },
   "peerDependenciesMeta": {
     "typescript": {

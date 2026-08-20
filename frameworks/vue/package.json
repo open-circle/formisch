@@ -71,9 +71,9 @@
     "vue-tsc": "^3.0.4"
   },
   "peerDependencies": {
-    "typescript": ">=5",
-    "valibot": "^1.4.1",
-    "vue": "^3.3.0"
+    "typescript": ">=5 <8",
+    "valibot": ">=1.4.1 <2",
+    "vue": ">=3.3 <4"
   },
   "peerDependenciesMeta": {
     "typescript": {

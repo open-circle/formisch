@@ -68,9 +68,9 @@
     "vitest": "^4.1.7"
   },
   "peerDependencies": {
-    "@angular/core": ">=19.0.0",
-    "typescript": ">=5",
-    "valibot": "^1.4.1"
+    "@angular/core": ">=19 <23",
+    "typescript": ">=5 <8",
+    "valibot": ">=1.4.1 <2"
   },
   "peerDependenciesMeta": {
     "typescript": {
