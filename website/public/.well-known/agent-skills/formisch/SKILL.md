@@ -1,10 +1,10 @@
 ---
 name: formisch
-description: Form handling with Formisch, the type-safe form library for modern frameworks. Use when the user needs to create forms, handle form state, validate form inputs, or work with Formisch.
+description: Form handling with Formisch, the schema-first and type-safe form library for Angular, Preact, Qwik, React, React Native, Solid, Svelte, and Vue. Use when creating forms, handling form state, validating inputs, working with field arrays, or using @formisch/* packages.
 license: MIT
 metadata:
   author: open-circle
-  version: "1.2"
+  version: "1.3"
 ---
 
 # Formisch
@@ -15,7 +15,7 @@ This skill helps AI agents work effectively with [Formisch](https://formisch.dev
 
 - When the user asks about form handling with Formisch
 - When managing form state and validation
-- When working with React, Vue, Solid, Preact, Svelte, or Qwik forms
+- When working with Angular, Preact, Qwik, React, React Native, Solid, Svelte, or Vue forms
 - When integrating Valibot schemas with forms
 
 ## Introduction
@@ -30,14 +30,16 @@ Formisch is a schema-based, headless form library that works across multiple fra
 
 ### Supported Frameworks
 
-| Framework | Package            | Hook/Primitive |
-| --------- | ------------------ | -------------- |
-| React     | `@formisch/react`  | `useForm`      |
-| Vue       | `@formisch/vue`    | `useForm`      |
-| SolidJS   | `@formisch/solid`  | `createForm`   |
-| Preact    | `@formisch/preact` | `useForm`      |
-| Svelte    | `@formisch/svelte` | `createForm`   |
-| Qwik      | `@formisch/qwik`   | `useForm$`     |
+| Framework    | Package                  | Hook/Primitive |
+| ------------ | ------------------------ | -------------- |
+| Angular      | `@formisch/angular`      | `injectForm`   |
+| Preact       | `@formisch/preact`       | `useForm`      |
+| Qwik         | `@formisch/qwik`         | `useForm$`     |
+| React        | `@formisch/react`        | `useForm`      |
+| React Native | `@formisch/react-native` | `useForm`      |
+| SolidJS      | `@formisch/solid`        | `createForm`   |
+| Svelte       | `@formisch/svelte`       | `createForm`   |
+| Vue          | `@formisch/vue`          | `useForm`      |
 
 ## Installation
 
@@ -50,12 +52,14 @@ npm install valibot
 ### 2. Install Formisch for your framework
 
 ```bash
-npm install @formisch/react   # React
-npm install @formisch/vue     # Vue
-npm install @formisch/solid   # SolidJS
-npm install @formisch/preact  # Preact
-npm install @formisch/svelte  # Svelte
-npm install @formisch/qwik    # Qwik
+npm install @formisch/react         # React
+npm install @formisch/angular       # Angular
+npm install @formisch/vue           # Vue
+npm install @formisch/solid         # SolidJS
+npm install @formisch/preact        # Preact
+npm install @formisch/svelte        # Svelte
+npm install @formisch/qwik          # Qwik
+npm install @formisch/react-native  # React Native
 ```
 
 ## Core Concepts
@@ -107,8 +111,10 @@ Each field has its own reactive store with:
 - `isEdited` — Field value has been edited
 - `isDirty` — Field value differs from initial value
 - `isValid` — Field passes validation
-- `props` — Props to spread onto input elements
-- `onChange` (React) / `onInput` (Solid, Svelte, Preact, Qwik) — Sets the field input value programmatically. Use this when the field cannot be connected to a native HTML element. In Vue, set `field.input` directly (e.g. with `v-model`).
+- `props` — Props to spread onto native elements (Angular connects controls with `[formischControl]` instead)
+- `onChange` (React and React Native) / `onInput` (Solid, Svelte, Preact, and Qwik) / `setInput` (Angular) — Sets the field input value programmatically. Use this when the field cannot be connected to a native element. In Vue, set `field.input` directly (for example with `v-model`).
+
+Store reactivity is framework-specific. React, React Native, Solid, Svelte, and Vue expose plain reactive properties. Angular properties are signals and are called like `field.errors()`, except `path`, which is a plain value. Preact and Qwik properties are signals; use `.value` in conditions and ordinary TypeScript logic. Do not copy one framework's access syntax into another.
 
 ### Dirty Tracking
 
@@ -120,6 +126,95 @@ Formisch tracks two inputs per field:
 `isDirty` becomes `true` when current input differs from initial input.
 
 ## Framework Examples
+
+### Angular Example
+
+Angular uses signals, dependency injection, and directives instead of a JSX component API.
+
+```ts
+import { Component } from "@angular/core";
+import {
+  FormischControl,
+  FormischField,
+  FormischForm,
+  injectForm,
+  type SubmitHandler,
+} from "@formisch/angular";
+import * as v from "valibot";
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+@Component({
+  selector: "app-login",
+  imports: [FormischForm, FormischField, FormischControl],
+  template: `
+    <form [formischForm]="loginForm" [formischSubmit]="handleSubmit">
+      <ng-container *formischField="['email'] of loginForm; let field">
+        <input [formischControl]="field" type="email" />
+        @if (field.errors(); as errors) {
+          <div>{{ errors[0] }}</div>
+        }
+      </ng-container>
+      <button type="submit" [disabled]="loginForm.isSubmitting()">Login</button>
+    </form>
+  `,
+})
+export class LoginComponent {
+  readonly loginForm = injectForm({ schema: LoginSchema });
+
+  readonly handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+    console.log(output);
+  };
+}
+```
+
+Let `[formischControl]` synchronize the native control. Do not add competing `[value]` or `[checked]` bindings except when `value` identifies an option in a radio or checkbox group.
+
+### React Native Example
+
+React Native has no DOM `<form>` element or Formisch `Form` component. Use `handleSubmit` and bind `field.props` to `TextInput`.
+
+```tsx
+import { Field, handleSubmit, useForm } from "@formisch/react-native";
+import { Button, TextInput, View } from "react-native";
+import * as v from "valibot";
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function LoginScreen() {
+  const loginForm = useForm({ schema: LoginSchema });
+  const submitForm = handleSubmit(loginForm, (output) => console.log(output));
+
+  return (
+    <View>
+      <Field of={loginForm} path={["email"]}>
+        {(field) => (
+          <TextInput
+            {...field.props}
+            value={field.input}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+        )}
+      </Field>
+      <Field of={loginForm} path={["password"]}>
+        {(field) => (
+          <TextInput {...field.props} value={field.input} secureTextEntry />
+        )}
+      </Field>
+      <Button title="Login" onPress={submitForm} />
+    </View>
+  );
+}
+```
+
+React Native text inputs are controlled, so always pass `value={field.input}`. Use `field.onChange(value)` for switches, sliders, pickers, and non-string values.
 
 ### React Example
 
@@ -194,13 +289,13 @@ const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
   <Form :of="loginForm" @submit="handleSubmit">
     <Field :of="loginForm" :path="['email']" v-slot="field">
       <div>
-        <input v-bind="field.props" v-model="field.input" type="email" />
+        <input v-model="field.input" v-bind="field.props" type="email" />
         <div v-if="field.errors">{{ field.errors[0] }}</div>
       </div>
     </Field>
     <Field :of="loginForm" :path="['password']" v-slot="field">
       <div>
-        <input v-bind="field.props" v-model="field.input" type="password" />
+        <input v-model="field.input" v-bind="field.props" type="password" />
         <div v-if="field.errors">{{ field.errors[0] }}</div>
       </div>
     </Field>
@@ -358,17 +453,26 @@ const form = useForm({
     email: "user@example.com",
   },
 
+  // Optional: Empty values for required fields without initial input
+  // Required strings default to ''; number, boolean, and date to undefined
+  emptyInput: {
+    number: 0,
+  },
+
   // Optional: When first validation occurs
   // Options: 'initial' | 'touch' | 'input' | 'change' | 'blur' | 'submit' (default)
   validate: "submit",
 
-  // Optional: When revalidation occurs after first validation
+  // Optional: When a field is validated again once it already has an
+  // error or the form has been submitted
   // Options: 'touch' | 'input' (default) | 'change' | 'blur' | 'submit'
   revalidate: "input",
 });
 ```
 
 In Qwik, `useForm$` must receive a function that returns the config, e.g. `useForm$(() => ({ schema: MySchema }))`. This allows Qwik to convert the config into a QRL.
+
+Optional and nullable fields remain `undefined`. `emptyInput` only supplies fallbacks for required fields whose input is `undefined`.
 
 ## Field Paths
 
@@ -400,7 +504,14 @@ All methods follow a consistent API pattern:
 ### Reading Values
 
 ```ts
-import { getInput, getErrors, getDeepErrors } from "@formisch/react";
+import {
+  getDeepError,
+  getDeepErrorEntries,
+  getDeepErrorEntry,
+  getDeepErrors,
+  getErrors,
+  getInput,
+} from "@formisch/react";
 
 // Get field value
 const email = getInput(form, { path: ["email"] });
@@ -416,7 +527,48 @@ const allErrors = getDeepErrors(form);
 
 // Get all errors of a field and its descendants
 const todoErrors = getDeepErrors(form, { path: ["todos"] });
+
+// Get every error together with its field path
+const errorEntries = getDeepErrorEntries(form);
+
+// Get only the first error of a field and its descendants
+const firstTodoError = getDeepError(form, { path: ["todos"] });
+
+// Get only the first error together with its field path
+const firstErrorEntry = getDeepErrorEntry(form);
 ```
+
+Form-level `form.errors` and `getErrors(form)` contain only root-level errors. Use the deep-error methods when descendant field errors are needed. The singular variants `getDeepError` and `getDeepErrorEntry` stop at the first field with errors, which is useful for showing a single message for a nested structure.
+
+### Reading Dirty State
+
+```ts
+import {
+  getDirtyInput,
+  getDirtyPaths,
+  isDirty,
+  pickDirty,
+} from "@formisch/react";
+
+// Raw dirty form input, or undefined when nothing is dirty
+const dirtyInput = getDirtyInput(form);
+
+// Paths of dirty fields (arrays are treated as atomic values)
+const dirtyPaths = getDirtyPaths(form);
+
+// Cheap boolean check when the dirty values are not needed
+const hasChanges = isDirty(form);
+
+// Boolean check scoped to a field and its descendants
+const emailChanged = isDirty(form, { path: ["email"] });
+
+// In a submit handler, keep transformed output only where fields are dirty
+const dirtyOutput = pickDirty(form, { from: output });
+```
+
+`getDirtyInput` returns raw form input. `pickDirty` applies the form's dirty mask to a supplied value, which is useful for validated and transformed submit output.
+
+The sibling methods `isTouched`, `isEdited`, and `isValid` follow the same pattern as `isDirty`. Each checks the entire form when called without a config, or a specific field and its descendants when called with a `path`.
 
 ### Setting Values
 
@@ -435,6 +587,9 @@ setErrors(form, { path: ["email"], errors: null });
 // Reset entire form
 reset(form);
 
+// Reset a single field
+reset(form, { path: ["email"] });
+
 // Reset with new initial values
 reset(form, {
   initialInput: { email: "", password: "" },
@@ -447,12 +602,14 @@ reset(form, {
 });
 ```
 
+`reset` also accepts the flags `keepTouched`, `keepEdited`, and `keepErrors`. The form-level reset additionally accepts `keepSubmitted`. All flags default to `false`.
+
 ### Form Control
 
 ```ts
 import { validate, focus, submit, handleSubmit } from "@formisch/react";
 
-// Validate form manually (returns a Valibot SafeParseResult, not a boolean)
+// Validate form manually (returns a Promise of a Valibot SafeParseResult)
 const result = await validate(form);
 if (result.success) {
   console.log(result.output);
@@ -475,9 +632,13 @@ const onExternalSubmit = handleSubmit(form, (output) => {
 });
 ```
 
+`submit` requires a registered DOM form and is not exported by `@formisch/react-native`. In React Native and in layouts without a `<form>` element, call the function returned by `handleSubmit` instead.
+
 ## Field Arrays
 
 For dynamic lists of fields, use `FieldArray` with array manipulation methods.
+
+The field array store exposes `path`, `items` (stable item IDs for use as keys), `errors`, `isTouched`, `isEdited`, `isDirty`, and `isValid`.
 
 ### Schema
 
@@ -656,7 +817,12 @@ const ProfileSchema = v.object({
 Pass forms to child components with proper typing:
 
 ```tsx
-import type { FormStore } from "@formisch/react";
+import { Form, type FormStore, useForm } from "@formisch/react";
+
+export default function LoginPage() {
+  const loginForm = useForm({ schema: LoginSchema });
+  return <FormContent of={loginForm} />;
+}
 
 type FormContentProps = {
   of: FormStore<typeof LoginSchema>;
@@ -695,6 +861,8 @@ function EmailInput({ of }: EmailInputProps) {
 }
 ```
 
+The `v.GenericSchema<{ email: string }>` constraint accepts any form whose schema contains an `email` field of type `string`. TypeScript catches mismatches at compile time.
+
 ### Available Types
 
 ```ts
@@ -726,7 +894,7 @@ Controls when the **first** validation occurs:
 
 ### revalidate Option
 
-Controls when validation runs **after** the first validation:
+Controls when a field is validated **again**, once it already has an error or the form has been submitted:
 
 | Value      | Description                                      |
 | ---------- | ------------------------------------------------ |
@@ -743,9 +911,9 @@ Controls when validation runs **after** the first validation:
 ```tsx
 <Field of={form} path={["framework"]}>
   {(field) => (
-    <select {...field.props}>
+    <select {...field.props} value={field.input ?? ""}>
       {options.map(({ label, value }) => (
-        <option key={value} value={value} selected={field.input === value}>
+        <option key={value} value={value}>
           {label}
         </option>
       ))}
@@ -759,13 +927,9 @@ Controls when validation runs **after** the first validation:
 ```tsx
 <Field of={form} path={["frameworks"]}>
   {(field) => (
-    <select {...field.props} multiple>
+    <select {...field.props} value={field.input ?? []} multiple>
       {options.map(({ label, value }) => (
-        <option
-          key={value}
-          value={value}
-          selected={field.input?.includes(value)}
-        >
+        <option key={value} value={value}>
           {label}
         </option>
       ))}
@@ -829,9 +993,11 @@ function EmailInput({ form }) {
 - **`Field` component** — Multiple fields in the same component
 - **`useField` hook** — Single field with component logic access
 
+The `useFieldArray` hook is the equivalent counterpart of the `FieldArray` component. In Angular, use the `injectField` and `injectFieldArray` functions or the `*formischField` and `*formischFieldArray` directives.
+
 ## Using Component Libraries
 
-When using component libraries that don't expose their underlying native HTML elements, you cannot spread `field.props` directly. Instead, update the value programmatically with `field.onChange` (React), `field.onInput` (Solid, Svelte, Preact, Qwik), or by assigning to `field.input` (Vue):
+When using component libraries that don't expose their underlying native elements, you cannot spread `field.props` directly. Instead, update the value programmatically with `field.onChange` (React and React Native), `field.onInput` (Solid, Svelte, Preact, and Qwik), `field.setInput` (Angular), or by assigning to `field.input` (Vue):
 
 ```tsx
 import { DatePicker } from "some-component-library";
@@ -856,24 +1022,31 @@ This is useful for:
 ## Async Submission
 
 ```tsx
-const handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+import { setErrors, useForm } from "@formisch/react";
+import type { SubmitHandler } from "@formisch/react";
+
+const loginForm = useForm({ schema: LoginSchema });
+
+const handleSubmit: SubmitHandler<typeof LoginSchema> = async (output) => {
   try {
     const response = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
+      body: JSON.stringify(output),
     });
 
     if (!response.ok) {
       // Set server-side errors
       const data = await response.json();
-      setErrors(form, { path: ["email"], errors: [data.error] });
+      setErrors(loginForm, { path: ["email"], errors: [data.error] });
     }
   } catch (error) {
     console.error("Submission failed:", error);
   }
 };
 ```
+
+The form's `isSubmitting` state stays `true` until the async handler resolves. If the handler throws, Formisch catches the error and sets its message as a root-level form error on `form.errors`.
 
 ## Common Patterns
 
@@ -892,8 +1065,8 @@ Formisch handles this automatically via the native `<form>` element.
 ### Reset After Success
 
 ```tsx
-const handleSubmit: SubmitHandler<typeof Schema> = async (values) => {
-  await saveData(values);
+const handleSubmit: SubmitHandler<typeof Schema> = async (output) => {
+  await saveData(output);
 
   // Full reset to initial state
   reset(form);
@@ -919,21 +1092,27 @@ reset(form, {
 ### Conditional Fields
 
 ```tsx
-<Field of={form} path={["hasAccount"]}>
-  {(field) => <input {...field.props} type="checkbox" checked={field.input} />}
-</Field>;
-
-{
-  getInput(form, { path: ["hasAccount"] }) && (
+<Form of={form} onSubmit={handleSubmit}>
+  <Field of={form} path={["hasAccount"]}>
+    {(field) => (
+      <input {...field.props} type="checkbox" checked={field.input} />
+    )}
+  </Field>
+  {getInput(form, { path: ["hasAccount"] }) && (
     <Field of={form} path={["accountId"]}>
       {(field) => <input {...field.props} value={field.input} />}
     </Field>
-  );
-}
+  )}
+</Form>
 ```
+
+In React, calling `getInput` during render is reactive because `useForm` and `useField` enable signal tracking in the component that calls them. In the other frameworks, the read is tracked by their own reactive scopes.
 
 ## Additional Resources
 
 - [Formisch Documentation](https://formisch.dev/)
+- [Formisch Coding Agents Guide](https://formisch.dev/react/guides/coding-agents/)
+- Formisch MCP server: `https://formisch.dev/mcp` (`search_docs`, `get_doc`, and `list_docs`)
+- Append `.md` to any documentation URL for agent-friendly Markdown, or use `https://formisch.dev/llms-{framework}.txt` for a framework-specific index
 - [Formisch GitHub](https://github.com/open-circle/formisch)
 - [Valibot Documentation](https://valibot.dev/)
