@@ -1,0 +1,93 @@
+---
+cover: Formisch v1
+title: 'Formisch v1 is here'
+description: >-
+  Formisch v1 is out. The API is stable and follows semver from here. Angular
+  and React Native bring it to eight frameworks, six framework sections now have
+  migration guides, and the docs are readable by coding agents.
+published: 2026-08-20
+authors:
+  - flySewa
+---
+
+import { Link } from '~/components';
+
+Formisch is now stable and ready for usage in production!
+
+Going forward we'll follow semver, so breaking changes will only come with a major release, and we'll always ship clear upgrade notes with them.
+
+If you're coming from another library, six of the eight frameworks have [migration guides](#migration-guides). And because Formisch needs no app-level setup, you can move one form over without touching the rest. If you've been waiting to try it, there's no better time.
+
+## New to Formisch?
+
+Formisch is a framework-agnostic form library built around schemas. You define your form with a schema, and Formisch uses it to provide the types and validation for your form. You then build whatever UI you want on top of that form logic, using any of the eight frameworks Formisch currently supports. This means your schema and form logic stay the same when you change the UI or move between frameworks.
+
+We've had people using Formisch across different projects and frameworks over the last few months, and it's been good to see what they make of it.
+
+> It's the right amount of abstraction for most of my projects. What it lacks, I can build on top of. I don't have to "relearn" a new lib when I hop between frameworks. Tbh I also work with Convex a lot and Formisch just feels like a natural addition.
+>
+> — Marty
+
+We thought about "the right amount of abstraction" a ton while building Formisch. There's always more you _could_ put into a form library, so deciding what to leave out mattered just as much as deciding what went in. It's rewarding to see that intent come through when someone uses it.
+
+If you just want to build a form, the <Link href="/react/guides/installation/">get-started guide</Link> is the place to start. If you'd rather be convinced than told, [Schemas Won, Form Libraries Haven't Noticed Yet](https://dev.to/oluwawunmiadesewa/schemas-won-form-libraries-havent-noticed-yet-2ek6) makes the case for putting the schema at the center instead of bolting validation onto components. And if you'd rather read the internals than take our word for any of this, the <Link href="/blog/one-core-six-frameworks/">architecture post</Link> walks through the decisions we made, while <Link href="/blog/formisch-v1-release-candidate/">the RC post</Link> covers how we got here.
+
+## What's new in v1?
+
+Formisch v1 has a few new features and improvements since the RC post in June. Two frameworks have joined since the release candidate, which brings us to eight in total.
+
+### Angular support
+
+<Link href="/angular/guides/introduction/">Angular support</Link> works the way
+the rest of Formisch does, with your <a href="https://valibot.dev/">Valibot</a>
+schema driving the types and validation. You wire a form up with `injectForm`
+and reach individual fields with `injectField`, then bind them in the template
+through the `FormischField` and `FormischControl` directives. If you've used
+Angular's reactive forms the shape will feel familiar, except you define the
+schema once instead of building the form model and its types by hand.
+
+### React Native support
+
+<Link href="/react-native/guides/introduction/">React Native</Link> is the first environment Formisch supports with no DOM at all. There's no `<form>` element to hook submission onto and no `input` to spread props onto. It works anyway because the core was never coupled to the DOM in the first place. Form state and validation are plain TypeScript, and each framework package is responsible for injecting its own reactivity at build time. For React Native, that meant writing a binding that produces props for `TextInput` and a focus path that walks through native component refs. Below that layer, it's the same code running your Vue and Svelte forms.
+
+### Migration guides
+
+If you already have forms written in another library, six of the eight framework sections now include migration guides, 15 in total. All six cover <Link href="/react/guides/migrate-from-tanstack-form/">TanStack Form</Link>, so whichever of those frameworks you're on, there's a written path off it.
+
+The rest depend on what each community is already running. React covers <Link href="/react/guides/migrate-from-formik/">Formik</Link> and <Link href="/react/guides/migrate-from-react-hook-form/">React Hook Form</Link>, React Native has <Link href="/react-native/guides/migrate-from-formik/">its own versions of both</Link>, Vue has guides for <Link href="/vue/guides/migrate-from-vee-validate/">VeeValidate</Link> and <Link href="/vue/guides/migrate-from-formkit/">FormKit</Link>, and the remaining three are <Link href="/svelte/guides/migrate-from-superforms/">Superforms</Link> for Svelte, <Link href="/solid/guides/migrate-from-felte/">Felte</Link> for Solid, and <Link href="/angular/guides/migrate-from-reactive-forms/">Reactive Forms</Link> for Angular.
+
+Each guide takes one example form and shows both versions side by side, then maps the old API concepts onto the new ones.
+
+Preact and Qwik don't have guides yet. If you're on either and want one, [open an issue](https://github.com/open-circle/formisch/issues/new) and tell us what you're migrating from. We'll prioritize based on that.
+
+### Documentation your agent can read
+
+A lot of form code gets written by a model now, and a model only knows the APIs that existed when it was trained. We'd rather your agent read the current docs than guess from an older snapshot.
+
+Every page is served as Markdown. That's the content without the navigation, scripts or styling, so it's cheap for an agent to fetch. There's also an MCP server at `formisch.dev/mcp` with tools to search, read and list the docs, and you can scope any of them to a single framework so it isn't wading through the other seven.
+
+More on all of it in <Link href="/blog/making-formisch-easier-for-coding-agents/">the agent documentation post</Link>.
+
+## What's next?
+
+We're not done. A few things are already in motion for after v1.
+
+[Meta-framework support](https://github.com/open-circle/formisch/issues/140), so one form can span client and server without you wiring the boundary by hand. The FormData decoding in the core is the groundwork for it.
+
+[Support for more schema libraries](https://github.com/open-circle/formisch/issues/2) beyond Valibot, through Standard Schema, which is the thing we hear most from people with an existing Zod codebase.
+
+And a few smaller things on top of those.
+
+## Try it
+
+The quickest way to get a feel for it is the <Link href="/playground/todos/">playground</Link>, which runs a working form in your browser with nothing installed. When you want it in a project, install the package for your framework alongside Valibot:
+
+```bash
+npm install @formisch/react valibot
+```
+
+The other seven work the same way, just swap in `@formisch/angular`, `@formisch/preact`, `@formisch/qwik`, `@formisch/react-native`, `@formisch/solid`, `@formisch/svelte` or `@formisch/vue`. If a form behaves in a way you don't expect, [open an issue](https://github.com/open-circle/formisch/issues/new) or come tell us on [Discord](https://discord.gg/w5mRTETqzv).
+
+## Thank you
+
+A lot of people helped get Formisch to v1. Thanks to everyone who ran the RC and reported bugs, everyone who contributed docs or code, and to our sponsors for keeping it free. If Formisch is useful to you, a star on [GitHub](https://github.com/open-circle/formisch) helps other people find it.
