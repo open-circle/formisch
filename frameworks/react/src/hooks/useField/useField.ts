@@ -50,7 +50,7 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
   useSignals();
 
   const internalFormStore = form[INTERNAL];
-  const internalFieldStore = getFieldStore(internalFormStore, config.path);
+  const internalFieldStore = getFieldStore(internalFormStore, config.path)!;
 
   useEffect(() => {
     return () => {

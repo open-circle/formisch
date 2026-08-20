@@ -74,7 +74,8 @@ export function getInput(
   form: BaseFormStore,
   config?: GetFormInputConfig | GetFieldInputConfig<FormSchema, RequiredPath>
 ): unknown {
-  return getFieldInput(
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL]
-  );
+  const internalFieldStore = config?.path
+    ? getFieldStore(form[INTERNAL], config.path)
+    : form[INTERNAL];
+  return internalFieldStore ? getFieldInput(internalFieldStore) : undefined;
 }

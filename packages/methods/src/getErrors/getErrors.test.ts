@@ -70,4 +70,13 @@ describe('getErrors', () => {
 
     expect(result).toEqual(['Item error']);
   });
+
+  test('should return null for missing dynamic array item path', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [] } }
+    );
+
+    expect(getErrors(store, { path: ['items', 0, 'name'] })).toBeNull();
+  });
 });

@@ -99,7 +99,7 @@ describe('injectField', () => {
 
   it('registers and unregisters the element via the control ref', () => {
     const { form, field } = setup();
-    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email'])!;
     const element = document.createElement('input');
     const cleanup = field[CONTROL].ref(element);
     expect(internalFieldStore.elements).toContain(element);
@@ -110,7 +110,7 @@ describe('injectField', () => {
 
   it('does not register an element that is already present', () => {
     const { form, field } = setup();
-    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email'])!;
     const element = document.createElement('input');
     // Simulate an array reorder having already transferred the element
     internalFieldStore.elements.push(element);
@@ -120,14 +120,14 @@ describe('injectField', () => {
 
   it('ignores a null element passed to the control ref', () => {
     const { form, field } = setup();
-    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email'])!;
     expect(field[CONTROL].ref(null)).toBeUndefined();
     expect(internalFieldStore.elements).toHaveLength(0);
   });
 
   it('keeps initialElements in sync when unregistering the element', () => {
     const { form, field } = setup();
-    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email'])!;
     const element = document.createElement('input');
     const cleanup = field[CONTROL].ref(element);
     expect(internalFieldStore.initialElements).toContain(element);
@@ -147,7 +147,7 @@ describe('injectField', () => {
       const form = injectForm({ schema: Schema });
       return { form, field: injectField(form, { path: ['email'] }) };
     });
-    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email'])!;
 
     const connected = document.createElement('input');
     document.body.append(connected);
@@ -167,7 +167,7 @@ describe('injectField', () => {
 
   it('does not touch initialElements when a reorder moved the elements', () => {
     const { form, field } = setup();
-    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email'])!;
     const element = document.createElement('input');
     const cleanup = field[CONTROL].ref(element);
     const initialElements = internalFieldStore.initialElements;
@@ -187,7 +187,7 @@ describe('injectField', () => {
       const form = injectForm({ schema: Schema });
       return { form, field: injectField(form, { path: ['email'] }) };
     });
-    const internalFieldStore = getFieldStore(form[INTERNAL], ['email']);
+    const internalFieldStore = getFieldStore(form[INTERNAL], ['email'])!;
 
     const element = document.createElement('input');
     field[CONTROL].ref(element);

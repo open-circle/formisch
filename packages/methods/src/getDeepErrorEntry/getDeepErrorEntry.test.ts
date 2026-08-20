@@ -126,6 +126,15 @@ describe('getDeepErrorEntry', () => {
     });
   });
 
+  test('should return null for missing dynamic array item path', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [] } }
+    );
+
+    expect(getDeepErrorEntry(store, { path: ['items', 0, 'name'] })).toBeNull();
+  });
+
   test('should include form-level errors with an empty path', () => {
     const store = createTestStore(v.object({ name: v.string() }));
     store.errors.value = ['Form is invalid'];

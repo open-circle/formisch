@@ -52,8 +52,8 @@ export function useField(
 ): FieldStore {
   const path = computed(() => toValue(config).path);
   const internalFormStore = computed(() => toValue(form)[INTERNAL]);
-  const internalFieldStore = computed(() =>
-    getFieldStore(internalFormStore.value, path.value)
+  const internalFieldStore = computed(
+    () => getFieldStore(internalFormStore.value, path.value)!
   );
 
   onUnmounted(() => {

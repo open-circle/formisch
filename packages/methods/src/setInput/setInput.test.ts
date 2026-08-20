@@ -62,6 +62,24 @@ describe('setInput', () => {
     }
   });
 
+  test('should ignore missing dynamic array item path', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [] } }
+    );
+
+    expect(() =>
+      setInput(store, { path: ['items', 0, 'name'], input: 'foo' })
+    ).not.toThrow();
+
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+    if (itemsStore.kind === 'array') {
+      expect(itemsStore.items.value).toEqual([]);
+      expect(itemsStore.isDirty.value).toBe(false);
+    }
+  });
+
   test('should set full form input', () => {
     const store = createTestStore(
       v.object({ name: v.string(), age: v.number() }),

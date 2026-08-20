@@ -58,4 +58,31 @@ describe('getFieldStore', () => {
       }
     }
   });
+
+  test('should return undefined for missing array item store', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: [] },
+    });
+    expect(getFieldStore(store, ['items', 0])).toBeUndefined();
+  });
+
+  test('should return undefined for child of missing array item store', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [] } }
+    );
+    expect(getFieldStore(store, ['items', 0, 'name'])).toBeUndefined();
+  });
+
+  test('should return undefined for removed array item store', () => {
+    const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+      initialInput: { items: ['a', 'b'] },
+    });
+    const itemsStore = store.children.items;
+    expect(itemsStore.kind).toBe('array');
+    if (itemsStore.kind === 'array') {
+      itemsStore.items.value = itemsStore.items.value.slice(0, 1);
+      expect(getFieldStore(store, ['items', 1])).toBeUndefined();
+    }
+  });
 });

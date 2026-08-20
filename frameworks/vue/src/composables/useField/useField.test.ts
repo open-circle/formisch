@@ -1,5 +1,5 @@
 import { getFieldStore, INTERNAL } from '@formisch/core/vue';
-import { swap } from '@formisch/methods/vue';
+import { remove, swap } from '@formisch/methods/vue';
 import { mount } from '@vue/test-utils';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
@@ -383,6 +383,60 @@ describe('useField', () => {
       expect(document.querySelector('[data-testid="input"]')).toBeNull();
     });
 
+    test('should clean up a dynamic array field when its item is removed', async () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
+
+      const Row = defineComponent({
+        props: {
+          form: { type: Object, required: true },
+          index: { type: Number, required: true },
+        },
+        setup(props) {
+          const field = useField(
+            props.form as FormStore<typeof schema>,
+            () => ({ path: ['todos', props.index, 'label'] as const })
+          );
+          return () => h('input', { 'data-testid': 'input', ...field.props });
+        },
+      });
+
+      const Test = defineComponent({
+        setup() {
+          const form = useForm({
+            schema,
+            initialInput: { todos: [{ label: 'a' }] },
+          });
+          formStore = form;
+          const fieldArray = useFieldArray(form, { path: ['todos'] });
+          return () =>
+            fieldArray.items.map((id, index) =>
+              h(Row, { key: id, form, index })
+            );
+        },
+      });
+
+      const wrapper = mount(Test, { attachTo: document.body });
+      const removedFieldStore = getFieldStore(formStore![INTERNAL], [
+        'todos',
+        0,
+        'label',
+      ])!;
+      expect(removedFieldStore.elements).toHaveLength(1);
+
+      remove(formStore!, { path: ['todos'], at: 0 });
+      await wrapper.vm.$nextTick();
+
+      expect(document.querySelector('[data-testid="input"]')).toBeNull();
+      expect(removedFieldStore.elements).toEqual([]);
+      expect(removedFieldStore.initialElements).toEqual([]);
+      expect(
+        getFieldStore(formStore![INTERNAL], ['todos', 0, 'label'])
+      ).toBeUndefined();
+    });
+
     test('should not register an element that is already present', () => {
       const schema = v.object({ name: v.string() });
       const { result } = renderHook(() => {
@@ -391,7 +445,7 @@ describe('useField', () => {
       });
       const internalFieldStore = getFieldStore(result.current.form[INTERNAL], [
         'name',
-      ]);
+      ])!;
       const element = document.createElement('input');
       // Simulate an array reorder having already transferred the element
       internalFieldStore.elements.push(element);
@@ -436,17 +490,17 @@ describe('useField', () => {
 
       mount(Test, { attachTo: document.body });
       expect(
-        getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+        getFieldStore(formStore![INTERNAL], ['todos', 0, 'label'])!.elements
       ).toHaveLength(1);
 
       swap(formStore!, { path: ['todos'], at: 0, and: 1 });
 
       await vi.waitFor(() => {
         expect(
-          getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+          getFieldStore(formStore![INTERNAL], ['todos', 0, 'label'])!.elements
         ).toHaveLength(1);
         expect(
-          getFieldStore(formStore![INTERNAL], ['todos', 1, 'label']).elements
+          getFieldStore(formStore![INTERNAL], ['todos', 1, 'label'])!.elements
         ).toHaveLength(1);
       });
     });
@@ -469,7 +523,7 @@ describe('useField', () => {
       const element = document.querySelector('[data-testid="input"]');
       const internalFieldStore = getFieldStore(capturedForm![INTERNAL], [
         'name',
-      ]);
+      ])!;
       expect(internalFieldStore.initialElements).toContain(element);
 
       // Simulate an array operation moving the elements to another store

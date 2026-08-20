@@ -117,115 +117,116 @@ export function reset(
       const internalFieldStore = config?.path
         ? getFieldStore(internalFormStore, config.path)
         : internalFormStore;
-
-      // If initial input is provided, set it
-      if (config && 'initialInput' in config) {
-        setInitialFieldInput(
-          internalFormStore,
-          internalFieldStore,
-          config.initialInput
-        );
-      }
-
-      // Reset state of fields by walking field store
-      walkFieldStore(internalFieldStore, (internalFieldStore) => {
-        // Reset elements to initial elements
-        // Hint: `copyItemState` and `swapItemState` move elements between field
-        // stores during array methods, so this restores each field's original
-        // element. Without it, focus and file reset target the wrong element
-        // after a reorder followed by a reset.
-        internalFieldStore.elements = internalFieldStore.initialElements;
-
-        // Reset errors if it is not to be kept
-        if (!config?.keepErrors) {
-          internalFieldStore.errors.value = null;
+      if (internalFieldStore) {
+        // If initial input is provided, set it
+        if (config && 'initialInput' in config) {
+          setInitialFieldInput(
+            internalFormStore,
+            internalFieldStore,
+            config.initialInput
+          );
         }
 
-        // Reset is touched if it is not to be kept
-        if (!config?.keepTouched) {
-          internalFieldStore.isTouched.value = false;
-        }
+        // Reset state of fields by walking field store
+        walkFieldStore(internalFieldStore, (internalFieldStore) => {
+          // Reset elements to initial elements
+          // Hint: `copyItemState` and `swapItemState` move elements between field
+          // stores during array methods, so this restores each field's original
+          // element. Without it, focus and file reset target the wrong element
+          // after a reorder followed by a reset.
+          internalFieldStore.elements = internalFieldStore.initialElements;
 
-        // Reset is edited if it is not to be kept
-        if (!config?.keepEdited) {
-          internalFieldStore.isEdited.value = false;
-        }
-
-        // Reset start input to initial input
-        internalFieldStore.startInput.value =
-          internalFieldStore.initialInput.value;
-
-        // Reset input if it is not to be kept
-        if (!config?.keepInput) {
-          internalFieldStore.input.value =
-            internalFieldStore.initialInput.value;
-        }
-
-        // If it is an array, reset array specific state
-        if (internalFieldStore.kind === 'array') {
-          // Reset start items to initial items
-          internalFieldStore.startItems.value =
-            internalFieldStore.initialItems.value;
-
-          // Reset items if it is not to be kept
-          if (
-            !config?.keepInput ||
-            // Hint: The array items are just an internal concept used to
-            // store and track changes. We reset anyway if the lengths are
-            // equal because otherwise, the field may be in a dirty state
-            // even though there is no visible change for the end user.
-            internalFieldStore.startItems.value.length ===
-              internalFieldStore.items.value.length
-          ) {
-            internalFieldStore.items.value =
-              internalFieldStore.initialItems.value;
+          // Reset errors if it is not to be kept
+          if (!config?.keepErrors) {
+            internalFieldStore.errors.value = null;
           }
 
-          // Update is dirty to reflect changes
-          internalFieldStore.isDirty.value =
-            internalFieldStore.startInput.value !==
-              internalFieldStore.input.value ||
-            internalFieldStore.startItems.value !==
-              internalFieldStore.items.value;
+          // Reset is touched if it is not to be kept
+          if (!config?.keepTouched) {
+            internalFieldStore.isTouched.value = false;
+          }
 
-          // If it is an object, reset object specific state
-        } else if (internalFieldStore.kind === 'object') {
-          // Update is dirty to reflect changes
-          internalFieldStore.isDirty.value =
-            internalFieldStore.startInput.value !==
-            internalFieldStore.input.value;
+          // Reset is edited if it is not to be kept
+          if (!config?.keepEdited) {
+            internalFieldStore.isEdited.value = false;
+          }
 
-          // If it is a value, reset value specific state
-        } else {
-          // Update is dirty to reflect changes
-          // TODO: Should we add support for Dates and Files?
-          const startInput = internalFieldStore.startInput.value;
-          const input = internalFieldStore.input.value;
-          internalFieldStore.isDirty.value =
-            startInput !== input &&
-            // Hint: This check ensures that an empty string or `NaN` does not mark
-            // the field as dirty if the start input was `undefined` or `null`.
-            (startInput != null || (input !== '' && !Number.isNaN(input)));
+          // Reset start input to initial input
+          internalFieldStore.startInput.value =
+            internalFieldStore.initialInput.value;
 
-          // Reset file inputs as they can't be controlled
-          for (const element of internalFieldStore.elements) {
-            if (element.type === 'file') {
-              element.value = '';
+          // Reset input if it is not to be kept
+          if (!config?.keepInput) {
+            internalFieldStore.input.value =
+              internalFieldStore.initialInput.value;
+          }
+
+          // If it is an array, reset array specific state
+          if (internalFieldStore.kind === 'array') {
+            // Reset start items to initial items
+            internalFieldStore.startItems.value =
+              internalFieldStore.initialItems.value;
+
+            // Reset items if it is not to be kept
+            if (
+              !config?.keepInput ||
+              // Hint: The array items are just an internal concept used to
+              // store and track changes. We reset anyway if the lengths are
+              // equal because otherwise, the field may be in a dirty state
+              // even though there is no visible change for the end user.
+              internalFieldStore.startItems.value.length ===
+                internalFieldStore.items.value.length
+            ) {
+              internalFieldStore.items.value =
+                internalFieldStore.initialItems.value;
+            }
+
+            // Update is dirty to reflect changes
+            internalFieldStore.isDirty.value =
+              internalFieldStore.startInput.value !==
+                internalFieldStore.input.value ||
+              internalFieldStore.startItems.value !==
+                internalFieldStore.items.value;
+
+            // If it is an object, reset object specific state
+          } else if (internalFieldStore.kind === 'object') {
+            // Update is dirty to reflect changes
+            internalFieldStore.isDirty.value =
+              internalFieldStore.startInput.value !==
+              internalFieldStore.input.value;
+
+            // If it is a value, reset value specific state
+          } else {
+            // Update is dirty to reflect changes
+            // TODO: Should we add support for Dates and Files?
+            const startInput = internalFieldStore.startInput.value;
+            const input = internalFieldStore.input.value;
+            internalFieldStore.isDirty.value =
+              startInput !== input &&
+              // Hint: This check ensures that an empty string or `NaN` does not mark
+              // the field as dirty if the start input was `undefined` or `null`.
+              (startInput != null || (input !== '' && !Number.isNaN(input)));
+
+            // Reset file inputs as they can't be controlled
+            for (const element of internalFieldStore.elements) {
+              if (element.type === 'file') {
+                element.value = '';
+              }
             }
           }
-        }
-      });
+        });
 
-      // If path is not defined, reset form specific state
-      if (!config?.path) {
-        // Reset is submitted if it is not to be kept
-        if (!config?.keepSubmitted) {
-          internalFormStore.isSubmitted.value = false;
-        }
+        // If path is not defined, reset form specific state
+        if (!config?.path) {
+          // Reset is submitted if it is not to be kept
+          if (!config?.keepSubmitted) {
+            internalFormStore.isSubmitted.value = false;
+          }
 
-        // Validate form input if configured
-        if (internalFormStore.validate === 'initial') {
-          validateFormInput(internalFormStore);
+          // Validate form input if configured
+          if (internalFormStore.validate === 'initial') {
+            validateFormInput(internalFormStore);
+          }
         }
       }
     });

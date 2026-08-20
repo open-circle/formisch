@@ -69,7 +69,8 @@ export function getErrors(
   form: BaseFormStore,
   config?: GetFormErrorsConfig | GetFieldErrorsConfig<FormSchema, RequiredPath>
 ): [string, ...string[]] | null {
-  return (
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL]
-  ).errors.value;
+  const internalFieldStore = config?.path
+    ? getFieldStore(form[INTERNAL], config.path)
+    : form[INTERNAL];
+  return internalFieldStore?.errors.value ?? null;
 }

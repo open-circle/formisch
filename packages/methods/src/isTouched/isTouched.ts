@@ -70,8 +70,10 @@ export function isTouched(
   form: BaseFormStore,
   config?: IsFormTouchedConfig | IsFieldTouchedConfig<FormSchema, RequiredPath>
 ): boolean {
-  return getFieldBool(
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
-    'isTouched'
-  );
+  const internalFieldStore = config?.path
+    ? getFieldStore(form[INTERNAL], config.path)
+    : form[INTERNAL];
+  return internalFieldStore
+    ? getFieldBool(internalFieldStore, 'isTouched')
+    : false;
 }

@@ -79,10 +79,12 @@ export function getDirtyPaths(
   // Collect paths of dirty fields via a single recursive walk, reading each
   // field's own path instead of reconstructing it during the walk
   const paths: RequiredPath[] = [];
-  collectDirtyPaths(
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
-    paths
-  );
+  const internalFieldStore = config?.path
+    ? getFieldStore(form[INTERNAL], config.path)
+    : form[INTERNAL];
+  if (internalFieldStore) {
+    collectDirtyPaths(internalFieldStore, paths);
+  }
 
   // Return collected paths
   return paths;

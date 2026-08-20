@@ -52,8 +52,8 @@ export function useField(
 ): FieldStore {
   const getPath = createMemo(() => unwrap(config).path);
   const getInternalFormStore = createMemo(() => unwrap(form)[INTERNAL]);
-  const getInternalFieldStore = createMemo(() =>
-    getFieldStore(getInternalFormStore(), getPath())
+  const getInternalFieldStore = createMemo(
+    () => getFieldStore(getInternalFormStore(), getPath())!
   );
 
   const getInput = createMemo(() => getFieldInput(getInternalFieldStore()));

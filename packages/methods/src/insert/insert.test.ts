@@ -265,6 +265,27 @@ describe('insert', () => {
     }
   });
 
+  test('should ignore missing dynamic array item path', () => {
+    const store = createTestStore(
+      v.object({
+        groups: v.array(v.object({ items: v.array(v.string()) })),
+      }),
+      { initialInput: { groups: [] } }
+    );
+
+    expect(() =>
+      insert(store, { path: ['groups', 0, 'items'], initialInput: 'foo' })
+    ).not.toThrow();
+
+    const groupsStore = store.children.groups;
+    expect(groupsStore.kind).toBe('array');
+    if (groupsStore.kind === 'array') {
+      expect(groupsStore.items.value).toEqual([]);
+      expect(groupsStore.children).toEqual([]);
+      expect(groupsStore.isDirty.value).toBe(false);
+    }
+  });
+
   test('should insert into nested array', () => {
     const store = createTestStore(
       v.object({ outer: v.object({ items: v.array(v.string()) }) }),

@@ -72,8 +72,8 @@ export function isValid(
   form: BaseFormStore,
   config?: IsFormValidConfig | IsFieldValidConfig<FormSchema, RequiredPath>
 ): boolean {
-  return !getFieldBool(
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
-    'errors'
-  );
+  const internalFieldStore = config?.path
+    ? getFieldStore(form[INTERNAL], config.path)
+    : form[INTERNAL];
+  return !internalFieldStore || !getFieldBool(internalFieldStore, 'errors');
 }

@@ -46,40 +46,40 @@ export function remove<
 ): void {
   // Get internal form and array store
   const internalFormStore = form[INTERNAL];
-  const internalArrayStore = getFieldStore(
-    internalFormStore,
-    config.path
-  ) as InternalArrayStore;
+  const internalArrayStore = getFieldStore(internalFormStore, config.path) as
+    | InternalArrayStore
+    | undefined;
+  if (internalArrayStore) {
+    // Get current items of field array
+    const items = untrack(() => internalArrayStore.items.value);
 
-  // Get current items of field array
-  const items = untrack(() => internalArrayStore.items.value);
+    // Continue if specified index is valid
+    if (config.at >= 0 && config.at <= items.length - 1) {
+      batch(() => {
+        // Remove item ID from the items array
+        const newItems = [...items];
+        newItems.splice(config.at, 1);
+        internalArrayStore.items.value = newItems;
 
-  // Continue if specified index is valid
-  if (config.at >= 0 && config.at <= items.length - 1) {
-    batch(() => {
-      // Remove item ID from the items array
-      const newItems = [...items];
-      newItems.splice(config.at, 1);
-      internalArrayStore.items.value = newItems;
+        // Move all child stores after the removed item one index down
+        for (let index = config.at; index < items.length - 1; index++) {
+          copyItemState(
+            internalFormStore,
+            internalArrayStore.children[index + 1],
+            internalArrayStore.children[index]
+          );
+        }
 
-      // Move all child stores after the removed item one index down
-      for (let index = config.at; index < items.length - 1; index++) {
-        copyItemState(
-          internalFormStore,
-          internalArrayStore.children[index + 1],
-          internalArrayStore.children[index]
-        );
-      }
+        // Mark field array as touched and edited and update dirty state
+        internalArrayStore.isTouched.value = true;
+        internalArrayStore.isEdited.value = true;
+        internalArrayStore.isDirty.value =
+          internalArrayStore.startItems.value.join() !== newItems.join();
 
-      // Mark field array as touched and edited and update dirty state
-      internalArrayStore.isTouched.value = true;
-      internalArrayStore.isEdited.value = true;
-      internalArrayStore.isDirty.value =
-        internalArrayStore.startItems.value.join() !== newItems.join();
-
-      // Validate if required
-      // TODO: Should we validate on touch, change and blur too?
-      validateIfRequired(internalFormStore, internalArrayStore, 'input');
-    });
+        // Validate if required
+        // TODO: Should we validate on touch, change and blur too?
+        validateIfRequired(internalFormStore, internalArrayStore, 'input');
+      });
+    }
   }
 }

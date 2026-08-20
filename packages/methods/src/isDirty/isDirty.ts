@@ -70,8 +70,10 @@ export function isDirty(
   form: BaseFormStore,
   config?: IsFormDirtyConfig | IsFieldDirtyConfig<FormSchema, RequiredPath>
 ): boolean {
-  return getFieldBool(
-    config?.path ? getFieldStore(form[INTERNAL], config.path) : form[INTERNAL],
-    'isDirty'
-  );
+  const internalFieldStore = config?.path
+    ? getFieldStore(form[INTERNAL], config.path)
+    : form[INTERNAL];
+  return internalFieldStore
+    ? getFieldBool(internalFieldStore, 'isDirty')
+    : false;
 }

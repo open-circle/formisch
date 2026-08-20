@@ -54,11 +54,13 @@ export function setInput(
 ): void {
   batch(() => {
     const internalFormStore = form[INTERNAL];
-    setFieldInput(internalFormStore, config.path ?? [], config.input);
     const fieldOrFormStore = config.path
       ? getFieldStore(internalFormStore, config.path)
       : internalFormStore;
-    validateIfRequired(internalFormStore, fieldOrFormStore, 'input');
-    validateIfRequired(internalFormStore, fieldOrFormStore, 'change');
+    if (fieldOrFormStore) {
+      setFieldInput(internalFormStore, config.path ?? [], config.input);
+      validateIfRequired(internalFormStore, fieldOrFormStore, 'input');
+      validateIfRequired(internalFormStore, fieldOrFormStore, 'change');
+    }
   });
 }

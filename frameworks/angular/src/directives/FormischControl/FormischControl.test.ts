@@ -58,7 +58,7 @@ describe('FormischControl', () => {
     const internalFieldStore = getFieldStore(
       fixture.componentInstance.form[INTERNAL],
       ['email']
-    );
+    )!;
     expect(internalFieldStore.elements).toContain(input);
   });
 
@@ -68,7 +68,7 @@ describe('FormischControl', () => {
     const internalFieldStore = getFieldStore(
       fixture.componentInstance.form[INTERNAL],
       ['email']
-    );
+    )!;
     expect(internalFieldStore.elements).toContain(input);
 
     fixture.destroy();
@@ -282,8 +282,8 @@ describe('FormischControl re-registration', () => {
       fixture.nativeElement as HTMLElement
     ).querySelector<HTMLInputElement>('[data-testid="input"]')!;
     const internalFormStore = fixture.componentInstance.form[INTERNAL];
-    const fieldAStore = getFieldStore(internalFormStore, ['a']);
-    const fieldBStore = getFieldStore(internalFormStore, ['b']);
+    const fieldAStore = getFieldStore(internalFormStore, ['a'])!;
+    const fieldBStore = getFieldStore(internalFormStore, ['b'])!;
 
     expect(fieldAStore.elements).toContain(input);
     expect(fieldBStore.elements).not.toContain(input);
@@ -333,8 +333,12 @@ describe('FormischControl path changes', () => {
       fixture.nativeElement as HTMLElement
     ).querySelector<HTMLInputElement>('[data-testid="input"]')!;
     const internalFormStore = fixture.componentInstance.form[INTERNAL];
-    const firstStore = getFieldStore(internalFormStore, ['items', 0, 'label']);
-    const secondStore = getFieldStore(internalFormStore, ['items', 1, 'label']);
+    const firstStore = getFieldStore(internalFormStore, ['items', 0, 'label'])!;
+    const secondStore = getFieldStore(internalFormStore, [
+      'items',
+      1,
+      'label',
+    ])!;
 
     expect(firstStore.elements).toContain(input);
     expect(secondStore.elements).not.toContain(input);
