@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   createGitHubRelease,
+  extractReleaseBody,
   getFolderNames,
   getProjectRoot,
   hasGitHubRelease,
@@ -67,36 +68,16 @@ function generateReleaseBody(
     // Read changelog content
     const changelogContent = fs.readFileSync(changelogPath, 'utf-8');
 
-    // Find version section in changelog
-    const versionHeading = `## v${frameworkVersion}`;
-    const versionIndex = changelogContent.indexOf(versionHeading);
-
-    // If version heading not found, return null
-    if (versionIndex === -1) {
-      console.log(
-        `⚠️  Skipping ${frameworkName}: Version ${frameworkVersion} not found in changelog`
-      );
-      return null;
-    }
-
-    // Extract content after version heading
-    const headingEndIndex = changelogContent.indexOf('\n', versionIndex);
-    const remainingContent = changelogContent.slice(headingEndIndex + 1);
-
-    // Extract content until next version heading
-    const nextVersionMatch = remainingContent.match(/\n## v[\d.]+\s/);
-    let versionContent: string;
-    if (nextVersionMatch) {
-      const endIndex = nextVersionMatch.index!;
-      versionContent = remainingContent.slice(0, endIndex).trim();
-    } else {
-      versionContent = remainingContent.trim();
-    }
+    // Extract version content from changelog
+    const versionContent = extractReleaseBody(
+      changelogContent,
+      frameworkVersion
+    );
 
     // If no version content found, return null
-    if (!versionContent) {
+    if (versionContent === null) {
       console.log(
-        `⚠️  Skipping ${frameworkName}: No content found for version ${frameworkVersion}`
+        `⚠️  Skipping ${frameworkName}: Version ${frameworkVersion} not found or empty in changelog`
       );
       return null;
     }

@@ -1,7 +1,7 @@
 {
   "name": "@formisch/svelte",
   "description": "The lightweight, schema-first, and fully type-safe form library for Svelte",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",
@@ -81,9 +81,9 @@
     "vitest": "^4.1.7"
   },
   "peerDependencies": {
-    "svelte": "^5.29.0",
-    "typescript": ">=5",
-    "valibot": "^1.4.1"
+    "svelte": ">=5.29 <6",
+    "typescript": ">=5 <8",
+    "valibot": ">=1.4.1 <2"
   },
   "peerDependenciesMeta": {
     "typescript": {

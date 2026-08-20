@@ -1,7 +1,7 @@
 {
   "name": "@formisch/solid",
   "description": "The lightweight, schema-first, and fully type-safe form library for SolidJS",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",
@@ -83,9 +83,9 @@
     "vitest": "4.1.7"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.0",
-    "typescript": ">=5",
-    "valibot": "^1.4.1"
+    "solid-js": ">=1.6 <2",
+    "typescript": ">=5 <8",
+    "valibot": ">=1.4.1 <2"
   },
   "peerDependenciesMeta": {
     "typescript": {

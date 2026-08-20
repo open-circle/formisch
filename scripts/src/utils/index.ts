@@ -1,4 +1,5 @@
 export * from './createGitHubRelease';
+export * from './extractReleaseBody';
 export * from './getFolderNames';
 export * from './getGitHubConfig';
 export * from './getGitHubClient';
