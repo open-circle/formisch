@@ -276,6 +276,14 @@ describe('insert', () => {
     expect(() =>
       insert(store, { path: ['groups', 0, 'items'], initialInput: 'foo' })
     ).not.toThrow();
+
+    const groupsStore = store.children.groups;
+    expect(groupsStore.kind).toBe('array');
+    if (groupsStore.kind === 'array') {
+      expect(groupsStore.items.value).toEqual([]);
+      expect(groupsStore.children).toEqual([]);
+      expect(groupsStore.isDirty.value).toBe(false);
+    }
   });
 
   test('should insert into nested array', () => {
