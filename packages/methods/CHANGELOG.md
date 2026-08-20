@@ -4,12 +4,17 @@ All notable changes to the library will be documented in this file.
 
 ## v1.0.0 (August 20, 2026)
 
+- Read the [Formisch v1 release announcement](https://formisch.dev/blog/formisch-v1/)
+- Change `@formisch/core` to v1.0.0
+
+## v1.0.0-rc.1 (August 20, 2026)
+
+- Change `@formisch/core` to v1.0.0-rc.1
 - Add `getDeepError` and `getDeepErrorEntry` methods to retrieve the first error message or first error entry from a form or specific field's subtree (issue #153)
 - Add React Native build output with `@formisch/methods/react-native` export (issue #117)
 - Add React Native specific `handleSubmit` and `setInput` functions that work without a native form element (issue #117)
 - Remove `submit` from the React Native build output as it depends on a native form element (issue #117)
 - Fix methods to ignore paths inside missing dynamic array items instead of throwing
-- Change `@formisch/core` to v1.0.0
 
 ## v1.0.0-rc.0 (June 23, 2026)
 

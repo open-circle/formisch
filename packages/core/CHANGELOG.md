@@ -4,6 +4,10 @@ All notable changes to the library will be documented in this file.
 
 ## v1.0.0 (August 20, 2026)
 
+- Read the [Formisch v1 release announcement](https://formisch.dev/blog/formisch-v1/)
+
+## v1.0.0-rc.1 (August 20, 2026)
+
 - Add React Native framework adapter and `@formisch/core/react-native` build output that reuses the React signal implementation (issue #117)
 - Add React Native specific `FieldElement` type, internal form store types and `focusFieldElement` function that work without DOM APIs (issue #117)
 - Remove `getElementInput` and `decodeFormData` from the React Native build output as they depend on DOM APIs (issue #117)
