@@ -25,3 +25,7 @@
 - [Field arrays](/qwik/guides/field-arrays/)
 - [TypeScript](/qwik/guides/typescript/)
 - [Architecture](/qwik/guides/architecture/)
+
+## Migration guides
+
+- [From Modular Forms](/qwik/guides/migrate-from-modular-forms/)

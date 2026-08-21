@@ -231,7 +231,7 @@ Leaving out the `path` sets form-level errors, which you can display via `loginF
 | `:value` / `v-model` on the form     | `initialInput` config                                                                                                                                           |
 | `@submit`                            | `@submit` on <Link href="/vue/api/Form/">`Form`</Link>                                                                                                          |
 | `state.valid`                        | `form.isValid` / `field.isValid`                                                                                                                                |
-| `state.dirty`                        | `form.isDirty` / `field.isDirty`                                                                                                                                |
+| `state.dirty`                        | `form.isEdited` / `field.isEdited` by default (see below)                                                                                                       |
 | `state.loading`                      | `form.isSubmitting`                                                                                                                                             |
 | `state.submitted`                    | `form.isSubmitted`                                                                                                                                              |
 | `node.setErrors()`                   | <Link href="/methods/api/setErrors/">`setErrors`</Link>                                                                                                         |
@@ -243,6 +243,8 @@ Leaving out the `path` sets form-level errors, which you can display via `loginF
 | `@formkit/zod` plugin                | Built in, the Valibot schema is the form definition                                                                                                             |
 
 A few entries have no direct equivalent. `<FormKitSchema>` generates entire forms from JSON, which has no counterpart in a headless library; with Formisch you write the template yourself. The same applies to FormKit's rendered UI scaffolding, themes, and icons: in Formisch you own the markup, so labels, help text, and message rendering move into your own <Link href="/vue/guides/input-components/">input components</Link>. And where FormKit configures validation display per input, Formisch configures validation timing once per form and leaves error display to your template.
+
+FormKit's default `dirty-behavior="touched"` stays `true` after any mutation, so it maps to Formisch's `isEdited`. If you configured `dirty-behavior="compare"`, use Formisch's `isDirty` instead; both compare the current input with its initial value and turn off when they match again.
 
 ## Common patterns
 

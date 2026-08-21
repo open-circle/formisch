@@ -298,17 +298,18 @@ readonly handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
 | `formControlName="email"`              | `*formischField="['email'] of form; let field"` + `[formischControl]="field"`                      |
 | `formGroupName` / `formArrayName`      | A longer path array, e.g. `['address', 'city']`                                                    |
 | `(ngSubmit)="save()"`                  | `[formischSubmit]="save"`                                                                          |
-| `Validators.required`                  | `v.nonEmpty()`                                                                                     |
+| `Validators.required`                  | `v.nonEmpty()` for strings and arrays; otherwise a type-appropriate schema                         |
 | `Validators.email`                     | `v.email()`                                                                                        |
 | `Validators.minLength(n)`              | `v.minLength(n)`                                                                                   |
 | `Validators.min(n)` / `max(n)`         | `v.minValue(n)` / `v.maxValue(n)`                                                                  |
 | `Validators.pattern(re)`               | `v.regex(re)`                                                                                      |
 | `updateOn: 'blur'`                     | `validate: 'blur'` on `injectForm`                                                                 |
+| `updateOn: 'change'`                   | `validate: 'input'` on `injectForm`                                                                |
 | `form.value` / `form.getRawValue()`    | <Link href="/methods/api/getInput/">`getInput(form)`</Link>                                        |
 | `form.patchValue({ … })`               | <Link href="/methods/api/setInput/">`setInput(form, { path, input })`</Link>                       |
 | `form.reset()` / `form.reset(value)`   | <Link href="/methods/api/reset/">`reset(form)`</Link> / `reset(form, { initialInput })`            |
 | `form.valid` / `form.invalid`          | `form.isValid()`                                                                                   |
-| `form.dirty`                           | `form.isDirty()`                                                                                   |
+| `form.dirty`                           | `form.isEdited()` (see below)                                                                      |
 | `form.touched`                         | `form.isTouched()`                                                                                 |
 | `form.pending`                         | `form.isValidating()`                                                                              |
 | `control.errors`                       | `field.errors()` (array of messages, or `null`)                                                    |
@@ -319,6 +320,8 @@ readonly handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
 | `form.controls.email.setErrors({ … })` | <Link href="/methods/api/setErrors/">`setErrors(form, { path, errors })`</Link>                    |
 | `formArray.push(control)`              | <Link href="/methods/api/insert/">`insert(form, { path, initialInput })`</Link>                    |
 | `formArray.removeAt(i)`                | <Link href="/methods/api/remove/">`remove(form, { path, at: i })`</Link>                           |
+
+A few mappings have slightly different semantics. Angular's `dirty` flag stays set after a user change, even when the value is changed back, so it maps to Formisch's `isEdited()`. Use `isDirty()` when you instead need to know whether the current input differs from the initial input. Angular marks a control as touched on blur, while Formisch does so when it receives focus or its input is set. Calling `setInput` also marks the affected Formisch fields as touched and edited, unlike Angular's programmatic `patchValue`. Finally, `getInput(form)` includes every schema field and is therefore closer to `getRawValue()` than to `form.value`, which excludes disabled controls.
 
 ## Common patterns
 
@@ -333,10 +336,15 @@ Every piece of form state is a signal, so it is read as a function call and work
 </button>
 
 <!-- After -->
-<button type="submit" [disabled]="loginForm.isValidating()">Login</button>
+<button
+  type="submit"
+  [disabled]="loginForm.isSubmitting() || loginForm.isValidating()"
+>
+  Login
+</button>
 ```
 
-Note that you rarely need to disable the button on `invalid` with Formisch: submitting an invalid form runs validation, shows the errors, and focuses the first invalid field, which is friendlier than a permanently disabled button.
+Note that you rarely need to disable the button on `invalid` with Formisch: submitting an invalid form runs validation, shows the errors, and focuses the first invalid field, which is friendlier than a permanently disabled button. Keep the `isSubmitting()` guard to prevent duplicate submissions while an async handler runs.
 
 To react to value changes in code, read the value inside an `effect` instead of subscribing to `valueChanges`:
 

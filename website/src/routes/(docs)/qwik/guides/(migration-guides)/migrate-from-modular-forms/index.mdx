@@ -1,0 +1,542 @@
+---
+title: Migrate from Modular Forms
+description: >-
+  Learn how to migrate your forms from Modular Forms to Formisch, including
+  the update from Qwik v1 to Qwik v2. This guide maps Modular Forms' hooks,
+  actions and methods to Formisch's schema-first API.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from Modular Forms
+
+This guide walks you through migrating a form from [Modular Forms](https://modularforms.dev) (`@modular-forms/qwik`) to Formisch. Formisch is the official successor of Modular Forms, built by the same author. Modular Forms is in maintenance mode, and Formisch is the recommended library for new projects.
+
+For Qwik, this migration comes with a second one: Modular Forms was built for Qwik v1 (`@builder.io/qwik`), while Formisch targets Qwik v2 (`@qwik.dev/core`). Plan the framework and form migrations together so the app resolves a single Qwik runtime: update the app to Qwik v2 first, then convert its forms to Formisch. Qwik's upgrade guide documents temporary package-manager overrides for v1-era third-party dependencies, but those overrides do not make Modular Forms a supported Qwik v2 package.
+
+The good news: because Formisch is a rewrite of the same ideas, much of your knowledge carries over. Both libraries are headless, both connect fields through a render prop, and most methods even kept their names. What changes is the source of truth: everything that Modular Forms spread across type parameters, loaders, adapters and `type` props now comes from a single Valibot schema.
+
+## Update to Qwik v2
+
+Qwik provides an automated migration command that updates package names and identifiers across your project:
+
+```bash
+npx qwik migrate-v2
+```
+
+The changes that matter for your form files are the package renames. `@builder.io/qwik` becomes `@qwik.dev/core`, and `@builder.io/qwik-city` becomes `@qwik.dev/router`. Imports like `component$` and `$` now come from `@qwik.dev/core`, while `routeLoader$`, `routeAction$` and `server$` come from `@qwik.dev/router`. Related identifiers are renamed as well, for example the `qwikCity` Vite plugin becomes `qwikRouter`. The `QwikCityProvider` wrapper is replaced by the `useQwikRouter` hook in most apps; the `QwikRouterProvider` component, which the migration command renames it to, still works but is only recommended when your root component reads signals.
+
+The details of the framework update are beyond the scope of this guide. Work through the official [Qwik v2 upgrade guide](https://qwik.dev/docs/upgrade/) until your app builds and runs on Qwik v2, then continue here to migrate your forms.
+
+## Key differences
+
+Modular Forms derives its types from a manually declared `type` like `LoginForm` and wires everything up separately: a mandatory `loader` for initial values, an optional `action` created with `formAction$` for server-side processing, and validation via a schema adapter like `valiForm$` or per-field `validate` props. Fields are addressed by dot-notation name strings, and non-string fields declare their runtime type with a `type` prop.
+
+Formisch is schema-first. A single Valibot schema provides everything at once: the TypeScript types, the runtime validation rules, and the structure of the form. There is no type parameter, no loader, no adapter, and no `type` prop. When the schema changes, every field path, every validation message and every inferred type follows automatically.
+
+The main differences in practice:
+
+- **Source of truth**: Modular Forms combines a TypeScript type with separate loaders, adapters and validation wiring. Formisch derives types, validation and form structure from one Valibot schema.
+- **Form setup**: Modular Forms' `useForm` requires a `loader` and returns a tuple with pre-bound components. Formisch's <Link href="/qwik/api/useForm$/">`useForm$`</Link> takes a function returning the config and returns only the form store. You import `Form`, `Field` and `FieldArray` and connect them with the `of` property, and `initialInput` is optional.
+- **Server integration**: Modular Forms processes submissions on the server through `formAction$` with progressive enhancement. Formisch handles submission client-side in the `onSubmit$` handler, from which you call your server code, for example via `server$`.
+- **Field paths**: Modular Forms addresses fields with dot-notation strings like `name="todos.0.label"`. Formisch uses type-safe path arrays like `path={['todos', 0, 'label']}`.
+- **Signals**: Modular Forms exposes state as store properties like `loginForm.submitting` and `field.value`. Formisch exposes signals that are read with `.value`, like `loginForm.isSubmitting.value` and `field.input.value`.
+- **Render prop**: Modular Forms passes `(field, props)` to the `children` render prop. Formisch uses a `render$` prop that receives one field store, with the element props at `field.props`.
+
+## Side-by-side example
+
+The following login form has two validated fields and server-side processing, implemented once with Modular Forms and once with Formisch.
+
+### Modular Forms
+
+```tsx
+import { component$ } from '@builder.io/qwik';
+import { routeLoader$ } from '@builder.io/qwik-city';
+import {
+  formAction$,
+  type InitialValues,
+  useForm,
+  valiForm$,
+} from '@modular-forms/qwik';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+type LoginForm = v.InferInput<typeof LoginSchema>;
+
+export const useFormLoader = routeLoader$<InitialValues<LoginForm>>(() => ({
+  email: '',
+  password: '',
+}));
+
+export const useFormAction = formAction$<LoginForm>((values) => {
+  // Runs on the server
+}, valiForm$(LoginSchema));
+
+export default component$(() => {
+  const [loginForm, { Form, Field }] = useForm<LoginForm>({
+    loader: useFormLoader(),
+    action: useFormAction(),
+    validate: valiForm$(LoginSchema),
+  });
+
+  return (
+    <Form>
+      <Field name="email">
+        {(field, props) => (
+          <div>
+            <input {...props} value={field.value} type="email" />
+            {field.error && <div>{field.error}</div>}
+          </div>
+        )}
+      </Field>
+      <Field name="password">
+        {(field, props) => (
+          <div>
+            <input {...props} value={field.value} type="password" />
+            {field.error && <div>{field.error}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit" disabled={loginForm.submitting}>
+        Login
+      </button>
+    </Form>
+  );
+});
+```
+
+### Formisch
+
+```tsx
+import { Field, Form, type SubmitHandler, useForm$ } from '@formisch/qwik';
+import { $, component$ } from '@qwik.dev/core';
+import { server$ } from '@qwik.dev/router';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+const loginUser = server$(async (values: v.InferOutput<typeof LoginSchema>) => {
+  // Runs on the server
+});
+
+export default component$(() => {
+  const loginForm = useForm$(() => ({
+    schema: LoginSchema,
+  }));
+
+  const submitForm = $<SubmitHandler<typeof LoginSchema>>(async (values) => {
+    await loginUser(values);
+  });
+
+  return (
+    <Form of={loginForm} onSubmit$={submitForm}>
+      <Field
+        of={loginForm}
+        path={['email']}
+        render$={(field) => (
+          <div>
+            <input {...field.props} value={field.input.value} type="email" />
+            {field.errors.value && <div>{field.errors.value[0]}</div>}
+          </div>
+        )}
+      />
+      <Field
+        of={loginForm}
+        path={['password']}
+        render$={(field) => (
+          <div>
+            <input {...field.props} value={field.input.value} type="password" />
+            {field.errors.value && <div>{field.errors.value[0]}</div>}
+          </div>
+        )}
+      />
+      <button type="submit" disabled={loginForm.isSubmitting.value}>
+        Login
+      </button>
+    </Form>
+  );
+});
+```
+
+Note that the manual `LoginForm` type, the loader and the schema adapter are gone. The schema is passed directly to <Link href="/qwik/api/useForm$/">`useForm$`</Link>, and the types flow from it into `path`, `field.input` and the values of your submit handler.
+
+## Migration steps
+
+### Install Formisch
+
+After updating your app to Qwik v2, replace Modular Forms with Formisch. Valibot is a peer dependency of Formisch:
+
+```bash
+npm uninstall @modular-forms/qwik
+npm install @formisch/qwik valibot
+```
+
+See the <Link href="/qwik/guides/installation/">installation</Link> guide for other package managers and TypeScript requirements.
+
+### Move validation into the schema
+
+How this step looks depends on how you validated with Modular Forms:
+
+- **With `valiForm$`**: You already have a Valibot schema. Pass it directly to <Link href="/qwik/api/useForm$/">`useForm$`</Link> as the `schema` config and delete the adapter.
+- **With `zodForm$`**: Formisch validates exclusively with Valibot, so translate your Zod schema. The structure maps one to one, and most rules have a same-named Valibot action.
+- **With field-level `validate` props**: Each validation function becomes a Valibot action in the schema, keeping its error message.
+
+The validation functions map as follows:
+
+| Modular Forms                   | Valibot                          |
+| ------------------------------- | -------------------------------- |
+| `required`                      | `v.nonEmpty` for strings/arrays  |
+| `email`                         | `v.email`                        |
+| `url`                           | `v.url`                          |
+| `minLength` / `maxLength`       | `v.minLength` / `v.maxLength`    |
+| `minRange` / `maxRange`         | `v.minValue` / `v.maxValue`      |
+| `pattern`                       | `v.regex`                        |
+| `value`                         | `v.value`                        |
+| `minSize` / `maxSize`           | `v.minSize` / `v.maxSize`        |
+| `minTotalSize` / `maxTotalSize` | `v.check` with a custom function |
+| `mimeType`                      | `v.mimeType`                     |
+| `custom$`                       | `v.check` / `v.checkAsync`       |
+
+One semantic difference to keep in mind: in Modular Forms, every validation function except `required` skips empty strings and lists. Valibot actions do not skip those values automatically, and `v.optional` only accepts `undefined`. To preserve an optional text field that accepts an empty input, explicitly allow it, for example with `v.union([v.literal(''), v.pipe(v.string(), v.email())])`; wrap that schema in `v.optional` only if `undefined` is also a valid input. A required string becomes `v.pipe(v.string(), v.nonEmpty('...'))`; use a type-appropriate schema for other inputs.
+
+Define the fields in the same order they appear in your form, since Formisch focuses the first invalid field on submit based on the schema order. See the <Link href="/qwik/guides/define-your-form/">define your form</Link> guide for details.
+
+### Replace the form setup
+
+Replace the `useForm` tuple with a single form store from <Link href="/qwik/api/useForm$/">`useForm$`</Link>, which takes a function returning the config. The `Form`, `Field` and `FieldArray` components are imported from the package and connected with the `of` property. The `loader` option is gone: initial values are optional and passed as `initialInput`. The `fieldArrays` option is gone as well, since the schema declares which fields are arrays:
+
+```tsx
+// Modular Forms
+const [loginForm, { Form, Field }] = useForm<LoginForm>({
+  loader: useFormLoader(),
+  action: useFormAction(),
+  validate: valiForm$(LoginSchema),
+});
+
+// Formisch
+const loginForm = useForm$(() => ({
+  schema: LoginSchema,
+}));
+```
+
+If your loader provided real server data rather than empty strings, keep the `routeLoader$` and pass its value as `initialInput`:
+
+```tsx
+export const useInitialValues = routeLoader$(async () => ({
+  email: (await getCurrentUser()).email,
+}));
+
+export default component$(() => {
+  const initialValues = useInitialValues();
+  const profileForm = useForm$(() => ({
+    schema: ProfileSchema,
+    initialInput: initialValues.value,
+  }));
+  // ...
+});
+```
+
+The `validateOn` and `revalidateOn` options become `validate` and `revalidate`. Their existing modes carry over with one rename: `'touched'` becomes `'touch'`; Formisch additionally supports `'initial'` and `'change'`. The defaults are unchanged, so a form that validates on submit and revalidates on input needs no config at all.
+
+### Replace field bindings
+
+Three things change on each field: the `name` string becomes a `path` array, the `children` render prop becomes `render$` and receives one field store with the element props at `field.props`, and the `validate` and `type` props are dropped because the schema covers both. Field state consists of signals, so reads go through `.value`:
+
+```tsx
+// Modular Forms
+<Field name="email">
+  {(field, props) => (
+    <div>
+      <input {...props} value={field.value} type="email" />
+      {field.error && <div>{field.error}</div>}
+    </div>
+  )}
+</Field>
+
+// Formisch
+<Field
+  of={loginForm}
+  path={['email']}
+  render$={(field) => (
+    <div>
+      <input {...field.props} value={field.input.value} type="email" />
+      {field.errors.value && <div>{field.errors.value[0]}</div>}
+    </div>
+  )}
+/>
+```
+
+Dot-notation names translate directly: `name="account.email"` becomes `path={['account', 'email']}`, and a dynamic name like `'todos.' + index + '.label'` becomes `path={['todos', index, 'label']}`. Instead of a single `field.error` string that is empty when valid, Formisch provides `field.errors`, a signal containing an array of all error messages or `null` when the field is valid, so `field.errors.value[0]` gives you the Modular Forms behavior.
+
+Also note that fields with a schema like `v.number()` or `v.date()` must be controlled, since their values are read from the DOM as strings and Formisch has no `type` prop that converts them. Checkboxes, radio groups, selects and file inputs are decoded automatically based on the element and the schema. See the <Link href="/qwik/guides/add-form-fields/">add form fields</Link> and <Link href="/qwik/guides/controlled-fields/">controlled fields</Link> guides for details.
+
+### Move the server action into the submit handler
+
+This is the biggest conceptual change. Modular Forms integrates with Qwik City actions: `formAction$` validates and processes the submission on the server, and the action result flows back into the form's `response` store. Formisch does not include a server action integration yet. Native meta-framework support is planned. For now, the <Link href="/qwik/api/Form/">`Form`</Link> component validates client-side and calls your `onSubmit$` handler with the typed values, and you decide how they reach the server, typically via `server$` or by calling a route action programmatically:
+
+```tsx
+const loginUser = server$(async (values: v.InferOutput<typeof LoginSchema>) => {
+  // Formerly the body of formAction$
+});
+
+const submitForm = $<SubmitHandler<typeof LoginSchema>>(async (values) => {
+  await loginUser(values);
+});
+```
+
+Since your server code should never trust client input, validate the values again on the server. With Modular Forms this was the second argument of `formAction$`; now it is a `v.safeParse` call with the same schema:
+
+```tsx
+const loginUser = server$(async (values: unknown) => {
+  const result = v.safeParse(LoginSchema, values);
+  if (!result.success) {
+    return { error: 'The submitted data is invalid.' };
+  }
+  // Process result.output
+});
+```
+
+What Modular Forms handled through `FormError` and the response store becomes regular control flow. Call <Link href="/methods/api/setErrors/">`setErrors`</Link> for errors the server attributes to a field, and track a status message in a signal instead of reading `form.response`:
+
+```tsx
+import { setErrors } from '@formisch/qwik';
+import { useSignal } from '@qwik.dev/core';
+
+const message = useSignal('');
+
+const submitForm = $<SubmitHandler<typeof LoginSchema>>(async (values) => {
+  const result = await loginUser(values);
+  if (result?.invalidPassword) {
+    setErrors(loginForm, {
+      path: ['password'],
+      errors: ['The password is incorrect.'],
+    });
+  } else if (result?.error) {
+    message.value = result.error;
+  }
+});
+```
+
+One capability does not carry over for now: progressive enhancement. A Modular Forms form posts natively to the action's URL when JavaScript is unavailable, while Formisch currently requires JavaScript to submit. If specific forms in your app must work without JavaScript, keep them on a plain `<form>` with a Qwik route action and revisit them once native meta-framework support is available. See the <Link href="/qwik/guides/handle-submission/">handle submission</Link> guide for details on submission handling.
+
+## API mapping
+
+| Modular Forms (`@modular-forms/qwik`)               | Formisch (`@formisch/qwik`)                                                              |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `useForm<LoginForm>(options)`                       | <Link href="/qwik/api/useForm$/">`useForm$`</Link> with `schema` config                  |
+| `[form, { Form, Field, FieldArray }]` tuple         | Form store + imported components with `of` property                                      |
+| `useFormStore`                                      | Not needed (<Link href="/qwik/api/useForm$/">`useForm$`</Link> returns only the store)   |
+| `loader` option / `InitialValues` type              | `initialInput` config option                                                             |
+| `action` option / `formAction$`                     | Server code called from `onSubmit$` (e.g. `server$`)                                     |
+| `validate: valiForm$(Schema)`                       | `schema` config option                                                                   |
+| `validate: zodForm$(Schema)`                        | `schema` config option (translated to Valibot)                                           |
+| `validateOn` / `revalidateOn`                       | `validate` / `revalidate` config (`'touched'` is now `'touch'`)                          |
+| Per-field `validateOn` / `revalidateOn`             | No equivalent (validation modes are form-wide)                                           |
+| `fieldArrays` option                                | Not needed (the schema declares arrays)                                                  |
+| `<Field name="a.b">`                                | <Link href="/qwik/api/Field/">`Field`</Link> with `path={['a', 'b']}`                    |
+| `validate` prop with validation functions           | Valibot schema actions                                                                   |
+| `type` prop (`'number'`, `'boolean'`, ...)          | Inferred from schema and element (number and date fields are controlled)                 |
+| `transform` prop, `toCustom$`, ...                  | Valibot transformation actions like `v.trim` (see below)                                 |
+| `keepActive` / `keepState` props                    | No equivalent (field state is kept automatically)                                        |
+| `(field, props)` render arguments                   | `render$` prop with `field.props`                                                        |
+| `field.value`                                       | `field.input.value`                                                                      |
+| `field.error` (string)                              | `field.errors.value` (array or `null`)                                                   |
+| `field.touched` / `field.dirty`                     | `field.isTouched.value` / `field.isDirty.value`                                          |
+| `field.active`                                      | No equivalent                                                                            |
+| `form.submitting` / `form.submitted`                | `form.isSubmitting.value` / `form.isSubmitted.value`                                     |
+| `form.validating`                                   | `form.isValidating.value`                                                                |
+| `form.invalid`                                      | `form.isValid.value` (inverted)                                                          |
+| `form.touched` / `form.dirty`                       | `form.isTouched.value` / `form.isDirty.value`                                            |
+| `form.submitCount`                                  | No equivalent                                                                            |
+| `form.response` / `setResponse` / `clearResponse`   | Your own signal + control flow in the submit handler                                     |
+| `keepResponse` / `responseDuration`                 | No equivalent (response store removed)                                                   |
+| `FormError`                                         | <Link href="/methods/api/setErrors/">`setErrors`</Link> + control flow                   |
+| `encType` / `FormDataInfo` (`arrays`, `files`, ...) | Not needed (values are passed to your server code as-is)                                 |
+| `reloadDocument`                                    | No equivalent                                                                            |
+| `shouldActive` / `shouldTouched` / `shouldDirty`    | No equivalent (all schema fields are validated and submitted)                            |
+| `getValue(form, name)` / `getValues(form)`          | <Link href="/methods/api/getInput/">`getInput`</Link>                                    |
+| `setValue(form, name, value)` / `setValues`         | <Link href="/methods/api/setInput/">`setInput`</Link>                                    |
+| `getError(form, name)`                              | <Link href="/methods/api/getErrors/">`getErrors`</Link> with `path`                      |
+| `getErrors(form)`                                   | <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>                          |
+| `setError(form, name, error)`                       | <Link href="/methods/api/setErrors/">`setErrors`</Link>                                  |
+| `clearError(form, name)`                            | <Link href="/methods/api/setErrors/">`setErrors`</Link> with `errors: null`              |
+| `hasField` / `hasFieldArray`                        | Not needed (the schema defines the structure)                                            |
+| `validate(form, name?)`                             | <Link href="/methods/api/validate/">`validate`</Link> (always validates the entire form) |
+| `focus(form, name)`                                 | <Link href="/methods/api/focus/">`focus`</Link> with `path`                              |
+| `reset(form, name?, options)`                       | <Link href="/methods/api/reset/">`reset`</Link> with `path` / `initialInput` config      |
+| `insert(form, name, { at, value })`                 | <Link href="/methods/api/insert/">`insert`</Link> with `path` / `at` / `initialInput`    |
+| `remove(form, name, { at })`                        | <Link href="/methods/api/remove/">`remove`</Link>                                        |
+| `replace(form, name, { at, value })`                | <Link href="/methods/api/replace/">`replace`</Link>                                      |
+| `move(form, name, { from, to })`                    | <Link href="/methods/api/move/">`move`</Link>                                            |
+| `swap(form, name, { at, and })`                     | <Link href="/methods/api/swap/">`swap`</Link>                                            |
+| `submit(form)`                                      | <Link href="/methods/api/submit/">`submit`</Link>                                        |
+| `FormValues<typeof form>`                           | `v.InferInput<typeof Schema>`                                                            |
+
+The touched flags are close but not identical: Modular Forms marks a field as touched after blur or a dirty input, while Formisch marks it on focus or whenever its input is set. The dirty flags in both libraries compare the current and initial input.
+
+## Common patterns
+
+### Form state
+
+Modular Forms exposes form state as plain store properties, while Formisch exposes signals. The properties follow an `is` naming convention, reads go through `.value`, and `invalid` flips to `isValid`:
+
+```tsx
+// Modular Forms
+loginForm.submitting; // boolean
+loginForm.invalid; // boolean
+
+// Formisch
+loginForm.isSubmitting.value; // boolean
+loginForm.isValid.value; // boolean
+```
+
+Values are read with the <Link href="/methods/api/getInput/">`getInput`</Link> method, which is reactive like `getValue` and `getValues` in Modular Forms:
+
+```tsx
+import { getInput } from '@formisch/qwik';
+
+getInput(loginForm, { path: ['email'] }); // string | undefined
+getInput(loginForm); // partial form values
+```
+
+### Conditional fields and active state
+
+Modular Forms only validates and submits fields that are "active", meaning currently mounted. This is how conditional forms work there: render a `<Field>` only when it applies, and its value disappears from the output. The `keepActive` and `keepState` props and the `shouldActive` options fine-tune this behavior.
+
+Formisch has no active-field concept. Every field in the schema is validated on every submit, and every value is part of the output, whether a `Field` component is currently rendered or not. Model conditional structures in the schema instead, for example with `v.variant` for a discriminated union:
+
+```tsx
+const PaymentSchema = v.variant('type', [
+  v.object({
+    type: v.literal('card'),
+    number: v.pipe(v.string(), v.nonEmpty('Please enter your card number.')),
+  }),
+  v.object({
+    type: v.literal('paypal'),
+    email: v.pipe(v.string(), v.email('The email address is badly formatted.')),
+  }),
+]);
+```
+
+This way, the schema only requires the fields of the selected variant, which replaces the mount-based logic of Modular Forms with type-safe validation logic.
+
+### Field arrays
+
+The mental model is unchanged: `fieldArray.items` contains stable keys to map over, and array methods modify the items. What changes is that the array structure and its validation move into the schema, the `fieldArrays` config option disappears, and item values are passed as `initialInput`:
+
+```tsx
+import { Field, FieldArray, insert, remove, useForm$ } from '@formisch/qwik';
+
+const TodoSchema = v.object({
+  todos: v.pipe(
+    v.array(
+      v.object({
+        label: v.pipe(v.string(), v.nonEmpty('Please enter a label.')),
+      })
+    ),
+    v.nonEmpty('Please add at least one todo.'),
+    v.maxLength(4, 'You cannot add more than 4 todos.')
+  ),
+});
+
+// Inside your component$
+const todoForm = useForm$(() => ({ schema: TodoSchema }));
+
+<FieldArray
+  of={todoForm}
+  path={['todos']}
+  render$={(fieldArray) => (
+    <div>
+      {fieldArray.items.value.map((item, index) => (
+        <div key={item}>
+          <Field
+            of={todoForm}
+            path={['todos', index, 'label']}
+            render$={(field) => (
+              <input {...field.props} value={field.input.value} type="text" />
+            )}
+          />
+          <button
+            type="button"
+            onClick$={() => remove(todoForm, { path: ['todos'], at: index })}
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+      {fieldArray.errors.value && <div>{fieldArray.errors.value[0]}</div>}
+    </div>
+  )}
+/>;
+
+<button
+  type="button"
+  onClick$={() =>
+    insert(todoForm, { path: ['todos'], initialInput: { label: '' } })
+  }
+>
+  Add todo
+</button>;
+```
+
+The `validate` prop of Modular Forms' `FieldArray`, which checked the number of items with functions like `required` and `maxLength`, becomes `v.nonEmpty` and `v.maxLength` on the `v.array` pipe. See the <Link href="/qwik/guides/field-arrays/">field arrays</Link> guide for a complete example.
+
+### Special inputs
+
+Modular Forms decodes checkboxes, number inputs, file inputs and dates through the `type` prop on `Field`. Formisch decodes checkboxes, radio groups, selects and file inputs automatically based on the element and the schema, so no `type` prop is needed. Setting the appropriate controlled attribute, like `checked` for a boolean checkbox, keeps the DOM in sync with initial values and programmatic updates:
+
+```tsx
+<Field
+  of={form}
+  path={['cookies']}
+  render$={(field) => (
+    <label>
+      <input {...field.props} type="checkbox" checked={field.input.value} />
+      Yes, I want cookies
+    </label>
+  )}
+/>
+```
+
+Number and date inputs are the exception: their values are read from the DOM as strings, so they must be controlled to store the correct type. File inputs are the opposite case: they cannot be controlled at all and are connected through `field.props` alone. The <Link href="/qwik/guides/special-inputs/">special inputs</Link> guide shows the equivalent patterns for checkbox groups, radio groups, selects, file inputs and dates.
+
+### Transformations
+
+Modular Forms transforms input values as the user types via the `transform` prop with helpers like `toTrimmed` and `toUpperCase`. In Formisch, transformations live in the schema as Valibot actions like `v.trim` and `v.toUpperCase`:
+
+```tsx
+const Schema = v.object({
+  email: v.pipe(v.string(), v.trim(), v.email()),
+});
+```
+
+Note the semantic difference: schema transformations apply to the validated output your submit handler receives, not to the value displayed in the input while typing. If you need to constrain what the user sees as they type, for example for an input mask, use a controlled field and set the transformed value with <Link href="/methods/api/setInput/">`setInput`</Link>.
+
+## Next steps
+
+With your first form migrated, work through the <Link href="/qwik/guides/define-your-form/">define your form</Link>, <Link href="/qwik/guides/add-form-fields/">add form fields</Link> and <Link href="/qwik/guides/handle-submission/">handle submission</Link> guides to deepen the concepts this guide touched on. The <Link href="/qwik/guides/controlled-fields/">controlled fields</Link> and <Link href="/qwik/guides/form-methods/">form methods</Link> guides are useful next reads once your migrated forms grow more dynamic.

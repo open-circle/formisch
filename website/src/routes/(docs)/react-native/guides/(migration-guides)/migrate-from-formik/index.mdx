@@ -188,7 +188,7 @@ See the <Link href="/react-native/guides/installation/">installation</Link> guid
 
 ### Move validation into a Valibot schema
 
-Translate your Yup schema, `validate` function, or field-level `validate` props into a single Valibot schema. Most Yup rules have a direct counterpart: `.required()` becomes `v.nonEmpty()`, `.min()` becomes `v.minLength()`, `.email()` becomes `v.email()`, and `.matches()` becomes `v.regex()`.
+Translate your Yup schema, `validate` function, or field-level `validate` props into a single Valibot schema. Most Yup rules have a close counterpart: string `.required()` becomes `v.nonEmpty()`, string `.min()` becomes `v.minLength()`, `.email()` becomes `v.email()`, and `.matches()` becomes `v.regex()`. Other input types need their corresponding Valibot schema and actions.
 
 ```ts
 import * as v from 'valibot';
@@ -323,12 +323,12 @@ You can pass the returned function to any trigger, for example a `TextInput`'s `
 A few entries deserve extra context:
 
 - **The `touched` gate**: Formik validates eagerly and computes `errors` for every field, so their display must be gated behind `touched`. Formisch populates `field.errors` only once validation has actually run for a field. With the default `validate: 'submit'` timing there is nothing to gate, and if you validate earlier, guard the display with field state like `isEdited`, as shown in the <Link href="/react-native/guides/validation/">validation</Link> guide.
-- **`touched`**: Formisch marks a field as touched when it receives focus, while Formik marks it on blur. Logic that shows errors based on touched state therefore reacts one event earlier.
+- **`touched`**: Formisch marks a field as touched when it receives focus or its input is set, while Formik marks it on blur. During ordinary interaction that means touched-based logic usually reacts on focus instead of waiting for blur.
 - **`dirty`**: Formik's `dirty` is comparison-based: it is `true` while `values` differs from `initialValues` and flips back off when the user reverts their changes. That matches `form.isDirty` exactly. Formisch's `form.isEdited` is the sticky variant that stays `true` once anything was edited, even after the value is changed back.
 - **`isValid`**: In Formisch, `form.isValid` reflects the result of the last validation run. With the default `validate: 'submit'` timing it stays `true` until the first submit, unlike Formik's `isValid`, which is recomputed on every change. If you rely on it before the first submit, for example to disable the submit button, set `validate: 'initial'`.
 - **`submitCount`**: Formisch tracks whether the form has been submitted as the boolean `form.isSubmitted` instead of a counter. If you used `submitCount > 0` to reveal errors after the first submit attempt, `form.isSubmitted` covers that. An actual attempt count requires your own state.
 - **`validateField`**: The <Link href="/methods/api/validate/">`validate`</Link> method always validates the entire form against the schema. The results are still distributed per field, so field-level triggering is not necessary.
-- **`setFieldTouched` / `setTouched`**: There is no imperative touched setter. Fields become touched automatically when they receive focus, and the custom blur handlers these helpers are typically used in are replaced by spreading `field.props`.
+- **`setFieldTouched` / `setTouched`**: There is no imperative touched setter. Fields become touched automatically when they receive focus or their input is set, and the custom blur handlers these helpers are typically used in are replaced by spreading `field.props`. This also means Formisch's `setInput` marks the field as touched and edited, whereas Formik's `setFieldValue` does not mark it as touched.
 - **`<FastField>`**: `FastField` exists to cut down Formik's subtree re-renders. Formisch's signal-based store already re-renders each field only when its own state changes, so an opt-out component is not needed.
 - **`useFormikContext` / `connect`**: The Formisch form store is a plain object. Pass it down as a prop, as our <Link href="/react-native/guides/input-components/">input components</Link> do, or share it through your own React context if you prefer.
 - **`status` / `setStatus`**: Form-adjacent state like a submission error message is regular component state in Formisch. For errors that should live on the form itself, <Link href="/methods/api/setErrors/">`setErrors`</Link> sets root-level errors that appear in `form.errors`.

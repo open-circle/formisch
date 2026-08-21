@@ -162,7 +162,7 @@ See the <Link href="/react/guides/installation/">installation</Link> guide for o
 
 ### Move validation into a Valibot schema
 
-Translate your `register` rules or resolver schema into a single Valibot schema. Each rule has a direct counterpart: `required` becomes `v.nonEmpty()`, `minLength` becomes `v.minLength()`, and `pattern` usually becomes a dedicated action like `v.email()` or `v.regex()`.
+Translate your `register` rules or resolver schema into a single Valibot schema. Most rules have a close counterpart: `required` becomes `v.nonEmpty()` for strings and arrays, `minLength` becomes `v.minLength()`, and `pattern` usually becomes a dedicated action like `v.email()` or `v.regex()`. Use a type-appropriate schema to express requiredness for other inputs.
 
 ```ts
 import * as v from 'valibot';
@@ -293,7 +293,7 @@ A few entries deserve extra context:
 - **`trigger('name')`**: The <Link href="/methods/api/validate/">`validate`</Link> method always validates the entire form against the schema. The results are still distributed per field, so field-level triggering is not necessary.
 - **`shouldFocusError`**: Formisch focuses the first field with an error automatically when a submit fails, following the field order of your schema.
 - **`formState.isValid`**: In Formisch, `form.isValid` reflects the result of the last validation run. With the default `validate: 'submit'` timing it stays `true` until the first submit, unlike React Hook Form's `isValid`, which validates proactively. If you rely on it before the first submit, for example to disable the submit button, set `validate: 'initial'`.
-- **`formState.touchedFields`**: Formisch marks a field as touched when it receives focus, while React Hook Form marks it on blur. Logic that shows errors based on touched state therefore reacts one event earlier.
+- **`formState.touchedFields`**: Formisch marks a field as touched when it receives focus or its input is set, while React Hook Form marks it on blur. During ordinary keyboard interaction that means touched-based logic usually reacts on focus instead of waiting for blur. Formisch's `setInput` also marks the field as touched and edited; React Hook Form's `setValue` only updates those flags when `shouldTouch` or `shouldDirty` is enabled.
 
 ## Common patterns
 

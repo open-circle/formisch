@@ -156,7 +156,7 @@ const LoginSchema = v.object({
 export class LoginComponent {
   readonly loginForm = injectForm({
     schema: LoginSchema,
-    validate: 'change',
+    validate: 'input',
   });
 
   readonly handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
@@ -222,7 +222,7 @@ readonly form = injectForm({
 // After
 readonly loginForm = injectForm({
   schema: LoginSchema,
-  validate: 'change',
+  validate: 'input',
 });
 ```
 
@@ -281,9 +281,10 @@ readonly handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
 | `field.api.handleBlur()`                    | Handled by `[formischControl]`                                                         |
 | `field.api.state.meta.errors`               | `field.errors()`                                                                       |
 | `field.api.state.meta.isTouched`            | `field.isTouched()`                                                                    |
-| `field.api.state.meta.isDirty`              | `field.isDirty()`                                                                      |
+| `field.api.state.meta.isDirty`              | `field.isEdited()` (see below)                                                         |
+| `field.api.state.meta.isDefaultValue`       | `!field.isDirty()` (see below)                                                         |
 | `injectStore(form, (s) => s.isSubmitting)`  | `form.isSubmitting()`                                                                  |
-| `injectStore(form, (s) => s.canSubmit)`     | `form.isValid()` / `form.isValidating()`                                               |
+| `injectStore(form, (s) => s.canSubmit)`     | No direct equivalent (see below)                                                       |
 | `injectStore(form, (s) => s.values)`        | <Link href="/methods/api/getInput/">`getInput(form)`</Link>                            |
 | `form.handleSubmit()`                       | <Link href="/methods/api/submit/">`submit(form)`</Link>                                |
 | `onSubmit: async ({ value }) => …`          | `[formischSubmit]="handleSubmit"`                                                      |
@@ -294,6 +295,11 @@ readonly handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
 | `field.removeValue(i)`                      | <Link href="/methods/api/remove/">`remove(form, { path, at: i })`</Link>               |
 | `field.swapValues(a, b)`                    | <Link href="/methods/api/swap/">`swap(form, { path, at, and })`</Link>                 |
 | `field.moveValue(from, to)`                 | <Link href="/methods/api/move/">`move(form, { path, from, to })`</Link>                |
+
+A few entries deserve a short note:
+
+- **`canSubmit`**: Formisch does not compute a combined flag. The idiomatic pattern is to keep the button enabled, let submission trigger validation, and disable it with `form.isSubmitting()` to prevent duplicates. If you need a validity-based flag, `form.isValid()` reflects the last validation run; with the default `validate: 'submit'` timing it stays `true` until the first submit, so use `validate: 'initial'` for proactive validity.
+- **Dirty state**: TanStack Form's `isDirty` stays `true` once a field was changed, even if its value is reverted. That matches Formisch's `isEdited()`. Formisch's `isDirty()` compares current and initial input, matching the inverse of TanStack Form's `isDefaultValue`.
 
 ## Common patterns
 
@@ -308,13 +314,13 @@ No store selectors are needed. Every value is a signal on the form store:
 <!-- After -->
 <button
   type="submit"
-  [disabled]="!loginForm.isValid() || loginForm.isValidating()"
+  [disabled]="loginForm.isSubmitting() || loginForm.isValidating()"
 >
   Login
 </button>
 ```
 
-Note that you rarely need to disable the button on invalid with Formisch: submitting an invalid form runs validation, shows the errors, and focuses the first invalid field, which is friendlier than a permanently disabled button. If you adopt that behavior, `[disabled]="loginForm.isValidating()"` is all that remains.
+Note that you rarely need to disable the button on invalid with Formisch: submitting an invalid form runs validation, shows the errors, and focuses the first invalid field, which is friendlier than a permanently disabled button. Keep the `isSubmitting()` check to prevent duplicate submissions while an async handler runs.
 
 ### Validation timing
 
