@@ -1,0 +1,494 @@
+---
+title: Migrate from Modular Forms
+description: >-
+  Learn how to migrate your forms from Modular Forms to Formisch. This guide
+  maps Modular Forms' name-based fields, validation functions and methods to
+  Formisch's schema-first API.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Migrate from Modular Forms
+
+This guide walks you through migrating a form from [Modular Forms](https://modularforms.dev) (`@modular-forms/solid`) to Formisch. Formisch is the official successor of Modular Forms, built by the same author. Modular Forms is in maintenance mode, and Formisch is the recommended library for new projects.
+
+Because Formisch is a rewrite of the same ideas, much of your knowledge carries over. Both libraries are headless, both connect fields through a render prop, and most methods even kept their names. What changes is the source of truth: everything that Modular Forms spread across type parameters, `validate` props and `type` props now comes from a single Valibot schema.
+
+Both libraries can coexist in the same application without conflicts. You can migrate one form at a time and remove Modular Forms once the last form is converted.
+
+## Key differences
+
+Modular Forms derives its types from a manually declared `type` like `LoginForm` and wires validation separately: either per field via the `validate` prop with functions like `required` and `email`, or per form via a schema adapter like `valiForm` or `zodForm`. Fields are addressed by dot-notation name strings, and non-string fields declare their runtime type with a `type` prop.
+
+Formisch is schema-first. A single Valibot schema provides everything at once: the TypeScript types, the runtime validation rules, and the structure of the form. There is no type parameter, no validation functions, no schema adapter, and no `type` prop. When the schema changes, every field path, every validation message and every inferred type follows automatically.
+
+The main differences in practice:
+
+- **Source of truth**: Modular Forms combines a TypeScript type with separate validation wiring. Formisch derives types, validation and form structure from one Valibot schema.
+- **Component access**: Modular Forms returns pre-bound `Form`, `Field` and `FieldArray` components from `createForm`. In Formisch, you import them from the package and connect them with the `of` property.
+- **Field paths**: Modular Forms addresses fields with dot-notation strings like `name="todos.0.label"`. Formisch uses type-safe path arrays like `path={['todos', 0, 'label']}`.
+- **Field state**: Modular Forms passes `(field, props)` to the render prop, with `field.value` and a single `field.error` string. Formisch passes one field store with `field.input`, an array of `field.errors`, and the element props at `field.props`.
+- **Active state**: Modular Forms tracks which fields are mounted and only validates and submits "active" fields. Formisch has no active-field concept, since the schema defines the structure of the form.
+- **Methods**: Most methods kept their names. They now take the form store and a single config object with a `path` array instead of a name string.
+
+## Side-by-side example
+
+The following login form has two validated fields and an async submit handler, implemented once with Modular Forms and once with Formisch.
+
+### Modular Forms
+
+```tsx
+import {
+  createForm,
+  email,
+  minLength,
+  required,
+  type SubmitHandler,
+} from '@modular-forms/solid';
+
+type LoginForm = {
+  email: string;
+  password: string;
+};
+
+export default function LoginPage() {
+  const [loginForm, { Form, Field }] = createForm<LoginForm>();
+
+  const submitForm: SubmitHandler<LoginForm> = async (values) => {
+    await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+  };
+
+  return (
+    <Form onSubmit={submitForm}>
+      <Field
+        name="email"
+        validate={[
+          required('Please enter your email.'),
+          email('The email address is badly formatted.'),
+        ]}
+      >
+        {(field, props) => (
+          <div>
+            <input {...props} value={field.value || ''} type="email" />
+            {field.error && <div>{field.error}</div>}
+          </div>
+        )}
+      </Field>
+      <Field
+        name="password"
+        validate={[
+          required('Please enter your password.'),
+          minLength(8, 'Your password must have 8 characters or more.'),
+        ]}
+      >
+        {(field, props) => (
+          <div>
+            <input {...props} value={field.value || ''} type="password" />
+            {field.error && <div>{field.error}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit" disabled={loginForm.submitting}>
+        Login
+      </button>
+    </Form>
+  );
+}
+```
+
+### Formisch
+
+```tsx
+import { createForm, Field, Form } from '@formisch/solid';
+import type { SubmitHandler } from '@formisch/solid';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your email.'),
+    v.email('The email address is badly formatted.')
+  ),
+  password: v.pipe(
+    v.string(),
+    v.nonEmpty('Please enter your password.'),
+    v.minLength(8, 'Your password must have 8 characters or more.')
+  ),
+});
+
+export default function LoginPage() {
+  const loginForm = createForm({
+    schema: LoginSchema,
+  });
+
+  const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+    await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+  };
+
+  return (
+    <Form of={loginForm} onSubmit={submitForm}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="email" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="password" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit" disabled={loginForm.isSubmitting}>
+        Login
+      </button>
+    </Form>
+  );
+}
+```
+
+Note that the manual `LoginForm` type and the per-field `validate` arrays are gone. The schema provides both, and the types flow from it into `path`, `field.input` and the values of your submit handler.
+
+## Migration steps
+
+### Install Formisch
+
+Formisch requires Valibot as a peer dependency. Install both packages alongside Modular Forms, so you can migrate form by form:
+
+```bash
+npm install @formisch/solid valibot
+```
+
+See the <Link href="/solid/guides/installation/">installation</Link> guide for other package managers and TypeScript requirements.
+
+### Move validation into the schema
+
+How this step looks depends on how you validated with Modular Forms:
+
+- **With `valiForm`**: You already have a Valibot schema. Pass it directly to `createForm` as the `schema` config and delete the adapter.
+- **With `zodForm`**: Formisch validates exclusively with Valibot, so translate your Zod schema. The structure maps one to one, and most rules have a same-named Valibot action.
+- **With field-level `validate` props**: Each validation function becomes a Valibot action in the schema, keeping its error message.
+
+The validation functions map as follows:
+
+| Modular Forms                   | Valibot                          |
+| ------------------------------- | -------------------------------- |
+| `required`                      | `v.nonEmpty` for strings/arrays  |
+| `email`                         | `v.email`                        |
+| `url`                           | `v.url`                          |
+| `minLength` / `maxLength`       | `v.minLength` / `v.maxLength`    |
+| `minRange` / `maxRange`         | `v.minValue` / `v.maxValue`      |
+| `pattern`                       | `v.regex`                        |
+| `value`                         | `v.value`                        |
+| `minSize` / `maxSize`           | `v.minSize` / `v.maxSize`        |
+| `minTotalSize` / `maxTotalSize` | `v.check` with a custom function |
+| `mimeType`                      | `v.mimeType`                     |
+| `custom`                        | `v.check` / `v.checkAsync`       |
+
+One semantic difference to keep in mind: in Modular Forms, every validation function except `required` skips empty strings and lists. Valibot actions do not skip those values automatically, and `v.optional` only accepts `undefined`. To preserve an optional text field that accepts an empty input, explicitly allow it, for example with `v.union([v.literal(''), v.pipe(v.string(), v.email())])`; wrap that schema in `v.optional` only if `undefined` is also a valid input. A required string becomes `v.pipe(v.string(), v.nonEmpty('...'))`; use a type-appropriate schema for other inputs.
+
+Define the fields in the same order they appear in your form, since Formisch focuses the first invalid field on submit based on the schema order. See the <Link href="/solid/guides/define-your-form/">define your form</Link> guide for details.
+
+### Replace the form setup
+
+Modular Forms returns a tuple of the form store and pre-bound components. Formisch returns only the store, and you import <Link href="/solid/api/Form/">`Form`</Link>, <Link href="/solid/api/Field/">`Field`</Link> and <Link href="/solid/api/FieldArray/">`FieldArray`</Link> from the package, connecting them with the `of` property. The `initialValues` option becomes `initialInput`, and there is no type parameter because <Link href="/solid/api/createForm/">`createForm`</Link> infers all types from the schema:
+
+```tsx
+// Modular Forms
+const [loginForm, { Form, Field }] = createForm<LoginForm>({
+  initialValues: { email: '', password: '' },
+  validate: valiForm(LoginSchema),
+});
+
+// Formisch
+const loginForm = createForm({
+  schema: LoginSchema,
+});
+```
+
+The `validateOn` and `revalidateOn` options become `validate` and `revalidate`. Their existing modes carry over with one rename: `'touched'` becomes `'touch'`; Formisch additionally supports `'initial'` and `'change'`. The defaults are unchanged, so a form that validates on submit and revalidates on input needs no config at all.
+
+### Replace field bindings
+
+Three things change on each field: the `name` string becomes a `path` array, the second `props` render argument moves onto the field store as `field.props`, and the `validate` and `type` props are dropped because the schema covers both:
+
+```tsx
+// Modular Forms
+<Field name="email" validate={[required('Please enter your email.')]}>
+  {(field, props) => (
+    <div>
+      <input {...props} value={field.value || ''} type="email" />
+      {field.error && <div>{field.error}</div>}
+    </div>
+  )}
+</Field>
+
+// Formisch
+<Field of={loginForm} path={['email']}>
+  {(field) => (
+    <div>
+      <input {...field.props} value={field.input} type="email" />
+      {field.errors && <div>{field.errors[0]}</div>}
+    </div>
+  )}
+</Field>
+```
+
+Dot-notation names translate directly: `name="account.email"` becomes `path={['account', 'email']}`, and a dynamic name like `'todos.' + index() + '.label'` becomes `path={['todos', index(), 'label']}`. Instead of a single `field.error` string that is empty when valid, Formisch provides `field.errors`, which is an array of all error messages or `null` when the field is valid, so `field.errors[0]` gives you the Modular Forms behavior.
+
+Also note that fields with a non-string schema like `v.number()` or `v.boolean()` must be controlled, since Formisch has no `type` prop that decodes the element value. See the <Link href="/solid/guides/add-form-fields/">add form fields</Link> and <Link href="/solid/guides/controlled-fields/">controlled fields</Link> guides for details.
+
+### Update submission handling
+
+The `onSubmit` handler on the <Link href="/solid/api/Form/">`Form`</Link> component works the same way: it runs after successful validation and receives the typed values. The `SubmitHandler` type now takes the schema instead of a values type:
+
+```tsx
+// Modular Forms
+const submitForm: SubmitHandler<LoginForm> = async (values) => {
+  /* ... */
+};
+
+// Formisch
+const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+  /* ... */
+};
+```
+
+What Modular Forms handled through `FormError` and the response store becomes regular control flow. Instead of throwing a `FormError` with field errors, call <Link href="/methods/api/setErrors/">`setErrors`</Link> for errors the server attributes to a field, and track a status message in a Solid signal instead of reading `form.response`:
+
+```tsx
+import { setErrors } from '@formisch/solid';
+import { createSignal } from 'solid-js';
+
+const [message, setMessage] = createSignal('');
+
+const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
+  const response = await fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(values),
+  });
+  if (response.status === 401) {
+    setErrors(loginForm, {
+      path: ['password'],
+      errors: ['The password is incorrect.'],
+    });
+  } else if (!response.ok) {
+    setMessage('An unknown error has occurred.');
+  }
+};
+```
+
+See the <Link href="/solid/guides/handle-submission/">handle submission</Link> guide for details.
+
+## API mapping
+
+| Modular Forms (`@modular-forms/solid`)                     | Formisch (`@formisch/solid`)                                                             |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `createForm<LoginForm>(options)`                           | <Link href="/solid/api/createForm/">`createForm`</Link> with `schema` config             |
+| `[form, { Form, Field, FieldArray }]` tuple                | Form store + imported components with `of` property                                      |
+| `initialValues`                                            | `initialInput` config option                                                             |
+| `validate: valiForm(Schema)`                               | `schema` config option                                                                   |
+| `validate: zodForm(Schema)`                                | `schema` config option (translated to Valibot)                                           |
+| `validateOn` / `revalidateOn`                              | `validate` / `revalidate` config (`'touched'` is now `'touch'`)                          |
+| Per-field `validateOn` / `revalidateOn`                    | No equivalent (validation modes are form-wide)                                           |
+| `<Field name="a.b">`                                       | <Link href="/solid/api/Field/">`Field`</Link> with `path={['a', 'b']}`                   |
+| `validate` prop with validation functions                  | Valibot schema actions                                                                   |
+| `type` prop (`'number'`, `'boolean'`, ...)                 | Inferred from schema (non-string fields are controlled)                                  |
+| `transform` prop, `toTrimmed`, `toCustom`, ...             | Valibot transformation actions like `v.trim` (see below)                                 |
+| `keepActive` / `keepState` props                           | No equivalent (field state is kept automatically)                                        |
+| `(field, props)` render arguments                          | Field store with `field.props`                                                           |
+| `field.value`                                              | `field.input`                                                                            |
+| `field.error` (string)                                     | `field.errors` (array or `null`)                                                         |
+| `field.touched` / `field.dirty`                            | `field.isTouched` / `field.isDirty`                                                      |
+| `field.active`                                             | No equivalent                                                                            |
+| `form.submitting` / `form.submitted`                       | `form.isSubmitting` / `form.isSubmitted`                                                 |
+| `form.validating`                                          | `form.isValidating`                                                                      |
+| `form.invalid`                                             | `form.isValid` (inverted)                                                                |
+| `form.touched` / `form.dirty`                              | `form.isTouched` / `form.isDirty`                                                        |
+| `form.submitCount`                                         | No equivalent                                                                            |
+| `form.response` / `setResponse` / `clearResponse`          | Your own signal + control flow in the submit handler                                     |
+| `FormError`                                                | <Link href="/methods/api/setErrors/">`setErrors`</Link> + control flow                   |
+| `shouldActive` / `shouldTouched` / `shouldDirty` on `Form` | No equivalent (all schema fields are validated and submitted)                            |
+| `getValue(form, name)` / `getValues(form)`                 | <Link href="/methods/api/getInput/">`getInput`</Link>                                    |
+| `setValue(form, name, value)` / `setValues`                | <Link href="/methods/api/setInput/">`setInput`</Link>                                    |
+| `getError(form, name)`                                     | <Link href="/methods/api/getErrors/">`getErrors`</Link> with `path`                      |
+| `getErrors(form)`                                          | <Link href="/methods/api/getDeepErrors/">`getDeepErrors`</Link>                          |
+| `setError(form, name, error)`                              | <Link href="/methods/api/setErrors/">`setErrors`</Link>                                  |
+| `clearError(form, name)`                                   | <Link href="/methods/api/setErrors/">`setErrors`</Link> with `errors: null`              |
+| `hasField` / `hasFieldArray`                               | Not needed (the schema defines the structure)                                            |
+| `validate(form, name?)`                                    | <Link href="/methods/api/validate/">`validate`</Link> (always validates the entire form) |
+| `focus(form, name)`                                        | <Link href="/methods/api/focus/">`focus`</Link> with `path`                              |
+| `reset(form, name?, options)`                              | <Link href="/methods/api/reset/">`reset`</Link> with `path` / `initialInput` config      |
+| `insert(form, name, { at, value })`                        | <Link href="/methods/api/insert/">`insert`</Link> with `path` / `at` / `initialInput`    |
+| `remove(form, name, { at })`                               | <Link href="/methods/api/remove/">`remove`</Link>                                        |
+| `replace(form, name, { at, value })`                       | <Link href="/methods/api/replace/">`replace`</Link>                                      |
+| `move(form, name, { from, to })`                           | <Link href="/methods/api/move/">`move`</Link>                                            |
+| `swap(form, name, { at, and })`                            | <Link href="/methods/api/swap/">`swap`</Link>                                            |
+| `submit(form)`                                             | <Link href="/methods/api/submit/">`submit`</Link>                                        |
+| `FormValues<typeof form>`                                  | `v.InferInput<typeof Schema>`                                                            |
+
+The touched flags are close but not identical: Modular Forms marks a field as touched after blur or a dirty input, while Formisch marks it on focus or whenever its input is set. The dirty flags in both libraries compare the current and initial input.
+
+## Common patterns
+
+### Form state
+
+Both libraries expose form state as reactive properties on the store, so this part barely changes. The properties follow an `is` naming convention, and `invalid` flips to `isValid`:
+
+```tsx
+// Modular Forms
+loginForm.submitting; // boolean
+loginForm.invalid; // boolean
+
+// Formisch
+loginForm.isSubmitting; // boolean
+loginForm.isValid; // boolean
+```
+
+Values are read with the <Link href="/methods/api/getInput/">`getInput`</Link> method, which is reactive like `getValue` and `getValues` in Modular Forms:
+
+```tsx
+import { getInput } from '@formisch/solid';
+
+getInput(loginForm, { path: ['email'] }); // string | undefined
+getInput(loginForm); // partial form values
+```
+
+### Conditional fields and active state
+
+Modular Forms only validates and submits fields that are "active", meaning currently mounted. This is how conditional forms work there: render a `<Field>` only when it applies, and its value disappears from the output. The `keepActive` and `keepState` props and the `shouldActive` options fine-tune this behavior.
+
+Formisch has no active-field concept. Every field in the schema is validated on every submit, and every value is part of the output, whether a `Field` component is currently rendered or not. Model conditional structures in the schema instead, for example with `v.variant` for a discriminated union:
+
+```tsx
+const PaymentSchema = v.variant('type', [
+  v.object({
+    type: v.literal('card'),
+    number: v.pipe(v.string(), v.nonEmpty('Please enter your card number.')),
+  }),
+  v.object({
+    type: v.literal('paypal'),
+    email: v.pipe(v.string(), v.email('The email address is badly formatted.')),
+  }),
+]);
+```
+
+This way, the schema only requires the fields of the selected variant, which replaces the mount-based logic of Modular Forms with type-safe validation logic.
+
+### Validation timing
+
+The `validateOn` and `revalidateOn` options carry over as `validate` and `revalidate` with the same defaults (`'submit'` and `'input'`). The `'touched'` mode is now called `'touch'` and follows Formisch's touched behavior described above. Formisch also accepts `'initial'` to validate as soon as the form is created and `'change'` for the native change event:
+
+```tsx
+const loginForm = createForm({
+  schema: LoginSchema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+Unlike Modular Forms, validation modes cannot be overridden per field, and validation always runs against the entire schema rather than a single field. Since Formisch only updates the DOM where errors actually change, this makes no practical difference. The <Link href="/solid/guides/validation/">validation</Link> guide covers the details.
+
+### Field arrays
+
+The mental model is unchanged: `fieldArray.items` contains stable keys for SolidJS's `<For>` component, and array methods modify the items. What changes is that the array structure and its validation move into the schema, and item values are passed as `initialInput`:
+
+```tsx
+import { Field, FieldArray, insert, remove } from '@formisch/solid';
+import { For } from 'solid-js';
+
+const TodoSchema = v.object({
+  todos: v.pipe(
+    v.array(
+      v.object({
+        label: v.pipe(v.string(), v.nonEmpty('Please enter a label.')),
+      })
+    ),
+    v.nonEmpty('Please add at least one todo.'),
+    v.maxLength(4, 'You cannot add more than 4 todos.')
+  ),
+});
+
+<FieldArray of={todoForm} path={['todos']}>
+  {(fieldArray) => (
+    <For each={fieldArray.items}>
+      {(_, getIndex) => (
+        <div>
+          <Field of={todoForm} path={['todos', getIndex(), 'label']}>
+            {(field) => (
+              <input {...field.props} value={field.input} type="text" />
+            )}
+          </Field>
+          <button
+            type="button"
+            onClick={() =>
+              remove(todoForm, { path: ['todos'], at: getIndex() })
+            }
+          >
+            Remove
+          </button>
+        </div>
+      )}
+    </For>
+  )}
+</FieldArray>;
+
+<button
+  type="button"
+  onClick={() =>
+    insert(todoForm, { path: ['todos'], initialInput: { label: '' } })
+  }
+>
+  Add todo
+</button>;
+```
+
+The `validate` prop of Modular Forms' `FieldArray`, which checked the number of items with functions like `required` and `maxLength`, becomes `v.nonEmpty` and `v.maxLength` on the `v.array` pipe. See the <Link href="/solid/guides/field-arrays/">field arrays</Link> guide for a complete example.
+
+### Special inputs
+
+Modular Forms decodes checkboxes, number inputs, file inputs and dates through the `type` prop on `Field`. Formisch connects fields through `field.props` and leaves the element markup to you, so non-string fields are controlled with the appropriate attribute, like `checked` for a boolean checkbox:
+
+```tsx
+<Field of={form} path={['cookies']}>
+  {(field) => (
+    <label>
+      <input {...field.props} type="checkbox" checked={!!field.input} />
+      Yes, I want cookies
+    </label>
+  )}
+</Field>
+```
+
+The <Link href="/solid/guides/special-inputs/">special inputs</Link> guide shows the equivalent patterns for checkbox groups, radio groups, selects, file inputs and dates.
+
+### Transformations
+
+Modular Forms transforms input values as the user types via the `transform` prop with helpers like `toTrimmed` and `toUpperCase`. In Formisch, transformations live in the schema as Valibot actions like `v.trim` and `v.toUpperCase`:
+
+```tsx
+const Schema = v.object({
+  email: v.pipe(v.string(), v.trim(), v.email()),
+});
+```
+
+Note the semantic difference: schema transformations apply to the validated output your submit handler receives, not to the value displayed in the input while typing. If you need to constrain what the user sees as they type, for example for an input mask, use a controlled field and set the transformed value with <Link href="/methods/api/setInput/">`setInput`</Link>.
+
+## Next steps
+
+With your first form migrated, work through the <Link href="/solid/guides/define-your-form/">define your form</Link>, <Link href="/solid/guides/add-form-fields/">add form fields</Link> and <Link href="/solid/guides/handle-submission/">handle submission</Link> guides to deepen the concepts this guide touched on. The <Link href="/solid/guides/controlled-fields/">controlled fields</Link> and <Link href="/solid/guides/form-methods/">form methods</Link> guides are useful next reads once your migrated forms grow more dynamic.

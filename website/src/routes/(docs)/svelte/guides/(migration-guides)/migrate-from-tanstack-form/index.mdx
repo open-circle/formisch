@@ -253,32 +253,33 @@ Unlike TanStack Form's `onSubmit`, which receives the current form values, the F
 
 ## API mapping
 
-| TanStack Form                                               | Formisch                                                                                |
-| ----------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `createForm(() => ({ … }))`                                 | <Link href="/svelte/api/createForm/">`createForm`</Link>`({ schema })`                  |
-| `defaultValues`                                             | `initialInput` config                                                                   |
-| `onSubmit` option                                           | `onsubmit` prop of <Link href="/svelte/api/Form/">`Form`</Link>                         |
-| `validators` config                                         | Valibot schema plus `validate` / `revalidate` config                                    |
-| `<form.Field name="…">`                                     | <Link href="/svelte/api/Field/">`Field`</Link> with `path` array                        |
-| `field.state.value`                                         | `field.input`                                                                           |
-| `field.handleChange` / `handleBlur`                         | Spread `field.props`, or `field.onInput` for custom inputs                              |
-| `field.state.meta.errors`                                   | `field.errors`                                                                          |
-| `field.state.meta.isTouched`                                | `field.isTouched`                                                                       |
-| `field.state.meta.isDirty`                                  | `field.isEdited`                                                                        |
-| `form.Subscribe` / `form.useStore` (now `form.useSelector`) | Direct property access, e.g. `form.isSubmitting`                                        |
-| `state.isSubmitting`                                        | `form.isSubmitting`                                                                     |
-| `state.canSubmit`                                           | No direct equivalent (see below)                                                        |
-| `form.handleSubmit()`                                       | <Link href="/methods/api/submit/">`submit`</Link>`(form)`                               |
-| `form.reset()`                                              | <Link href="/methods/api/reset/">`reset`</Link>`(form)`                                 |
-| `form.setFieldValue(name, value)`                           | <Link href="/methods/api/setInput/">`setInput`</Link>`(form, { path, input })`          |
-| `form.state.values`                                         | <Link href="/methods/api/getInput/">`getInput`</Link>`(form)`                           |
-| `form.validateAllFields`                                    | <Link href="/methods/api/validate/">`validate`</Link>`(form)`                           |
-| `<form.Field mode="array">`                                 | <Link href="/svelte/api/FieldArray/">`FieldArray`</Link>                                |
-| `field.pushValue` / `insertValue`                           | <Link href="/methods/api/insert/">`insert`</Link>`(form, { path })`                     |
-| `field.removeValue`                                         | <Link href="/methods/api/remove/">`remove`</Link>`(form, { path, at })`                 |
-| `field.moveValue`                                           | <Link href="/methods/api/move/">`move`</Link>`(form, { path, from, to })`               |
-| `field.swapValues`                                          | <Link href="/methods/api/swap/">`swap`</Link>`(form, { path, at, and })`                |
-| `field.replaceValue`                                        | <Link href="/methods/api/replace/">`replace`</Link>`(form, { path, at, initialInput })` |
+| TanStack Form                                               | Formisch                                                                              |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `createForm(() => ({ … }))`                                 | <Link href="/svelte/api/createForm/">`createForm({ schema })`</Link>                  |
+| `defaultValues`                                             | `initialInput` config                                                                 |
+| `onSubmit` option                                           | `onsubmit` prop of <Link href="/svelte/api/Form/">`Form`</Link>                       |
+| `validators` config                                         | Valibot schema plus `validate` / `revalidate` config                                  |
+| `<form.Field name="…">`                                     | <Link href="/svelte/api/Field/">`Field`</Link> with `path` array                      |
+| `field.state.value`                                         | `field.input`                                                                         |
+| `field.handleChange` / `handleBlur`                         | Spread `field.props`, or `field.onInput` for custom inputs                            |
+| `field.state.meta.errors`                                   | `field.errors`                                                                        |
+| `field.state.meta.isTouched`                                | `field.isTouched`                                                                     |
+| `field.state.meta.isDirty`                                  | `field.isEdited`                                                                      |
+| `field.state.meta.isDefaultValue`                           | `!field.isDirty`                                                                      |
+| `form.Subscribe` / `form.useStore` (now `form.useSelector`) | Direct property access, e.g. `form.isSubmitting`                                      |
+| `state.isSubmitting`                                        | `form.isSubmitting`                                                                   |
+| `state.canSubmit`                                           | No direct equivalent (see below)                                                      |
+| `form.handleSubmit()`                                       | <Link href="/methods/api/submit/">`submit(form)`</Link>                               |
+| `form.reset()`                                              | <Link href="/methods/api/reset/">`reset(form)`</Link>                                 |
+| `form.setFieldValue(name, value)`                           | <Link href="/methods/api/setInput/">`setInput(form, { path, input })`</Link>          |
+| `form.state.values`                                         | <Link href="/methods/api/getInput/">`getInput(form)`</Link>                           |
+| `form.validateAllFields`                                    | <Link href="/methods/api/validate/">`validate(form)`</Link>                           |
+| `<form.Field mode="array">`                                 | <Link href="/svelte/api/FieldArray/">`FieldArray`</Link>                              |
+| `field.pushValue` / `insertValue`                           | <Link href="/methods/api/insert/">`insert(form, { path })`</Link>                     |
+| `field.removeValue`                                         | <Link href="/methods/api/remove/">`remove(form, { path, at })`</Link>                 |
+| `field.moveValue`                                           | <Link href="/methods/api/move/">`move(form, { path, from, to })`</Link>               |
+| `field.swapValues`                                          | <Link href="/methods/api/swap/">`swap(form, { path, at, and })`</Link>                |
+| `field.replaceValue`                                        | <Link href="/methods/api/replace/">`replace(form, { path, at, initialInput })`</Link> |
 
 A few entries deserve a short note:
 

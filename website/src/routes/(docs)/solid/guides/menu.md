@@ -29,6 +29,7 @@
 
 ## Migration guides
 
+- [From Modular Forms](/solid/guides/migrate-from-modular-forms/)
 - [From Felte](/solid/guides/migrate-from-felte/)
 - [From TanStack Form](/solid/guides/migrate-from-tanstack-form/)
 

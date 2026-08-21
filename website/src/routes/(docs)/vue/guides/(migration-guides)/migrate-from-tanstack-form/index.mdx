@@ -267,7 +267,7 @@ See the <Link href="/vue/guides/handle-submission/">handle submission</Link> gui
 
 | TanStack Form                              | Formisch                                                                                                           |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| `useForm({ defaultValues, onSubmit })`     | <Link href="/vue/api/useForm/">`useForm`</Link>`({ schema })`                                                      |
+| `useForm({ defaultValues, onSubmit })`     | <Link href="/vue/api/useForm/">`useForm({ schema })`</Link>                                                        |
 | `defaultValues`                            | `initialInput` (optional and partial)                                                                              |
 | `onSubmit` option                          | `@submit` on the <Link href="/vue/api/Form/">`Form`</Link> component                                               |
 | `form.handleSubmit`                        | <Link href="/methods/api/submit/">`submit`</Link> or <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> |
@@ -285,16 +285,16 @@ See the <Link href="/vue/guides/handle-submission/">handle submission</Link> gui
 | `form.useStore` and `form.Subscribe`       | Direct reactive property access, e.g. `loginForm.isValid`                                                          |
 | `form.state.isSubmitting`                  | `form.isSubmitting`                                                                                                |
 | `form.state.canSubmit`                     | No direct equivalent (see below)                                                                                   |
-| `form.reset(values)`                       | <Link href="/methods/api/reset/">`reset`</Link>`(form, { initialInput })`                                          |
-| `form.resetField(name)`                    | <Link href="/methods/api/reset/">`reset`</Link>`(form, { path })`                                                  |
-| `form.setFieldValue(name, value)`          | <Link href="/methods/api/setInput/">`setInput`</Link>`(form, { path, input })`                                     |
-| `form.getFieldValue(name)`                 | <Link href="/methods/api/getInput/">`getInput`</Link>`(form, { path })`                                            |
-| `form.validateAllFields(cause)`            | <Link href="/methods/api/validate/">`validate`</Link>`(form)`                                                      |
-| `field.pushValue(value)`                   | <Link href="/methods/api/insert/">`insert`</Link>`(form, { path, initialInput })`                                  |
-| `field.removeValue(index)`                 | <Link href="/methods/api/remove/">`remove`</Link>`(form, { path, at })`                                            |
-| `form.moveFieldValues(name, from, to)`     | <Link href="/methods/api/move/">`move`</Link>`(form, { path, from, to })`                                          |
-| `form.swapFieldValues(name, i1, i2)`       | <Link href="/methods/api/swap/">`swap`</Link>`(form, { path, at, and })`                                           |
-| `form.replaceFieldValue(name, i, value)`   | <Link href="/methods/api/replace/">`replace`</Link>`(form, { path, at, initialInput })`                            |
+| `form.reset(values)`                       | <Link href="/methods/api/reset/">`reset(form, { initialInput })`</Link>                                            |
+| `form.resetField(name)`                    | <Link href="/methods/api/reset/">`reset(form, { path })`</Link>                                                    |
+| `form.setFieldValue(name, value)`          | <Link href="/methods/api/setInput/">`setInput(form, { path, input })`</Link>                                       |
+| `form.getFieldValue(name)`                 | <Link href="/methods/api/getInput/">`getInput(form, { path })`</Link>                                              |
+| `form.validateAllFields(cause)`            | <Link href="/methods/api/validate/">`validate(form)`</Link>                                                        |
+| `field.pushValue(value)`                   | <Link href="/methods/api/insert/">`insert(form, { path, initialInput })`</Link>                                    |
+| `field.removeValue(index)`                 | <Link href="/methods/api/remove/">`remove(form, { path, at })`</Link>                                              |
+| `form.moveFieldValues(name, from, to)`     | <Link href="/methods/api/move/">`move(form, { path, from, to })`</Link>                                            |
+| `form.swapFieldValues(name, i1, i2)`       | <Link href="/methods/api/swap/">`swap(form, { path, at, and })`</Link>                                             |
+| `form.replaceFieldValue(name, i, value)`   | <Link href="/methods/api/replace/">`replace(form, { path, at, initialInput })`</Link>                              |
 
 A few entries deserve extra context:
 

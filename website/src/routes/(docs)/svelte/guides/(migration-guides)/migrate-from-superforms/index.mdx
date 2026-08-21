@@ -20,7 +20,7 @@ Both libraries can coexist in the same application, so you can migrate one form 
 
 ## Key differences
 
-The biggest shift is where the form lives. Superforms is server-first: you initialize the form with `superValidate` in a `load` function, post to a form action, and connect the client with `superForm` and `use:enhance`. Even in SPA mode, the API keeps this server-shaped structure with a `SuperValidated` object and an `onUpdate` event. Formisch is client-first: you call the <Link href="/svelte/api/createForm/">`createForm`</Link> rune directly in your component, and there is no `load` function, form action, or adapter involved. Dedicated SvelteKit integration is planned for one of the next releases; until then, server validation is something you wire up separately, for example by parsing the same Valibot schema in an API endpoint.
+The biggest shift is where the form lives. Superforms is server-first: you initialize the form with `superValidate` in a `load` function, post to a form action, and connect the client with `superForm` and `use:enhance`. Even in SPA mode, the API keeps this server-shaped structure with a `SuperValidated` object and an `onUpdate` event. Formisch is client-first: you call the <Link href="/svelte/api/createForm/">`createForm`</Link> rune directly in your component, and there is no `load` function, form action, or adapter involved. Dedicated SvelteKit integration is planned; until then, server validation is something you wire up separately, for example by parsing the same Valibot schema in an API endpoint.
 
 Beyond that, three differences shape the migration:
 
@@ -268,7 +268,7 @@ If you still need server-side validation, parse the submitted data in your endpo
 | ------------------------------------------ | --------------------------------------------------------------------------------------- |
 | `superValidate(valibot(schema))` in `load` | Not needed, <Link href="/svelte/api/createForm/">`createForm`</Link> runs on the client |
 | `superForm(data.form, options)`            | <Link href="/svelte/api/createForm/">`createForm`</Link> rune                           |
-| `defaults(valibot(schema))`                | `initialInput` config of <Link href="/svelte/api/createForm/">`createForm`</Link>       |
+| `defaults(data, valibotClient(schema))`    | `initialInput` config of <Link href="/svelte/api/createForm/">`createForm`</Link>       |
 | `validators: valibotClient(schema)`        | `schema` config, validation always comes from the schema                                |
 | `validationMethod`                         | `validate` / `revalidate` config                                                        |
 | `dataType: 'json'`                         | Not needed, path arrays support nested data                                             |
@@ -281,7 +281,7 @@ If you still need server-side validation, parse the submitted data in your endpo
 | `$submitting`                              | `form.isSubmitting`                                                                     |
 | `$delayed` / `$timeout`                    | No equivalent (see notes)                                                               |
 | `$posted`                                  | `form.isSubmitted`                                                                      |
-| `$tainted` / `isTainted('email')`          | `field.isDirty` / <Link href="/methods/api/isDirty/">`isDirty`</Link>                   |
+| `$tainted` / `isTainted('email')`          | `field.isEdited` / <Link href="/methods/api/isEdited/">`isEdited`</Link>                |
 | `reset({ data, newState })`                | <Link href="/methods/api/reset/">`reset`</Link> with `initialInput`                     |
 | `validateForm()` / `validate('email')`     | <Link href="/methods/api/validate/">`validate`</Link>                                   |
 | `submit()`                                 | <Link href="/methods/api/submit/">`submit`</Link>                                       |
@@ -294,32 +294,32 @@ A few entries have no direct counterpart:
 - **`$constraints`**: Superforms derives HTML validation attributes like `required` and `minlength` from the schema. Formisch validates at runtime against the schema instead and does not generate constraint attributes. Set attributes like `required` on your inputs yourself where you want them for accessibility or styling.
 - **`$delayed` / `$timeout`**: Formisch exposes `isSubmitting` and `isValidating` but has no built-in loading timers. If you need a delayed spinner, wrap `form.isSubmitting` in your own timer logic.
 - **`$message` / `setMessage`**: Status messages are not form state in Formisch. Use regular Svelte state that you set in your submit handler.
-- **`taintedMessage`**: There is no built-in navigation guard. You can build one with SvelteKit's `beforeNavigate` and the <Link href="/methods/api/isDirty/">`isDirty`</Link> method.
+- **`taintedMessage`**: There is no built-in navigation guard. You can build one with SvelteKit's `beforeNavigate` and the <Link href="/methods/api/isEdited/">`isEdited`</Link> method. Unlike Superforms, Formisch does not automatically clear edited state after a successful server response; call <Link href="/methods/api/reset/">`reset`</Link> when the saved values should become the new baseline.
 - **`validate('email')`**: Formisch has no partial validation. The <Link href="/methods/api/validate/">`validate`</Link> method always parses the whole form against the schema, which keeps cross-field rules correct, and then distributes the errors to the individual fields.
 
 ## Common patterns
 
 ### Form state
 
-Superforms spreads form state across several stores like `$submitting`, `$posted`, and `$tainted` with the `isTainted` helper. In Formisch, the form store exposes reactive properties directly: `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors`. Each field offers per-field `isTouched`, `isEdited`, `isDirty`, and `isValid` counterparts.
+Superforms spreads form state across several stores like `$submitting`, `$posted`, and `$tainted` with the `isTainted` helper. In Formisch, the form store exposes reactive properties directly: `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors`. Each field offers per-field `isTouched`, `isEdited`, `isDirty`, and `isValid` counterparts. Superforms' tainted state is sticky after a modification, so `isEdited` is the closest match; use `isDirty` only when you want a current-versus-initial comparison that turns off after a value is reverted.
 
 ```svelte
-<button type="submit" disabled={loginForm.isSubmitting || !loginForm.isDirty}>
+<button type="submit" disabled={loginForm.isSubmitting || !loginForm.isEdited}>
   {loginForm.isSubmitting ? 'Saving...' : 'Save'}
 </button>
 ```
 
-To check the dirty state of a single field outside of a <Link href="/svelte/api/Field/">`Field`</Link> component, like `isTainted('email')` in Superforms, use the <Link href="/methods/api/isDirty/">`isDirty`</Link> method. Wrap the call in `$derived` so it stays reactive:
+To check the edited state of a single field outside of a <Link href="/svelte/api/Field/">`Field`</Link> component, like `isTainted('email')` in Superforms, use the <Link href="/methods/api/isEdited/">`isEdited`</Link> method. Wrap the call in `$derived` so it stays reactive:
 
 ```ts
-import { isDirty } from '@formisch/svelte';
+import { isEdited } from '@formisch/svelte';
 
-const emailIsDirty = $derived(isDirty(loginForm, { path: ['email'] }));
+const emailIsEdited = $derived(isEdited(loginForm, { path: ['email'] }));
 ```
 
 ### Validation timing
 
-The `validationMethod` option of Superforms maps onto the `validate` and `revalidate` config of <Link href="/svelte/api/createForm/">`createForm`</Link>. The default `'auto'` behavior, where a field is first checked on blur and then re-checked on input once it has errors, corresponds to `validate: 'blur'` with `revalidate: 'input'`:
+The `validationMethod` option of Superforms maps onto the `validate` and `revalidate` config of <Link href="/svelte/api/createForm/">`createForm`</Link>. The closest match for the default `'auto'` behavior is `validate: 'blur'` with `revalidate: 'input'`:
 
 ```ts
 const loginForm = createForm({
@@ -329,11 +329,11 @@ const loginForm = createForm({
 });
 ```
 
-`'oninput'` maps to `validate: 'input'`, `'onblur'` to `validate: 'blur'`, and `'onsubmit'` to `validate: 'submit'`, which is the Formisch default. Note that `validate` and `revalidate` control when validation runs, not when errors are shown. The <Link href="/svelte/guides/validation/">validation</Link> guide shows how to reveal errors at the right time using flags like `field.isEdited` and `form.isSubmitted`.
+Superforms remembers that a field previously had errors and continues validating it on input even after the errors clear. Formisch revalidates on input while a field has errors or after the form was submitted, then returns to the initial trigger after an error clears. The explicit modes map directly: `'oninput'` to `validate: 'input'`, `'onblur'` to `validate: 'blur'`, and `'onsubmit'` to `validate: 'submit'`, which is the Formisch default. Note that `validate` and `revalidate` control when validation runs, not when errors are shown. The <Link href="/svelte/guides/validation/">validation</Link> guide shows how to reveal errors at the right time using flags like `field.isEdited` and `form.isSubmitted`.
 
 ### Field arrays
 
-In Superforms, dynamic arrays require `dataType: 'json'`, an `{#each}` loop over `$form.tags`, and manual array mutations like `$form.tags = [...$form.tags, { name: '' }]`. Formisch provides the <Link href="/svelte/api/FieldArray/">`FieldArray`</Link> component, which exposes stable `items` keys for the `{#each}` block, together with methods like <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/move/">`move`</Link>, and <Link href="/methods/api/swap/">`swap`</Link>:
+In Superforms, nested arrays of objects generally use `dataType: 'json'`, an `{#each}` loop over `$form.tags`, and manual array mutations like `$form.tags = [...$form.tags, { name: '' }]`; top-level arrays of primitive values can instead be posted as repeated form fields. Formisch provides the <Link href="/svelte/api/FieldArray/">`FieldArray`</Link> component, which exposes stable `items` keys for the `{#each}` block, together with methods like <Link href="/methods/api/insert/">`insert`</Link>, <Link href="/methods/api/remove/">`remove`</Link>, <Link href="/methods/api/move/">`move`</Link>, and <Link href="/methods/api/swap/">`swap`</Link>:
 
 ```svelte
 <script lang="ts">
@@ -365,7 +365,7 @@ See the <Link href="/svelte/guides/field-arrays/">field arrays</Link> guide for 
 
 ### Reset
 
-The `reset()` method of Superforms maps to the <Link href="/methods/api/reset/">`reset`</Link> method of Formisch. Calling it without a config restores the initial values. Passing `initialInput` replaces the baseline, which covers both the `data` and `newState` options of Superforms at once, since future resets will use the new values:
+The `reset()` method of Superforms maps to the <Link href="/methods/api/reset/">`reset`</Link> method of Formisch. Calling it without a config restores the initial values. Passing `initialInput` changes both the current values and the baseline used by future resets. Superforms separates those concerns: `data` changes the values for that reset, while `newState` changes the future reset baseline, so use both there when you want the same result as Formisch's `initialInput`:
 
 ```ts
 import { reset } from '@formisch/svelte';
@@ -377,7 +377,7 @@ reset(loginForm);
 reset(loginForm, { initialInput: { email: 'new@example.com' } });
 ```
 
-There is no `resetForm` option because Formisch does not reset the form after submission by default. If you want that behavior, call <Link href="/methods/api/reset/">`reset`</Link> at the end of your submit handler.
+There is no `resetForm` option because Formisch does not reset the form after submission by default. Superforms v2 enables `resetForm` by default, so if your form relied on that behavior, call <Link href="/methods/api/reset/">`reset`</Link> after a successful Formisch submission.
 
 ### Special inputs
 
