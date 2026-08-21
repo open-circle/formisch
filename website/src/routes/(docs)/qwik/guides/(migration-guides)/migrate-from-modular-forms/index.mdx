@@ -26,7 +26,7 @@ Qwik provides an automated migration command that updates package names and iden
 npx qwik migrate-v2
 ```
 
-The changes that matter for your form files are the package renames. `@builder.io/qwik` becomes `@qwik.dev/core`, and `@builder.io/qwik-city` becomes `@qwik.dev/router`. Imports like `component$` and `$` now come from `@qwik.dev/core`, while `routeLoader$`, `routeAction$` and `server$` come from `@qwik.dev/router`. Related identifiers are renamed as well, for example the `qwikCity` Vite plugin becomes `qwikRouter` and `QwikCityProvider` becomes `QwikRouterProvider`.
+The changes that matter for your form files are the package renames. `@builder.io/qwik` becomes `@qwik.dev/core`, and `@builder.io/qwik-city` becomes `@qwik.dev/router`. Imports like `component$` and `$` now come from `@qwik.dev/core`, while `routeLoader$`, `routeAction$` and `server$` come from `@qwik.dev/router`. Related identifiers are renamed as well, for example the `qwikCity` Vite plugin becomes `qwikRouter`. The `QwikCityProvider` wrapper is replaced by the `useQwikRouter` hook in most apps; the `QwikRouterProvider` component, which the migration command renames it to, still works but is only recommended when your root component reads signals.
 
 The details of the framework update are beyond the scope of this guide. Work through the official [Qwik v2 upgrade guide](https://qwik.dev/docs/upgrade/) until your app builds and runs on Qwik v2, then continue here to migrate your forms.
 
@@ -293,7 +293,7 @@ Three things change on each field: the `name` string becomes a `path` array, the
 
 Dot-notation names translate directly: `name="account.email"` becomes `path={['account', 'email']}`, and a dynamic name like `'todos.' + index + '.label'` becomes `path={['todos', index, 'label']}`. Instead of a single `field.error` string that is empty when valid, Formisch provides `field.errors`, a signal containing an array of all error messages or `null` when the field is valid, so `field.errors.value[0]` gives you the Modular Forms behavior.
 
-Also note that fields with a non-string schema like `v.number()` or `v.boolean()` must be controlled, since Formisch has no `type` prop that decodes the element value. See the <Link href="/qwik/guides/add-form-fields/">add form fields</Link> and <Link href="/qwik/guides/controlled-fields/">controlled fields</Link> guides for details.
+Also note that fields with a schema like `v.number()` or `v.date()` must be controlled, since their values are read from the DOM as strings and Formisch has no `type` prop that converts them. Checkboxes, radio groups, selects and file inputs are decoded automatically based on the element and the schema. See the <Link href="/qwik/guides/add-form-fields/">add form fields</Link> and <Link href="/qwik/guides/controlled-fields/">controlled fields</Link> guides for details.
 
 ### Move the server action into the submit handler
 
@@ -360,7 +360,7 @@ One capability does not carry over for now: progressive enhancement. A Modular F
 | `fieldArrays` option                                | Not needed (the schema declares arrays)                                                  |
 | `<Field name="a.b">`                                | <Link href="/qwik/api/Field/">`Field`</Link> with `path={['a', 'b']}`                    |
 | `validate` prop with validation functions           | Valibot schema actions                                                                   |
-| `type` prop (`'number'`, `'boolean'`, ...)          | Inferred from schema (non-string fields are controlled)                                  |
+| `type` prop (`'number'`, `'boolean'`, ...)          | Inferred from schema and element (number and date fields are controlled)                 |
 | `transform` prop, `toCustom$`, ...                  | Valibot transformation actions like `v.trim` (see below)                                 |
 | `keepActive` / `keepState` props                    | No equivalent (field state is kept automatically)                                        |
 | `(field, props)` render arguments                   | `render$` prop with `field.props`                                                        |
@@ -450,7 +450,7 @@ This way, the schema only requires the fields of the selected variant, which rep
 The mental model is unchanged: `fieldArray.items` contains stable keys to map over, and array methods modify the items. What changes is that the array structure and its validation move into the schema, the `fieldArrays` config option disappears, and item values are passed as `initialInput`:
 
 ```tsx
-import { Field, FieldArray, insert, remove } from '@formisch/qwik';
+import { Field, FieldArray, insert, remove, useForm$ } from '@formisch/qwik';
 
 const TodoSchema = v.object({
   todos: v.pipe(
@@ -463,6 +463,9 @@ const TodoSchema = v.object({
     v.maxLength(4, 'You cannot add more than 4 todos.')
   ),
 });
+
+// Inside your component$
+const todoForm = useForm$(() => ({ schema: TodoSchema }));
 
 <FieldArray
   of={todoForm}
@@ -505,7 +508,7 @@ The `validate` prop of Modular Forms' `FieldArray`, which checked the number of 
 
 ### Special inputs
 
-Modular Forms decodes checkboxes, number inputs, file inputs and dates through the `type` prop on `Field`. Formisch connects fields through `field.props` and leaves the element markup to you, so non-string fields are controlled with the appropriate attribute, like `checked` for a boolean checkbox:
+Modular Forms decodes checkboxes, number inputs, file inputs and dates through the `type` prop on `Field`. Formisch decodes checkboxes, radio groups, selects and file inputs automatically based on the element and the schema, so no `type` prop is needed. Setting the appropriate controlled attribute, like `checked` for a boolean checkbox, keeps the DOM in sync with initial values and programmatic updates:
 
 ```tsx
 <Field
@@ -520,7 +523,7 @@ Modular Forms decodes checkboxes, number inputs, file inputs and dates through t
 />
 ```
 
-The <Link href="/qwik/guides/special-inputs/">special inputs</Link> guide shows the equivalent patterns for checkbox groups, radio groups, selects, file inputs and dates.
+Number and date inputs are the exception: their values are read from the DOM as strings, so they must be controlled to store the correct type. File inputs are the opposite case: they cannot be controlled at all and are connected through `field.props` alone. The <Link href="/qwik/guides/special-inputs/">special inputs</Link> guide shows the equivalent patterns for checkbox groups, radio groups, selects, file inputs and dates.
 
 ### Transformations
 

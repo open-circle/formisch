@@ -281,7 +281,7 @@ If you still need server-side validation, parse the submitted data in your endpo
 | `$submitting`                              | `form.isSubmitting`                                                                     |
 | `$delayed` / `$timeout`                    | No equivalent (see notes)                                                               |
 | `$posted`                                  | `form.isSubmitted`                                                                      |
-| `$tainted` / `isTainted('email')`          | `field.isEdited` / <Link href="/methods/api/isEdited/">`isEdited`</Link>                |
+| `$tainted` / `isTainted('email')`          | `field.isDirty` / <Link href="/methods/api/isDirty/">`isDirty`</Link>                   |
 | `reset({ data, newState })`                | <Link href="/methods/api/reset/">`reset`</Link> with `initialInput`                     |
 | `validateForm()` / `validate('email')`     | <Link href="/methods/api/validate/">`validate`</Link>                                   |
 | `submit()`                                 | <Link href="/methods/api/submit/">`submit`</Link>                                       |
@@ -294,27 +294,27 @@ A few entries have no direct counterpart:
 - **`$constraints`**: Superforms derives HTML validation attributes like `required` and `minlength` from the schema. Formisch validates at runtime against the schema instead and does not generate constraint attributes. Set attributes like `required` on your inputs yourself where you want them for accessibility or styling.
 - **`$delayed` / `$timeout`**: Formisch exposes `isSubmitting` and `isValidating` but has no built-in loading timers. If you need a delayed spinner, wrap `form.isSubmitting` in your own timer logic.
 - **`$message` / `setMessage`**: Status messages are not form state in Formisch. Use regular Svelte state that you set in your submit handler.
-- **`taintedMessage`**: There is no built-in navigation guard. You can build one with SvelteKit's `beforeNavigate` and the <Link href="/methods/api/isEdited/">`isEdited`</Link> method. Unlike Superforms, Formisch does not automatically clear edited state after a successful server response; call <Link href="/methods/api/reset/">`reset`</Link> when the saved values should become the new baseline.
+- **`taintedMessage`**: There is no built-in navigation guard. You can build one with SvelteKit's `beforeNavigate` and the <Link href="/methods/api/isDirty/">`isDirty`</Link> method. Unlike Superforms, Formisch does not automatically update the comparison baseline after a successful server response; call <Link href="/methods/api/reset/">`reset`</Link> when the saved values should become the new baseline.
 - **`validate('email')`**: Formisch has no partial validation. The <Link href="/methods/api/validate/">`validate`</Link> method always parses the whole form against the schema, which keeps cross-field rules correct, and then distributes the errors to the individual fields.
 
 ## Common patterns
 
 ### Form state
 
-Superforms spreads form state across several stores like `$submitting`, `$posted`, and `$tainted` with the `isTainted` helper. In Formisch, the form store exposes reactive properties directly: `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors`. Each field offers per-field `isTouched`, `isEdited`, `isDirty`, and `isValid` counterparts. Superforms' tainted state is sticky after a modification, so `isEdited` is the closest match; use `isDirty` only when you want a current-versus-initial comparison that turns off after a value is reverted.
+Superforms spreads form state across several stores like `$submitting`, `$posted`, and `$tainted` with the `isTainted` helper. In Formisch, the form store exposes reactive properties directly: `isSubmitting`, `isSubmitted`, `isValidating`, `isTouched`, `isEdited`, `isDirty`, `isValid`, and `errors`. Each field offers per-field `isTouched`, `isEdited`, `isDirty`, and `isValid` counterparts. Superforms' tainted state tracks the original data and clears when a value is reverted, so the comparison-based `isDirty` is the closest match; use `isEdited` when you want sticky tracking that stays on after the first change.
 
 ```svelte
-<button type="submit" disabled={loginForm.isSubmitting || !loginForm.isEdited}>
+<button type="submit" disabled={loginForm.isSubmitting || !loginForm.isDirty}>
   {loginForm.isSubmitting ? 'Saving...' : 'Save'}
 </button>
 ```
 
-To check the edited state of a single field outside of a <Link href="/svelte/api/Field/">`Field`</Link> component, like `isTainted('email')` in Superforms, use the <Link href="/methods/api/isEdited/">`isEdited`</Link> method. Wrap the call in `$derived` so it stays reactive:
+To check the dirty state of a single field outside of a <Link href="/svelte/api/Field/">`Field`</Link> component, like `isTainted('email')` in Superforms, use the <Link href="/methods/api/isDirty/">`isDirty`</Link> method. Wrap the call in `$derived` so it stays reactive:
 
 ```ts
-import { isEdited } from '@formisch/svelte';
+import { isDirty } from '@formisch/svelte';
 
-const emailIsEdited = $derived(isEdited(loginForm, { path: ['email'] }));
+const emailIsDirty = $derived(isDirty(loginForm, { path: ['email'] }));
 ```
 
 ### Validation timing
@@ -329,7 +329,7 @@ const loginForm = createForm({
 });
 ```
 
-Superforms remembers that a field previously had errors and continues validating it on input even after the errors clear. Formisch revalidates on input while a field has errors or after the form was submitted, then returns to the initial trigger after an error clears. The explicit modes map directly: `'oninput'` to `validate: 'input'`, `'onblur'` to `validate: 'blur'`, and `'onsubmit'` to `validate: 'submit'`, which is the Formisch default. Note that `validate` and `revalidate` control when validation runs, not when errors are shown. The <Link href="/svelte/guides/validation/">validation</Link> guide shows how to reveal errors at the right time using flags like `field.isEdited` and `form.isSubmitted`.
+Superforms remembers that a field previously had errors and continues validating it on input even after the errors clear. Formisch's revalidation trigger depends on the mode: with the default `validate: 'submit'`, the form revalidates on input once it has been submitted. With modes like `'blur'` or `'input'`, a field with errors revalidates on input and returns to the initial trigger once its errors clear. The explicit modes map directly: `'oninput'` to `validate: 'input'`, `'onblur'` to `validate: 'blur'`, and `'onsubmit'` to `validate: 'submit'`, which is the Formisch default. Note that `validate` and `revalidate` control when validation runs, not when errors are shown. The <Link href="/svelte/guides/validation/">validation</Link> guide shows how to reveal errors at the right time using flags like `field.isEdited` and `form.isSubmitted`.
 
 ### Field arrays
 

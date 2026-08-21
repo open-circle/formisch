@@ -250,7 +250,7 @@ Three things change on each field: the `name` string becomes a `path` array, the
 
 Dot-notation names translate directly: `name="account.email"` becomes `path={['account', 'email']}`, and a dynamic name like `'todos.' + index() + '.label'` becomes `path={['todos', index(), 'label']}`. Instead of a single `field.error` string that is empty when valid, Formisch provides `field.errors`, which is an array of all error messages or `null` when the field is valid, so `field.errors[0]` gives you the Modular Forms behavior.
 
-Also note that fields with a non-string schema like `v.number()` or `v.boolean()` must be controlled, since Formisch has no `type` prop that decodes the element value. See the <Link href="/solid/guides/add-form-fields/">add form fields</Link> and <Link href="/solid/guides/controlled-fields/">controlled fields</Link> guides for details.
+Also note that fields with a schema like `v.number()` or `v.date()` must be controlled, since their values are read from the DOM as strings and Formisch has no `type` prop that converts them. Checkboxes, radio groups, selects and file inputs are decoded automatically based on the element and the schema. See the <Link href="/solid/guides/add-form-fields/">add form fields</Link> and <Link href="/solid/guides/controlled-fields/">controlled fields</Link> guides for details.
 
 ### Update submission handling
 
@@ -308,7 +308,7 @@ See the <Link href="/solid/guides/handle-submission/">handle submission</Link> g
 | Per-field `validateOn` / `revalidateOn`                    | No equivalent (validation modes are form-wide)                                           |
 | `<Field name="a.b">`                                       | <Link href="/solid/api/Field/">`Field`</Link> with `path={['a', 'b']}`                   |
 | `validate` prop with validation functions                  | Valibot schema actions                                                                   |
-| `type` prop (`'number'`, `'boolean'`, ...)                 | Inferred from schema (non-string fields are controlled)                                  |
+| `type` prop (`'number'`, `'boolean'`, ...)                 | Inferred from schema and element (number and date fields are controlled)                 |
 | `transform` prop, `toTrimmed`, `toCustom`, ...             | Valibot transformation actions like `v.trim` (see below)                                 |
 | `keepActive` / `keepState` props                           | No equivalent (field state is kept automatically)                                        |
 | `(field, props)` render arguments                          | Field store with `field.props`                                                           |
@@ -402,14 +402,14 @@ const loginForm = createForm({
 });
 ```
 
-Unlike Modular Forms, validation modes cannot be overridden per field, and validation always runs against the entire schema rather than a single field. Since Formisch only updates the DOM where errors actually change, this makes no practical difference. The <Link href="/solid/guides/validation/">validation</Link> guide covers the details.
+Unlike Modular Forms, validation modes cannot be overridden per field, and validation always runs against the entire schema rather than a single field. Formisch only updates the DOM where errors actually change, so this has no rendering cost. It does mean, however, that expensive or asynchronous rules like `v.checkAsync` run on every validation pass, not only when their own field changes. The <Link href="/solid/guides/validation/">validation</Link> guide covers the details.
 
 ### Field arrays
 
 The mental model is unchanged: `fieldArray.items` contains stable keys for SolidJS's `<For>` component, and array methods modify the items. What changes is that the array structure and its validation move into the schema, and item values are passed as `initialInput`:
 
 ```tsx
-import { Field, FieldArray, insert, remove } from '@formisch/solid';
+import { createForm, Field, FieldArray, insert, remove } from '@formisch/solid';
 import { For } from 'solid-js';
 
 const TodoSchema = v.object({
@@ -423,6 +423,8 @@ const TodoSchema = v.object({
     v.maxLength(4, 'You cannot add more than 4 todos.')
   ),
 });
+
+const todoForm = createForm({ schema: TodoSchema });
 
 <FieldArray of={todoForm} path={['todos']}>
   {(fieldArray) => (
@@ -462,7 +464,7 @@ The `validate` prop of Modular Forms' `FieldArray`, which checked the number of 
 
 ### Special inputs
 
-Modular Forms decodes checkboxes, number inputs, file inputs and dates through the `type` prop on `Field`. Formisch connects fields through `field.props` and leaves the element markup to you, so non-string fields are controlled with the appropriate attribute, like `checked` for a boolean checkbox:
+Modular Forms decodes checkboxes, number inputs, file inputs and dates through the `type` prop on `Field`. Formisch decodes checkboxes, radio groups, selects and file inputs automatically based on the element and the schema, so no `type` prop is needed. Setting the appropriate controlled attribute, like `checked` for a boolean checkbox, keeps the DOM in sync with initial values and programmatic updates:
 
 ```tsx
 <Field of={form} path={['cookies']}>
@@ -475,7 +477,7 @@ Modular Forms decodes checkboxes, number inputs, file inputs and dates through t
 </Field>
 ```
 
-The <Link href="/solid/guides/special-inputs/">special inputs</Link> guide shows the equivalent patterns for checkbox groups, radio groups, selects, file inputs and dates.
+Number and date inputs are the exception: their values are read from the DOM as strings, so they must be controlled to store the correct type. File inputs are the opposite case: they cannot be controlled at all and are connected through `field.props` alone. The <Link href="/solid/guides/special-inputs/">special inputs</Link> guide shows the equivalent patterns for checkbox groups, radio groups, selects, file inputs and dates.
 
 ### Transformations
 
