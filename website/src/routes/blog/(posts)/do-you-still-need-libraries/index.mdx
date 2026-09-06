@@ -1,0 +1,143 @@
+---
+cover: Libraries
+title: 'Do you still need libraries when agents write the code?'
+description: >-
+  Coding agents can generate working code on demand, so it's fair to ask why
+  you'd install a dependency at all. We think the answer depends on the
+  problem, and that the deep problems still belong in libraries.
+published: 2026-08-21
+authors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+Ask a coding agent for a login form and you get a working one in a couple of minutes. The same goes for a debounce helper, a modal, or a client for your API. So a question that used to be settled is open again: if a model can write all of this on demand, why install a library at all?
+
+We build a form library, so we have a stake in the answer. But the question is fair, and the honest answer is not "always use libraries". It depends on the problem. This post is our attempt to draw the line, and to explain why the deep problems still belong in libraries, maybe more than before.
+
+## The case against libraries
+
+The argument goes like this: a dependency is code you didn't write, running in your product, on someone else's release schedule. It's a supply chain to audit, breaking changes to migrate through, and an API that never fits your case exactly. If an agent can generate purpose-built code on demand, you can skip all of that. When requirements change, you regenerate instead of migrating.
+
+Some people take it further. [This post](https://maho.dev/2026/03/ai-is-making-libraries-obsolete/) argues that general-purpose libraries are becoming unnecessary overhead now that models can generate exactly what each project needs. And Drew Breunig went as far as [publishing a library with no code](https://www.dbreunig.com/2026/01/08/a-software-library-with-no-code.html): a spec and a test suite that your agent implements on demand, in whatever language your project is in.
+
+## What got cheap, and what didn't
+
+Writing code got cheap. Everything around it didn't. Maybe you review what the agent wrote, in which case the bottleneck just moved, because an agent produces two hundred lines faster than anyone can read them. Or maybe you don't, and as models get better, fewer people will. Then the question is what your trust rests on instead.
+
+A good library earns that trust outside your repo. The edge cases were found by other people's bug reports, the fixes are reviewed by maintainers who carry the context, and the test suite encodes years of production surprises from thousands of apps. Generated code has none of that behind it. It ran once while the agent watched, and it will run unread in your product until it breaks. There's no upstream either: no changelog, no security advisories, no fix that arrives because another project hit the bug first. When something does break, it breaks only in your codebase, in a state machine nobody has ever read.
+
+There's a longer-term version of this too. Developers who grow up with agents will understand less of what happens under the hood. That's fine on its own. It's what abstractions are for, and nobody reads the output of their compiler. But it only works when the thing under the hood has a name, documentation, a test suite and a maintainer. You can use a library without understanding its internals, because the understanding lives somewhere. With two hundred generated lines that only your repo has, it lives nowhere.
+
+## Where generating wins
+
+To be clear, the reverse is often true. Breunig's own conclusion is that spec-only libraries "likely work best for implement-and-forget utilities", and we'd draw the line in a similar place. A slug function, a date formatter, glue between two APIs, a one-off migration script: these are small, fully specified, and done when they're done. Pulling in a dependency for them was always questionable, and with an agent it's just unnecessary. If the whole problem fits in a prompt, let the agent write it.
+
+The mistake is applying that logic to problems that only look small.
+
+## The problems that stay deep
+
+Some problems accumulate edge cases for as long as software exists. Dates and time zones. Text editing. Drag and drop. Routing. Caching. Forms. They all look simple from the outside, and every one of them is a state machine with years of bug reports built into the good implementations.
+
+Breunig lists the conditions under which real libraries keep winning: when performance matters, when the edge cases are hard to test, when bugs need a place to be reported and fixed, when the code needs updates over time, and when a community adds value around it. That list is a decent definition of a deep problem. And a deep problem is exactly where a fresh, untested implementation costs you the most, because most of the complexity is not in your prompt, so it's not in the generated code either. It shows up one bug report at a time, in code that only your team has ever run.
+
+## A worked example: forms
+
+Forms are the deep problem we know best. They're also where frontend code stops being low-stakes, because the form's output becomes the request your backend receives, a double submit becomes a duplicate order, and input lost to a re-render is a user's work gone. Every field tracks its input, whether it was touched, whether it's dirty, and its current errors. Validation has timing (on submit, on blur, on change after the first error) and it can be async. Focus has to move to the first invalid field. Field arrays have to carry each entry's state through insert, move, swap and remove. None of that is in the prompt "build me a login form", so none of it is in the result. This is the shape of what an agent writes on its own, abbreviated:
+
+```tsx
+import { type ChangeEvent, useState } from 'react';
+
+export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState<string>();
+  const [passwordError, setPasswordError] = useState<string>();
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function validateEmail(value: string) {
+    if (!value) return 'Email is required.';
+    if (!/^\S+@\S+\.\S+$/.test(value)) return 'Email is invalid.';
+  }
+
+  function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
+    setEmail(event.target.value);
+    if (emailTouched) setEmailError(validateEmail(event.target.value));
+  }
+
+  // ...the same for the password, two blur handlers, a submit
+  // handler that validates everything again, and the JSX that
+  // wires each piece to the right input
+}
+```
+
+Seven `useState` calls for two fields, a whole-component re-render on every keystroke, and an email regex that exists nowhere else in your codebase. With a form library (this one is <Link href="/react/guides/introduction/">Formisch</Link>, ours), the same form looks like this:
+
+```tsx
+import { Field, Form, useForm } from '@formisch/react';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function LoginPage() {
+  const loginForm = useForm({ schema: LoginSchema });
+
+  return (
+    <Form of={loginForm} onSubmit={(output) => console.log(output)}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="email" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="password" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit">Login</button>
+    </Form>
+  );
+}
+```
+
+The difference is not the line count. It's what the second version doesn't contain: the state machine. Touched tracking, validation timing, error routing and the submit lifecycle are not in the diff, because they live in the library, where they're typed, tested with 100% coverage, and the same in every form you ship. Updates are fine-grained too: the form only re-renders the individual part where something actually changed instead of re-rendering the entire form. You review a schema and some markup. The hard part was written, and reviewed, once.
+
+There's also a quieter effect. Ten hand-rolled forms are ten slightly different state machines, and agents learn conventions from the code they read, so every inconsistent form teaches the next one to be inconsistent too. With a library there's one mental model, visible in every file the agent opens, and it's the consistency that compounds instead.
+
+## What to look for in a library now
+
+Agents don't just change whether you use libraries. They change which libraries are worth using. Integration work used to be an argument for the big batteries-included option, because wiring small tools together was tedious. Agents are good at exactly that wiring, so the calculus shifts toward libraries that are precise about what they own and easy to build on. A few properties matter more than they used to. Formisch is the example we know best, so that's the one we'll use.
+
+**Headless.** An agent is good at markup and glue, so a library that owns the hard state and none of the UI plays to its strength. Formisch manages form state and validation and owns no markup. The agent, or you, builds whatever UI the project needs on top.
+
+**Declarative.** The less code it takes to express the problem, the less there is to generate and the less there is to review. In Formisch a [Valibot](https://valibot.dev/) schema defines the form once, and both the types and the validation come from it, so they can't drift apart.
+
+**Modular.** Formisch ships 26 methods (`focus`, `insert`, `move`, `reset`, `validate`, `getDirtyInput` and the rest). Each is an independent function over the form store, lives in its own folder, and is tree-shaken away if you don't import it, which is why bundles start at 2.5 kB. It also means the library is extendable in a way an agent can use: a building block we don't ship can be written as a new method that follows the same pattern, without forking the state management underneath.
+
+**Readable by agents.** A library is only as useful as what the model knows about it, and training data goes stale. Formisch serves every docs page as Markdown, publishes per-framework `llms.txt` files, runs a free MCP server at `formisch.dev/mcp`, and ships an agent skill you can install with `npx skills add open-circle/agent-skills --skill formisch valibot`. The <Link href="/react/guides/coding-agents/">coding agents guide</Link> has the setup, and <Link href="/blog/making-formisch-easier-for-coding-agents/">the agent documentation post</Link> has the full story.
+
+## The division of labor
+
+So our answer to the question in the title: yes, for the deep problems, and the shape of the library matters more than it did. Let the agent write the utilities, the glue and the UI, because those are specific to your product and cheap to regenerate. Let a library own the state machine underneath, because that part is the same in everyone's product and expensive to get wrong. The agent writes the parts that make your app yours, and the library carries the parts you shouldn't have to think about.
+
+## Try it
+
+If you want to see what that looks like in practice, the <Link href="/playground/login/">playground</Link> runs a working Formisch form in your browser with nothing installed, and getting it into a project is one command:
+
+```bash
+npm install @formisch/react valibot
+```
+
+The other seven frameworks work the same way with `@formisch/angular`, `@formisch/preact`, `@formisch/qwik`, `@formisch/react-native`, `@formisch/solid`, `@formisch/svelte` or `@formisch/vue`. If you'd draw the line between agents and libraries somewhere else, we're happy to argue about it on [Discord](https://discord.gg/w5mRTETqzv) or in an [issue](https://github.com/open-circle/formisch/issues/new). And if Formisch is useful to you, a star on [GitHub](https://github.com/open-circle/formisch) helps other people find it.

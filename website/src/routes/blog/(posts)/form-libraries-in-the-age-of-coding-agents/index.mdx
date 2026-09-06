@@ -1,0 +1,143 @@
+---
+cover: Agents & Libraries
+title: 'Do you still need a form library when agents write the code?'
+description: >-
+  Coding agents can generate a working form in seconds, so it's fair to ask why
+  you'd install a form library at all. We think a good form library is worth
+  more with agents, not less. This post makes that case.
+published: 2026-08-21
+authors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+Ask a coding agent for a login form and you get a working one in a couple of minutes. It renders, it validates, it submits. So the question comes up more and more: if a model can write this on demand, why install a form library at all?
+
+We build a form library, so you know where this post lands. But it's a fair question, and the premise behind it is true. Writing code got cheap. Reading it, maintaining it and trusting it didn't. That's the case for a form library now, and this post makes it.
+
+## The case against libraries
+
+The argument goes like this: a dependency is code you didn't write, running in your product, on someone else's release schedule. It's a supply chain to audit, breaking changes to migrate through, and an API that never fits your case exactly. If an agent can generate purpose-built code on demand, you can skip all of that. When requirements change, you regenerate instead of migrating.
+
+Some people take it further. [This post](https://maho.dev/2026/03/ai-is-making-libraries-obsolete/) argues that general-purpose libraries are becoming unnecessary overhead now that models can generate exactly what each project needs. And Drew Breunig went as far as [publishing a library with no code](https://www.dbreunig.com/2026/01/08/a-software-library-with-no-code.html): a spec and a test suite that your agent implements on demand, in whatever language your project is in.
+
+The interesting part of that experiment is where its author lands. In his own words, spec-only libraries "likely work best for implement-and-forget utilities". Maintained libraries keep winning when performance matters, when the edge cases are hard to test, when bugs need a place to be reported and fixed, when the code needs updates over time, and when a community adds value around it.
+
+Forms check every point on that list.
+
+## Forms are a worst case for generated code
+
+A form looks like the easiest thing an agent could write: some inputs, a validation function, a submit handler. That's the happy path, and agents handle the happy path well.
+
+But a form is a state machine wearing a UI. Every field tracks its input, whether it was touched, whether it's dirty, and its current errors. Validation has timing (on submit, on blur, on change after the first error) and it can be async. Errors have to reach the right element, and focus has to move to the first invalid field. Field arrays are harder still, because insert, move, swap and remove have to carry each entry's state along with its value. On top of that there's reset, initial input from the server, the submit lifecycle, and keeping all of it type-safe.
+
+Most of this is not in your prompt, so most of it is not in the generated code either. It shows up one bug report at a time. And since every generated form is a fresh implementation, each one is a new, untested state machine. Fixing the third form doesn't fix the fourth.
+
+Forms also aren't the cosmetic kind of frontend code. The form's output becomes the request your backend receives, a double submit becomes a duplicate order, and input lost to a re-render is a user's work gone.
+
+## The same form, twice
+
+This is the shape of what an agent writes without a library, abbreviated, because the real file keeps going:
+
+```tsx
+import { type ChangeEvent, useState } from 'react';
+
+export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState<string>();
+  const [passwordError, setPasswordError] = useState<string>();
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function validateEmail(value: string) {
+    if (!value) return 'Email is required.';
+    if (!/^\S+@\S+\.\S+$/.test(value)) return 'Email is invalid.';
+  }
+
+  function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
+    setEmail(event.target.value);
+    if (emailTouched) setEmailError(validateEmail(event.target.value));
+  }
+
+  // ...the same for the password, two blur handlers, a submit
+  // handler that validates everything again, and the JSX that
+  // wires each piece to the right input
+}
+```
+
+Seven `useState` calls for two fields, and the count grows with every field. The whole component re-renders on every keystroke. The email regex is a little dialect of validation that exists nowhere else in your codebase. And none of this is tested beyond the fact that it ran once while the agent watched.
+
+With Formisch, the same form looks like this:
+
+```tsx
+import { Field, Form, useForm } from '@formisch/react';
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function LoginPage() {
+  const loginForm = useForm({ schema: LoginSchema });
+
+  return (
+    <Form of={loginForm} onSubmit={(output) => console.log(output)}>
+      <Field of={loginForm} path={['email']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="email" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <Field of={loginForm} path={['password']}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="password" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit">Login</button>
+    </Form>
+  );
+}
+```
+
+The difference is not the line count. It's what the second version doesn't contain: the state machine. Touched tracking, validation timing, error routing and the submit lifecycle are not in the diff, because they live in the library, where they are typed, tested with 100% coverage, and the same in every form you ship. The schema is the single source of truth, so the types and the validation can't drift apart. And updates are fine-grained: the form only re-renders the individual part where something actually changed instead of re-rendering the entire form.
+
+This is worth more with agents, not less. If you review what the agent wrote, the hand-rolled version is the bottleneck, because an agent produces two hundred lines faster than you can read them, while the Formisch version cuts the review down to a schema and some markup. And if you don't review it, which will only get more common as models improve, it matters even more where the state machine lives. You can use a library without understanding its internals, because the understanding lives somewhere: with its docs, its tests and its maintainers. With two hundred generated lines that only your repo has ever run, it lives nowhere.
+
+## Ten forms later
+
+There's a second effect that shows up after the first few forms. Ten hand-rolled forms are ten slightly different state machines. One validates on blur, one on change, one tracks touched state and two don't, and each has its own opinion of what an email looks like. That's a maintenance problem, but it's also context: agents learn conventions from the code they read, so every inconsistent form teaches the next one to be inconsistent too.
+
+A library turns this around. One mental model, applied everywhere, visible in every file the agent opens. With a library it's the consistency that compounds instead.
+
+## Where Formisch fits
+
+We didn't design Formisch for coding agents. But a lot of what we decided, including what we left out, works in their favor.
+
+Formisch is headless. It manages form state and validation and owns no markup, so you, or your agent, build whatever UI the project needs on top. It's schema-based: a [Valibot](https://valibot.dev/) schema defines the form once, and both the types and the validation come from it. And it's one framework-agnostic core with a thin adapter per framework, with reactivity injected at build time. A model learns one set of primitives and applies them across Angular, Preact, Qwik, React, React Native, Solid, Svelte and Vue. The <Link href="/blog/one-core-six-frameworks/">architecture post</Link> walks through how that works.
+
+The part that matters most here is the modular methods API. Formisch ships 26 methods (`focus`, `insert`, `move`, `reset`, `validate`, `getDirtyInput` and the rest). Each is an independent function over the form store, lives in its own folder, and is tree-shaken away if you don't import it. That's why bundles start at 2.5 kB. Modularity also cuts the other way: since every method is a small, standalone function over a documented core, an agent that needs a building block we don't ship can write one that follows the same pattern, without forking the state management underneath. In <Link href="/blog/formisch-v1/">the v1 announcement</Link> a user described Formisch as "the right amount of abstraction", because what it lacks, you can build on top. That's exactly the property a coding agent can use.
+
+So the division of labor we're arguing for is this: the library owns the state machine, and the agent writes the glue and the custom blocks.
+
+## Point your agent at the docs
+
+If your agent writes the Formisch code, it should read the current API instead of guessing from training data. There's an agent skill you can install with `npx skills add open-circle/agent-skills --skill formisch valibot`, per-framework `llms.txt` files, a Markdown version of every docs page, and a free MCP server at `formisch.dev/mcp` that searches, reads and lists the docs scoped to your framework. The <Link href="/react/guides/coding-agents/">coding agents guide</Link> has the setup, and <Link href="/blog/making-formisch-easier-for-coding-agents/">the agent documentation post</Link> has the full story.
+
+## Try it
+
+The <Link href="/playground/login/">playground</Link> runs a working form in your browser with nothing installed. When you want it in a project, install the package for your framework alongside Valibot:
+
+```bash
+npm install @formisch/react valibot
+```
+
+For the other frameworks it's the same command with `@formisch/angular`, `@formisch/preact`, `@formisch/qwik`, `@formisch/react-native`, `@formisch/solid`, `@formisch/svelte` or `@formisch/vue`. Then hand your agent a schema and let it do the rest. If a form behaves in a way you don't expect, [open an issue](https://github.com/open-circle/formisch/issues/new) or tell us on [Discord](https://discord.gg/w5mRTETqzv). And if Formisch is useful to you, a star on [GitHub](https://github.com/open-circle/formisch) helps other people find it.
