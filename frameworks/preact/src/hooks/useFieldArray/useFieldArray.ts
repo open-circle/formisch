@@ -34,19 +34,14 @@ export interface UseFieldArrayConfig<
  *
  * @returns The field array store with reactive properties for array management.
  */
+// @__NO_SIDE_EFFECTS__
 export function useFieldArray<
-  TSchema extends FormSchema,
-  TFieldArrayPath extends RequiredPath,
+  TSchema extends FormSchema = FormSchema,
+  TFieldArrayPath extends RequiredPath = RequiredPath,
 >(
   form: FormStore<TSchema>,
   config: UseFieldArrayConfig<TSchema, TFieldArrayPath>
-): FieldArrayStore<TSchema, TFieldArrayPath>;
-
-// @__NO_SIDE_EFFECTS__
-export function useFieldArray(
-  form: FormStore,
-  config: UseFieldArrayConfig
-): FieldArrayStore {
+): FieldArrayStore<TSchema, TFieldArrayPath> {
   const pathSignal = usePathSignal(config.path);
   const internalFieldStore = useComputed(
     () => getFieldStore(form[INTERNAL], pathSignal.value) as InternalArrayStore

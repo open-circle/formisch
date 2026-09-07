@@ -77,7 +77,7 @@
     "tsdown": "^0.16.8",
     "tsup": "^8.5.0",
     "tsup-preset-solid": "^2.2.0",
-    "typescript": "^5.8.3",
+    "typescript": "~6.0.3",
     "valibot": "^1.4.1",
     "vite-plugin-solid": "^2.11.6",
     "vitest": "4.1.7"

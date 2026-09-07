@@ -26,16 +26,16 @@
     "@tsconfig/node22": "^22.0.2",
     "@types/node": "^24.1.0",
     "@vitejs/plugin-vue": "^6.0.0",
-    "@vue/eslint-config-typescript": "^14.6.0",
-    "@vue/tsconfig": "^0.7.0",
+    "@vue/eslint-config-typescript": "^14.9.0",
+    "@vue/tsconfig": "^0.9.1",
     "eslint": "^9.32.0",
     "eslint-plugin-vue": "~10.3.0",
     "jiti": "^2.5.1",
     "npm-run-all2": "^8.0.4",
     "tailwindcss": "^4.1.11",
-    "typescript": "~5.8.3",
+    "typescript": "~6.0.3",
     "vite": "^7.0.6",
     "vite-plugin-vue-devtools": "^8.0.0",
-    "vue-tsc": "^3.0.4"
+    "vue-tsc": "~3.1.0"
   }
 }
