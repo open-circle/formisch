@@ -57,6 +57,7 @@ export function handleSubmit(
     internalFormStore.isSubmitted.value = true;
     internalFormStore.isSubmitting.value = true;
 
+    // Hint: Capture this call's ID before parsing can invalidate its input.
     const validationId = internalFormStore.validationId + 1;
 
     // Try to run submit actions if form is valid
@@ -65,15 +66,12 @@ export function handleSubmit(
         shouldFocus: true,
       });
 
-      // Discard submissions superseded during validation
+      // Run handler only for current successful validation
       if (
-        internalFormStore.submissionId !== submissionId ||
-        internalFormStore.validationId !== validationId
+        result.success &&
+        internalFormStore.submissionId === submissionId &&
+        internalFormStore.validationId === validationId
       ) {
-        return;
-      }
-
-      if (result.success) {
         isHandlingSubmit = true;
         // @ts-expect-error - union of SubmitHandler and SubmitEventHandler
         await handler(result.output, event);

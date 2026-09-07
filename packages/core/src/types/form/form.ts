@@ -83,7 +83,8 @@ export interface InternalFormStore<TSchema extends FormSchema = FormSchema>
   element?: HTMLFormElement | undefined;
 
   /**
-   * The ID of the latest validation.
+   * The validation ID, incremented when validation starts or pending results
+   * are invalidated.
    */
   validationId: number;
   /**

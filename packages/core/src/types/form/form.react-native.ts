@@ -17,7 +17,8 @@ import type {
 export interface InternalFormStore<TSchema extends FormSchema = FormSchema>
   extends InternalObjectStore {
   /**
-   * The ID of the latest validation.
+   * The validation ID, incremented when validation starts or pending results
+   * are invalidated.
    */
   validationId: number;
   /**
