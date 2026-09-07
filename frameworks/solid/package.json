@@ -30,19 +30,25 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    "solid": {
-      "development": "./dist/dev.jsx",
-      "import": "./dist/index.jsx"
-    },
-    "development": {
+    ".": {
+      "solid": {
+        "development": "./dist/dev.jsx",
+        "import": "./dist/index.jsx"
+      },
+      "development": {
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/dev.js"
+        }
+      },
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/dev.js"
+        "default": "./dist/index.js"
       }
     },
-    "import": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+    "./internals": {
+      "types": "./dist/internals.d.ts",
+      "import": "./dist/internals.js"
     }
   },
   "sideEffects": false,

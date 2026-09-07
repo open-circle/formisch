@@ -32,6 +32,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "svelte": "./dist/index.js"
+    },
+    "./internals": {
+      "types": "./dist/internals.svelte.d.ts",
+      "svelte": "./dist/internals.svelte.js"
     }
   },
   "sideEffects": false,

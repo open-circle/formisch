@@ -10,21 +10,19 @@ const __dirname = path.dirname(__filename);
 const coreDist = path.join(__dirname, '../../../packages/core/dist');
 const methodsDist = path.join(__dirname, '../../../packages/methods/dist');
 const svelteDist = path.join(__dirname, '../dist');
-const coreDestDir = path.join(svelteDist, 'core');
 const methodsDestDir = path.join(svelteDist, 'methods');
 
 // Create destination directories
-fs.mkdirSync(coreDestDir);
 fs.mkdirSync(methodsDestDir);
 
 // Copy @formisch/core to dist
 fs.copyFileSync(
   path.join(coreDist, 'index.svelte.js'),
-  path.join(coreDestDir, 'index.svelte.js')
+  path.join(svelteDist, 'internals.svelte.js')
 );
 fs.copyFileSync(
   path.join(coreDist, 'index.svelte.d.ts'),
-  path.join(coreDestDir, 'index.svelte.d.ts')
+  path.join(svelteDist, 'internals.svelte.d.ts')
 );
 console.log('Copied @formisch/core to /dist');
 
@@ -94,11 +92,11 @@ function updateImportPaths(filePath) {
   // Calculate relative paths to core and methods directories
   const relativeToCoreJs = path.relative(
     path.dirname(filePath),
-    path.join(coreDestDir, 'index.svelte.js')
+    path.join(svelteDist, 'internals.svelte.js')
   );
   const relativeToCoreDts = path.relative(
     path.dirname(filePath),
-    path.join(coreDestDir, 'index.svelte.d.ts')
+    path.join(svelteDist, 'internals.svelte.d.ts')
   );
   const relativeToMethodsJs = path.relative(
     path.dirname(filePath),

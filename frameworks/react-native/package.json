@@ -34,6 +34,12 @@
       "react-native": "./dist/index.js",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./internals": {
+      "types": "./dist/internals.d.ts",
+      "react-native": "./dist/internals.js",
+      "import": "./dist/internals.js",
+      "default": "./dist/internals.js"
     }
   },
   "sideEffects": false,

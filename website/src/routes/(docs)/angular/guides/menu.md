@@ -26,6 +26,7 @@
 - [Field arrays](/angular/guides/field-arrays/)
 - [TypeScript](/angular/guides/typescript/)
 - [Architecture](/angular/guides/architecture/)
+- [Internals](/angular/guides/internals/)
 
 ## Migration guides
 
