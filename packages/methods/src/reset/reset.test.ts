@@ -422,15 +422,14 @@ describe('reset', () => {
     });
   });
 
-  describe('reset while an async validation is pending', () => {
-    test('should not apply a stale validation result for input replaced by reset', async () => {
+  describe('pending async validation', () => {
+    test('should discard pending validation after reset', async () => {
       const schema = v.object({
         name: v.pipe(v.string(), v.nonEmpty('Name is required')),
       });
       type ParseResult = v.SafeParseResult<typeof schema>;
 
-      // Manually controlled parse result so the test decides exactly when
-      // the async validation resolves, instead of relying on real timers.
+      // Control completion explicitly to reproduce the race without timers.
       let resolveValidation: (value: ParseResult) => void;
       const pendingParse = new Promise<ParseResult>((resolve) => {
         resolveValidation = resolve;
@@ -440,42 +439,29 @@ describe('reset', () => {
       const parse = vi.fn().mockReturnValue(pendingParse);
       store.parse = parse;
 
-      // Enter an invalid value for the field
       setInput(store, { path: ['name'], input: '' });
 
-      // Start async validation for the invalid input and keep it pending.
-      // `validate` is the public method that mirrors what a framework
-      // wrapper triggers when validation runs (e.g. on blur).
       const pendingValidation = validate(store);
       expect(parse).toHaveBeenCalledWith({ name: '' });
       expect(store.isValidating.value).toBe(true);
 
-      // Reset the form while the validation above is still in flight
       reset(store);
 
-      // A: reset immediately restores the valid initial input, clears
-      // errors, and does not leave the form stuck in a validating state
-      // since no new validation was started (`validate` is not 'initial')
       expect(store.children.name.input.value).toBe('John');
       expect(store.children.name.errors.value).toBeNull();
       expect(store.isValidating.value).toBe(false);
 
-      // Complete the pending validation with a real error result for the
-      // input that was actually validated (before reset replaced it)
       const staleResult = v.safeParse(schema, { name: '' });
       expect(staleResult.success).toBe(false);
       resolveValidation!(staleResult);
       await pendingValidation;
 
-      // B: the stale validation result must not reintroduce errors for
-      // input that no longer exists after reset, and must not resurrect
-      // the validating state either
       expect(store.children.name.input.value).toBe('John');
       expect(store.children.name.errors.value).toBeNull();
       expect(store.isValidating.value).toBe(false);
     });
 
-    test('should keep isValidating true until the new validation started by reset completes, even if the stale validation resolves first', async () => {
+    test('should keep reset-triggered validation active when an older validation completes', async () => {
       const schema = v.object({
         name: v.pipe(v.string(), v.nonEmpty('Name is required')),
       });
@@ -490,8 +476,6 @@ describe('reset', () => {
         resolveNewValidation = resolve;
       });
 
-      // The initial input is invalid so the validation reset('initial')
-      // starts has a genuine error to report once it resolves.
       const store = createTestStore(schema, {
         validate: 'initial',
         initialInput: { name: '' },
@@ -502,42 +486,26 @@ describe('reset', () => {
         .mockReturnValueOnce(pendingNewParse);
       store.parse = parse;
 
-      // Set the input directly, bypassing `setInput`'s own validation
-      // trigger (which would fire an extra time here since `validate:
-      // 'initial'` falls back to `revalidate` for input-change events), so
-      // the explicit `validate(store)` call below is the only thing that
-      // starts the "old" validation.
+      // Set input directly so input revalidation does not start an extra parse.
       store.children.name.input.value = 'temporary';
       const oldValidation = validate(store);
       expect(store.isValidating.value).toBe(true);
 
-      // Reset while the old validation is still in flight. Since `validate`
-      // is 'initial', reset starts a brand new validation for the restored
-      // (invalid) initial input.
       reset(store);
       expect(parse).toHaveBeenCalledTimes(2);
+      expect(parse).toHaveBeenNthCalledWith(1, { name: 'temporary' });
+      expect(parse).toHaveBeenNthCalledWith(2, { name: '' });
       expect(store.isValidating.value).toBe(true);
 
-      // Resolve the OLD validation first, with a real (but now irrelevant)
-      // success result for the input it actually validated ('temporary' is
-      // non-empty, so it passes). Using a success result here specifically
-      // checks that the stale validation is discarded outright rather than
-      // merely failing to overwrite an error: if it were still processed, it
-      // would incorrectly clear `isValidating` early, even though it reports
-      // no error of its own.
+      // Even a successful stale result must not clear the new validating state.
       const staleResult = v.safeParse(schema, { name: 'temporary' });
       expect(staleResult.success).toBe(true);
       resolveOldValidation!(staleResult);
       await oldValidation;
 
-      // The new validation triggered by reset has not resolved yet, so the
-      // form must still report as validating, and the stale (successful)
-      // result must not have been applied either.
       expect(store.isValidating.value).toBe(true);
       expect(store.children.name.errors.value).toBeNull();
 
-      // Resolve the NEW validation with the genuine result for the reset
-      // (invalid) initial input.
       const newResult = v.safeParse(schema, { name: '' });
       expect(newResult.success).toBe(false);
       resolveNewValidation!(newResult);
@@ -546,10 +514,8 @@ describe('reset', () => {
       expect(store.isValidating.value).toBe(false);
       expect(store.children.name.errors.value).toEqual(['Name is required']);
     });
-  });
 
-  describe('reset with keepErrors while an async validation is pending', () => {
-    test('should not let a stale validation result overwrite errors kept by keepErrors', async () => {
+    test('should preserve kept errors when pending validation completes', async () => {
       const schema = v.object({
         name: v.pipe(v.string(), v.nonEmpty('Name is required')),
       });
@@ -564,7 +530,6 @@ describe('reset', () => {
       const parse = vi.fn().mockReturnValue(pendingParse);
       store.parse = parse;
 
-      // Give the field a pre-existing error that keepErrors should preserve.
       store.children.name.errors.value = ['Existing error'];
 
       setInput(store, { path: ['name'], input: '' });
@@ -573,8 +538,6 @@ describe('reset', () => {
 
       reset(store, { keepErrors: true });
 
-      // keepErrors preserves the pre-existing error, and the pending
-      // validation is still invalidated like in a regular reset.
       expect(store.children.name.input.value).toBe('John');
       expect(store.children.name.errors.value).toEqual(['Existing error']);
       expect(store.isValidating.value).toBe(false);
@@ -583,14 +546,11 @@ describe('reset', () => {
       resolveValidation!(staleResult);
       await pendingValidation;
 
-      // The stale validation must not overwrite the kept error either.
       expect(store.children.name.errors.value).toEqual(['Existing error']);
       expect(store.isValidating.value).toBe(false);
     });
-  });
 
-  describe('reset with keepInput while an async validation is pending', () => {
-    test('should discard the stale validation and reset error/validating state even though keepInput preserves the input it was validating', async () => {
+    test('should discard pending validation when input is kept', async () => {
       const schema = v.object({
         name: v.pipe(v.string(), v.nonEmpty('Name is required')),
       });
@@ -601,10 +561,6 @@ describe('reset', () => {
         resolveValidation = resolve;
       });
 
-      // `validate: 'submit'` is used so that entering the invalid value via
-      // the public `setInput` API does not itself trigger a validation
-      // (submit-mode only auto-validates once the form has been submitted),
-      // leaving `validate(store)` below as the sole trigger.
       const store = createTestStore(schema, {
         validate: 'submit',
         initialInput: { name: 'John' },
@@ -612,36 +568,23 @@ describe('reset', () => {
       const parse = vi.fn().mockReturnValue(pendingParse);
       store.parse = parse;
 
-      // Enter a value different from the initial input that fails validation.
       setInput(store, { path: ['name'], input: '' });
 
-      // Start async validation for the current (invalid) input via the
-      // public API and keep it pending.
       const pendingValidation = validate(store);
       expect(parse).toHaveBeenCalledWith({ name: '' });
       expect(store.isValidating.value).toBe(true);
 
-      // Reset while that validation is still in flight, keeping the current
-      // input instead of reverting to the initial value.
       reset(store, { keepInput: true });
 
-      // `keepInput` preserves the input, but reset still invalidates pending
-      // validation and clears the validating state. Errors are cleared unless
-      // `keepErrors` is also enabled.
       expect(store.children.name.input.value).toBe('');
       expect(store.children.name.errors.value).toBeNull();
       expect(store.isValidating.value).toBe(false);
 
-      // Complete the pre-reset validation with a real error result for the
-      // input it actually validated, which - because of keepInput - is
-      // still the field's current input.
       const staleResult = v.safeParse(schema, { name: '' });
       expect(staleResult.success).toBe(false);
       resolveValidation!(staleResult);
       await pendingValidation;
 
-      // The stale result must still not be applied, even though it was
-      // validating the exact value keepInput preserved.
       expect(store.children.name.input.value).toBe('');
       expect(store.children.name.errors.value).toBeNull();
       expect(store.isValidating.value).toBe(false);

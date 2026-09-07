@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix full form reset to discard pending validation results and clear the validating state (issue #210, pull request #211)
+
 ## v1.0.0 (August 20, 2026)
 
 - Read the [Formisch v1 release announcement](https://formisch.dev/blog/formisch-v1/)
