@@ -5,7 +5,6 @@ All notable changes to the library will be documented in this file.
 ## vX.X.X (Month DD, YYYY)
 
 - Add `@formisch/svelte/internals` to expose the framework-specific core for custom methods and building blocks
-- Fix repeated runs of the build import-rewriting script
 
 ## v1.0.0 (August 20, 2026)
 

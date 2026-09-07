@@ -5,7 +5,7 @@ export default defineConfig({
   external: ['@formisch/core/qwik'],
   outDir: 'dist',
   outExtensions: () => ({
-    dts: '.d.ts',
+    dts: '.qwik.d.ts',
     js: '.qwik.js',
   }),
   outputOptions: {

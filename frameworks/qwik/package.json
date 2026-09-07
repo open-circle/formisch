@@ -27,10 +27,10 @@
   "type": "module",
   "main": "./dist/index.qwik.js",
   "qwik": "./dist/index.qwik.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.qwik.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/index.qwik.d.ts",
       "import": "./dist/index.qwik.js"
     },
     "./internals": {
