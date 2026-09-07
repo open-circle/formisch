@@ -11,7 +11,7 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsdoc": "^50.6.17",
     "eslint-plugin-security": "^3.0.1",
-    "typescript-eslint": "^8.21.0"
+    "typescript-eslint": "^8.68.0"
   },
   "peerDependencies": {
     "eslint": "^9.0.0"

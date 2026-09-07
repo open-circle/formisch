@@ -57,18 +57,18 @@
     "@testing-library/jest-dom": "^6.6.0",
     "@types/node": "^24.1.0",
     "@vitest/coverage-v8": "^4.1.7",
-    "@vue/eslint-config-typescript": "^14.6.0",
+    "@vue/eslint-config-typescript": "^14.9.0",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^9.32.0",
     "eslint-plugin-vue": "~10.3.0",
     "jsdom": "^26.1.0",
     "tsdown": "^0.16.8",
-    "typescript": "~5.8.3",
+    "typescript": "~6.0.3",
     "unplugin-vue": "^7.0.0",
     "valibot": "^1.4.1",
     "vitest": "^4.1.7",
     "vue": "^3.5.18",
-    "vue-tsc": "^3.0.4"
+    "vue-tsc": "~3.1.0"
   },
   "peerDependencies": {
     "typescript": ">=5 <8",

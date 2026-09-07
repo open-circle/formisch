@@ -63,7 +63,7 @@
     "jsdom": "^26.1.0",
     "preact": "^10.29.2",
     "tsdown": "^0.16.8",
-    "typescript": "^5.8.3",
+    "typescript": "~6.0.3",
     "valibot": "^1.4.1",
     "vite": "^6.0.4",
     "vitest": "^4.1.7"
