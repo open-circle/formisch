@@ -440,6 +440,43 @@ jobs:
         run: pnpm test
         working-directory: frameworks/react-native
 
+  # frameworks/honox
+  honox_prettier:
+    name: Run Prettier in frameworks/honox
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: frameworks/honox
+
+  honox_eslint:
+    name: Run ESLint in frameworks/honox
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: frameworks/honox
+
+  honox_vitest:
+    name: Run Vitest in frameworks/honox
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Vitest tests
+        run: pnpm test
+        working-directory: frameworks/honox
+
   # website
   website_prettier:
     name: Run Prettier in website
