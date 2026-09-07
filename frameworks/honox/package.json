@@ -1,0 +1,78 @@
+{
+  "name": "@formisch/honox",
+  "description": "The lightweight, schema-first, and fully type-safe form library for hono/jsx and HonoX",
+  "version": "1.0.0-rc.0",
+  "license": "MIT",
+  "author": "Kanon",
+  "homepage": "https://formisch.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-circle/formisch.git"
+  },
+  "keywords": [
+    "hono",
+    "honox",
+    "hono-form",
+    "form",
+    "forms",
+    "form-validation",
+    "validation",
+    "schema",
+    "typescript",
+    "type-safe",
+    "signals",
+    "bundle-size",
+    "modular",
+    "valibot"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run --typecheck",
+    "lint": "eslint \"src/**/*.ts*\" && tsc --noEmit",
+    "lint.fix": "eslint \"src/**/*.ts*\" --fix",
+    "format": "prettier --write ./src",
+    "format.check": "prettier --check ./src"
+  },
+  "devDependencies": {
+    "@formisch/core": "workspace:*",
+    "@formisch/eslint-config": "workspace:*",
+    "@formisch/methods": "workspace:*",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@types/node": "^24.10.1",
+    "@vitest/coverage-v8": "^4.1.7",
+    "eslint": "^9.39.1",
+    "hono": "4.12.32",
+    "jsdom": "^26.1.0",
+    "tsdown": "^0.16.8",
+    "typescript": "~5.9.3",
+    "valibot": "^1.4.1",
+    "vitest": "^4.1.7"
+  },
+  "peerDependencies": {
+    "hono": "^4.0.0",
+    "typescript": ">=5",
+    "valibot": "^1.4.1"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  }
+}
