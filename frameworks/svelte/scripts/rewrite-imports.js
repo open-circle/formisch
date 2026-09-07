@@ -13,7 +13,7 @@ const svelteDist = path.join(__dirname, '../dist');
 const methodsDestDir = path.join(svelteDist, 'methods');
 
 // Create destination directories
-fs.mkdirSync(methodsDestDir);
+fs.mkdirSync(methodsDestDir, { recursive: true });
 
 // Copy @formisch/core to dist
 fs.copyFileSync(

@@ -34,8 +34,8 @@
       "import": "./dist/index.qwik.js"
     },
     "./internals": {
-      "types": "./dist/internals.d.ts",
-      "import": "./dist/internals.js"
+      "types": "./dist/internals.qwik.d.ts",
+      "import": "./dist/internals.qwik.js"
     }
   },
   "files": [

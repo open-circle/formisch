@@ -9,7 +9,7 @@ export default defineConfig({
     js: '.qwik.js',
   }),
   outputOptions: {
-    paths: { '@formisch/core/qwik': './internals.js' },
+    paths: { '@formisch/core/qwik': './internals.qwik.js' },
   },
   dts: {
     resolve: ['@formisch/methods/qwik'],
@@ -17,11 +17,11 @@ export default defineConfig({
   copy: [
     {
       from: '../../packages/core/dist/index.qwik.js',
-      to: 'dist/internals.js',
+      to: 'dist/internals.qwik.js',
     },
     {
       from: '../../packages/core/dist/index.qwik.d.ts',
-      to: 'dist/internals.d.ts',
+      to: 'dist/internals.qwik.d.ts',
     },
   ],
 });
