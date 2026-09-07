@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix missing `Framework` export warning when building React Native declarations
+
 ## v1.0.0 (August 20, 2026)
 
 - Read the [Formisch v1 release announcement](https://formisch.dev/blog/formisch-v1/)

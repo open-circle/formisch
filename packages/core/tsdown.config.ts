@@ -14,6 +14,9 @@ type Framework =
   | 'svelte'
   | 'vue';
 
+const FRAMEWORK_FILE_REGEX =
+  /\.(?:angular|preact|qwik|react|react-native|solid|svelte|vue)(?:\.d)?\.ts$/;
+
 /**
  * Rolldown plugin to rewrite framework-specific imports.
  */
@@ -23,7 +26,7 @@ function rewriteFrameworkImports(framework: Framework): RolldownPluginOption {
 
     // Transform imports of `.d.ts` files to framework-specific files
     transform(code, id) {
-      if (id.endsWith('.d.ts') && !id.endsWith(`.${framework}.d.ts`)) {
+      if (id.endsWith('.d.ts') && !FRAMEWORK_FILE_REGEX.test(id)) {
         // Match all relative import statements
         const imports = code.matchAll(/from "(\.[\w-/.]*\/([\w-]+).ts)";$/gm);
 
@@ -54,8 +57,8 @@ function rewriteFrameworkImports(framework: Framework): RolldownPluginOption {
 
     // Resolve imports of `.ts` files to framework-specific files
     async resolveId(source, importer) {
-      // Skip rewriting if importer is already a framework-specific file
-      if (importer?.endsWith(`.${framework}.ts`)) {
+      // Preserve base imports when an adapter reuses another framework's file
+      if (importer && FRAMEWORK_FILE_REGEX.test(importer)) {
         return null;
       }
 

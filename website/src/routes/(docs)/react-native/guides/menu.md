@@ -26,6 +26,7 @@
 - [Field arrays](/react-native/guides/field-arrays/)
 - [TypeScript](/react-native/guides/typescript/)
 - [Architecture](/react-native/guides/architecture/)
+- [Internals](/react-native/guides/internals/)
 
 ## Migration guides
 
