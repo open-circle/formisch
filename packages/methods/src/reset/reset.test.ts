@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 import * as v from 'valibot';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
+import { setInput } from '../setInput/setInput.ts';
+import { validate } from '../validate/validate.ts';
 import { createTestStore } from '../vitest/index.ts';
 import { reset } from './reset.ts';
 
@@ -417,6 +419,175 @@ describe('reset', () => {
       // Form should trigger validation on initial mode
       // The parse function is called during validation
       expect(store.isSubmitted.value).toBe(false);
+    });
+  });
+
+  describe('pending async validation', () => {
+    test('should discard pending validation after reset', async () => {
+      const schema = v.object({
+        name: v.pipe(v.string(), v.nonEmpty('Name is required')),
+      });
+      type ParseResult = v.SafeParseResult<typeof schema>;
+
+      // Control completion explicitly to reproduce the race without timers.
+      let resolveValidation: (value: ParseResult) => void;
+      const pendingParse = new Promise<ParseResult>((resolve) => {
+        resolveValidation = resolve;
+      });
+
+      const store = createTestStore(schema, { initialInput: { name: 'John' } });
+      const parse = vi.fn().mockReturnValue(pendingParse);
+      store.parse = parse;
+
+      setInput(store, { path: ['name'], input: '' });
+
+      const pendingValidation = validate(store);
+      expect(parse).toHaveBeenCalledWith({ name: '' });
+      expect(store.isValidating.value).toBe(true);
+
+      reset(store);
+
+      expect(store.children.name.input.value).toBe('John');
+      expect(store.children.name.errors.value).toBeNull();
+      expect(store.isValidating.value).toBe(false);
+
+      const staleResult = v.safeParse(schema, { name: '' });
+      expect(staleResult.success).toBe(false);
+      resolveValidation!(staleResult);
+      await pendingValidation;
+
+      expect(store.children.name.input.value).toBe('John');
+      expect(store.children.name.errors.value).toBeNull();
+      expect(store.isValidating.value).toBe(false);
+    });
+
+    test('should keep reset-triggered validation active when an older validation completes', async () => {
+      const schema = v.object({
+        name: v.pipe(v.string(), v.nonEmpty('Name is required')),
+      });
+      type ParseResult = v.SafeParseResult<typeof schema>;
+
+      let resolveOldValidation: (value: ParseResult) => void;
+      const pendingOldParse = new Promise<ParseResult>((resolve) => {
+        resolveOldValidation = resolve;
+      });
+      let resolveNewValidation: (value: ParseResult) => void;
+      const pendingNewParse = new Promise<ParseResult>((resolve) => {
+        resolveNewValidation = resolve;
+      });
+
+      const store = createTestStore(schema, {
+        validate: 'initial',
+        initialInput: { name: '' },
+      });
+      const parse = vi
+        .fn()
+        .mockReturnValueOnce(pendingOldParse)
+        .mockReturnValueOnce(pendingNewParse);
+      store.parse = parse;
+
+      // Set input directly so input revalidation does not start an extra parse.
+      store.children.name.input.value = 'temporary';
+      const oldValidation = validate(store);
+      expect(store.isValidating.value).toBe(true);
+
+      reset(store);
+      expect(parse).toHaveBeenCalledTimes(2);
+      expect(parse).toHaveBeenNthCalledWith(1, { name: 'temporary' });
+      expect(parse).toHaveBeenNthCalledWith(2, { name: '' });
+      expect(store.isValidating.value).toBe(true);
+
+      // Even a successful stale result must not clear the new validating state.
+      const staleResult = v.safeParse(schema, { name: 'temporary' });
+      expect(staleResult.success).toBe(true);
+      resolveOldValidation!(staleResult);
+      await oldValidation;
+
+      expect(store.isValidating.value).toBe(true);
+      expect(store.children.name.errors.value).toBeNull();
+
+      const newResult = v.safeParse(schema, { name: '' });
+      expect(newResult.success).toBe(false);
+      resolveNewValidation!(newResult);
+      await pendingNewParse;
+
+      expect(store.isValidating.value).toBe(false);
+      expect(store.children.name.errors.value).toEqual(['Name is required']);
+    });
+
+    test('should preserve kept errors when pending validation completes', async () => {
+      const schema = v.object({
+        name: v.pipe(v.string(), v.nonEmpty('Name is required')),
+      });
+      type ParseResult = v.SafeParseResult<typeof schema>;
+
+      let resolveValidation: (value: ParseResult) => void;
+      const pendingParse = new Promise<ParseResult>((resolve) => {
+        resolveValidation = resolve;
+      });
+
+      const store = createTestStore(schema, { initialInput: { name: 'John' } });
+      const parse = vi.fn().mockReturnValue(pendingParse);
+      store.parse = parse;
+
+      store.children.name.errors.value = ['Existing error'];
+
+      setInput(store, { path: ['name'], input: '' });
+      const pendingValidation = validate(store);
+      expect(store.isValidating.value).toBe(true);
+
+      reset(store, { keepErrors: true });
+
+      expect(store.children.name.input.value).toBe('John');
+      expect(store.children.name.errors.value).toEqual(['Existing error']);
+      expect(store.isValidating.value).toBe(false);
+
+      const staleResult = v.safeParse(schema, { name: '' });
+      resolveValidation!(staleResult);
+      await pendingValidation;
+
+      expect(store.children.name.errors.value).toEqual(['Existing error']);
+      expect(store.isValidating.value).toBe(false);
+    });
+
+    test('should discard pending validation when input is kept', async () => {
+      const schema = v.object({
+        name: v.pipe(v.string(), v.nonEmpty('Name is required')),
+      });
+      type ParseResult = v.SafeParseResult<typeof schema>;
+
+      let resolveValidation: (value: ParseResult) => void;
+      const pendingParse = new Promise<ParseResult>((resolve) => {
+        resolveValidation = resolve;
+      });
+
+      const store = createTestStore(schema, {
+        validate: 'submit',
+        initialInput: { name: 'John' },
+      });
+      const parse = vi.fn().mockReturnValue(pendingParse);
+      store.parse = parse;
+
+      setInput(store, { path: ['name'], input: '' });
+
+      const pendingValidation = validate(store);
+      expect(parse).toHaveBeenCalledWith({ name: '' });
+      expect(store.isValidating.value).toBe(true);
+
+      reset(store, { keepInput: true });
+
+      expect(store.children.name.input.value).toBe('');
+      expect(store.children.name.errors.value).toBeNull();
+      expect(store.isValidating.value).toBe(false);
+
+      const staleResult = v.safeParse(schema, { name: '' });
+      expect(staleResult.success).toBe(false);
+      resolveValidation!(staleResult);
+      await pendingValidation;
+
+      expect(store.children.name.input.value).toBe('');
+      expect(store.children.name.errors.value).toBeNull();
+      expect(store.isValidating.value).toBe(false);
     });
   });
 
