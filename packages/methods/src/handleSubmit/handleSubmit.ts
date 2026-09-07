@@ -49,9 +49,15 @@ export function handleSubmit(
     // Get internal form store
     const internalFormStore = form[INTERNAL];
 
+    // Record submission order
+    const submissionId = ++internalFormStore.submissionId;
+    let isHandlingSubmit = false;
+
     // Mark form as submitted and submitting
     internalFormStore.isSubmitted.value = true;
     internalFormStore.isSubmitting.value = true;
+
+    const validationId = internalFormStore.validationId + 1;
 
     // Try to run submit actions if form is valid
     try {
@@ -59,25 +65,43 @@ export function handleSubmit(
         shouldFocus: true,
       });
 
+      // Discard submissions superseded during validation
+      if (
+        internalFormStore.submissionId !== submissionId ||
+        internalFormStore.validationId !== validationId
+      ) {
+        return;
+      }
+
       if (result.success) {
+        isHandlingSubmit = true;
         // @ts-expect-error - union of SubmitHandler and SubmitEventHandler
         await handler(result.output, event);
       }
 
       // If an error occurred, set form errors
     } catch (error: unknown) {
-      internalFormStore.errors.value = [
-        error &&
-        typeof error === 'object' &&
-        'message' in error &&
-        typeof error.message === 'string'
-          ? error.message
-          : 'An unknown error has occurred.',
-      ];
+      // Hint: Once the handler starts, input changes must not hide its errors.
+      // A newer submission or full reset still takes precedence.
+      if (
+        internalFormStore.submissionId === submissionId &&
+        (isHandlingSubmit || internalFormStore.validationId === validationId)
+      ) {
+        internalFormStore.errors.value = [
+          error &&
+          typeof error === 'object' &&
+          'message' in error &&
+          typeof error.message === 'string'
+            ? error.message
+            : 'An unknown error has occurred.',
+        ];
+      }
 
       // Finally reset submitting state
     } finally {
-      internalFormStore.isSubmitting.value = false;
+      if (internalFormStore.submissionId === submissionId) {
+        internalFormStore.isSubmitting.value = false;
+      }
     }
   };
 }

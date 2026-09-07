@@ -1,5 +1,6 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
+import { validateFormInput } from '../../form/validateFormInput/validateFormInput.ts';
 import { createTestStore } from '../../vitest/index.ts';
 import { getFieldBool } from '../getFieldBool/getFieldBool.ts';
 import { getFieldInput } from '../getFieldInput/getFieldInput.ts';
@@ -330,5 +331,27 @@ describe('setFieldInput', () => {
       setFieldInput(store, ['user'], null);
       expect(store.children.user.isDirty.value).toBe(true);
     });
+  });
+
+  test('should discard pending validation when input changes', async () => {
+    const schema = v.object({
+      name: v.pipe(v.string(), v.nonEmpty('Required')),
+    });
+    type ParseResult = v.SafeParseResult<typeof schema>;
+    let resolveParse: (value: ParseResult) => void;
+    const pendingParse = new Promise<ParseResult>((resolve) => {
+      resolveParse = resolve;
+    });
+    const store = createTestStore(schema, { initialInput: { name: '' } });
+    store.parse = () => pendingParse;
+    const pendingValidation = validateFormInput(store);
+
+    setFieldInput(store, ['name'], 'John');
+    expect(store.isValidating.value).toBe(false);
+
+    resolveParse!(v.safeParse(schema, { name: '' }));
+    await pendingValidation;
+    expect(store.children.name.input.value).toBe('John');
+    expect(store.children.name.errors.value).toBeNull();
   });
 });

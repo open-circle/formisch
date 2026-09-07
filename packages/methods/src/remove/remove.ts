@@ -56,6 +56,10 @@ export function remove<
     // Continue if specified index is valid
     if (config.at >= 0 && config.at <= items.length - 1) {
       batch(() => {
+        // Invalidate validation of previous array input
+        internalFormStore.validationId++;
+        internalFormStore.isValidating.value = false;
+
         // Remove item ID from the items array
         const newItems = [...items];
         newItems.splice(config.at, 1);

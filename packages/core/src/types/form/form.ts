@@ -87,6 +87,10 @@ export interface InternalFormStore<TSchema extends FormSchema = FormSchema>
    */
   validationId: number;
   /**
+   * The ID of the latest submission. Incremented by full form resets as well.
+   */
+  submissionId: number;
+  /**
    * The resolved empty input of the form, keyed by field type.
    */
   emptyInput: EmptyInput;

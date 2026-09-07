@@ -5,6 +5,9 @@ All notable changes to the library will be documented in this file.
 ## vX.X.X (Month DD, YYYY)
 
 - Fix full form reset to discard pending validation results and clear the validating state (issue #210, pull request #211)
+- Fix field resets and array mutations to discard pending validation results for previous input
+- Fix submissions to ignore validation results superseded by input changes, full resets, or newer submissions
+- Fix older submission handlers to preserve current errors and submitting state after full resets or newer submissions
 
 ## v1.0.0 (August 20, 2026)
 

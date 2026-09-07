@@ -38,6 +38,7 @@ export function createFormStore(
 
   // Set form config and validation
   store.validationId = 0;
+  store.submissionId = 0;
   store.validate = config.validate ?? 'submit';
   store.revalidate = config.revalidate ?? 'input';
   store.parse = parse;
