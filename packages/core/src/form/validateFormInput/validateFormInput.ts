@@ -41,11 +41,10 @@ export async function validateFormInput(
       untrack(() => getFieldInput(internalFormStore))
     );
 
-    // Return outdated result without processing it if a newer validation was
-    // started in the meantime
-    // Hint: Only the newest validation may write errors or reset the validating
-    // state, so an older async result that settles late cannot overwrite the
-    // state of a newer validation.
+    // Return outdated result without processing it
+    // Hint: Input changes and resets also invalidate pending results without
+    // starting a new validation. Only the current validation may write errors
+    // or reset the validating state.
     if (internalFormStore.validationId !== validationId) {
       return result;
     }

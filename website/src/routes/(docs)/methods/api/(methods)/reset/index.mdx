@@ -34,6 +34,10 @@ When called without a config or with `path` set to `undefined`, the entire form 
 
 By default, the form resets to its original initial input. However, you can pass a new `initialInput` in the config to update the form's baseline data. This is useful when remote data has changed and the form needs to reflect the updated values. Combined with `keepInput`, `keepTouched`, `keepEdited`, `keepErrors`, and `keepSubmitted`, you can update the initial state without overwriting the user's current edits.
 
+Resetting a field discards pending validation of the previous form input, including results for other fields. Existing errors on unrelated fields are preserved. Call <Link href="../validate/">`validate`</Link> if you need fresh results immediately after a field reset.
+
+A full form reset clears `isSubmitting`. Pending submissions no longer call their handlers after validation finishes, and late exceptions from their validations or handlers do not update form errors. Resetting does not abort a handler or network request that has already started.
+
 #### More context on dirty tracking
 
 Formisch distinguishes between two concepts:

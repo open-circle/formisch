@@ -118,6 +118,11 @@ export function reset(
         ? getFieldStore(internalFormStore, config.path)
         : internalFormStore;
       if (internalFieldStore) {
+        // Invalidate pending validation before resetting field state
+        // Hint: Stale results skip cleanup, so clear the validating state here.
+        internalFormStore.validationId++;
+        internalFormStore.isValidating.value = false;
+
         // If initial input is provided, set it
         if (config && 'initialInput' in config) {
           setInitialFieldInput(
@@ -218,17 +223,9 @@ export function reset(
 
         // If path is not defined, reset form specific state
         if (!config?.path) {
-          // Invalidate any validation that is still pending from before the
-          // reset so its result cannot be applied to the state below once it
-          // settles.
-          // Hint: `validateFormInput` only writes its result when its captured
-          // ID still matches `internalFormStore.validationId`, so bumping it
-          // here makes that check fail for the outdated validation. Since that
-          // validation will now skip its own cleanup, `isValidating` is reset
-          // here as well. If `validate` is `'initial'`, it is set back to
-          // `true` below by the new validation this method starts.
-          internalFormStore.validationId++;
-          internalFormStore.isValidating.value = false;
+          // Discard pending submissions
+          internalFormStore.submissionId++;
+          internalFormStore.isSubmitting.value = false;
 
           // Reset is submitted if it is not to be kept
           if (!config?.keepSubmitted) {

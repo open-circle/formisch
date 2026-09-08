@@ -13,12 +13,13 @@ describe('createFormStore', () => {
       expect(store.revalidate).toBe('input');
     });
 
-    test('should initialize validation ID to 0', () => {
+    test('should initialize validation and submission IDs to 0', () => {
       const schema = v.object({ name: v.string() });
       const parse = vi.fn();
       const store = createFormStore({ schema }, parse);
 
       expect(store.validationId).toBe(0);
+      expect(store.submissionId).toBe(0);
     });
 
     test('should initialize all boolean signals to false', () => {

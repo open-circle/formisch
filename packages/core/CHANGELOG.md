@@ -4,6 +4,8 @@ All notable changes to the library will be documented in this file.
 
 ## vX.X.X (Month DD, YYYY)
 
+- Fix field input updates to discard pending validation results for previous input
+- Fix submission tracking for concurrent submissions and full form resets
 - Fix missing `Framework` export warning when building React Native declarations
 
 ## v1.0.0 (August 20, 2026)
