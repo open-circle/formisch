@@ -2,8 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.1.0 (September 07, 2026)
 
+- Change `@formisch/core` to v1.0.1
+- Change `@formisch/methods` to v1.0.1
 - Add `@formisch/preact/internals` to expose the framework-specific core for custom methods and building blocks
 
 ## v1.0.0 (August 20, 2026)

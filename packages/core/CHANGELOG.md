@@ -2,7 +2,7 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.0.1 (September 07, 2026)
 
 - Fix field input updates to discard pending validation results for previous input
 - Fix submission tracking for concurrent submissions and full form resets
