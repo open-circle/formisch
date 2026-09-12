@@ -20,7 +20,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: packages/core
@@ -34,7 +34,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: packages/core
@@ -48,7 +48,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Vitest tests
         run: pnpm test
         working-directory: packages/core
@@ -63,7 +63,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: packages/methods
@@ -77,7 +77,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: packages/methods
@@ -91,7 +91,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Vitest tests
         run: pnpm test
         working-directory: packages/methods
@@ -106,7 +106,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: frameworks/solid
@@ -120,7 +120,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: frameworks/solid
@@ -134,7 +134,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Vitest tests
         run: pnpm test
         working-directory: frameworks/solid
@@ -149,7 +149,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: frameworks/react
@@ -163,7 +163,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: frameworks/react
@@ -177,7 +177,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Vitest tests
         run: pnpm test
         working-directory: frameworks/react
@@ -192,7 +192,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: frameworks/preact
@@ -206,7 +206,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: frameworks/preact
@@ -220,7 +220,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Vitest tests
         run: pnpm test
         working-directory: frameworks/preact
@@ -235,7 +235,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: frameworks/qwik
@@ -249,7 +249,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: frameworks/qwik
@@ -264,7 +264,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: frameworks/svelte
@@ -278,7 +278,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: frameworks/svelte
@@ -292,7 +292,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Svelte check
         run: pnpm check
         working-directory: frameworks/svelte
@@ -306,7 +306,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Vitest tests
         run: pnpm test
         working-directory: frameworks/svelte
@@ -321,7 +321,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: frameworks/vue
@@ -335,7 +335,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: frameworks/vue
@@ -349,7 +349,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Vitest tests
         run: pnpm test
         working-directory: frameworks/vue
@@ -364,7 +364,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: frameworks/angular
@@ -378,7 +378,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: frameworks/angular
@@ -392,7 +392,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Vitest tests
         run: pnpm test
         working-directory: frameworks/angular
@@ -407,7 +407,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: frameworks/react-native
@@ -421,7 +421,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: frameworks/react-native
@@ -435,7 +435,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Vitest tests
         run: pnpm test
         working-directory: frameworks/react-native
@@ -450,7 +450,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: website
@@ -464,7 +464,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: website
