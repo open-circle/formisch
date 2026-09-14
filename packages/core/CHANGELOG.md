@@ -4,7 +4,7 @@ All notable changes to the library will be documented in this file.
 
 ## vX.X.X (Month DD, YYYY)
 
-- Throw descriptive error with requested path in `getFieldStore` when no field store exists
+- Fix `getFieldStore` to throw a descriptive error with the requested path when no field store exists
 
 ## v1.0.1 (September 07, 2026)
 
