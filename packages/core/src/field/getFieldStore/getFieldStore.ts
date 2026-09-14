@@ -14,6 +14,8 @@ import type {
  *
  * @returns The field store, or `undefined` if a dynamic array item in the path
  * does not exist at runtime.
+ *
+ * @throws An error if no field store exists at the path.
  */
 // @__NO_SIDE_EFFECTS__
 export function getFieldStore(
@@ -36,7 +38,12 @@ export function getFieldStore(
 
     // Navigate to child at current path key
     // @ts-expect-error
-    internalFieldStore = internalFieldStore.children[key];
+    internalFieldStore = internalFieldStore.children?.[key];
+
+    // Report missing schema fields before callers access their properties
+    if (!internalFieldStore) {
+      throw new Error(`No field store found at path ${JSON.stringify(path)}`);
+    }
   }
 
   // Return found field store
