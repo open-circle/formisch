@@ -85,4 +85,17 @@ describe('getFieldStore', () => {
       expect(getFieldStore(store, ['items', 1])).toBeUndefined();
     }
   });
+
+  test('should throw error if field store does not exist', () => {
+    const store = createTestStore(v.object({ name: v.string() }));
+    expect(() => getFieldStore(store, ['missing'])).toThrowError(
+      'No field store found at path ["missing"]'
+    );
+    expect(() => getFieldStore(store, ['missing', 'nested'])).toThrowError(
+      'No field store found at path ["missing","nested"]'
+    );
+    expect(() => getFieldStore(store, ['name', 'nested'])).toThrowError(
+      'No field store found at path ["name","nested"]'
+    );
+  });
 });

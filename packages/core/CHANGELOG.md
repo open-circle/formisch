@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix `getFieldStore` to throw a descriptive error with the requested path when no field store exists
+
 ## v1.0.1 (September 07, 2026)
 
 - Fix field input updates to discard pending validation results for previous input
