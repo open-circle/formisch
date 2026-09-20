@@ -26,6 +26,7 @@
 - [Field arrays](/react/guides/field-arrays/)
 - [TypeScript](/react/guides/typescript/)
 - [Architecture](/react/guides/architecture/)
+- [Internals](/react/guides/internals/)
 
 ## Migration guides
 

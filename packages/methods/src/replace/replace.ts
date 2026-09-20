@@ -66,6 +66,10 @@ export function replace<
     // Continue if specified index is valid
     if (config.at >= 0 && config.at <= items.length - 1) {
       batch(() => {
+        // Invalidate validation of previous array input
+        internalFormStore.validationId++;
+        internalFormStore.isValidating.value = false;
+
         // Replace item ID to trigger reactivity
         const newItems = [...items];
         newItems[config.at] = createId();

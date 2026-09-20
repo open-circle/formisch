@@ -26,6 +26,7 @@
 - [Field arrays](/vue/guides/field-arrays/)
 - [TypeScript](/vue/guides/typescript/)
 - [Architecture](/vue/guides/architecture/)
+- [Internals](/vue/guides/internals/)
 
 ## Migration guides
 

@@ -121,7 +121,7 @@ return {
 };
 ```
 
-The internal store is tucked away behind the [`INTERNAL`](https://github.com/open-circle/formisch/blob/main/packages/core/src/values.ts) symbol. Methods like `setInput(form, …)` reach in via `form[INTERNAL]` to mutate signals, while your code only sees the public form store. This separation is what keeps the public API small and stable even as the internal shape evolves.
+The internal store is tucked away behind the [`INTERNAL`](https://github.com/open-circle/formisch/blob/main/packages/core/src/values.ts) key. Methods like `setInput(form, …)` reach in via `form[INTERNAL]` to mutate signals, while regular form code uses the public form store. This separation is what keeps the public API small and stable even as the internal shape evolves.
 
 ## How the directives connect to the DOM
 
@@ -137,6 +137,10 @@ Bundle size is the obvious payoff. The others are why the design is worth talkin
 - **Fine-grained reactivity.** The store shape is pre-allocated at form creation, with one signal per piece of state. Methods write `.value` directly and Angular's reactive graph handles propagation. Updating one field does not invalidate the rest, and no `NgZone` is involved.
 - **Framework portability.** The entire library is parameterized over a four-function adapter. Adding a new framework means writing a small adapter that maps `createSignal`, `batch`, `untrack` and `createId` onto its primitives.
 - **Type safety.** Your Valibot schema is the single source of truth. It drives both runtime parsing and the inferred TypeScript types for paths, inputs and outputs — including the typed template contexts of the structural directives — so there is no second declaration to keep in sync.
+
+## Build on the core
+
+Use `@formisch/angular/internals` to access the framework-specific core from your application or library. The <Link href="/angular/guides/internals/">internals guide</Link> shows how to create custom methods and explains what to consider when building reactive bindings and components.
 
 ## Further reading
 

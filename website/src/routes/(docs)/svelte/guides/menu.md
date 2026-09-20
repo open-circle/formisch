@@ -26,6 +26,7 @@
 - [Field arrays](/svelte/guides/field-arrays/)
 - [TypeScript](/svelte/guides/typescript/)
 - [Architecture](/svelte/guides/architecture/)
+- [Internals](/svelte/guides/internals/)
 
 ## Migration guides
 

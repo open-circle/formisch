@@ -32,6 +32,10 @@ const result = handleSubmit<TSchema>(form, handler);
 
 The `form` parameter is the form store to handle submission for. The `handler` parameter can be a `SubmitHandler` (no event) or, in the frameworks that submit through a form element, a `SubmitEventHandler` (with event) that gets called with the validated form output if validation succeeds. In React Native only `SubmitHandler` applies, as there is no submit event.
 
+If the input changes, the form is fully reset, or a newer validation or submission starts before validation finishes, the outdated submission does not call its handler.
+
+A newer submission or full form reset also prevents an older handler from changing form errors or `isSubmitting` when it finishes. This does not abort a handler or network request that has already started.
+
 ## Returns
 
 - `result` <Property {...properties.result} />

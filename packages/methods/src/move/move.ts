@@ -68,6 +68,10 @@ export function move<
       config.from !== config.to
     ) {
       batch(() => {
+        // Invalidate validation of previous array input
+        internalFormStore.validationId++;
+        internalFormStore.isValidating.value = false;
+
         // Move item ID in the items array
         const newItems = [...items];
         newItems.splice(config.to, 0, newItems.splice(config.from, 1)[0]);

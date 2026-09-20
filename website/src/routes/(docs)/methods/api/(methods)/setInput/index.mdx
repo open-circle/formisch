@@ -34,6 +34,8 @@ The `form` parameter is the form store to set input on. The `config` parameter s
 
 > `setInput` updates the **current input** (what the user is editing), but it does not change the **initial input** (the baseline used for `isDirty`). If your baseline data changes (e.g. after refetching from the server), prefer <Link href="../reset/">`reset`</Link> with a new `initialInput`.
 
+Updating input discards pending validation results for the previous input. A new validation only starts when required by the form's validation mode.
+
 ## Related
 
 ### Primitives

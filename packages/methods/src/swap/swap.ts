@@ -65,6 +65,10 @@ export function swap<
       config.at !== config.and
     ) {
       batch(() => {
+        // Invalidate validation of previous array input
+        internalFormStore.validationId++;
+        internalFormStore.isValidating.value = false;
+
         // Swap item IDs in items array
         const newItems = [...items];
         const tempItemId = newItems[config.at];

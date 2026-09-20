@@ -118,6 +118,11 @@ export function reset(
         ? getFieldStore(internalFormStore, config.path)
         : internalFormStore;
       if (internalFieldStore) {
+        // Invalidate pending validation before resetting field state
+        // Hint: Stale results skip cleanup, so clear the validating state here.
+        internalFormStore.validationId++;
+        internalFormStore.isValidating.value = false;
+
         // If initial input is provided, set it
         if (config && 'initialInput' in config) {
           setInitialFieldInput(
@@ -218,6 +223,10 @@ export function reset(
 
         // If path is not defined, reset form specific state
         if (!config?.path) {
+          // Discard pending submissions
+          internalFormStore.submissionId++;
+          internalFormStore.isSubmitting.value = false;
+
           // Reset is submitted if it is not to be kept
           if (!config?.keepSubmitted) {
             internalFormStore.isSubmitted.value = false;

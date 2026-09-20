@@ -190,6 +190,10 @@ export function setFieldInput(
         }
       }
 
+      // Invalidate validation of previous input
+      internalFormStore.validationId++;
+      internalFormStore.isValidating.value = false;
+
       // Set nested input on target field
       setNestedInput(internalFormStore, internalFieldStore, input);
     });

@@ -1,0 +1,96 @@
+---
+title: Internals
+description: >-
+  Build custom methods and framework building blocks with Formisch's
+  framework-specific core exports.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Internals
+
+Formisch exposes its core through `@formisch/angular/internals`. You can use these functions and types to build methods, reactive bindings and components for behavior that Formisch does not provide out of the box. Coding agents can use the same building blocks as the library itself.
+
+## Versioning
+
+**Internals are not covered by Formisch's semantic versioning guarantees.** Breaking changes to their functions, types and store structure can occur in any release, including minor and patch releases. Review your use of internals when upgrading Formisch, and test validation, reactivity and cleanup for the behavior your extension implements.
+
+## Import the core
+
+```ts
+import {
+  type BaseFormStore,
+  getFieldStore,
+  INTERNAL,
+  setFieldInput,
+} from '@formisch/angular/internals';
+```
+
+This entry point re-exports the entire Angular-specific core, including store types, field and array helpers, validation utilities and the reactivity adapter. It is included in `@formisch/angular`, so no additional package is needed. Always use the internals from the same framework package as your form so they share its reactivity implementation.
+
+The regular `@formisch/angular` entry point provides the ready-made methods and framework bindings. The internals entry point gives you access to the lower-level operations and store structure described in the <Link href="/angular/guides/architecture/">architecture guide</Link>.
+
+## Implement a method
+
+The existing <Link href="/methods/api/setInput/">`setInput`</Link> method shows how these building blocks work together. This simplified implementation updates a single field and reuses `SetFieldInputConfig` to infer the path and input types from your schema:
+
+```ts
+import type { SetFieldInputConfig } from '@formisch/angular';
+import {
+  type BaseFormStore,
+  batch,
+  type FormSchema,
+  getFieldStore,
+  INTERNAL,
+  type RequiredPath,
+  setFieldInput,
+  validateIfRequired,
+} from '@formisch/angular/internals';
+
+/**
+ * Sets a field's input and validates it if required.
+ */
+export function setInput<
+  TSchema extends FormSchema,
+  TFieldPath extends RequiredPath,
+>(
+  form: BaseFormStore<TSchema>,
+  config: SetFieldInputConfig<TSchema, TFieldPath>
+): void {
+  batch(() => {
+    const internalFormStore = form[INTERNAL];
+    const internalFieldStore = getFieldStore(internalFormStore, config.path);
+
+    if (internalFieldStore) {
+      setFieldInput(internalFormStore, config.path, config.input);
+      validateIfRequired(internalFormStore, internalFieldStore, 'input');
+    }
+  });
+}
+```
+
+Pass an existing form store, a field path and its new input to this method:
+
+```ts
+setInput(loginForm, { path: ['email'], input: 'jane@example.com' });
+```
+
+`INTERNAL` is the key for accessing the internal store through `form[INTERNAL]`. `getFieldStore` can return `undefined` when a dynamic array item no longer exists, so check the result before updating the field.
+
+`setFieldInput` updates the input and maintains touched, edited and dirty state. Writing directly to an input signal bypasses this bookkeeping. `batch` groups signal updates, and `validateIfRequired` triggers validation only when the form's validation settings require it for an input event.
+
+The [full implementation](https://github.com/open-circle/formisch/blob/main/packages/methods/src/setInput/setInput.ts) also supports setting the entire form input and includes the corresponding type overloads. Use the built-in method in your application; this example is a starting point for understanding the core helpers and building your own methods.
+
+## Build reactive bindings and components
+
+You can also build your own framework bindings on top of the core. These bindings are responsible for subscribing to state changes, registering input elements or refs, handling events and cleaning up when fields unmount. Start with <Link href="/angular/guides/input-components/">input components</Link> if you can compose the existing bindings.
+
+Read signals in a template or Angular reactive context. Follow the existing functions and directives for injection context, element registration and cleanup.
+
+The [Angular binding source](https://github.com/open-circle/formisch/tree/main/frameworks/angular/src) shows how Formisch handles these responsibilities. The core exposes the helpers those bindings use; it does not automatically supply their framework lifecycle behavior.
+
+## Work with coding agents
+
+Give your agent this guide, your schema and the behavior you want to build. Ask it to inspect the relevant method or framework binding and the installed type declarations, then test the custom behavior with your form. The <Link href="/angular/guides/coding-agents/">coding agents guide</Link> explains how to access the documentation through our skill, MCP server and Markdown files.

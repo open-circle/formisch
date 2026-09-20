@@ -25,6 +25,7 @@
 - [Field arrays](/qwik/guides/field-arrays/)
 - [TypeScript](/qwik/guides/typescript/)
 - [Architecture](/qwik/guides/architecture/)
+- [Internals](/qwik/guides/internals/)
 
 ## Migration guides
 

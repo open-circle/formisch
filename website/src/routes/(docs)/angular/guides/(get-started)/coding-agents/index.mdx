@@ -7,6 +7,8 @@ contributors:
   - fabian-hiller
 ---
 
+import { Link } from '~/components';
+
 # Coding agents
 
 Formisch is built to be consumed by AI coding agents. This page describes the agent skill, MCP server and Markdown documentation we provide so that your AI tools generate correct Angular code with Formisch.
@@ -65,3 +67,7 @@ We provide several [LLMs.txt](https://llmstxt.org/) files. Use the one that work
 ## Markdown for agents
 
 Every documentation page is available as Markdown. Append `.md` to the URL of a page (e.g. `/angular/guides/installation/` becomes [`/angular/guides/installation.md`](/angular/guides/installation.md)) or request the page with an `Accept: text/markdown` header to receive its Markdown version.
+
+## Custom building blocks
+
+Coding agents can use `@formisch/angular/internals` to build custom methods and framework bindings with the same core helpers as Formisch. See the <Link href="/angular/guides/internals/">internals guide</Link> for a typed example and guidance on reactivity and lifecycle behavior.

@@ -83,6 +83,10 @@ export function insert<
     // Continue if insertion index is valid
     if (insertIndex >= 0 && insertIndex <= items.length) {
       batch(() => {
+        // Invalidate validation of previous array input
+        internalFormStore.validationId++;
+        internalFormStore.isValidating.value = false;
+
         // Insert new item ID at the specified index
         const newItems = [...items];
         newItems.splice(insertIndex, 0, createId());

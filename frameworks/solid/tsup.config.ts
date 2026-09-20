@@ -14,6 +14,17 @@ const preset_options: preset.PresetOptions = {
   ],
   // Set to `true` to remove all `console.*` calls and `debugger` statements in prod builds
   drop_console: true,
+  esbuild_plugins: [
+    {
+      name: 'externalize-core',
+      setup(build) {
+        build.onResolve({ filter: /^@formisch\/core\/solid$/ }, () => ({
+          path: './internals.js',
+          external: true,
+        }));
+      },
+    },
+  ],
   // Set to `true` to generate a CommonJS build alongside ESM
   // cjs: true,
 };
@@ -31,6 +42,13 @@ export default defineConfig((config) => {
 
   if (!watching && !CI) {
     const package_fields = preset.generatePackageExports(parsed_options);
+    package_fields.exports = {
+      '.': package_fields.exports,
+      './internals': {
+        types: './dist/internals.d.ts',
+        import: './dist/internals.js',
+      },
+    };
 
     console.log(
       `package.json: \n\n${JSON.stringify(package_fields, null, 2)}\n\n`
