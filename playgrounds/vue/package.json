@@ -33,7 +33,7 @@
     "jiti": "^2.5.1",
     "npm-run-all2": "^8.0.4",
     "tailwindcss": "^4.1.11",
-    "typescript": "~5.8.3",
+    "typescript": "~6.0.3",
     "vite": "^7.0.6",
     "vite-plugin-vue-devtools": "^8.0.0",
     "vue-tsc": "^3.0.4"

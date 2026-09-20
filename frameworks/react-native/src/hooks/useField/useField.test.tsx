@@ -495,7 +495,7 @@ describe('useField', () => {
 
       // Only the live element must remain registered
       expect(
-        getFieldStore(capturedForm![INTERNAL], ['email']).elements
+        getFieldStore(capturedForm![INTERNAL], ['email'])!.elements
       ).toHaveLength(1);
 
       // Submit so validation focuses the first error field
@@ -538,7 +538,7 @@ describe('useField', () => {
       render(<Test />);
       const internalFieldStore = getFieldStore(capturedForm![INTERNAL], [
         'email',
-      ]);
+      ])!;
       expect(internalFieldStore.elements).toHaveLength(2);
 
       // Remove the first element while the second stays mounted, so exactly
@@ -607,7 +607,7 @@ describe('useField', () => {
         'todos',
         0,
         'label',
-      ]);
+      ])!;
       expect(internalFieldStore.elements).toHaveLength(1);
       expect(internalFieldStore.elements[0]).toBe(
         screen.getByTestId('input-0')
@@ -668,11 +668,11 @@ describe('useField', () => {
 
       // Both reset baselines must still contain their original live elements
       expect(
-        getFieldStore(capturedForm![INTERNAL], ['todos', 0, 'label'])
+        getFieldStore(capturedForm![INTERNAL], ['todos', 0, 'label'])!
           .initialElements
       ).toContain(firstElement);
       expect(
-        getFieldStore(capturedForm![INTERNAL], ['todos', 1, 'label'])
+        getFieldStore(capturedForm![INTERNAL], ['todos', 1, 'label'])!
           .initialElements
       ).toContain(secondElement);
     });
