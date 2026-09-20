@@ -75,7 +75,7 @@
     "publint": "^0.3.12",
     "svelte": "^5.38.8",
     "svelte-check": "^4.3.1",
-    "typescript": "^5.9.2",
+    "typescript": "~6.0.3",
     "valibot": "^1.4.1",
     "vite": "^7.1.5",
     "vitest": "^4.1.7"

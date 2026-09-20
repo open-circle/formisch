@@ -44,7 +44,9 @@ export function Form({ of, onSubmit, ...other }: FormProps): JSX.Element {
       {...other}
       novalidate
       ref={(element) => {
-        of[INTERNAL].element = element;
+        if (element) {
+          of[INTERNAL].element = element;
+        }
       }}
       onSubmit={handleSubmit(of, onSubmit)}
     />

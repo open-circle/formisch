@@ -433,7 +433,7 @@ describe('useField', () => {
       });
       const internalFieldStore = getFieldStore(result.current.form[INTERNAL], [
         'name',
-      ]);
+      ])!;
       const element = document.createElement('input');
       // Simulate an array reorder having already transferred the element
       internalFieldStore.elements.push(element);
@@ -475,7 +475,7 @@ describe('useField', () => {
 
       render(<Test />);
       expect(
-        getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+        getFieldStore(formStore![INTERNAL], ['todos', 0, 'label'])!.elements
       ).toHaveLength(1);
 
       act(() => {
@@ -484,10 +484,10 @@ describe('useField', () => {
 
       await vi.waitFor(() => {
         expect(
-          getFieldStore(formStore![INTERNAL], ['todos', 0, 'label']).elements
+          getFieldStore(formStore![INTERNAL], ['todos', 0, 'label'])!.elements
         ).toHaveLength(1);
         expect(
-          getFieldStore(formStore![INTERNAL], ['todos', 1, 'label']).elements
+          getFieldStore(formStore![INTERNAL], ['todos', 1, 'label'])!.elements
         ).toHaveLength(1);
       });
     });

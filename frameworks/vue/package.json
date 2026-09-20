@@ -63,7 +63,7 @@
     "eslint-plugin-vue": "~10.3.0",
     "jsdom": "^26.1.0",
     "tsdown": "^0.16.8",
-    "typescript": "~5.8.3",
+    "typescript": "~6.0.3",
     "unplugin-vue": "^7.0.0",
     "valibot": "^1.4.1",
     "vitest": "^4.1.7",
