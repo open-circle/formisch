@@ -66,7 +66,7 @@
     "@formisch/methods": "workspace:*",
     "@sveltejs/adapter-auto": "^6.1.0",
     "@sveltejs/kit": "^2.37.1",
-    "@sveltejs/package": "^2.5.0",
+    "@sveltejs/package": "^2.5.8",
     "@sveltejs/vite-plugin-svelte": "^6.2.0",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/svelte": "^5.2.4",
