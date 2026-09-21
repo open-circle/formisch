@@ -6,6 +6,7 @@ import { defineConfig, type UserConfig, type UserConfigFn } from 'tsdown';
 
 type Framework =
   | 'angular'
+  | 'honox'
   | 'preact'
   | 'qwik'
   | 'react'
@@ -128,6 +129,7 @@ function defineFrameworkConfig(
 const config: (UserConfig | UserConfigFn)[] = [
   defineFrameworkConfig(null),
   defineFrameworkConfig('angular'),
+  defineFrameworkConfig('honox'),
   defineFrameworkConfig('preact'),
   defineFrameworkConfig('qwik'),
   defineFrameworkConfig('react'),
