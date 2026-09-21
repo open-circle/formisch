@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+/* Lexend 400 */
+@font-face {
+  font-family: 'Lexend';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/lexend-400.woff2) format('woff2');
+}
+
+/* Base styles */
+html {
+  font-family: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Disable-transitions */
+.disable-transitions,
+.disable-transitions * {
+  transition: none !important;
+}
+
+/* Reset appearance */
+[type='date'] {
+  @apply flex appearance-none items-center justify-start;
+}
