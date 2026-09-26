@@ -1,1 +1,1 @@
-export * from './resolveFieldElement/index.ts';
+export * from './resolveFieldElements/index.ts';

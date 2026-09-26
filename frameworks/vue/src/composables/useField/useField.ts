@@ -15,7 +15,7 @@ import type * as v from 'valibot';
 import type { MaybeRefOrGetter } from 'vue';
 import { computed, onUnmounted, toValue } from 'vue';
 import type { FieldStore, FormStore } from '../../types/index.ts';
-import { resolveFieldElement } from '../../utils/index.ts';
+import { resolveFieldElements } from '../../utils/index.ts';
 
 /**
  * Use field config interface.
@@ -129,15 +129,15 @@ export function useField(
       },
       autofocus: !!internalFieldStore.value.errors.value,
       ref(elementOrInstance) {
-        const element = elementOrInstance
-          ? resolveFieldElement(elementOrInstance)
-          : null;
-
-        // An array reorder transfers registered elements between the field
-        // stores, so the element may already be present when the framework
-        // re-registers it against the destination store
-        if (element && !internalFieldStore.value.elements.includes(element)) {
-          internalFieldStore.value.elements.push(element);
+        if (elementOrInstance) {
+          for (const element of resolveFieldElements(elementOrInstance)) {
+            // An array reorder transfers registered elements between the field
+            // stores, so the element may already be present when the
+            // framework re-registers it against the destination store
+            if (!internalFieldStore.value.elements.includes(element)) {
+              internalFieldStore.value.elements.push(element);
+            }
+          }
         }
       },
       onFocus() {

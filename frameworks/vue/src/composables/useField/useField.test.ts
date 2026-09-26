@@ -410,6 +410,52 @@ describe('useField', () => {
       });
     });
 
+    test('should focus the visible input of a component with a preceding hidden input', async () => {
+      const Input = defineComponent({
+        inheritAttrs: false,
+        setup(_, { attrs }) {
+          return () =>
+            h('div', [
+              h('input', { type: 'hidden', name: attrs.name }),
+              h('input', { ...attrs, 'data-testid': 'input' }),
+            ]);
+        },
+      });
+
+      const Test = defineComponent({
+        setup() {
+          const form = useForm({
+            schema: v.object({
+              email: v.pipe(v.string(), v.nonEmpty('Required')),
+            }),
+            initialInput: { email: '' },
+          });
+          const field = useField(form, { path: ['email'] });
+          return () =>
+            h(
+              Form,
+              { of: form, onSubmit: vi.fn(), 'aria-label': 'Test' },
+              {
+                default: () => [
+                  h(Input, field.props),
+                  h('button', { type: 'submit' }, 'Submit'),
+                ],
+              }
+            );
+        },
+      });
+
+      const wrapper = mount(Test, { attachTo: document.body });
+      const input = wrapper.get<HTMLInputElement>('[data-testid="input"]');
+      expect(document.activeElement).not.toBe(input.element);
+
+      await wrapper.get('form').trigger('submit');
+
+      await vi.waitFor(() => {
+        expect(document.activeElement).toBe(input.element);
+      });
+    });
+
     // A component with a fragment root has no single root element to resolve
     // the form control from, so the component instance must not be registered
     test('should not register a component without a root element', () => {
