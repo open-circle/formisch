@@ -12,7 +12,7 @@ import {
   type ValidPath,
 } from '@formisch/core/vue';
 import type * as v from 'valibot';
-import type { MaybeRefOrGetter } from 'vue';
+import type { ComponentPublicInstance, MaybeRefOrGetter } from 'vue';
 import { computed, onUnmounted, toValue } from 'vue';
 import type { FieldStore, FormStore } from '../../types/index.ts';
 
@@ -27,6 +27,36 @@ export interface UseFieldConfig<
    * The path to the field within the form schema.
    */
   readonly path: ValidPath<v.InferInput<TSchema>, TFieldPath>;
+}
+
+/**
+ * Resolves the field element from a template ref, which is a component
+ * instance instead of a DOM element when the field props are bound to a
+ * component that wraps the actual form control.
+ *
+ * @param element The DOM element or component instance.
+ *
+ * @returns The resolved field element, if any.
+ */
+function resolveFieldElement(
+  element: Element | ComponentPublicInstance
+): FieldElement | null {
+  // If element is a DOM element, return it as is
+  if (element instanceof Element) {
+    return element as FieldElement;
+  }
+
+  // Otherwise, resolve the root element of the component and use it if it is
+  // a form control or search its descendants for the first form control
+  const rootElement: unknown = element.$el;
+  if (rootElement instanceof Element) {
+    return rootElement.matches('input, select, textarea')
+      ? (rootElement as FieldElement)
+      : rootElement.querySelector<FieldElement>('input, select, textarea');
+  }
+
+  // Hint: Components with a fragment root do not have a root element
+  return null;
 }
 
 /**
@@ -127,15 +157,16 @@ export function useField(
         return internalFieldStore.value.name;
       },
       autofocus: !!internalFieldStore.value.errors.value,
-      ref(element) {
+      ref(elementOrInstance) {
+        const element = elementOrInstance
+          ? resolveFieldElement(elementOrInstance)
+          : null;
+
         // An array reorder transfers registered elements between the field
         // stores, so the element may already be present when the framework
         // re-registers it against the destination store
-        if (
-          element &&
-          !internalFieldStore.value.elements.includes(element as FieldElement)
-        ) {
-          internalFieldStore.value.elements.push(element as FieldElement);
+        if (element && !internalFieldStore.value.elements.includes(element)) {
+          internalFieldStore.value.elements.push(element);
         }
       },
       onFocus() {

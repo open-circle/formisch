@@ -366,6 +366,92 @@ describe('useField', () => {
       });
     });
 
+    test('should focus the input of a component when validation fails on submit', async () => {
+      const Input = defineComponent({
+        setup() {
+          return () => h('input', { 'data-testid': 'input' });
+        },
+      });
+      const WrappedInput = defineComponent({
+        setup() {
+          return () => h('div', [h('label', 'Email'), h('input'), h('input')]);
+        },
+      });
+      const ExposedInput = defineComponent({
+        setup(_, { expose }) {
+          expose({});
+          return () => h('input');
+        },
+      });
+
+      for (const [component, selector] of [
+        [Input, 'input'],
+        [WrappedInput, 'div > input'],
+        [ExposedInput, 'input'],
+      ] as const) {
+        const Test = defineComponent({
+          setup() {
+            const form = useForm({
+              schema: v.object({
+                email: v.pipe(v.string(), v.nonEmpty('Required')),
+              }),
+              initialInput: { email: '' },
+            });
+            const field = useField(form, { path: ['email'] });
+            return () =>
+              h(
+                Form,
+                { of: form, onSubmit: vi.fn(), 'aria-label': 'Test' },
+                {
+                  default: () => [
+                    h(component, field.props),
+                    h('button', { type: 'submit' }, 'Submit'),
+                  ],
+                }
+              );
+          },
+        });
+
+        const wrapper = mount(Test, { attachTo: document.body });
+        const input = wrapper.get<HTMLInputElement>(selector);
+        expect(document.activeElement).not.toBe(input.element);
+
+        await wrapper.get('form').trigger('submit');
+
+        await vi.waitFor(() => {
+          expect(document.activeElement).toBe(input.element);
+        });
+
+        wrapper.unmount();
+      }
+    });
+
+    test('should not register a component without a root element', () => {
+      const FragmentInput = defineComponent({
+        inheritAttrs: false,
+        setup() {
+          return () => [h('label', 'Name'), h('input')];
+        },
+      });
+
+      let capturedForm: FormStore | undefined;
+
+      const Test = defineComponent({
+        setup() {
+          const form = useForm({ schema: v.object({ name: v.string() }) });
+          capturedForm = form as unknown as FormStore;
+          const field = useField(form, { path: ['name'] });
+          return () => h(FragmentInput, field.props);
+        },
+      });
+
+      const wrapper = mount(Test, { attachTo: document.body });
+      expect(
+        getFieldStore(capturedForm![INTERNAL], ['name'])!.elements
+      ).toEqual([]);
+      wrapper.unmount();
+    });
+
     test('should unmount cleanly when the registered element is removed', () => {
       const Test = defineComponent({
         setup() {
