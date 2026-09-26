@@ -366,67 +366,57 @@ describe('useField', () => {
       });
     });
 
+    // Vue passes the component instance instead of a DOM element to the ref
+    // callback when `field.props` is bound to a component, so the adapter has
+    // to resolve the wrapped form control itself
     test('should focus the input of a component when validation fails on submit', async () => {
       const Input = defineComponent({
         setup() {
           return () => h('input', { 'data-testid': 'input' });
         },
       });
-      const WrappedInput = defineComponent({
+
+      const Test = defineComponent({
         setup() {
-          return () => h('div', [h('label', 'Email'), h('input'), h('input')]);
+          const form = useForm({
+            schema: v.object({
+              email: v.pipe(v.string(), v.nonEmpty('Required')),
+            }),
+            initialInput: { email: '' },
+          });
+          const field = useField(form, { path: ['email'] });
+          return () =>
+            h(
+              Form,
+              { of: form, onSubmit: vi.fn(), 'aria-label': 'Test' },
+              {
+                default: () => [
+                  h(Input, field.props),
+                  h('button', { type: 'submit' }, 'Submit'),
+                ],
+              }
+            );
         },
       });
-      const ExposedInput = defineComponent({
-        setup(_, { expose }) {
-          expose({});
-          return () => h('input');
-        },
+
+      const wrapper = mount(Test, { attachTo: document.body });
+      const input = wrapper.get<HTMLInputElement>('[data-testid="input"]');
+      expect(document.activeElement).not.toBe(input.element);
+
+      await wrapper.get('form').trigger('submit');
+
+      await vi.waitFor(() => {
+        expect(document.activeElement).toBe(input.element);
       });
-
-      for (const [component, selector] of [
-        [Input, 'input'],
-        [WrappedInput, 'div > input'],
-        [ExposedInput, 'input'],
-      ] as const) {
-        const Test = defineComponent({
-          setup() {
-            const form = useForm({
-              schema: v.object({
-                email: v.pipe(v.string(), v.nonEmpty('Required')),
-              }),
-              initialInput: { email: '' },
-            });
-            const field = useField(form, { path: ['email'] });
-            return () =>
-              h(
-                Form,
-                { of: form, onSubmit: vi.fn(), 'aria-label': 'Test' },
-                {
-                  default: () => [
-                    h(component, field.props),
-                    h('button', { type: 'submit' }, 'Submit'),
-                  ],
-                }
-              );
-          },
-        });
-
-        const wrapper = mount(Test, { attachTo: document.body });
-        const input = wrapper.get<HTMLInputElement>(selector);
-        expect(document.activeElement).not.toBe(input.element);
-
-        await wrapper.get('form').trigger('submit');
-
-        await vi.waitFor(() => {
-          expect(document.activeElement).toBe(input.element);
-        });
-
-        wrapper.unmount();
-      }
     });
 
+    // A component with a fragment root has no single root element to resolve
+    // the form control from, so the component instance must not be registered
     test('should not register a component without a root element', () => {
+      const schema = v.object({ name: v.string() });
+
+      let capturedForm: FormStore<typeof schema> | undefined;
+
       const FragmentInput = defineComponent({
         inheritAttrs: false,
         setup() {
@@ -434,22 +424,19 @@ describe('useField', () => {
         },
       });
 
-      let capturedForm: FormStore | undefined;
-
       const Test = defineComponent({
         setup() {
-          const form = useForm({ schema: v.object({ name: v.string() }) });
-          capturedForm = form as unknown as FormStore;
+          const form = useForm({ schema });
+          capturedForm = form;
           const field = useField(form, { path: ['name'] });
           return () => h(FragmentInput, field.props);
         },
       });
 
-      const wrapper = mount(Test, { attachTo: document.body });
+      mount(Test, { attachTo: document.body });
       expect(
         getFieldStore(capturedForm![INTERNAL], ['name'])!.elements
       ).toEqual([]);
-      wrapper.unmount();
     });
 
     test('should unmount cleanly when the registered element is removed', () => {

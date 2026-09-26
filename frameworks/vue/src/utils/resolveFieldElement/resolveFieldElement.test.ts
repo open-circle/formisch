@@ -1,6 +1,11 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, test } from 'vitest';
-import { type ComponentPublicInstance, defineComponent, h } from 'vue';
+import {
+  type ComponentPublicInstance,
+  defineComponent,
+  h,
+  type VNode,
+} from 'vue';
 import { resolveFieldElement } from './resolveFieldElement.ts';
 
 /**
@@ -10,9 +15,7 @@ import { resolveFieldElement } from './resolveFieldElement.ts';
  *
  * @returns The component instance.
  */
-function mountInstance(
-  render: () => ReturnType<typeof h> | ReturnType<typeof h>[]
-): ComponentPublicInstance {
+function mountInstance(render: () => VNode | VNode[]): ComponentPublicInstance {
   return mount(defineComponent({ inheritAttrs: false, setup: () => render }))
     .vm;
 }
@@ -48,8 +51,7 @@ describe('resolveFieldElement', () => {
         },
       })
     );
-    const element = resolveFieldElement(wrapper.vm);
-    expect(element).toBe(wrapper.element);
+    expect(resolveFieldElement(wrapper.vm)).toBe(wrapper.vm.$el);
   });
 
   test('should return the first nested form control of a component', () => {
