@@ -6,7 +6,7 @@ import {
   h,
   type VNode,
 } from 'vue';
-import { resolveFieldElements } from './resolveFieldElements.ts';
+import { resolveFieldElement } from './resolveFieldElement.ts';
 
 /**
  * Mounts a component with the given render function inside a parent and
@@ -46,10 +46,10 @@ function mountRef(
   return refValue!;
 }
 
-describe('resolveFieldElements', () => {
+describe('resolveFieldElement', () => {
   test('should return a DOM element as is', () => {
     const element = document.createElement('input');
-    expect(resolveFieldElements(element)).toEqual([element]);
+    expect(resolveFieldElement(element)).toBe(element);
   });
 
   test('should return a DOM element of another realm as is', () => {
@@ -57,44 +57,40 @@ describe('resolveFieldElements', () => {
     document.body.append(iframe);
     const element = iframe.contentDocument!.createElement('input');
     expect(element).not.toBeInstanceOf(Element);
-    expect(resolveFieldElements(element)).toEqual([element]);
+    expect(resolveFieldElement(element)).toBe(element);
     iframe.remove();
   });
 
   test('should return the root element of a component if it is a form control', () => {
     for (const tag of ['input', 'select', 'textarea']) {
       const instance = mountRef(() => h(tag));
-      expect(resolveFieldElements(instance)).toEqual([instance.$el]);
+      expect(resolveFieldElement(instance)).toBe(instance.$el);
     }
   });
 
   test('should return the root element of a component with exposed state', () => {
     const instance = mountRef(() => h('input'), true);
-    const [element] = resolveFieldElements(instance);
+    const element = resolveFieldElement(instance);
     expect(element).toBeInstanceOf(HTMLInputElement);
     expect(element).toBe(instance.$el);
   });
 
-  test('should return all nested form controls of a component', () => {
+  test('should return the first nested form control of a component', () => {
     const instance = mountRef(() =>
-      h('div', [
-        h('label', 'Name'),
-        h('input', { type: 'hidden' }),
-        h('textarea'),
-        h('select'),
-      ])
+      h('div', [h('label', 'Name'), h('textarea'), h('input')])
     );
-    const [, hidden, textarea, select] = (instance.$el as Element).children;
-    expect(resolveFieldElements(instance)).toEqual([hidden, textarea, select]);
+    expect(resolveFieldElement(instance)).toBe(
+      (instance.$el as Element).querySelector('textarea')
+    );
   });
 
-  test('should return an empty array if a component has no form control', () => {
+  test('should return null if a component has no form control', () => {
     const instance = mountRef(() => h('div', [h('span', 'Name')]));
-    expect(resolveFieldElements(instance)).toEqual([]);
+    expect(resolveFieldElement(instance)).toBe(null);
   });
 
-  test('should return an empty array if a component has a fragment root', () => {
+  test('should return null if a component has a fragment root', () => {
     const instance = mountRef(() => [h('label', 'Name'), h('input')]);
-    expect(resolveFieldElements(instance)).toEqual([]);
+    expect(resolveFieldElement(instance)).toBe(null);
   });
 });

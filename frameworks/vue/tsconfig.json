@@ -6,7 +6,7 @@
     "exactOptionalPropertyTypes": true,
     "jsx": "preserve",
     "jsxImportSource": "vue",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2020", "DOM"],
     "module": "ES2020",
     "moduleResolution": "Bundler",
     "noEmit": true,
