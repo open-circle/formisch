@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix focusing fields whose props are bound to a component wrapping the form control (issue #220)
+
 ## v1.1.0 (September 07, 2026)
 
 - Change `@formisch/core` to v1.0.1

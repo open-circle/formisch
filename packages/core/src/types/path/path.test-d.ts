@@ -720,7 +720,7 @@ describe('DirtyPath', () => {
     // segments collapse to `PathKey, ...Path` (RequiredPath catch-all).
     expectTypeOf<
       readonly ['a', 'b', 'c', 'd', 'e', PathKey, ...Path]
-    >().toMatchTypeOf<Result>();
+    >().toExtend<Result>();
   });
 
   test('should merge keys across object union members', () => {
@@ -732,7 +732,7 @@ describe('DirtyPath', () => {
   test('should be a subtype of RequiredPath', () => {
     expectTypeOf<
       DirtyPath<{ name: string; user: { email: string } }>
-    >().toMatchTypeOf<RequiredPath>();
+    >().toExtend<RequiredPath>();
   });
 });
 
@@ -803,12 +803,12 @@ describe('FieldPath', () => {
     // segments collapse to `PathKey, ...Path` (RequiredPath catch-all).
     expectTypeOf<
       readonly ['a', 'b', 'c', 'd', 'e', PathKey, ...Path]
-    >().toMatchTypeOf<Result>();
+    >().toExtend<Result>();
   });
 
   test('should be a subtype of RequiredPath', () => {
     expectTypeOf<
       FieldPath<{ tags: string[]; user: { email: string } }>
-    >().toMatchTypeOf<RequiredPath>();
+    >().toExtend<RequiredPath>();
   });
 });
