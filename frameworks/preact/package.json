@@ -74,7 +74,7 @@
   },
   "peerDependencies": {
     "@preact/signals": ">=2 <3",
-    "preact": ">=10 <11",
+    "preact": ">=10 <11 || >=11.0.0-0 <12",
     "typescript": ">=5 <8",
     "valibot": ">=1.4.1 <2"
   },
