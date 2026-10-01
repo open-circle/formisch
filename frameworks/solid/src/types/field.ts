@@ -7,7 +7,7 @@ import type {
   ValidArrayPath,
   ValidPath,
 } from '@formisch/core/solid';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 import type * as v from 'valibot';
 
 /**

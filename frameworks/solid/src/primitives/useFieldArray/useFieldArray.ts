@@ -7,7 +7,6 @@ import {
   type RequiredPath,
   type ValidArrayPath,
 } from '@formisch/core/solid';
-import { createMemo } from 'solid-js';
 import type * as v from 'valibot';
 import type {
   FieldArrayStore,
@@ -51,26 +50,11 @@ export function useFieldArray(
   form: MaybeGetter<FormStore>,
   config: MaybeGetter<UseFieldArrayConfig>
 ): FieldArrayStore {
-  const getInternalFieldStore = createMemo(
-    () =>
-      getFieldStore(
-        unwrap(form)[INTERNAL],
-        unwrap(config).path
-      ) as InternalArrayStore
-  );
-
-  const getIsTouched = createMemo(() =>
-    getFieldBool(getInternalFieldStore(), 'isTouched')
-  );
-  const getIsEdited = createMemo(() =>
-    getFieldBool(getInternalFieldStore(), 'isEdited')
-  );
-  const getIsDirty = createMemo(() =>
-    getFieldBool(getInternalFieldStore(), 'isDirty')
-  );
-  const getIsValid = createMemo(
-    () => !getFieldBool(getInternalFieldStore(), 'errors')
-  );
+  const getInternalFieldStore = () =>
+    getFieldStore(
+      unwrap(form)[INTERNAL],
+      unwrap(config).path
+    ) as InternalArrayStore;
 
   return {
     get path() {
@@ -83,16 +67,16 @@ export function useFieldArray(
       return getInternalFieldStore().errors.value;
     },
     get isTouched() {
-      return getIsTouched();
+      return getFieldBool(getInternalFieldStore(), 'isTouched');
     },
     get isEdited() {
-      return getIsEdited();
+      return getFieldBool(getInternalFieldStore(), 'isEdited');
     },
     get isDirty() {
-      return getIsDirty();
+      return getFieldBool(getInternalFieldStore(), 'isDirty');
     },
     get isValid() {
-      return getIsValid();
+      return !getFieldBool(getInternalFieldStore(), 'errors');
     },
   };
 }

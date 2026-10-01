@@ -1,6 +1,6 @@
 import { insert } from '@formisch/methods/solid';
 import { fireEvent, render, screen, waitFor } from '@solidjs/testing-library';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
 import { createForm } from '../../primitives/index.ts';

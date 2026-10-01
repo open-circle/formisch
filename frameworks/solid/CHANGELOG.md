@@ -2,6 +2,14 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Add experimental `2.0.0-next.0` compatibility with Solid `2.0.0-rc.13` for #202, preserving the public form API and package name
+- Change the bundled `@formisch/core` to experimental `2.0.0-next.0`; published Solid 1 applications continue using `@formisch/solid` 1.x
+- Change JSX types to `@solidjs/web` and replace `splitProps` with reactive `omit`
+- Refactor browser and SSR library entries to use `@solidjs/vite-plugin`, sharing the core module exposed by `@formisch/solid/internals`
+- Update test tooling and cover batched updates, array callback modes, and element cleanup
+
 ## v1.1.0 (September 07, 2026)
 
 - Change `@formisch/core` to v1.0.1

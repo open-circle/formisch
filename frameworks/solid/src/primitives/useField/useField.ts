@@ -1,4 +1,5 @@
 import {
+  type FieldElement,
   type FormSchema,
   getElementInput,
   getFieldBool,
@@ -11,7 +12,7 @@ import {
   validateIfRequired,
   type ValidPath,
 } from '@formisch/core/solid';
-import { createMemo, onCleanup } from 'solid-js';
+import { getOwner, onCleanup, runWithOwner, untrack } from 'solid-js';
 import type * as v from 'valibot';
 import type { FieldStore, FormStore, MaybeGetter } from '../../types/index.ts';
 import { unwrap } from '../../utils/index.ts';
@@ -50,47 +51,33 @@ export function useField(
   form: MaybeGetter<FormStore>,
   config: MaybeGetter<UseFieldConfig>
 ): FieldStore {
-  const getPath = createMemo(() => unwrap(config).path);
-  const getInternalFormStore = createMemo(() => unwrap(form)[INTERNAL]);
-  const getInternalFieldStore = createMemo(
-    () => getFieldStore(getInternalFormStore(), getPath())!
-  );
-
-  const getInput = createMemo(() => getFieldInput(getInternalFieldStore()));
-  const getIsTouched = createMemo(() =>
-    getFieldBool(getInternalFieldStore(), 'isTouched')
-  );
-  const getIsEdited = createMemo(() =>
-    getFieldBool(getInternalFieldStore(), 'isEdited')
-  );
-  const getIsDirty = createMemo(() =>
-    getFieldBool(getInternalFieldStore(), 'isDirty')
-  );
-  const getIsValid = createMemo(
-    () => !getFieldBool(getInternalFieldStore(), 'errors')
-  );
+  const fieldOwner = getOwner();
+  const getPath = () => unwrap(config).path;
+  const getInternalFormStore = () => unwrap(form)[INTERNAL];
+  const getInternalFieldStore = () =>
+    getFieldStore(getInternalFormStore(), getPath())!;
 
   return {
     get path() {
       return getPath();
     },
     get input() {
-      return getInput();
+      return getFieldInput(getInternalFieldStore());
     },
     get errors() {
       return getInternalFieldStore().errors.value;
     },
     get isTouched() {
-      return getIsTouched();
+      return getFieldBool(getInternalFieldStore(), 'isTouched');
     },
     get isEdited() {
-      return getIsEdited();
+      return getFieldBool(getInternalFieldStore(), 'isEdited');
     },
     get isDirty() {
-      return getIsDirty();
+      return getFieldBool(getInternalFieldStore(), 'isDirty');
     },
     get isValid() {
-      return getIsValid();
+      return !getFieldBool(getInternalFieldStore(), 'errors');
     },
     onInput(value) {
       setFieldInput(getInternalFormStore(), getPath(), value);
@@ -105,33 +92,51 @@ export function useField(
         return getInternalFieldStore().name;
       },
       // eslint-disable-next-line solid/reactivity
-      autofocus: !!getInternalFieldStore().errors.value,
-      ref: (element) => {
-        const internalFieldStore = getInternalFieldStore();
-        // An array reorder transfers registered elements between the field
-        // stores, so the element may already be present when the framework
-        // re-registers it against the destination store
-        if (!internalFieldStore.elements.includes(element)) {
-          internalFieldStore.elements.push(element);
-        }
-        onCleanup(() => {
-          const elements = internalFieldStore.elements.filter(
-            (el) => el !== element
-          );
-          // Keep `initialElements` in sync while the store still owns it
-          // (same reference) and filter it separately otherwise, so the
-          // detached element of a removed array item does not survive in the
-          // reset baseline
-          if (
-            internalFieldStore.elements === internalFieldStore.initialElements
-          ) {
-            internalFieldStore.initialElements = elements;
-          } else {
-            internalFieldStore.initialElements =
-              internalFieldStore.initialElements.filter((el) => el !== element);
+      autofocus: untrack(() => !!getInternalFieldStore().errors.value),
+      get ref() {
+        // Capture the JSX scope while props are read, before ref runs unowned.
+        const owner = getOwner() ?? fieldOwner;
+        return (element: FieldElement) => {
+          const internalFormStore = getInternalFormStore();
+          const internalFieldStore = getFieldStore(
+            internalFormStore,
+            getPath()
+          )!;
+          const registeredElements = internalFieldStore.elements;
+          // An array reorder transfers registered elements between the field
+          // stores, so the element may already be present when the framework
+          // re-registers it against the destination store
+          if (!registeredElements.includes(element)) {
+            registeredElements.push(element);
           }
-          internalFieldStore.elements = elements;
-        });
+          runWithOwner(owner, () =>
+            onCleanup(() => {
+              // Array methods transfer the registered array before JSX updates.
+              // Mutate it in place so every destination store drops the element,
+              // even if its ref never runs there before disposal. Also retract it
+              // from the captured store and its reset baseline if they diverged.
+              for (const elements of [
+                registeredElements,
+                internalFieldStore.elements,
+                internalFieldStore.initialElements,
+              ]) {
+                const index = elements.indexOf(element);
+                if (index !== -1) {
+                  elements.splice(index, 1);
+                }
+              }
+              // A vacated array slot may still alias the destination's elements.
+              // Detach that inactive slot so new destination refs stay there,
+              // while its original baseline remains available for reset.
+              if (
+                getFieldStore(internalFormStore, internalFieldStore.path) !==
+                internalFieldStore
+              ) {
+                internalFieldStore.elements = [];
+              }
+            })
+          );
+        };
       },
       onFocus() {
         setFieldBool(getInternalFieldStore(), 'isTouched', true);

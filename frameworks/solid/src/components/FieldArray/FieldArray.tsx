@@ -3,7 +3,7 @@ import {
   type RequiredPath,
   type ValidArrayPath,
 } from '@formisch/core/solid';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 import type * as v from 'valibot';
 import { useFieldArray } from '../../primitives/index.ts';
 import type { FieldArrayStore, FormStore } from '../../types/index.ts';

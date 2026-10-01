@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@solidjs/testing-library';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
+import { createSignal } from 'solid-js';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
 import { createForm } from '../../primitives/index.ts';
@@ -34,6 +35,25 @@ describe('Form', () => {
     expect(formElement).toHaveClass('my-form');
     expect(formElement).toHaveAttribute('id', 'signup');
     expect(screen.getByTestId('child')).toBeInTheDocument();
+  });
+
+  test('should update forwarded attributes after a batched prop change', async () => {
+    const [label, setLabel] = createSignal('Before');
+    function Test(): JSX.Element {
+      const form = createForm({ schema });
+      return (
+        <Form of={form} onSubmit={vi.fn()} aria-label={label()}>
+          child
+        </Form>
+      );
+    }
+    render(() => <Test />);
+    const element = screen.getByRole('form', { name: 'Before' });
+    expect(element).not.toHaveAttribute('of');
+    setLabel('After');
+    await vi.waitFor(() =>
+      expect(element).toHaveAttribute('aria-label', 'After')
+    );
   });
 
   test('should call onSubmit with the validated output when submitted', async () => {

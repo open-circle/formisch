@@ -1,0 +1,33 @@
+name: Solid 2 compatibility
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  solid2:
+    name: Check Solid 2 bindings and packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup environment
+        uses: ./.github/actions/environment
+      - name: Build Solid package
+        run: pnpm build
+        working-directory: frameworks/solid
+      - name: Check Solid bindings
+        run: pnpm lint && pnpm format.check && pnpm test && pnpm test:artifacts
+        working-directory: frameworks/solid
+      - name: Check core
+        run: pnpm lint && pnpm test
+        working-directory: packages/core
+      - name: Check methods
+        run: pnpm lint && pnpm test
+        working-directory: packages/methods

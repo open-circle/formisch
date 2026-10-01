@@ -4,7 +4,8 @@ import {
   type SubmitEventHandler,
 } from '@formisch/core/solid';
 import { handleSubmit } from '@formisch/methods/solid';
-import { type JSX, splitProps } from 'solid-js';
+import type { JSX } from '@solidjs/web';
+import { omit } from 'solid-js';
 import type { FormStore } from '../../types/index.ts';
 
 /**
@@ -43,8 +44,8 @@ export function Form<TSchema extends FormSchema>(
 
 // @__NO_SIDE_EFFECTS__
 export function Form(props: FormProps): JSX.Element {
-  // Split props between local, config and other
-  const [, other] = splitProps(props, ['of', 'onSubmit']);
+  // Forward native form props while retaining reactive getters.
+  const other = omit(props, 'of', 'onSubmit');
 
   return (
     <form

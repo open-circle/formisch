@@ -11,7 +11,7 @@
     "format.check": "prettier --check ./src"
   },
   "dependencies": {
-    "@formisch/solid": "workspace:*",
+    "@formisch/solid": "^1.1.0",
     "@formkit/auto-animate": "^0.8.2",
     "@solid-primitives/event-listener": "^2.4.3",
     "@solidjs/meta": "^0.29.4",

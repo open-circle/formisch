@@ -4,6 +4,8 @@ All notable changes to the library will be documented in this file.
 
 ## vX.X.X (Month DD, YYYY)
 
+- Change the core version to experimental `2.0.0-next.0` for the Solid 2 branch so its Solid 2-only `/solid` target and peer range cannot enter the stable core 1.x release line
+- Add a release requirement to keep Solid 1 consumers on core 1.x; publication of this experimental core requires a separate prerelease tag and maintainer agreement
 - Fix `getFieldStore` to throw a descriptive error with the requested path when no field store exists
 
 ## v1.0.1 (September 07, 2026)

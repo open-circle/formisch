@@ -6,7 +6,6 @@ import {
   INTERNAL,
   validateFormInput,
 } from '@formisch/core/solid';
-import { createMemo } from 'solid-js';
 import * as v from 'valibot';
 import type { FormStore } from '../../types/index.ts';
 
@@ -28,19 +27,7 @@ export function createForm(config: FormConfig): FormStore {
     v.safeParseAsync(config.schema, input)
   );
 
-  const getIsTouched = createMemo(() =>
-    getFieldBool(internalFormStore, 'isTouched')
-  );
-  const getIsEdited = createMemo(() =>
-    getFieldBool(internalFormStore, 'isEdited')
-  );
-  const getIsDirty = createMemo(() =>
-    getFieldBool(internalFormStore, 'isDirty')
-  );
-  const getIsValid = createMemo(
-    () => !getFieldBool(internalFormStore, 'errors')
-  );
-
+  // Read the core directly: Solid 2 memos retain the committed batch snapshot.
   const form = {
     [INTERNAL]: internalFormStore,
     get isSubmitting() {
@@ -53,16 +40,16 @@ export function createForm(config: FormConfig): FormStore {
       return internalFormStore.isValidating.value;
     },
     get isTouched() {
-      return getIsTouched();
+      return getFieldBool(internalFormStore, 'isTouched');
     },
     get isEdited() {
-      return getIsEdited();
+      return getFieldBool(internalFormStore, 'isEdited');
     },
     get isDirty() {
-      return getIsDirty();
+      return getFieldBool(internalFormStore, 'isDirty');
     },
     get isValid() {
-      return getIsValid();
+      return !getFieldBool(internalFormStore, 'errors');
     },
     get errors() {
       return internalFormStore.errors.value;

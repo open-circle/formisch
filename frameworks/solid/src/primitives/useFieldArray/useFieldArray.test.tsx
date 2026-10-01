@@ -6,9 +6,10 @@ import {
   screen,
   waitFor,
 } from '@solidjs/testing-library';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
+import { For } from 'solid-js';
 import * as v from 'valibot';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { createForm } from '../createForm/index.ts';
 import { useFieldArray } from './useFieldArray.ts';
 
@@ -45,6 +46,30 @@ describe('useFieldArray', () => {
   });
 
   describe('reactivity', () => {
+    test('should update accessor items with stable numeric indices', async () => {
+      const { result } = renderHook(() => {
+        const form = createForm({
+          schema: v.object({ items: v.array(v.string()) }),
+          initialInput: { items: ['a', 'b'] },
+        });
+        return { form, fieldArray: useFieldArray(form, { path: ['items'] }) };
+      });
+      const keys = [...result.fieldArray.items];
+      render(() => (
+        <For each={result.fieldArray.items} keyed={false}>
+          {(item, index) => <span data-testid={`row-${index}`}>{item()}</span>}
+        </For>
+      ));
+      const first = screen.getByTestId('row-0');
+      expect(first).toHaveTextContent(String(keys[0]));
+      swap(result.form, { path: ['items'], at: 0, and: 1 });
+      await vi.waitFor(() => {
+        expect(screen.getByTestId('row-0')).toBe(first);
+        expect(first).toHaveTextContent(String(keys[1]));
+        expect(screen.getByTestId('row-1')).toHaveTextContent(String(keys[0]));
+      });
+    });
+
     test('should grow items when insert is called', () => {
       const { result } = renderHook(() => {
         const form = createForm({
@@ -63,6 +88,7 @@ describe('useFieldArray', () => {
       });
 
       expect(result.fieldArray.items).toHaveLength(3);
+      expect(result.fieldArray.isEdited).toBe(true);
     });
 
     test('should preserve item keys when swap is called', () => {
