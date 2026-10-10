@@ -1,0 +1,110 @@
+---
+cover: LLMs and Forms
+title: 'Do LLMs Make Form Libraries Obsolete?'
+description: >-
+  LLMs can generate a login form in seconds, but most of that code is mechanics
+  that get reinvented on every form. Here's what a library settles once, and why
+  that matters more when an agent is doing the writing.
+published: 2026-09-19
+authors:
+  - flySewa
+---
+
+It's a bit awkward for a form library to admit, but a lot of the repetitive code we used to save you from writing, an LLM writes for you now.
+
+Boilerplate, state wiring, validation handlers. It takes about five seconds and costs a few cents. If that's the whole job, there's practically no use for a form library anymore.
+
+So let's find out whether that's the whole job. The easiest way is to count what's in the code.
+
+## Count what's in the output
+
+Here's roughly what a model hands you for a login form:
+
+```tsx
+const [email, setEmail] = useState('');
+const [password, setPassword] = useState('');
+const [emailError, setEmailError] = useState('');
+const [passwordError, setPasswordError] = useState('');
+const [isSubmitting, setIsSubmitting] = useState(false);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!email.includes('@')) setEmailError('Invalid email');
+  if (password.length < 8) setPasswordError('Too short');
+  // ...
+};
+```
+
+Now count. Two lines in there are about logging in: the email field and the eight-character minimum. Everything else is form mechanics: state, events, validation plumbing, submission, error handling. Your model writes all of it again, slightly differently, for every form in the app.
+
+Here are those same two lines with the mechanics living in a library:
+
+```tsx
+import * as v from 'valibot';
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+```
+
+Scale that up. Consider a form with 100 moving parts, 70 of them those mechanics and 30 your product: business rules, conditional logic, whatever your API does that nobody else's does.
+
+So, what's the real question here? Whether those 70 parts get regenerated every time, at token cost and with fresh room for hallucinated bugs, or maintained in one place by something built for the job.
+
+## No Silver Bullet, still no silver bullet
+
+Fred Brooks drew the line in 1986, and it's humbling how little it's moved. In [No Silver Bullet](https://en.wikipedia.org/wiki/No_Silver_Bullet), he split software work in two:
+
+- Accidental complexity: syntax, wiring, boilerplate. Friction from how we build.
+- Essential complexity: the business logic. Which fields, which rules, what happens on submit.
+
+LLMs are extraordinary at the first kind. Syntax, wiring, tedious glue; that's home turf.
+
+Forms were never a syntax problem, though. The teams getting the most out of LLMs let a library handle the architecture and point the model at its primitives. Your automation speed then rides on something documented, versioned, and shared across thousands of projects, rather than whatever the model came up with.
+
+## "But I can just prompt for exactly what I want"
+
+We hear this one a lot: know what you want, prompt for it, skip the overhead.
+
+That works if forms are simple. Frontend history says they aren't, and the history is the argument. Every major form library exists because its predecessor hit a wall:
+
+- [Redux Form](https://github.com/redux-form/redux-form) (2015): form state went into the global store. Every keystroke traveled through actions and reducers; slow.
+- [Final Form](https://final-form.org/) & [Formik](https://formik.org/) (2017): state moved back to local components. Controlled inputs still re-rendered the whole form on every keypress, unless you narrowed it with Final Form's subscriptions.
+- [React Hook Form](https://react-hook-form.com/) (2019): uncontrolled inputs and refs, values kept outside React's render cycle. The paradigm shifted.
+- [Formisch](https://formisch.dev/) (now): schema-first and modular. One schema validates at runtime and gives you the TypeScript type, nothing to keep in sync, in around 2.5 kB.
+
+Notice what happened across that timeline. The complexity never disappeared. It got documented.
+
+Our favorite example: React Hook Form's own docs carry a warning about how [`useFieldArray` behaves with `shouldUnregister: true`](https://react-hook-form.com/docs/usefieldarray). That warning exists because years of real usage turned up an edge case nobody saw coming, including the people who wrote the library. A bespoke AI build hits the same edge case with no warning, no docs, no issue thread, just a bug found by a user.
+
+## "Okay, but libraries come with baggage"
+
+True! Bundle size, API surface, dependency weight. All real, and we're not going to pretend otherwise.
+
+Here's the thing, though: you're carrying baggage either way. The only question is which kind you'd rather own.
+
+A library's baggage is documented, versioned, and maintained in the open. Your LLM-generated replacement's baggage is undocumented, unversioned, and shows up when something breaks in production and you're the one figuring out why.
+
+## So, is this the end of form libraries?
+
+No. If anything, the role of a form library becomes clearer when an LLM is doing more of the writing.
+
+You are faster, for a start. The model has less code to write, and it can work from primitives and patterns it already knows instead of generating the same form mechanics from scratch every time.
+
+You're also spending less time supervising it. A library has already made decisions about state, validation, subscriptions, field arrays, and all the other pieces that make forms complicated. You can tell the model what the form needs to do and let the library handle the parts that have already been solved.
+
+And the result is usually better, too. You get the behavior the library has accumulated over years of use, along with features you might never think to ask an LLM to implement. When a form submission fails, a good one automatically moves focus to the first field with an error so the user knows exactly where to look. That's the kind of detail that comes with a library by default and gets forgotten when you're generating everything from scratch.
+
+## Back to that login form
+
+One last thing about the form we started with, the one the model wrote in five seconds.
+
+Ship it. For one form, on one page, in one app, it'll do the job.
+
+The headache kicks in around the sixth form: you've got checkouts with conditional fields, multi-step wizards running async validation, and those instances where a single requirement change forces someone to re-prompt, re-review, and re-test code that should have been a one-line schema edit.
+
+Forms are still state machines. Your LLM just became a very fast typist. Give it good primitives to type against and let the library handle the mechanics.
+
+## Try Formisch
+
+If you've decided those 70 parts belong in a library, [Formisch](https://formisch.dev/) is built to hold them. The docs are built to be easy for models to read as much as people, with an MCP server at formisch.dev/mcp and every docs page available as Markdown, so the model writing your form works off the current API instead of guessing at it.
