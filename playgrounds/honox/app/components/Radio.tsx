@@ -1,0 +1,25 @@
+import type { FieldElementProps } from '@formisch/honox';
+
+interface RadioProps extends FieldElementProps {
+  class?: string;
+  label: string;
+  value: string;
+  checked: boolean;
+}
+
+/**
+ * Simple radio button input. Should be used inside a RadioGroup component.
+ */
+export function Radio({ label, checked, ...props }: RadioProps) {
+  return (
+    <label class="flex cursor-pointer select-none items-center space-x-3 font-medium md:text-lg lg:text-xl">
+      <input
+        {...props}
+        class="h-4 w-4 cursor-pointer lg:h-5 lg:w-5"
+        type="radio"
+        checked={checked}
+      />
+      <span>{label}</span>
+    </label>
+  );
+}
