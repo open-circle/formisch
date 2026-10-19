@@ -54,17 +54,26 @@ export function useField(
 ): FieldStore {
   const path = computed(() => toValue(config).path);
   const internalFormStore = computed(() => toValue(form)[INTERNAL]);
-  // Fall back to the previous field store once its array item was removed
-  // Hint: Since Vue 3.6, a computed without subscribers re-evaluates on its
-  // next read, so the unmount cleanup of a removed array item would otherwise
-  // resolve to `undefined`
-  const internalFieldStore = computed<InternalFieldStore>(
-    (previous) =>
-      getFieldStore(internalFormStore.value, path.value) ?? previous!
-  );
+  // Remember the last resolved field store for the unmount cleanup
+  let lastInternalFieldStore: InternalFieldStore | undefined;
+  const internalFieldStore = computed(() => {
+    const resolvedFieldStore = getFieldStore(
+      internalFormStore.value,
+      path.value
+    );
+    if (resolvedFieldStore) {
+      lastInternalFieldStore = resolvedFieldStore;
+    }
+    return resolvedFieldStore!;
+  });
 
   onUnmounted(() => {
-    const internalFieldStoreValue = internalFieldStore.value;
+    // Fall back to the last resolved field store if its array item was removed
+    // Hint: Since Vue 3.6, a computed without subscribers re-evaluates on its
+    // next read, so the field store of a removed array item resolves to
+    // `undefined` during the cleanup
+    const internalFieldStoreValue = (internalFieldStore.value ??
+      lastInternalFieldStore)!;
     const elements = internalFieldStoreValue.elements.filter(
       (element) => element.isConnected
     );
