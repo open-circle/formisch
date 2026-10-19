@@ -3,7 +3,7 @@ import { remove, swap } from '@formisch/methods/vue';
 import { mount } from '@vue/test-utils';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
-import { defineComponent, h } from 'vue';
+import { defineComponent, h, ref } from 'vue';
 import Form from '../../components/Form/Form.vue';
 import type { FormStore } from '../../types/index.ts';
 import { renderHook } from '../../vitest/renderHook.ts';
@@ -508,6 +508,64 @@ describe('useField', () => {
       expect(
         getFieldStore(formStore![INTERNAL], ['todos', 0, 'label'])
       ).toBeUndefined();
+    });
+
+    // Since Vue 3.6, a computed re-evaluates when read after its component
+    // unmounted. Changing a dependency of the path getter after the removal
+    // forces the same re-evaluation in older Vue versions.
+    test('should clean up a removed array item field when its store is re-resolved', async () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
+      const version = ref(0);
+
+      const Row = defineComponent({
+        props: {
+          form: { type: Object, required: true },
+          index: { type: Number, required: true },
+        },
+        setup(props) {
+          const field = useField(props.form as FormStore<typeof schema>, () => {
+            void version.value;
+            return { path: ['todos', props.index, 'label'] as const };
+          });
+          return () => h('input', { 'data-testid': 'input', ...field.props });
+        },
+      });
+
+      const Test = defineComponent({
+        setup() {
+          const form = useForm({
+            schema,
+            initialInput: { todos: [{ label: 'a' }, { label: 'b' }] },
+          });
+          formStore = form;
+          const fieldArray = useFieldArray(form, { path: ['todos'] });
+          return () =>
+            fieldArray.items.map((id, index) =>
+              h(Row, { key: id, form, index })
+            );
+        },
+      });
+
+      const wrapper = mount(Test, { attachTo: document.body });
+      const removedFieldStore = getFieldStore(formStore![INTERNAL], [
+        'todos',
+        1,
+        'label',
+      ])!;
+      expect(removedFieldStore.elements).toHaveLength(1);
+
+      remove(formStore!, { path: ['todos'], at: 1 });
+      version.value++;
+      await wrapper.vm.$nextTick();
+
+      expect(document.querySelectorAll('[data-testid="input"]')).toHaveLength(
+        1
+      );
+      expect(removedFieldStore.elements).toEqual([]);
+      expect(removedFieldStore.initialElements).toEqual([]);
     });
 
     test('should not register an element that is already present', () => {

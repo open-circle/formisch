@@ -5,6 +5,7 @@ import {
   getFieldInput,
   getFieldStore,
   INTERNAL,
+  type InternalFieldStore,
   type RequiredPath,
   setFieldBool,
   setFieldInput,
@@ -53,8 +54,13 @@ export function useField(
 ): FieldStore {
   const path = computed(() => toValue(config).path);
   const internalFormStore = computed(() => toValue(form)[INTERNAL]);
-  const internalFieldStore = computed(
-    () => getFieldStore(internalFormStore.value, path.value)!
+  // Fall back to the previous field store once its array item was removed
+  // Hint: Since Vue 3.6, a computed without subscribers re-evaluates on its
+  // next read, so the unmount cleanup of a removed array item would otherwise
+  // resolve to `undefined`
+  const internalFieldStore = computed<InternalFieldStore>(
+    (previous) =>
+      getFieldStore(internalFormStore.value, path.value) ?? previous!
   );
 
   onUnmounted(() => {
