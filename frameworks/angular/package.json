@@ -52,12 +52,12 @@
     "format.check": "prettier --check ./src"
   },
   "devDependencies": {
-    "@analogjs/vite-plugin-angular": "^2.5.2",
-    "@angular/common": "^22.0.0",
-    "@angular/compiler": "^22.0.0",
-    "@angular/compiler-cli": "^22.0.0",
-    "@angular/core": "^22.0.0",
-    "@angular/platform-browser": "^22.0.0",
+    "@analogjs/vite-plugin-angular": "^2.8.1",
+    "@angular/common": "^22.2.3",
+    "@angular/compiler": "^22.2.3",
+    "@angular/compiler-cli": "^22.2.3",
+    "@angular/core": "^22.2.3",
+    "@angular/platform-browser": "^22.2.3",
     "@formisch/core": "workspace:*",
     "@formisch/eslint-config": "workspace:*",
     "@formisch/methods": "workspace:*",
@@ -68,8 +68,8 @@
     "rolldown": "1.0.0-beta.52",
     "rolldown-plugin-dts": "^0.18.1",
     "typescript": "~6.0.3",
-    "valibot": "^1.4.1",
-    "vitest": "^4.1.7"
+    "valibot": "^1.4.2",
+    "vitest": "^4.1.12"
   },
   "peerDependencies": {
     "@angular/core": ">=19 <23",

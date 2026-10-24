@@ -65,7 +65,7 @@
     "@formisch/eslint-config": "workspace:*",
     "@formisch/methods": "workspace:*",
     "@sveltejs/adapter-auto": "^6.1.0",
-    "@sveltejs/kit": "^2.37.1",
+    "@sveltejs/kit": "^2.70.3",
     "@sveltejs/package": "^2.5.0",
     "@sveltejs/vite-plugin-svelte": "^6.2.0",
     "@testing-library/jest-dom": "^6.6.0",
@@ -77,12 +77,12 @@
     "globals": "^16.4.0",
     "jsdom": "^26.1.0",
     "publint": "^0.3.12",
-    "svelte": "^5.38.8",
+    "svelte": "^5.57.2",
     "svelte-check": "^4.3.1",
     "typescript": "^5.9.2",
-    "valibot": "^1.4.1",
+    "valibot": "^1.4.2",
     "vite": "^7.1.5",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.12"
   },
   "peerDependencies": {
     "svelte": ">=5.29 <6",

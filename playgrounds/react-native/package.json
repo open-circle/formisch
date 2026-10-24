@@ -33,7 +33,7 @@
     "react-native-screens": "~4.26.2",
     "react-native-web": "^0.21.2",
     "react-native-worklets": "0.10.0",
-    "valibot": "^1.4.1"
+    "valibot": "^1.4.2"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
