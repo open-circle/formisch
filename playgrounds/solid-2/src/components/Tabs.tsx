@@ -67,6 +67,17 @@ export function Tabs(props: TabsProps) {
                   )}
                   href={href}
                   onClick={(event) => {
+                    // Let browser handle modified and non-primary clicks, for
+                    // example to open tab in new window
+                    if (
+                      event.button !== 0 ||
+                      event.metaKey ||
+                      event.ctrlKey ||
+                      event.shiftKey ||
+                      event.altKey
+                    ) {
+                      return;
+                    }
                     event.preventDefault();
                     navigate(href);
                     event.currentTarget.scrollIntoView({

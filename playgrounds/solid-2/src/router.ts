@@ -27,8 +27,11 @@ export { getPathname };
  * Navigates to the given pathname without reloading the page.
  */
 export function navigate(pathname: string) {
-  if (pathname !== getPathname()) {
-    window.history.pushState(null, '', pathname);
-    setPathname(pathname);
+  const nextPathname = normalizePathname(pathname);
+  // Hint: The location is compared instead of the signal, because Solid 2
+  // only commits the signal on the next flush
+  if (nextPathname !== window.location.pathname) {
+    window.history.pushState(null, '', nextPathname);
+    setPathname(nextPathname);
   }
 }

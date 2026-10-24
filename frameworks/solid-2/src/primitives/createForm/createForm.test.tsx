@@ -7,6 +7,7 @@ import {
   waitFor,
 } from '@solidjs/testing-library';
 import type { JSX } from '@solidjs/web';
+import { flush } from 'solid-js';
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
 import { createForm } from './createForm.ts';
@@ -56,6 +57,9 @@ describe('createForm', () => {
           initialInput: { email: 'invalid' },
         })
       );
+
+      // Solid 2 commits derived values on the next flush
+      flush();
 
       expect(result.isValidating).toBe(false);
       expect(result.isValid).toBe(true);
