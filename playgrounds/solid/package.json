@@ -22,7 +22,7 @@
     "solid-js": "^1.9.7",
     "tailwindcss": "^4.1.11",
     "valibot": "^1.4.2",
-    "vinxi": "^0.5.8"
+    "vinxi": "^0.5.11"
   },
   "devDependencies": {
     "@formisch/eslint-config": "workspace:*",

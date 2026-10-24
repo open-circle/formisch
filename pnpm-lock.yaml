@@ -1093,7 +1093,7 @@ importers:
         version: 0.15.3(solid-js@1.9.9)
       '@solidjs/start':
         specifier: ^1.1.6
-        version: 1.2.0(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vinxi@0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
+        version: 1.2.0(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vinxi@0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.1.16(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
@@ -1110,8 +1110,8 @@ importers:
         specifier: ^1.4.2
         version: 1.4.2(typescript@5.9.3)
       vinxi:
-        specifier: ^0.5.8
-        version: 0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
+        specifier: ^0.5.11
+        version: 0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
     devDependencies:
       '@formisch/eslint-config':
         specifier: workspace:*
@@ -10232,9 +10232,6 @@ packages:
     resolution: {integrity: sha512-dhG34DXATL5hSxJbIexCft8FChFXtmskoZYnoPWjXQuebWYCNkVeV3KkGegCK9CP1oswI/vQibS2GY7Em/sJJA==}
     engines: {node: '>= 8'}
 
-  knitwork@1.2.0:
-    resolution: {integrity: sha512-xYSH7AvuQ6nXkq42x0v5S8/Iry+cfulBz/DJQzhIyESdLD7425jXsPy4vn5cCXU+HhRN2kVw51Vd1K6/By4BQg==}
-
   knitwork@1.3.0:
     resolution: {integrity: sha512-4LqMNoONzR43B1W0ek0fhXMsDNW/zxa1NdFAVMY+k28pgZLovR4G3PB5MrpTxCy1QaZCqNoiaKPr5w5qZHfSNw==}
 
@@ -10584,10 +10581,6 @@ packages:
 
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
-
-  lru-cache@11.5.2:
-    resolution: {integrity: sha512-4pfM1Ff0x50o0tQwb5ucw/RzNyD0/YJME6IVcStalZuMWxdt3sR3huStTtxz4PUmvZfRguvDejasvQ2kifR11g==}
-    engines: {node: 20 || >=22}
 
   lru-cache@11.5.3:
     resolution: {integrity: sha512-U4N8FgzmWxc8k1VH8Kr6lQg18U7Fjvby6wXHVRX/ZZ7IwWbRMgrRbP0Wrb5q5NVinryp4SQampHKdvtecItxUg==}
@@ -11284,9 +11277,6 @@ packages:
   obug@3.0.0:
     resolution: {integrity: sha512-5vvB5+W7ePv+p3uqxi+RcW1XAzLW0/hxt3/4X4Lc4qHudzOhmBiBwOY6DRob4WnanAEGvNcLjF+KNOufrUoEQw==}
     engines: {node: '>=12.20.0'}
-
-  ofetch@1.4.1:
-    resolution: {integrity: sha512-QZj2DfGplQAr2oj9KzceK9Hwz6Whxazmn85yYeVuS3u9XTMOGMRx0kO95MQ+vLsj/S/NwBDMMLU5hpxvI6Tklw==}
 
   ofetch@1.5.1:
     resolution: {integrity: sha512-2W4oUZlVaqAPAil6FUg/difl6YhqhUR7x2eZY4bQCko22UXg3hptq9KLQdqFClV+Wu85UX7hNtdGTngi/1BxcA==}
@@ -13404,9 +13394,6 @@ packages:
     resolution: {integrity: sha512-LbBDqdIC5s8iROCUjMbW1f5dJQTEFB1+KO9ogbvlb3nm9n4YHa5p4KTvFPWvh2Hs8gZMBuiB1/8+pdfe/tDPug==}
     hasBin: true
 
-  ufo@1.6.1:
-    resolution: {integrity: sha512-9a4/uxlTWJ4+a5i0ooc1rU7C7YOw3wT+UGqdeNNHWnOF9qcMBgLRS+4IYUqbczewFx4mLEig6gawh7X6mFlEkA==}
-
   ufo@1.6.4:
     resolution: {integrity: sha512-JFNbkD1Svwe0KvGi8GOeLcP4kAWQ609twvCdcHxq1oSL8svv39ZuSvajcD8B+5D0eL4+s1Is2D/O6KN3qcTeRA==}
 
@@ -13425,9 +13412,6 @@ packages:
 
   uncrypto@0.1.3:
     resolution: {integrity: sha512-Ql87qFHB3s/De2ClA9e0gsnS6zXG27SkTiSJwjCc9MebbfapQfuPzumMIUMi38ezPZVNFcHI9sUIepeQfw8J8Q==}
-
-  unctx@2.4.1:
-    resolution: {integrity: sha512-AbaYw0Nm4mK4qjhns67C+kgxR2YWiwlDBPzxrN8h8C6VtAdCgditAY5Dezu3IJy4XVqAnbrXt9oQJvsn3fyozg==}
 
   unctx@2.5.0:
     resolution: {integrity: sha512-p+Rz9x0R7X+CYDkT+Xg8/GhpcShTlU8n+cf9OtOEf7zEQsNcCZO1dPKNRDqvUTaq+P32PMMkxWHwfrxkqfqAYg==}
@@ -13600,68 +13584,6 @@ packages:
       synckit:
         optional: true
 
-  unstorage@1.17.1:
-    resolution: {integrity: sha512-KKGwRTT0iVBCErKemkJCLs7JdxNVfqTPc/85ae1XES0+bsHbc/sFBfVi5kJp156cc51BHinIH2l3k0EZ24vOBQ==}
-    peerDependencies:
-      '@azure/app-configuration': ^1.8.0
-      '@azure/cosmos': ^4.2.0
-      '@azure/data-tables': ^13.3.0
-      '@azure/identity': ^4.6.0
-      '@azure/keyvault-secrets': ^4.9.0
-      '@azure/storage-blob': ^12.26.0
-      '@capacitor/preferences': ^6.0.3 || ^7.0.0
-      '@deno/kv': '>=0.9.0'
-      '@netlify/blobs': ^6.5.0 || ^7.0.0 || ^8.1.0 || ^9.0.0 || ^10.0.0
-      '@planetscale/database': ^1.19.0
-      '@upstash/redis': ^1.34.3
-      '@vercel/blob': '>=0.27.1'
-      '@vercel/functions': ^2.2.12 || ^3.0.0
-      '@vercel/kv': ^1.0.1
-      aws4fetch: ^1.0.20
-      db0: '>=0.2.1'
-      idb-keyval: ^6.2.1
-      ioredis: ^5.4.2
-      uploadthing: ^7.4.4
-    peerDependenciesMeta:
-      '@azure/app-configuration':
-        optional: true
-      '@azure/cosmos':
-        optional: true
-      '@azure/data-tables':
-        optional: true
-      '@azure/identity':
-        optional: true
-      '@azure/keyvault-secrets':
-        optional: true
-      '@azure/storage-blob':
-        optional: true
-      '@capacitor/preferences':
-        optional: true
-      '@deno/kv':
-        optional: true
-      '@netlify/blobs':
-        optional: true
-      '@planetscale/database':
-        optional: true
-      '@upstash/redis':
-        optional: true
-      '@vercel/blob':
-        optional: true
-      '@vercel/functions':
-        optional: true
-      '@vercel/kv':
-        optional: true
-      aws4fetch:
-        optional: true
-      db0:
-        optional: true
-      idb-keyval:
-        optional: true
-      ioredis:
-        optional: true
-      uploadthing:
-        optional: true
-
   unstorage@1.17.6:
     resolution: {integrity: sha512-gjKtcmn/KwZuJZO9o2sc0esAQnhmTw0LviDHwevTXbJMYs0dRTp8ZEEWXHU0vTpzbN3cA0yxlTeyXssMp3zDqw==}
     peerDependencies:
@@ -13744,9 +13666,6 @@ packages:
     hasBin: true
     peerDependencies:
       browserslist: 4.29.3
-
-  uqr@0.1.2:
-    resolution: {integrity: sha512-MJu7ypHq6QasgF5YRTjqscSzQp/W11zoUk6kvmlH+fmWEs63Y0Eib13hYFwAzagRJcVY8WVnlV+eBDUGMJ5IbA==}
 
   uqr@0.1.3:
     resolution: {integrity: sha512-0rjE8iEJe4YmT9TOhwsZtqCMRLc5DXZUI2UEYUUg63ikBkqqE5EYWaI0etFe/5KUcmcYwLih2RND1kq+hrUJXA==}
@@ -13851,8 +13770,8 @@ packages:
   vfile@6.0.3:
     resolution: {integrity: sha512-KzIbH/9tXat2u30jf+smMwFCsno4wHVdNmzFyL+T/L3UGqqk6JKfVqOFOZEpZSHADH1k40ab6NUIXZq422ov3Q==}
 
-  vinxi@0.5.8:
-    resolution: {integrity: sha512-1pGA+cU1G9feBQ1sd5FMftPuLUT8NSX880AvELhNWqoqWhe2jeSOQxjDPxlA3f1AC+Bbknl4UPKHyVXmfLZQjw==}
+  vinxi@0.5.11:
+    resolution: {integrity: sha512-82Qm+EG/b2PRFBvXBbz1lgWBGcd9totIL6SJhnrZYfakjloTVG9+5l6gfO6dbCCtztm5pqWFzLY0qpZ3H3ww/w==}
     hasBin: true
 
   vite-dev-rpc@1.1.0:
@@ -17019,7 +16938,7 @@ snapshots:
     dependencies:
       string-width: 5.1.2
       string-width-cjs: string-width@4.2.3
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
       strip-ansi-cjs: strip-ansi@6.0.1
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
@@ -17729,6 +17648,7 @@ snapshots:
       '@parcel/watcher-win32-arm64': 2.5.1
       '@parcel/watcher-win32-ia32': 2.5.1
       '@parcel/watcher-win32-x64': 2.5.1
+    optional: true
 
   '@parcel/watcher@2.6.0':
     dependencies:
@@ -17771,7 +17691,7 @@ snapshots:
 
   '@poppinss/dumper@0.7.0':
     dependencies:
-      '@poppinss/colors': 4.1.5
+      '@poppinss/colors': 4.1.6
       '@sindresorhus/is': 7.1.0
       supports-color: 10.2.2
 
@@ -18629,7 +18549,7 @@ snapshots:
     dependencies:
       serialize-javascript: 7.0.5
       smob: 1.5.0
-      terser: 5.44.0
+      terser: 5.51.2
     optionalDependencies:
       rollup: 4.59.0
 
@@ -18828,11 +18748,11 @@ snapshots:
     dependencies:
       solid-js: 1.9.9
 
-  '@solidjs/start@1.2.0(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vinxi@0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))':
+  '@solidjs/start@1.2.0(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vinxi@0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))':
     dependencies:
       '@tanstack/server-functions-plugin': 1.121.21(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
-      '@vinxi/plugin-directives': 0.5.1(vinxi@0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
-      '@vinxi/server-components': 0.5.1(vinxi@0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
+      '@vinxi/plugin-directives': 0.5.1(vinxi@0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
+      '@vinxi/server-components': 0.5.1(vinxi@0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
       cookie-es: 2.0.0
       defu: 6.1.5
       error-stack-parser: 2.1.4
@@ -18844,7 +18764,7 @@ snapshots:
       source-map-js: 1.2.2
       terracotta: 1.0.6(solid-js@1.9.9)
       tinyglobby: 0.2.15
-      vinxi: 0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
+      vinxi: 0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
       vite-plugin-solid: 2.11.10(@testing-library/jest-dom@6.9.1)(solid-js@1.9.9)(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
     transitivePeerDependencies:
       - '@testing-library/jest-dom'
@@ -20490,7 +20410,7 @@ snapshots:
 
   '@vinxi/listhen@1.5.6':
     dependencies:
-      '@parcel/watcher': 2.5.1
+      '@parcel/watcher': 2.6.0
       '@parcel/watcher-wasm': 2.3.0
       citty: 0.1.6
       clipboardy: 4.0.0
@@ -20506,9 +20426,9 @@ snapshots:
       std-env: 3.10.0
       ufo: 1.6.4
       untun: 0.1.3
-      uqr: 0.1.2
+      uqr: 0.1.3
 
-  '@vinxi/plugin-directives@0.5.1(vinxi@0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))':
+  '@vinxi/plugin-directives@0.5.1(vinxi@0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))':
     dependencies:
       '@babel/parser': 7.29.7
       acorn: 8.15.0
@@ -20519,18 +20439,18 @@ snapshots:
       magicast: 0.2.11
       recast: 0.23.11
       tslib: 2.8.1
-      vinxi: 0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
+      vinxi: 0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
 
-  '@vinxi/server-components@0.5.1(vinxi@0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))':
+  '@vinxi/server-components@0.5.1(vinxi@0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))':
     dependencies:
-      '@vinxi/plugin-directives': 0.5.1(vinxi@0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
+      '@vinxi/plugin-directives': 0.5.1(vinxi@0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
       acorn: 8.15.0
       acorn-loose: 8.5.2
       acorn-typescript: 1.4.13(acorn@8.15.0)
       astring: 1.9.0
       magicast: 0.2.11
       recast: 0.23.11
-      vinxi: 0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
+      vinxi: 0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
 
   '@vitejs/plugin-basic-ssl@2.3.0(vite@8.3.4(@types/node@24.10.1)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))':
     dependencies:
@@ -22037,7 +21957,8 @@ snapshots:
 
   destroy@1.2.0: {}
 
-  detect-libc@1.0.3: {}
+  detect-libc@1.0.3:
+    optional: true
 
   detect-libc@2.1.2: {}
 
@@ -24557,8 +24478,6 @@ snapshots:
 
   klona@2.0.6: {}
 
-  knitwork@1.2.0: {}
-
   knitwork@1.3.0: {}
 
   known-css-properties@0.30.0: {}
@@ -24861,8 +24780,6 @@ snapshots:
       js-tokens: 4.0.0
 
   lru-cache@10.4.3: {}
-
-  lru-cache@11.5.2: {}
 
   lru-cache@11.5.3: {}
 
@@ -25813,7 +25730,7 @@ snapshots:
       defu: 6.1.5
       destr: 2.0.5
       dot-prop: 10.1.0
-      esbuild: 0.28.1
+      esbuild: 0.28.2
       escape-string-regexp: 5.0.0
       etag: 1.8.1
       exsolve: 1.1.3
@@ -25853,8 +25770,8 @@ snapshots:
       uncrypto: 0.1.3
       unctx: 2.5.0
       unenv: 2.0.0-rc.24
-      unimport: 6.5.0(esbuild@0.28.1)(oxc-parser@0.150.0)(rolldown@1.2.14)(rollup@4.59.0)(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
-      unplugin-utils: 0.3.1
+      unimport: 6.5.0(esbuild@0.28.2)(oxc-parser@0.150.0)(rolldown@1.2.14)(rollup@4.59.0)(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
+      unplugin-utils: 0.3.2
       unstorage: 1.17.6(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)
       untyped: 2.0.0
       unwasm: 0.5.3
@@ -26058,12 +25975,6 @@ snapshots:
   obug@2.1.1: {}
 
   obug@3.0.0: {}
-
-  ofetch@1.4.1:
-    dependencies:
-      destr: 2.0.5
-      node-fetch-native: 1.6.7
-      ufo: 1.6.4
 
   ofetch@1.5.1:
     dependencies:
@@ -26374,7 +26285,7 @@ snapshots:
 
   path-scurry@2.0.2:
     dependencies:
-      lru-cache: 11.5.2
+      lru-cache: 11.5.3
       minipass: 7.1.2
 
   path-to-regexp@1.9.0:
@@ -27996,7 +27907,7 @@ snapshots:
     dependencies:
       eastasianwidth: 0.2.0
       emoji-regex: 9.2.2
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   string-width@7.2.0:
     dependencies:
@@ -28781,8 +28692,6 @@ snapshots:
 
   ua-parser-js@1.0.41: {}
 
-  ufo@1.6.1: {}
-
   ufo@1.6.4: {}
 
   uid-promise@1.0.0: {}
@@ -28802,13 +28711,6 @@ snapshots:
       quansync: 0.2.11
 
   uncrypto@0.1.3: {}
-
-  unctx@2.4.1:
-    dependencies:
-      acorn: 8.19.0
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
-      unplugin: 2.3.11
 
   unctx@2.5.0:
     dependencies:
@@ -28869,7 +28771,7 @@ snapshots:
       trough: 2.2.0
       vfile: 6.0.3
 
-  unimport@6.5.0(esbuild@0.28.1)(oxc-parser@0.150.0)(rolldown@1.2.14)(rollup@4.59.0)(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)):
+  unimport@6.5.0(esbuild@0.28.2)(oxc-parser@0.150.0)(rolldown@1.2.14)(rollup@4.59.0)(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)):
     dependencies:
       acorn: 8.19.0
       escape-string-regexp: 5.0.0
@@ -28883,7 +28785,7 @@ snapshots:
       scule: 1.3.0
       strip-literal: 4.0.0
       tinyglobby: 0.2.17
-      unplugin: 3.4.0(esbuild@0.28.1)(rolldown@1.2.14)(rollup@4.59.0)(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
+      unplugin: 3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
       unplugin-utils: 0.3.2
     optionalDependencies:
       oxc-parser: 0.150.0
@@ -28981,17 +28883,6 @@ snapshots:
       picomatch: 4.0.4
       webpack-virtual-modules: 0.6.2
 
-  unplugin@3.4.0(esbuild@0.28.1)(rolldown@1.2.14)(rollup@4.59.0)(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)):
-    dependencies:
-      '@jridgewell/remapping': 2.3.5
-      picomatch: 4.0.4
-      webpack-virtual-modules: 0.6.2
-    optionalDependencies:
-      esbuild: 0.28.1
-      rolldown: 1.2.14
-      rollup: 4.59.0
-      vite: 6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
-
   unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.0.0-beta.26)(rollup@4.59.0):
     dependencies:
       '@jridgewell/remapping': 2.3.5
@@ -29001,6 +28892,17 @@ snapshots:
       esbuild: 0.28.2
       rolldown: 1.0.0-beta.26
       rollup: 4.59.0
+
+  unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)):
+    dependencies:
+      '@jridgewell/remapping': 2.3.5
+      picomatch: 4.0.4
+      webpack-virtual-modules: 0.6.2
+    optionalDependencies:
+      esbuild: 0.28.2
+      rolldown: 1.2.14
+      rollup: 4.59.0
+      vite: 6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
 
   unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@8.3.4(@types/node@22.18.12)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)):
     dependencies:
@@ -29056,20 +28958,6 @@ snapshots:
       '@oxc-project/runtime': 0.99.0
       rolldown: 1.0.0-beta.52
 
-  unstorage@1.17.1(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1):
-    dependencies:
-      anymatch: 3.1.3
-      chokidar: 4.0.3
-      destr: 2.0.5
-      h3: 1.15.9
-      lru-cache: 10.4.3
-      node-fetch-native: 1.6.7
-      ofetch: 1.4.1
-      ufo: 1.6.4
-    optionalDependencies:
-      db0: 0.3.4(better-sqlite3@12.10.0)
-      ioredis: 5.11.1
-
   unstorage@1.17.6(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1):
     dependencies:
       anymatch: 3.1.3
@@ -29097,7 +28985,7 @@ snapshots:
       citty: 0.1.6
       defu: 6.1.5
       jiti: 2.7.0
-      knitwork: 1.2.0
+      knitwork: 1.3.0
       scule: 1.3.0
 
   unwasm@0.5.3:
@@ -29114,8 +29002,6 @@ snapshots:
       browserslist: 4.29.3
       escalade: 3.2.0
       picocolors: 1.1.1
-
-  uqr@0.1.2: {}
 
   uqr@0.1.3: {}
 
@@ -29217,11 +29103,11 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vinxi@0.5.8(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1):
+  vinxi@0.5.11(@parcel/watcher@2.6.0)(@types/node@24.10.1)(better-sqlite3@12.10.0)(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(oxc-parser@0.150.0)(rolldown@1.2.14)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1):
     dependencies:
       '@babel/core': 7.29.7
-      '@babel/plugin-syntax-jsx': 7.27.1(@babel/core@7.29.7)
-      '@babel/plugin-syntax-typescript': 7.27.1(@babel/core@7.29.7)
+      '@babel/plugin-syntax-jsx': 7.29.7(@babel/core@7.29.7)
+      '@babel/plugin-syntax-typescript': 7.29.7(@babel/core@7.29.7)
       '@types/micromatch': 4.0.10
       '@vinxi/listhen': 1.5.6
       boxen: 8.0.1
@@ -29246,11 +29132,11 @@ snapshots:
       resolve: 1.22.11
       serve-placeholder: 2.0.2
       serve-static: 1.16.2
-      tinyglobby: 0.2.15
-      ufo: 1.6.1
-      unctx: 2.4.1
+      tinyglobby: 0.2.17
+      ufo: 1.6.4
+      unctx: 2.5.0
       unenv: 1.10.0
-      unstorage: 1.17.1(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)
+      unstorage: 1.17.6(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)
       vite: 6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
       zod: 4.6.7
     transitivePeerDependencies:
@@ -30158,13 +30044,13 @@ snapshots:
     dependencies:
       ansi-styles: 6.2.3
       string-width: 5.1.2
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   wrap-ansi@9.0.2:
     dependencies:
       ansi-styles: 6.2.3
       string-width: 7.2.0
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   wrappy@1.0.2: {}
 

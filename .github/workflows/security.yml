@@ -49,11 +49,14 @@ jobs:
       # deterministic fingerprint as fallback so they never collapse into
       # one alert.
       #
-      # Findings of advisories without any patched release (no "Patched"
-      # entry in the rule help) are reported as warnings instead of errors,
-      # so they stay visible without blocking pull requests on something
-      # that cannot be fixed yet. Once a fix is published, the advisory
-      # gains a patched version and the finding is an error again.
+      # Findings of advisories without any patched release (rule help
+      # without a "Patched" entry) are reported as warnings instead of
+      # errors, so they stay visible without blocking pull requests on
+      # something that cannot be fixed yet. Once a fix is published, the
+      # advisory gains a patched version and the finding is an error again.
+      # Rules without help text stay errors. Critical findings still fail
+      # the scan step through fail-on, as they need a decision even without
+      # a fix, such as removing the affected dependency.
       - name: Normalize SARIF report
         id: sarif
         if: always()
@@ -64,8 +67,8 @@ jobs:
               ($lock | split("\n")) as $lines |
               .runs[]? |= (
                 ([.tool.driver.rules[]?
-                  | select(((.help.text // "") + (.help.markdown // ""))
-                      | test("Patched( version)?:") | not)
+                  | ((.help.text // "") + (.help.markdown // "")) as $help
+                  | select($help != "" and ($help | test("Patched( version)?:") | not))
                   | .id]) as $unpatched |
                 .results[]? |= (
                   ((.message.text // "") | split(" ") | first // "") as $pv |
