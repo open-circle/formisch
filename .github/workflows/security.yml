@@ -48,6 +48,12 @@ jobs:
       # lockfile entry. Findings whose package cannot be located keep a
       # deterministic fingerprint as fallback so they never collapse into
       # one alert.
+      #
+      # Findings of advisories without any patched release (no "Patched"
+      # entry in the rule help) are reported as warnings instead of errors,
+      # so they stay visible without blocking pull requests on something
+      # that cannot be fixed yet. Once a fix is published, the advisory
+      # gains a patched version and the finding is an error again.
       - name: Normalize SARIF report
         id: sarif
         if: always()
@@ -56,22 +62,33 @@ jobs:
           if [[ -n "$file" ]]; then
             jq --rawfile lock pnpm-lock.yaml '
               ($lock | split("\n")) as $lines |
-              .runs[]?.results[]? |= (
-                ((.message.text // "") | split(" ") | first // "") as $pv |
-                ([$lines | to_entries[]
-                  | select($pv != "" and (.value
-                      | sub("^ +"; "") | ltrimstr("\u0027")
-                      | startswith($pv)))
-                  | .key] | first) as $idx |
-                if $idx != null then
-                  (.locations[0].physicalLocation.region =
-                    { startLine: ($idx + 1) })
-                  | del(.partialFingerprints)
-                else
-                  .partialFingerprints =
-                    { primaryLocationLineHash:
-                        ((.ruleId // "unknown") + ":" + $pv) }
-                end
+              .runs[]? |= (
+                ([.tool.driver.rules[]?
+                  | select(((.help.text // "") + (.help.markdown // ""))
+                      | test("Patched( version)?:") | not)
+                  | .id]) as $unpatched |
+                .results[]? |= (
+                  ((.message.text // "") | split(" ") | first // "") as $pv |
+                  (.ruleId // "") as $rule |
+                  ([$lines | to_entries[]
+                    | select($pv != "" and (.value
+                        | sub("^ +"; "") | ltrimstr("\u0027")
+                        | startswith($pv)))
+                    | .key] | first) as $idx |
+                  (if $idx != null then
+                    (.locations[0].physicalLocation.region =
+                      { startLine: ($idx + 1) })
+                    | del(.partialFingerprints)
+                  else
+                    .partialFingerprints =
+                      { primaryLocationLineHash:
+                          ((.ruleId // "unknown") + ":" + $pv) }
+                  end)
+                  | if .level == "error" and ($unpatched | index($rule)) != null
+                    then .level = "warning"
+                    else .
+                    end
+                )
               )' "$file" > cve-lite.sarif
             echo "exists=true" >> "$GITHUB_OUTPUT"
           fi

@@ -20,11 +20,18 @@ allowBuilds:
   unrs-resolver: true
   vercel: true
   workerd: true
+packageExtensions:
+  # Imports vite without declaring it, which otherwise resolves to a hoisted
+  # vite of another major instead of the one used by @qwik.dev/core
+  '@qwik.dev/optimizer':
+    peerDependencies:
+      vite: '>=8 <9'
 overrides:
   # Security: pin vulnerable deps to patched versions (CVE Lite findings).
   # Keyed by major so only the affected major line is moved to its fixed version.
   '@babel/core@7': '7.29.7'
   '@babel/plugin-transform-modules-systemjs@7': '7.29.4'
+  '@expo/metro@56': '56.1.0'
   '@humanfs/node@0.16': '0.16.8'
   '@sveltejs/kit@2': '2.70.3'
   '@tootallnate/once@2': '2.0.1'
@@ -93,5 +100,6 @@ overrides:
   'ws@8': '8.22.0'
   'yaml@1': '1.10.3'
   'yaml@2': '2.9.1'
+  'zod@3': '4.6.7'
 patchedDependencies:
-  '@qwik.dev/router@2.0.0-beta.9': patches/@qwik.dev__router@2.0.0-beta.9.patch
+  '@qwik.dev/router@2.0.0-rc.3': patches/@qwik.dev__router@2.0.0-rc.3.patch
