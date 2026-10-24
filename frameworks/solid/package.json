@@ -49,6 +49,17 @@
     "./internals": {
       "types": "./dist/internals.d.ts",
       "import": "./dist/internals.js"
+    },
+    "./v2": {
+      "solid": "./dist/v2/index.jsx",
+      "import": {
+        "types": "./dist/v2/index.d.ts",
+        "default": "./dist/v2/index.js"
+      }
+    },
+    "./v2/internals": {
+      "types": "./dist/v2/internals.d.ts",
+      "import": "./dist/v2/internals.js"
     }
   },
   "sideEffects": false,
@@ -70,6 +81,7 @@
     "@formisch/core": "workspace:*",
     "@formisch/eslint-config": "workspace:*",
     "@formisch/methods": "workspace:*",
+    "@formisch/solid-2": "workspace:*",
     "@solidjs/testing-library": "^0.8.10",
     "@testing-library/jest-dom": "^6.6.0",
     "@types/node": "24.0.13",
@@ -89,11 +101,15 @@
     "vitest": "4.1.12"
   },
   "peerDependencies": {
-    "solid-js": ">=1.6 <2",
+    "@solidjs/web": ">=2.0.0-0 <3",
+    "solid-js": ">=1.6 <2 || >=2.0.0-0 <3",
     "typescript": ">=5 <8",
     "valibot": ">=1.4.1 <2"
   },
   "peerDependenciesMeta": {
+    "@solidjs/web": {
+      "optional": true
+    },
     "typescript": {
       "optional": true
     }

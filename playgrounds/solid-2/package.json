@@ -1,0 +1,34 @@
+{
+  "name": "formisch-playground-solid-2",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint \"src/**/*.ts*\" && tsc --noEmit",
+    "lint.fix": "eslint \"src/**/*.ts*\" --fix",
+    "format": "prettier --write ./src",
+    "format.check": "prettier --check ./src"
+  },
+  "dependencies": {
+    "@formisch/solid": "workspace:*",
+    "@formkit/auto-animate": "^0.8.2",
+    "@solidjs/web": "2.0.0-rc.18",
+    "clsx": "^2.1.1",
+    "solid-js": "2.0.0-rc.18",
+    "valibot": "^1.4.2"
+  },
+  "devDependencies": {
+    "@formisch/eslint-config": "workspace:*",
+    "@solidjs/vite-plugin": "3.0.0-next.51",
+    "@tailwindcss/vite": "^4.1.11",
+    "eslint": "^9.31.0",
+    "eslint-plugin-solid": "^0.18.0",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.8.3",
+    "vite": "~8.3.4"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -12,6 +12,7 @@ export type Framework =
   | 'react'
   | 'react-native'
   | 'solid'
+  | 'solid-2'
   | 'svelte'
   | 'vue';
 

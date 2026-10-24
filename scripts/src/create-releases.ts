@@ -160,6 +160,14 @@ async function createReleases() {
       continue;
     }
 
+    // If framework package is private, skip release, because it is published
+    // as part of another package (e.g. `frameworks/solid-2` as `@formisch/solid/v2`)
+    if (frameworkPackage.private) {
+      console.log(`⏭️  Skipping ${framework}: Package is private`);
+      skippedCount++;
+      continue;
+    }
+
     // Construct tag name for release
     const tagName = `v${frameworkPackage.version}-${framework}`;
 

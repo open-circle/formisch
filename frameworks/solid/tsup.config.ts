@@ -48,6 +48,18 @@ export default defineConfig((config) => {
         types: './dist/internals.d.ts',
         import: './dist/internals.js',
       },
+      // SolidJS 2 build copied from `frameworks/solid-2` by tsdown
+      './v2': {
+        solid: './dist/v2/index.jsx',
+        import: {
+          types: './dist/v2/index.d.ts',
+          default: './dist/v2/index.js',
+        },
+      },
+      './v2/internals': {
+        types: './dist/v2/internals.d.ts',
+        import: './dist/v2/internals.js',
+      },
     };
 
     console.log(

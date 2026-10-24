@@ -1,0 +1,71 @@
+{
+  "name": "@formisch/solid-2",
+  "description": "SolidJS 2 build of @formisch/solid, published as @formisch/solid/v2",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "author": "Fabian Hiller",
+  "homepage": "https://formisch.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-circle/formisch.git"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "solid": "./dist/index.jsx",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./internals": {
+      "types": "./dist/internals.d.ts",
+      "import": "./dist/internals.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "vitest run --typecheck",
+    "lint": "eslint \"src/**/*.ts*\" && tsc --noEmit",
+    "lint.fix": "eslint \"src/**/*.ts*\" --fix",
+    "format": "prettier --write ./src",
+    "format.check": "prettier --check ./src",
+    "build": "vite build && tsdown"
+  },
+  "devDependencies": {
+    "@formisch/core": "workspace:*",
+    "@formisch/eslint-config": "workspace:*",
+    "@formisch/methods": "workspace:*",
+    "@solidjs/testing-library": "1.0.0-rc.2",
+    "@solidjs/vite-plugin": "3.0.0-next.51",
+    "@solidjs/web": "2.0.0-rc.18",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@types/node": "24.0.13",
+    "@vitest/coverage-v8": "4.1.12",
+    "eslint": "^9.31.0",
+    "eslint-plugin-solid": "^0.18.0",
+    "jsdom": "^26.1.0",
+    "solid-js": "2.0.0-rc.18",
+    "tsdown": "^0.16.8",
+    "typescript": "^5.8.3",
+    "valibot": "^1.4.2",
+    "vite": "~8.3.4",
+    "vitest": "4.1.12"
+  },
+  "peerDependencies": {
+    "@solidjs/web": ">=2.0.0-0 <3",
+    "solid-js": ">=2.0.0-0 <3",
+    "typescript": ">=5 <8",
+    "valibot": ">=1.4.1 <2"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  }
+}

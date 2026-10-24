@@ -44,6 +44,10 @@
       "types": "./dist/index.solid.d.ts",
       "default": "./dist/index.solid.js"
     },
+    "./solid-2": {
+      "types": "./dist/index.solid-2.d.ts",
+      "default": "./dist/index.solid-2.js"
+    },
     "./svelte": {
       "types": "./dist/index.svelte.d.ts",
       "default": "./dist/index.svelte.js"

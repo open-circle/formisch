@@ -42,6 +42,10 @@
       "types": "./dist/index.solid.d.ts",
       "default": "./dist/index.solid.js"
     },
+    "./solid-2": {
+      "types": "./dist/index.solid-2.d.ts",
+      "default": "./dist/index.solid-2.js"
+    },
     "./svelte": {
       "types": "./dist/index.svelte.d.ts",
       "default": "./dist/index.svelte.js"
@@ -89,6 +93,7 @@
     "rolldown": "1.0.0-beta.26",
     "rolldown-plugin-dts": "^0.13.13",
     "solid-js": "^1.9.7",
+    "solid-js-2": "npm:solid-js@2.0.0-rc.18",
     "svelte": "^5.57.2",
     "tsdown": "^0.16.8",
     "typescript": "^5.8.3",
@@ -102,7 +107,7 @@
     "@qwik.dev/core": ">=2 <3",
     "@types/react": ">=16.8.0 <20",
     "react": ">=16.8.0 <20",
-    "solid-js": ">=1.6 <2",
+    "solid-js": ">=1.6 <2 || >=2.0.0-0 <3",
     "svelte": ">=5.29 <6",
     "typescript": ">=5 <8",
     "valibot": ">=1.4.1 <2",

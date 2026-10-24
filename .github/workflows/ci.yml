@@ -139,6 +139,49 @@ jobs:
         run: pnpm test
         working-directory: frameworks/solid
 
+  # frameworks/solid-2
+  solid_2_prettier:
+    name: Run Prettier in frameworks/solid-2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup environment
+        uses: $/.github/actions/environment
+      - name: Prettier check
+        run: pnpm format.check
+        working-directory: frameworks/solid-2
+
+  solid_2_eslint:
+    name: Run ESLint in frameworks/solid-2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup environment
+        uses: $/.github/actions/environment
+      - name: ESLint check
+        run: pnpm lint
+        working-directory: frameworks/solid-2
+
+  solid_2_vitest:
+    name: Run Vitest in frameworks/solid-2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup environment
+        uses: $/.github/actions/environment
+      - name: Vitest tests
+        run: pnpm test
+        working-directory: frameworks/solid-2
+
   # frameworks/react
   react_prettier:
     name: Run Prettier in frameworks/react

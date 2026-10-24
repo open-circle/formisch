@@ -58,6 +58,18 @@ export default function LoginPage() {
 
 In addition, Formisch offers several functions (we call them "methods") that can be used to read and manipulate the form state. These include `focus`, `getDeepErrorEntries`, `getDeepErrors`, `getDirtyInput`, `getDirtyPaths`, `getErrors`, `getInput`, `handleSubmit`, `insert`, `isDirty`, `isEdited`, `isTouched`, `isValid`, `move`, `pickDirty`, `remove`, `replace`, `reset`, `setErrors`, `setInput`, `submit`, `swap` and `validate`. These methods allow you to control the form programmatically.
 
+## SolidJS 2
+
+Support for the SolidJS 2 release candidate is available via the `@formisch/solid/v2` entry point. It requires `solid-js` and `@solidjs/web` v2 as well as the SolidJS 2 Vite plugin `@solidjs/vite-plugin`. The API is the same, only the import path changes.
+
+```tsx
+import { createForm, Field, Form } from '@formisch/solid/v2';
+```
+
+The entry point ships uncompiled JSX via the `solid` export condition, which the SolidJS 2 Vite plugin picks up automatically. The compiled fallback only supports client-side rendering.
+
+As usual in SolidJS 2, derived form and field state such as `input`, `isDirty` and `isValid` updates on the next flush. Read it reactively or call `flush()` from `solid-js` before reading it synchronously right after a change.
+
 ## Comparison
 
 What makes Formisch unique is its framework-agnostic core, which is fully native to the framework you are using. It works by inserting framework-specific reactivity blocks when the core package is built, giving you native performance for any UI update. A modular methods API keeps bundles starting at just ~2.5 kB by only including the methods you import, and end-to-end type safety covers deeply nested paths and field arrays with TypeScript inference that stays fast even as forms grow.

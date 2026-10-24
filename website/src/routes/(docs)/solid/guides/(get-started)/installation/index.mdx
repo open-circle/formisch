@@ -56,6 +56,38 @@ Then you can import it into any JavaScript or TypeScript file.
 import { … } from '@formisch/solid';
 ```
 
+## SolidJS 2
+
+Formisch has support for the SolidJS 2 release candidate. It is available via the `@formisch/solid/v2` entry point of the same package. Besides `solid-js` v2, it requires `@solidjs/web`, which contains the web renderer and JSX types of SolidJS 2.
+
+> SolidJS 2 is not stable yet. The `@formisch/solid/v2` entry point follows its release candidates and may change until SolidJS 2 is released.
+
+```bash
+npm install solid-js@next @solidjs/web@next     # npm
+yarn add solid-js@next @solidjs/web@next        # yarn
+pnpm add solid-js@next @solidjs/web@next        # pnpm
+bun add solid-js@next @solidjs/web@next         # bun
+deno add npm:solid-js@next npm:@solidjs/web@next    # deno
+```
+
+To compile the JSX of your app and of Formisch, you also need the SolidJS 2 Vite plugin `@solidjs/vite-plugin` instead of `vite-plugin-solid`.
+
+```bash
+npm install -D @solidjs/vite-plugin     # npm
+yarn add -D @solidjs/vite-plugin        # yarn
+pnpm add -D @solidjs/vite-plugin        # pnpm
+bun add -D @solidjs/vite-plugin         # bun
+deno add -D npm:@solidjs/vite-plugin    # deno
+```
+
+The API is the same as for SolidJS 1. Only the import path changes.
+
+```ts
+import { … } from '@formisch/solid/v2';
+```
+
+As usual in SolidJS 2, derived form and field state such as `input`, `isDirty` and `isValid` updates on the next flush. Read it reactively, for example in JSX, or call `flush()` from `solid-js` before reading it synchronously right after a change.
+
 ## For AI Agents
 
 We provide agent skills that teach AI agents the correct patterns for working with Valibot and Formisch. You can install them by running the following command in your terminal:

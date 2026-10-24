@@ -11,11 +11,12 @@ type Framework =
   | 'react'
   | 'react-native'
   | 'solid'
+  | 'solid-2'
   | 'svelte'
   | 'vue';
 
 const FRAMEWORK_FILE_REGEX =
-  /\.(?:angular|preact|qwik|react|react-native|solid|svelte|vue)(?:\.d)?\.ts$/;
+  /\.(?:angular|preact|qwik|react|react-native|solid|solid-2|svelte|vue)(?:\.d)?\.ts$/;
 
 /**
  * Rolldown plugin to rewrite framework-specific imports.
@@ -100,6 +101,7 @@ function defineFrameworkConfig(
       '@preact/signals',
       '@qwik.dev/core',
       'solid-js',
+      'solid-js-2',
       'svelte',
       'valibot',
       'vue',
@@ -109,6 +111,10 @@ function defineFrameworkConfig(
     minify: false,
     dts: true,
     outDir: './dist',
+    // Hint: The Solid 2 adapter imports Solid 2 through the `solid-js-2` pnpm
+    // alias, because this package also depends on Solid 1 for the Solid adapter.
+    // Published output must reference the real `solid-js` package instead.
+    outputOptions: { paths: { 'solid-js-2': 'solid-js' } },
     outExtensions() {
       if (framework) {
         return {
@@ -133,6 +139,7 @@ const config: (UserConfig | UserConfigFn)[] = [
   defineFrameworkConfig('react'),
   defineFrameworkConfig('react-native'),
   defineFrameworkConfig('solid'),
+  defineFrameworkConfig('solid-2'),
   defineFrameworkConfig('svelte'),
   defineFrameworkConfig('vue'),
 ];

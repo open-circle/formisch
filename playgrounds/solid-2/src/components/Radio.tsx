@@ -1,0 +1,27 @@
+import type { FieldElementProps } from '@formisch/solid/v2';
+import { omit } from 'solid-js';
+
+interface RadioProps extends FieldElementProps {
+  class?: string;
+  label: string;
+  value: string;
+  checked: boolean;
+}
+
+/**
+ * Simple radio button input. Should be used inside a RadioGroup component.
+ */
+export function Radio(props: RadioProps) {
+  const inputProps = omit(props, 'class', 'label');
+
+  return (
+    <label class="flex cursor-pointer select-none items-center space-x-3 font-medium md:text-lg lg:text-xl">
+      <input
+        {...inputProps}
+        class="h-4 w-4 cursor-pointer lg:h-5 lg:w-5"
+        type="radio"
+      />
+      <span>{props.label}</span>
+    </label>
+  );
+}

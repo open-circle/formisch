@@ -162,6 +162,10 @@ jobs:
           persist-credentials: false
       - name: Setup environment
         uses: $/.github/actions/environment
+      # The Solid 2 build is shipped as `@formisch/solid/v2`
+      - name: Build Solid 2 library
+        run: pnpm build
+        working-directory: frameworks/solid-2
       - name: Build library
         run: pnpm build
         working-directory: frameworks/solid

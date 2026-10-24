@@ -24,5 +24,16 @@ export default defineConfig({
       from: '../../packages/core/dist/index.solid.d.ts',
       to: 'dist/internals.d.ts',
     },
+    // SolidJS 2 build, published as `@formisch/solid/v2`
+    ...[
+      'index.jsx',
+      'index.js',
+      'index.d.ts',
+      'internals.js',
+      'internals.d.ts',
+    ].map((file) => ({
+      from: `../solid-2/dist/${file}`,
+      to: `dist/v2/${file}`,
+    })),
   ],
 });

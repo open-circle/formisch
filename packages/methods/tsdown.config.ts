@@ -11,6 +11,7 @@ type Framework =
   | 'react'
   | 'react-native'
   | 'solid'
+  | 'solid-2'
   | 'svelte'
   | 'vue';
 
@@ -128,6 +129,7 @@ const config: (UserConfig | UserConfigFn)[] = [
   defineFrameworkConfig('react'),
   defineFrameworkConfig('react-native'),
   defineFrameworkConfig('solid'),
+  defineFrameworkConfig('solid-2'),
   defineFrameworkConfig('svelte'),
   defineFrameworkConfig('vue'),
 ];
