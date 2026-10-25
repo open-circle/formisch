@@ -81,7 +81,7 @@ overrides:
 packageExtensionsChecksum: sha256-illU9lmUYyq7v1f5kiCfseY2/3bdsMkJ1htZVDMEdKE=
 
 patchedDependencies:
-  '@qwik.dev/router@2.0.0-rc.3': 18f5a1b53135ffa4a0ec025c6ddb595534a4650465b82b3a13c70d77d8414e11
+  '@qwik.dev/router@2.0.0-rc.3': a470bf5ce697fae3c13a7fa760a573ec4aae019a625a267b4b88ca3e10eaf031
 
 importers:
 
@@ -939,7 +939,7 @@ importers:
         version: 2.0.0-rc.3(@oxc-project/types@0.154.0)(esbuild@0.28.2)(prettier@3.6.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@8.3.4(@types/node@24.0.13)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vitest@4.1.12)
       '@qwik.dev/router':
         specifier: 2.0.0-rc.3
-        version: 2.0.0-rc.3(patch_hash=18f5a1b53135ffa4a0ec025c6ddb595534a4650465b82b3a13c70d77d8414e11)(@qwik.dev/core@2.0.0-rc.3(@oxc-project/types@0.154.0)(esbuild@0.28.2)(prettier@3.6.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@8.3.4(@types/node@24.0.13)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vitest@4.1.12))(@types/node@24.0.13)(rollup@4.59.0)(typescript@5.8.3)(vite@8.3.4(@types/node@24.0.13)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
+        version: 2.0.0-rc.3(patch_hash=a470bf5ce697fae3c13a7fa760a573ec4aae019a625a267b4b88ca3e10eaf031)(@qwik.dev/core@2.0.0-rc.3(@oxc-project/types@0.154.0)(esbuild@0.28.2)(prettier@3.6.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@8.3.4(@types/node@24.0.13)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vitest@4.1.12))(@types/node@24.0.13)(rollup@4.59.0)(typescript@5.8.3)(vite@8.3.4(@types/node@24.0.13)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.1.16(vite@8.3.4(@types/node@24.0.13)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
@@ -1402,7 +1402,7 @@ importers:
         version: 2.0.0-rc.3(@oxc-project/types@0.154.0)(esbuild@0.28.2)(prettier@3.6.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@8.3.4(@types/node@22.18.12)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vitest@4.1.12)
       '@qwik.dev/router':
         specifier: 2.0.0-rc.3
-        version: 2.0.0-rc.3(patch_hash=18f5a1b53135ffa4a0ec025c6ddb595534a4650465b82b3a13c70d77d8414e11)(@qwik.dev/core@2.0.0-rc.3(@oxc-project/types@0.154.0)(esbuild@0.28.2)(prettier@3.6.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@8.3.4(@types/node@22.18.12)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vitest@4.1.12))(@types/node@22.18.12)(rollup@4.59.0)(typescript@5.8.3)(vite@8.3.4(@types/node@22.18.12)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
+        version: 2.0.0-rc.3(patch_hash=a470bf5ce697fae3c13a7fa760a573ec4aae019a625a267b4b88ca3e10eaf031)(@qwik.dev/core@2.0.0-rc.3(@oxc-project/types@0.154.0)(esbuild@0.28.2)(prettier@3.6.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@8.3.4(@types/node@22.18.12)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vitest@4.1.12))(@types/node@22.18.12)(rollup@4.59.0)(typescript@5.8.3)(vite@8.3.4(@types/node@22.18.12)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
       '@shikijs/rehype':
         specifier: ^3.13.0
         version: 3.13.0
@@ -18083,7 +18083,7 @@ snapshots:
     dependencies:
       vite: 8.3.4(@types/node@24.0.13)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
 
-  '@qwik.dev/router@2.0.0-rc.3(patch_hash=18f5a1b53135ffa4a0ec025c6ddb595534a4650465b82b3a13c70d77d8414e11)(@qwik.dev/core@2.0.0-rc.3(@oxc-project/types@0.154.0)(esbuild@0.28.2)(prettier@3.6.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@8.3.4(@types/node@22.18.12)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vitest@4.1.12))(@types/node@22.18.12)(rollup@4.59.0)(typescript@5.8.3)(vite@8.3.4(@types/node@22.18.12)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))':
+  '@qwik.dev/router@2.0.0-rc.3(patch_hash=a470bf5ce697fae3c13a7fa760a573ec4aae019a625a267b4b88ca3e10eaf031)(@qwik.dev/core@2.0.0-rc.3(@oxc-project/types@0.154.0)(esbuild@0.28.2)(prettier@3.6.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@8.3.4(@types/node@22.18.12)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vitest@4.1.12))(@types/node@22.18.12)(rollup@4.59.0)(typescript@5.8.3)(vite@8.3.4(@types/node@22.18.12)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))':
     dependencies:
       '@azure/functions': 3.5.1
       '@mdx-js/mdx': 3.1.1
@@ -18119,7 +18119,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@qwik.dev/router@2.0.0-rc.3(patch_hash=18f5a1b53135ffa4a0ec025c6ddb595534a4650465b82b3a13c70d77d8414e11)(@qwik.dev/core@2.0.0-rc.3(@oxc-project/types@0.154.0)(esbuild@0.28.2)(prettier@3.6.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@8.3.4(@types/node@24.0.13)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vitest@4.1.12))(@types/node@24.0.13)(rollup@4.59.0)(typescript@5.8.3)(vite@8.3.4(@types/node@24.0.13)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))':
+  '@qwik.dev/router@2.0.0-rc.3(patch_hash=a470bf5ce697fae3c13a7fa760a573ec4aae019a625a267b4b88ca3e10eaf031)(@qwik.dev/core@2.0.0-rc.3(@oxc-project/types@0.154.0)(esbuild@0.28.2)(prettier@3.6.2)(rolldown@1.2.14)(rollup@4.59.0)(vite@8.3.4(@types/node@24.0.13)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))(vitest@4.1.12))(@types/node@24.0.13)(rollup@4.59.0)(typescript@5.8.3)(vite@8.3.4(@types/node@24.0.13)(esbuild@0.28.2)(jiti@2.7.0)(less@4.4.2)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))':
     dependencies:
       '@azure/functions': 3.5.1
       '@mdx-js/mdx': 3.1.1
