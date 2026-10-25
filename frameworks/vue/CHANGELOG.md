@@ -5,6 +5,7 @@ All notable changes to the library will be documented in this file.
 ## vX.X.X (Month DD, YYYY)
 
 - Fix focusing fields whose props are bound to a component wrapping the form control (issue #220)
+- Fix `useField` cleanup throwing when an array item is removed with Vue 3.6
 
 ## v1.1.0 (September 07, 2026)
 
