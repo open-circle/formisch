@@ -17,7 +17,7 @@ type Framework =
   | 'vue';
 
 const FRAMEWORK_FILE_REGEX =
-  /\.(?:angular|preact|qwik|react|react-native|solid|solid-2|svelte|vue)(?:\.d)?\.ts$/;
+  /\.(?:angular|honox|preact|qwik|react|react-native|solid|solid-2|svelte|vue)(?:\.d)?\.ts$/;
 
 /**
  * Rolldown plugin to rewrite framework-specific imports.
