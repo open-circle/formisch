@@ -44,7 +44,6 @@ jobs:
               - '.github/actions/**'
               - '.github/workflows/ci.yml'
               - '.npmrc'
-              - '.pnpmrc'
               - 'package.json'
               - 'patches/**'
               - 'pnpm-lock.yaml'
