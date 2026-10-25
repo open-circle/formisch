@@ -82,7 +82,7 @@
   "devDependencies": {
     "@angular/core": "^22.2.3",
     "@formisch/eslint-config": "workspace:*",
-    "@preact/signals": "^2.9.0",
+    "@preact/signals": "^2.11.3",
     "@qwik.dev/core": "2.0.0-rc.3",
     "@types/node": "24.0.13",
     "@types/react": "^19.2.5",
