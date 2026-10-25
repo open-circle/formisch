@@ -34,7 +34,6 @@ allowBuilds:
   msgpackr-extract: false
   sharp: true
   unrs-resolver: true
-  vercel: true
   workerd: true
 packageExtensions:
   # Imports vite without declaring it, which otherwise resolves to a hoisted
