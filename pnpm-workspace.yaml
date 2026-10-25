@@ -4,7 +4,7 @@ packages:
   - 'playgrounds/*'
   - 'scripts'
   - 'website'
-minimumReleaseAge: 10080  # minutes — 7 days
+minimumReleaseAge: 10080 # minutes — 7 days
 minimumReleaseAgeExclude:
   - valibot
   # Solid 2 release candidates for frameworks/solid-2 and playgrounds/solid-2
@@ -34,7 +34,7 @@ allowBuilds:
   msgpackr-extract: false
   sharp: true
   unrs-resolver: true
-  vercel: true
+  vercel: set this to true or false
   workerd: true
 packageExtensions:
   # Imports vite without declaring it, which otherwise resolves to a hoisted

@@ -15,7 +15,6 @@ backups
 # Services
 .vscode
 .netlify
-.vercel
 
 # Claude generated files
 docs/superpowers
