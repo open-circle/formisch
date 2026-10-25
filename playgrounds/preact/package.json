@@ -13,10 +13,11 @@
   "dependencies": {
     "@formisch/preact": "workspace:*",
     "@formkit/auto-animate": "^0.8.2",
-    "@preact/signals": "^2.9.0",
+    "@preact/signals": "^2.11.3",
     "clsx": "^2.1.1",
-    "preact": "^10.29.2",
-    "preact-iso": "^2.9.2",
+    "preact": "^11.0.1",
+    "preact-iso": "^2.12.2",
+    "preact-render-to-string": "^6.8.1",
     "valibot": "^1.4.2"
   },
   "devDependencies": {
