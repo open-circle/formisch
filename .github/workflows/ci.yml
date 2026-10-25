@@ -10,9 +10,88 @@ permissions:
   contents: read
 
 jobs:
+  # Detect which parts of the monorepo a pull request touches, so that only
+  # the affected jobs run. Each filter includes the paths of the workspace
+  # packages it depends on. Pushes to main and workflow calls run everything.
+  changes:
+    name: Detect changed files
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      core: ${{ github.event_name != 'pull_request' || steps.filter.outputs.core == 'true' }}
+      methods: ${{ github.event_name != 'pull_request' || steps.filter.outputs.methods == 'true' }}
+      solid: ${{ github.event_name != 'pull_request' || steps.filter.outputs.solid == 'true' }}
+      solid_2: ${{ github.event_name != 'pull_request' || steps.filter.outputs.solid_2 == 'true' }}
+      react: ${{ github.event_name != 'pull_request' || steps.filter.outputs.react == 'true' }}
+      preact: ${{ github.event_name != 'pull_request' || steps.filter.outputs.preact == 'true' }}
+      qwik: ${{ github.event_name != 'pull_request' || steps.filter.outputs.qwik == 'true' }}
+      svelte: ${{ github.event_name != 'pull_request' || steps.filter.outputs.svelte == 'true' }}
+      vue: ${{ github.event_name != 'pull_request' || steps.filter.outputs.vue == 'true' }}
+      angular: ${{ github.event_name != 'pull_request' || steps.filter.outputs.angular == 'true' }}
+      react_native: ${{ github.event_name != 'pull_request' || steps.filter.outputs.react_native == 'true' }}
+      website: ${{ github.event_name != 'pull_request' || steps.filter.outputs.website == 'true' }}
+    steps:
+      # For pull requests, the changed files are fetched from the GitHub API,
+      # so no checkout is required
+      - name: Filter changed files
+        id: filter
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          filters: |
+            shared: &shared
+              - '.github/actions/**'
+              - '.github/workflows/ci.yml'
+              - '.npmrc'
+              - 'package.json'
+              - 'patches/**'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'prettier.config.js'
+              - 'packages/eslint-config/**'
+            core: &core
+              - *shared
+              - 'packages/core/**'
+            methods: &methods
+              - *core
+              - 'packages/methods/**'
+            solid_2: &solid_2
+              - *methods
+              - 'frameworks/solid-2/**'
+            solid:
+              - *solid_2
+              - 'frameworks/solid/**'
+            react:
+              - *methods
+              - 'frameworks/react/**'
+            preact:
+              - *methods
+              - 'frameworks/preact/**'
+            qwik:
+              - *methods
+              - 'frameworks/qwik/**'
+            svelte:
+              - *methods
+              - 'frameworks/svelte/**'
+            vue:
+              - *methods
+              - 'frameworks/vue/**'
+            angular:
+              - *methods
+              - 'frameworks/angular/**'
+            react_native:
+              - *methods
+              - 'frameworks/react-native/**'
+            website:
+              - *shared
+              - 'website/**'
+
   # packages/core
   core_prettier:
     name: Run Prettier in packages/core
+    needs: changes
+    if: needs.changes.outputs.core == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -27,6 +106,8 @@ jobs:
 
   core_eslint:
     name: Run ESLint in packages/core
+    needs: changes
+    if: needs.changes.outputs.core == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -41,6 +122,8 @@ jobs:
 
   core_vitest:
     name: Run Vitest in packages/core
+    needs: changes
+    if: needs.changes.outputs.core == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -56,6 +139,8 @@ jobs:
   # packages/methods
   methods_prettier:
     name: Run Prettier in packages/methods
+    needs: changes
+    if: needs.changes.outputs.methods == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -70,6 +155,8 @@ jobs:
 
   methods_eslint:
     name: Run ESLint in packages/methods
+    needs: changes
+    if: needs.changes.outputs.methods == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -84,6 +171,8 @@ jobs:
 
   methods_vitest:
     name: Run Vitest in packages/methods
+    needs: changes
+    if: needs.changes.outputs.methods == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -99,6 +188,8 @@ jobs:
   # frameworks/solid
   solid_prettier:
     name: Run Prettier in frameworks/solid
+    needs: changes
+    if: needs.changes.outputs.solid == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -113,6 +204,8 @@ jobs:
 
   solid_eslint:
     name: Run ESLint in frameworks/solid
+    needs: changes
+    if: needs.changes.outputs.solid == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -127,6 +220,8 @@ jobs:
 
   solid_vitest:
     name: Run Vitest in frameworks/solid
+    needs: changes
+    if: needs.changes.outputs.solid == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -142,6 +237,8 @@ jobs:
   # frameworks/solid-2
   solid_2_prettier:
     name: Run Prettier in frameworks/solid-2
+    needs: changes
+    if: needs.changes.outputs.solid_2 == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -156,6 +253,8 @@ jobs:
 
   solid_2_eslint:
     name: Run ESLint in frameworks/solid-2
+    needs: changes
+    if: needs.changes.outputs.solid_2 == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -170,6 +269,8 @@ jobs:
 
   solid_2_vitest:
     name: Run Vitest in frameworks/solid-2
+    needs: changes
+    if: needs.changes.outputs.solid_2 == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -185,6 +286,8 @@ jobs:
   # frameworks/react
   react_prettier:
     name: Run Prettier in frameworks/react
+    needs: changes
+    if: needs.changes.outputs.react == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -199,6 +302,8 @@ jobs:
 
   react_eslint:
     name: Run ESLint in frameworks/react
+    needs: changes
+    if: needs.changes.outputs.react == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -213,6 +318,8 @@ jobs:
 
   react_vitest:
     name: Run Vitest in frameworks/react
+    needs: changes
+    if: needs.changes.outputs.react == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -228,6 +335,8 @@ jobs:
   # frameworks/preact
   preact_prettier:
     name: Run Prettier in frameworks/preact
+    needs: changes
+    if: needs.changes.outputs.preact == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -242,6 +351,8 @@ jobs:
 
   preact_eslint:
     name: Run ESLint in frameworks/preact
+    needs: changes
+    if: needs.changes.outputs.preact == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -256,6 +367,8 @@ jobs:
 
   preact_vitest:
     name: Run Vitest in frameworks/preact
+    needs: changes
+    if: needs.changes.outputs.preact == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -271,6 +384,8 @@ jobs:
   # frameworks/qwik
   qwik_prettier:
     name: Run Prettier in frameworks/qwik
+    needs: changes
+    if: needs.changes.outputs.qwik == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -285,6 +400,8 @@ jobs:
 
   qwik_eslint:
     name: Run ESLint in frameworks/qwik
+    needs: changes
+    if: needs.changes.outputs.qwik == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -300,6 +417,8 @@ jobs:
   # frameworks/svelte
   svelte_prettier:
     name: Run Prettier in frameworks/svelte
+    needs: changes
+    if: needs.changes.outputs.svelte == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -314,6 +433,8 @@ jobs:
 
   svelte_eslint:
     name: Run ESLint in frameworks/svelte
+    needs: changes
+    if: needs.changes.outputs.svelte == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -328,6 +449,8 @@ jobs:
 
   svelte_check:
     name: Run Svelte check in frameworks/svelte
+    needs: changes
+    if: needs.changes.outputs.svelte == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -342,6 +465,8 @@ jobs:
 
   svelte_vitest:
     name: Run Vitest in frameworks/svelte
+    needs: changes
+    if: needs.changes.outputs.svelte == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -357,6 +482,8 @@ jobs:
   # frameworks/vue
   vue_prettier:
     name: Run Prettier in frameworks/vue
+    needs: changes
+    if: needs.changes.outputs.vue == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -371,6 +498,8 @@ jobs:
 
   vue_eslint:
     name: Run ESLint in frameworks/vue
+    needs: changes
+    if: needs.changes.outputs.vue == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -385,6 +514,8 @@ jobs:
 
   vue_vitest:
     name: Run Vitest in frameworks/vue
+    needs: changes
+    if: needs.changes.outputs.vue == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -400,6 +531,8 @@ jobs:
   # frameworks/angular
   angular_prettier:
     name: Run Prettier in frameworks/angular
+    needs: changes
+    if: needs.changes.outputs.angular == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -414,6 +547,8 @@ jobs:
 
   angular_eslint:
     name: Run ESLint in frameworks/angular
+    needs: changes
+    if: needs.changes.outputs.angular == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -428,6 +563,8 @@ jobs:
 
   angular_vitest:
     name: Run Vitest in frameworks/angular
+    needs: changes
+    if: needs.changes.outputs.angular == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -443,6 +580,8 @@ jobs:
   # frameworks/react-native
   react_native_prettier:
     name: Run Prettier in frameworks/react-native
+    needs: changes
+    if: needs.changes.outputs.react_native == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -457,6 +596,8 @@ jobs:
 
   react_native_eslint:
     name: Run ESLint in frameworks/react-native
+    needs: changes
+    if: needs.changes.outputs.react_native == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -471,6 +612,8 @@ jobs:
 
   react_native_vitest:
     name: Run Vitest in frameworks/react-native
+    needs: changes
+    if: needs.changes.outputs.react_native == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -486,6 +629,8 @@ jobs:
   # website
   website_prettier:
     name: Run Prettier in website
+    needs: changes
+    if: needs.changes.outputs.website == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -500,6 +645,8 @@ jobs:
 
   website_eslint:
     name: Run ESLint in website
+    needs: changes
+    if: needs.changes.outputs.website == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
