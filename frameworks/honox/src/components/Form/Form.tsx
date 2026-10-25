@@ -48,7 +48,9 @@ export function Form({ of, onSubmit, ...other }: FormProps): JSX.Element {
           of[INTERNAL].element = element;
         }
       }}
-      onSubmit={handleSubmit(of, onSubmit)}
+      // Hint: Unlike React, hono/jsx types the submit handler with the generic
+      // `Event`, although the browser always passes a `SubmitEvent` to it
+      onSubmit={(event) => handleSubmit(of, onSubmit)(event as SubmitEvent)}
     />
   );
 }

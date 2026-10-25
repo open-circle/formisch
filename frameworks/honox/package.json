@@ -65,7 +65,7 @@
     "hono": "^4.13.13",
     "jsdom": "^26.1.0",
     "tsdown": "^0.16.8",
-    "typescript": "~5.9.3",
+    "typescript": "~6.0.3",
     "valibot": "^1.4.2",
     "vitest": "^4.1.12"
   },
