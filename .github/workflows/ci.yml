@@ -633,8 +633,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Prettier check
         run: pnpm format.check
         working-directory: frameworks/honox
@@ -645,8 +647,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: ESLint check
         run: pnpm lint
         working-directory: frameworks/honox
@@ -657,8 +661,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Setup environment
-        uses: ./.github/actions/environment
+        uses: $/.github/actions/environment
       - name: Vitest tests
         run: pnpm test
         working-directory: frameworks/honox
