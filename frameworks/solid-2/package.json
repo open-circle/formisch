@@ -52,7 +52,7 @@
     "jsdom": "^26.1.0",
     "solid-js": "2.0.0-rc.18",
     "tsdown": "^0.16.8",
-    "typescript": "^5.8.3",
+    "typescript": "~6.0.3",
     "valibot": "^1.4.2",
     "vite": "~8.3.4",
     "vitest": "4.1.12"
