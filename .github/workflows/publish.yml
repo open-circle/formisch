@@ -12,6 +12,10 @@ jobs:
   default_ci:
     name: Run default CI of repository
     uses: $/.github/workflows/ci.yml
+    # Required by the change detection job of the called workflow
+    permissions:
+      contents: read
+      pull-requests: read
 
   angular_npm:
     name: Publish Angular to NPM
