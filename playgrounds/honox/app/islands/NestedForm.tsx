@@ -39,7 +39,7 @@ export default function NestedForm() {
     },
   });
 
-  const itemsListElement = useAutoAnimate();
+  const [itemsListElement] = useAutoAnimate();
 
   return (
     <Form
@@ -92,7 +92,7 @@ export default function NestedForm() {
                     path={['items', itemIndex, 'options']}
                   >
                     {(fieldArray) => {
-                      const optionsListElement = useAutoAnimate();
+                      const [optionsListElement] = useAutoAnimate();
                       return (
                         <div ref={optionsListElement} class="space-y-5 px-6">
                           {fieldArray.items.map((item, optionIndex) => (

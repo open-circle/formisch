@@ -6,15 +6,19 @@ import { useCallback } from 'hono/jsx';
  * whenever they are added, removed or reordered.
  *
  * Hint: There is no official `@formkit/auto-animate` adapter for hono/jsx, so
- * the framework-agnostic core is wired up to a callback ref here. See
- * `useElementRef` for why a callback and not a ref object is used.
+ * the framework-agnostic core is wired up to a callback ref here. Like the
+ * React adapter, the ref is returned in a tuple. See `useElementRef` for why a
+ * callback and not a ref object is used.
  */
-export function useAutoAnimate<T extends HTMLElement = HTMLDivElement>(): (
-  element: T | null
-) => void {
-  return useCallback((element: T | null) => {
+export function useAutoAnimate<T extends HTMLElement = HTMLDivElement>(): [
+  (element: T | null) => (() => void) | undefined,
+] {
+  const ref = useCallback((element: T | null) => {
     if (element) {
-      autoAnimate(element);
+      // Hint: hono/jsx calls the returned function when the element is removed
+      const controller = autoAnimate(element);
+      return () => controller.destroy?.();
     }
   }, []);
+  return [ref];
 }

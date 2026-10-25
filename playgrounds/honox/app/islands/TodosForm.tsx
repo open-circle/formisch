@@ -43,7 +43,7 @@ export default function TodosForm() {
     },
   });
 
-  const listElement = useAutoAnimate();
+  const [listElement] = useAutoAnimate();
 
   return (
     <Form

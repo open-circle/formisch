@@ -24,3 +24,11 @@ html {
 [type='date'] {
   @apply flex appearance-none items-center justify-start;
 }
+
+/* Island layout */
+/* Hint: HonoX wraps each island in a custom `<honox-island>` element that is
+   inline by default, so that vertical spacing such as `space-y-*` would not
+   apply to the island. Rendering it as a block keeps the layout identical. */
+honox-island {
+  display: block;
+}
