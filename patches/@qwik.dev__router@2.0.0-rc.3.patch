@@ -1,3 +1,30 @@
+diff --git a/lib/chunks/head.qwik.mjs b/lib/chunks/head.qwik.mjs
+index 3f00636..46690d9 100644
+--- a/lib/chunks/head.qwik.mjs
++++ b/lib/chunks/head.qwik.mjs
+@@ -1005,11 +1005,20 @@ var ChildMatchKind = /* @__PURE__ */ function(ChildMatchKind) {
+ 	ChildMatchKind[ChildMatchKind["Rest"] = 2] = "Rest";
+ 	return ChildMatchKind;
+ }(ChildMatchKind || {});
++/** Lowercased static keys of each route node, so matching stays case-insensitive. */
++var lowerStaticKeys = /* @__PURE__ */ new WeakMap();
+ /** The static child for a segment; inherited object properties (`constructor`, …) are not routes. */
+ function getStaticChild(node, partLower) {
+ 	const key = escapeStaticTrieKey(partLower);
+-	if (!Object.prototype.hasOwnProperty.call(node, key)) return;
+-	return node[key];
++	if (Object.prototype.hasOwnProperty.call(node, key)) return node[key];
++	let keys = lowerStaticKeys.get(node);
++	if (!keys) {
++		keys = /* @__PURE__ */ new Map();
++		for (const k of Object.keys(node)) if (isStaticTrieKey(k)) keys.set(k.toLowerCase(), k);
++		lowerStaticKeys.set(node, keys);
++	}
++	const originalKey = keys.get(key);
++	return originalKey === void 0 ? void 0 : node[originalKey];
+ }
+ /**
+ * Try to find a child matching `partLower` in `node`, including inside group children (_M). Returns
 diff --git a/lib/ssg/index.mjs b/lib/ssg/index.mjs
 index bbbd037..4f0fcb2 100644
 --- a/lib/ssg/index.mjs
@@ -11,3 +38,25 @@ index bbbd037..4f0fcb2 100644
  							}
  						} else if (pathname.endsWith("/")) pathname = pathname.slice(0, pathname.length - 1);
  					}
+diff --git a/lib/vite/index.mjs b/lib/vite/index.mjs
+index 9b8a809..010cb4f 100644
+--- a/lib/vite/index.mjs
++++ b/lib/vite/index.mjs
+@@ -279,7 +279,7 @@ function routeSortCompare(a, b) {
+ * - `[slug]` → `{ key: '_W', paramName: 'slug' }`
+ * - `[...rest]` → `{ key: '_A', paramName: 'rest' }`
+ * - `pre[slug]post` → `{ key: '_W', paramName: 'slug', prefix: 'pre', suffix: 'post' }`
+-* - `blog` → `{ key: 'blog' }` (lowercased)
++* - `blog` → `{ key: 'blog' }` (original casing is kept, matching is case-insensitive)
+ */
+ function parseDirName(name) {
+ 	if (name.startsWith("(") && name.endsWith(")")) return { key: null };
+@@ -295,7 +295,7 @@ function parseDirName(name) {
+ 		prefix: paramMatch[1] || void 0,
+ 		suffix: paramMatch[3] || void 0
+ 	};
+-	return { key: name.toLowerCase() };
++	return { key: name };
+ }
+ /** Walk the routes directory and return a BuildTrieNode with trie keys. */
+ async function walkRoutes(routesDir) {
