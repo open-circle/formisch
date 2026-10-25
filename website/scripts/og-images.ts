@@ -10,7 +10,7 @@ import { promises as fsp } from 'node:fs';
 import path from 'node:path';
 import { html } from 'satori-html';
 import sharp from 'sharp';
-import { findNestedFiles } from './utils/index';
+import { findNestedFiles, urlPathFromFilePath } from './utils/index';
 
 interface RouteInfo {
   /** Path component (e.g. "solid_guides_introduction") or "index" for "/". */
@@ -26,14 +26,6 @@ const OUT_DIR = path.join('public', 'og');
 
 /** Area segments that follow a package or framework prefix in the URL. */
 const AREA_LIST = ['guides', 'api'];
-
-function urlPathFromFilePath(filePath: string): string {
-  return filePath
-    .replace(/\\/g, '/')
-    .replace(/src\/routes\//, '')
-    .replace(/\(.+?\)\//g, '')
-    .replace(/index\.(tsx|mdx)$/, '');
-}
 
 function slugFromUrlPath(urlPath: string): string {
   const trimmed = urlPath.replace(/^\/+|\/+$/g, '');

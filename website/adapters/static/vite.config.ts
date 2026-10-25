@@ -2,7 +2,8 @@ import { ssgAdapter } from '@qwik.dev/router/adapters/ssg/vite';
 import { extendConfig } from '@qwik.dev/router/vite';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import type { Plugin } from 'vite';
-import { findNestedFiles } from '../../scripts/utils/index';
+import { findNestedFiles } from '../../scripts/utils/findNestedFiles.ts';
+import { urlPathFromFilePath } from '../../scripts/utils/urlPathFromFilePath.ts';
 import baseConfig from '../../vite.config.ts';
 
 /**
@@ -42,14 +43,7 @@ function caseRedirects(): Plugin {
         ['src/routes'],
         (fileName) => fileName === 'index.tsx' || fileName === 'index.mdx'
       )
-        .map(
-          (filePath) =>
-            `/${filePath
-              .replace(/\\/g, '/')
-              .replace(/src\/routes\//, '')
-              .replace(/\(.+?\)\//g, '')
-              .replace(/index\.(tsx|mdx)$/, '')}`
-        )
+        .map((filePath) => `/${urlPathFromFilePath(filePath)}`)
         .filter((urlPath) => urlPath !== urlPath.toLowerCase())
         .sort()
         // Hint: Paths without trailing slash need their own rule, because

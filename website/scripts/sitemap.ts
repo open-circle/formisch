@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { findNestedFiles } from './utils/index';
+import { findNestedFiles, urlPathFromFilePath } from './utils/index';
 
 const ORIGIN = 'https://formisch.dev';
 
@@ -13,13 +13,7 @@ const filePaths = findNestedFiles(
 // Create URL paths and sort them
 const urlSet = filePaths
   // Transform file paths to URL paths
-  .map((filePath) =>
-    filePath
-      .replace(/\\/g, '/')
-      .replace(/src\/routes\//, '')
-      .replaceAll(/\([^)]+\)\//g, '')
-      .replace(/index\.(tsx|mdx)/, '')
-  )
+  .map(urlPathFromFilePath)
   // Sort URL paths alphabetically
   .sort()
   // Reduce URL paths to URL set
