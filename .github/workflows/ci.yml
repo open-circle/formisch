@@ -30,6 +30,7 @@ jobs:
       vue: ${{ github.event_name != 'pull_request' || steps.filter.outputs.vue == 'true' }}
       angular: ${{ github.event_name != 'pull_request' || steps.filter.outputs.angular == 'true' }}
       react_native: ${{ github.event_name != 'pull_request' || steps.filter.outputs.react_native == 'true' }}
+      honox: ${{ github.event_name != 'pull_request' || steps.filter.outputs.honox == 'true' }}
       website: ${{ github.event_name != 'pull_request' || steps.filter.outputs.website == 'true' }}
     steps:
       # For pull requests, the changed files are fetched from the GitHub API,
@@ -83,6 +84,9 @@ jobs:
             react_native:
               - *methods
               - 'frameworks/react-native/**'
+            honox:
+              - *methods
+              - 'frameworks/honox/**'
             website:
               - *shared
               - 'website/**'
@@ -629,6 +633,8 @@ jobs:
   # frameworks/honox
   honox_prettier:
     name: Run Prettier in frameworks/honox
+    needs: changes
+    if: needs.changes.outputs.honox == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -643,6 +649,8 @@ jobs:
 
   honox_eslint:
     name: Run ESLint in frameworks/honox
+    needs: changes
+    if: needs.changes.outputs.honox == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -657,6 +665,8 @@ jobs:
 
   honox_vitest:
     name: Run Vitest in frameworks/honox
+    needs: changes
+    if: needs.changes.outputs.honox == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
