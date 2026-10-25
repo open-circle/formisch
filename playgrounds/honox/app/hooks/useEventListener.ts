@@ -1,4 +1,4 @@
-import { type RefObject, useEffect, useRef } from 'hono/jsx';
+import { type RefObject, useEffect, useLayoutEffect, useRef } from 'hono/jsx';
 
 // MediaQueryList Event based useEventListener interface
 export function useEventListener<K extends keyof MediaQueryListEventMap>(
@@ -55,7 +55,10 @@ export function useEventListener<
   // Create a ref that stores handler
   const savedHandler = useRef(handler);
 
-  useEffect(() => {
+  // Hint: Unlike React, hono/jsx defers `useEffect` callbacks to the next
+  // animation frame, so the handler is synced in a layout effect to prevent an
+  // event in between from calling the handler of the previous render
+  useLayoutEffect(() => {
     savedHandler.current = handler;
   }, [handler]);
 

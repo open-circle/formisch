@@ -12,7 +12,8 @@ type TabsProps = {
  * between them.
  */
 export default function Tabs(props: TabsProps) {
-  // Use navigation element ref and indicator style state
+  // Use scroll and navigation element refs and indicator style state
+  const [scrollElement, setScrollElement] = useElementRef<HTMLDivElement>();
   const [navElement, setNavElement] = useElementRef<HTMLElement>();
   const [indicatorStyle, setIndicatorStyle] = useState<
     | {
@@ -49,6 +50,30 @@ export default function Tabs(props: TabsProps) {
   // Update indicator style when window size change
   useEventListener('resize', updateIndicatorStyle);
 
+  // Scroll active element into view after page load
+  //
+  // Hint: Unlike the React playground, each tab is a separate page in HonoX,
+  // so the scroll position of the navigation is lost when navigating. The
+  // scroll element is scrolled directly instead of using `scrollIntoView` to
+  // not interfere with the scroll restoration of the page.
+  useEffect(() => {
+    const activeElement = [...(navElement.current?.children ?? [])].find(
+      (e) => (e as HTMLAnchorElement).pathname === props.pathname
+    );
+    if (scrollElement.current && activeElement) {
+      const scrollRect = scrollElement.current.getBoundingClientRect();
+      const activeRect = activeElement.getBoundingClientRect();
+      scrollElement.current.scrollTo({
+        left:
+          scrollElement.current.scrollLeft +
+          activeRect.left +
+          activeRect.width / 2 -
+          (scrollRect.left + scrollRect.width / 2),
+        behavior: 'instant',
+      });
+    }
+  }, []);
+
   /**
    * Scrolls the current target into the view.
    *
@@ -62,7 +87,10 @@ export default function Tabs(props: TabsProps) {
   };
 
   return (
-    <div class="scrollbar-none flex scroll-px-8 overflow-x-auto scroll-smooth px-8">
+    <div
+      class="scrollbar-none flex scroll-px-8 overflow-x-auto scroll-smooth px-8"
+      ref={setScrollElement}
+    >
       <div class="relative flex-1 border-b-2 border-b-slate-200 dark:border-b-slate-800">
         <nav class="flex space-x-8 lg:space-x-14" ref={setNavElement}>
           {props.items.map((item) => {
