@@ -28,7 +28,7 @@
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
     "tailwindcss": "^4.1.17",
-    "typescript": "~5.9.3",
+    "typescript": "~6.0.3",
     "vite": "^7.2.4"
   }
 }

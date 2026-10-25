@@ -934,7 +934,7 @@ importers:
         version: 0.1.62(hono@4.13.13)(miniflare@4.20260603.0(@types/node@24.10.1))(wrangler@4.98.0(@types/node@24.10.1))
       valibot:
         specifier: ^1.4.2
-        version: 1.4.2(typescript@5.9.3)
+        version: 1.4.2(typescript@6.0.3)
     devDependencies:
       '@formisch/eslint-config':
         specifier: workspace:*
@@ -955,8 +955,8 @@ importers:
         specifier: ^4.1.17
         version: 4.3.3
       typescript:
-        specifier: ~5.9.3
-        version: 5.9.3
+        specifier: ~6.0.3
+        version: 6.0.3
       vite:
         specifier: 7.3.7
         version: 7.3.7(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1)
@@ -27122,7 +27122,7 @@ snapshots:
   string-width@8.2.2:
     dependencies:
       get-east-asian-width: 1.6.0
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   string.prototype.codepointat@0.2.1: {}
 
@@ -29033,7 +29033,7 @@ snapshots:
     dependencies:
       ansi-styles: 6.2.3
       string-width: 8.2.2
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   wrap-ansi@10.0.2:
     dependencies:
