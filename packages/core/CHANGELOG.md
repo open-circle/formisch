@@ -4,6 +4,7 @@ All notable changes to the library will be documented in this file.
 
 ## v1.0.2 (October 26, 2026)
 
+- Add HonoX framework adapter and `@formisch/core/honox` build output that reuses the React signal implementation (issue #175)
 - Fix `getFieldStore` to throw a descriptive error with the requested path when no field store exists
 - Fix Qwik peer dependency range to `>=2.0.0-0 <3` so that it matches Qwik v2 beta and release candidate versions
 - Fix `copyItemState`, `swapItemState` and `resetItemState` to create child stores before updating the items of a field array, so unbatched computed signals never access a missing child store
