@@ -5,6 +5,17 @@ import { useCallback, useLayoutEffect, useMemo, useReducer } from 'hono/jsx';
  * Hook to enable reactive signals within a hono/jsx component.
  */
 export function useSignals(): void {
+  // Skip signal tracking during server-side rendering
+  //
+  // Hint: hono/jsx neither runs effects nor re-renders components on the
+  // server, so the listener set below would never be cleared again and would
+  // leak into everything that reads a signal afterwards. Since the environment
+  // does not change between renders, the hooks below are still called in a
+  // consistent order.
+  if (typeof document === 'undefined') {
+    return;
+  }
+
   // Create a force update function to trigger re-renders
   //
   // Hint: Unlike React, hono/jsx's `useReducer` has no special zero-argument

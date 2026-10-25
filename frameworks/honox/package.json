@@ -1,9 +1,9 @@
 {
   "name": "@formisch/honox",
   "description": "The lightweight, schema-first, and fully type-safe form library for hono/jsx and HonoX",
-  "version": "1.0.0-rc.0",
+  "version": "0.1.0",
   "license": "MIT",
-  "author": "Kanon",
+  "author": "Fabian Hiller",
   "homepage": "https://formisch.dev",
   "repository": {
     "type": "git",
@@ -32,6 +32,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./internals": {
+      "types": "./dist/internals.d.ts",
+      "import": "./dist/internals.js"
     }
   },
   "sideEffects": false,
@@ -56,19 +60,19 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.0",
     "@types/node": "^24.10.1",
-    "@vitest/coverage-v8": "^4.1.7",
+    "@vitest/coverage-v8": "^4.1.12",
     "eslint": "^9.39.1",
-    "hono": "4.12.32",
+    "hono": "^4.13.13",
     "jsdom": "^26.1.0",
     "tsdown": "^0.16.8",
     "typescript": "~5.9.3",
-    "valibot": "^1.4.1",
-    "vitest": "^4.1.7"
+    "valibot": "^1.4.2",
+    "vitest": "^4.1.12"
   },
   "peerDependencies": {
-    "hono": "^4.0.0",
-    "typescript": ">=5",
-    "valibot": "^1.4.1"
+    "hono": ">=4.5 <5",
+    "typescript": ">=5 <8",
+    "valibot": ">=1.4.1 <2"
   },
   "peerDependenciesMeta": {
     "typescript": {

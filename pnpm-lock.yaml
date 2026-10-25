@@ -190,14 +190,14 @@ importers:
         specifier: ^24.10.1
         version: 24.10.1
       '@vitest/coverage-v8':
-        specifier: ^4.1.7
+        specifier: ^4.1.12
         version: 4.1.12(vitest@4.1.12)
       eslint:
         specifier: ^9.39.1
         version: 9.39.5(jiti@2.7.0)
       hono:
-        specifier: 4.12.32
-        version: 4.12.32
+        specifier: ^4.13.13
+        version: 4.13.13
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0
@@ -208,10 +208,10 @@ importers:
         specifier: ~5.9.3
         version: 5.9.3
       valibot:
-        specifier: ^1.4.1
+        specifier: ^1.4.2
         version: 1.4.2(typescript@5.9.3)
       vitest:
-        specifier: ^4.1.7
+        specifier: ^4.1.12
         version: 4.1.12(@types/node@24.10.1)(@vitest/coverage-v8@4.1.12)(jsdom@26.1.0)(vite@6.4.4(@types/node@24.10.1)(jiti@2.7.0)(less@4.4.2)(lightningcss@1.33.0)(sass-embedded@1.104.1)(sass@1.104.1)(stylus@0.62.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.9.1))
 
   frameworks/preact:
@@ -9452,8 +9452,8 @@ packages:
     resolution: {integrity: sha512-Ox1pJVrDCyGHMG9CFg1tmrRUMRPRsAWYc/PinY0XzJU4K7y7vjNoLKIQ7BR5UJMCxNN8EM1MNDmHWA/B3aZUuw==}
     engines: {node: '>=6'}
 
-  hono@4.12.32:
-    resolution: {integrity: sha512-XcuyW9qE2kJn07PkecMOBd5Vq/hMy7mmGw+idz1yblbg9N17ijJODrvPkn7/dwL3Kulj8LcRJ69DLOWf91dRUg==}
+  hono@4.13.13:
+    resolution: {integrity: sha512-CQ46U0ZkAGmbT/4UxdzzGJpacP2IeKgY4a5/tOI9AABbpOMfK739wfDXmv1usCk+3RkKj1hQy4/fjhiwa2xlrA==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -22885,7 +22885,7 @@ snapshots:
 
   hex-rgb@4.3.0: {}
 
-  hono@4.12.32: {}
+  hono@4.13.13: {}
 
   hookable@5.5.3: {}
 
