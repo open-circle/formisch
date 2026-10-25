@@ -58,7 +58,7 @@ overrides:
   '@qwik.dev/core>rollup': 4.59.0
   semver@7: 7.5.2
   serialize-javascript@6: 7.0.5
-  seroval@<1.6.3: 1.6.3
+  seroval@>=1 <1.6.3: 1.6.3
   sharp@0.33: 0.35.5
   sharp@0.34: 0.35.5
   shell-quote@1: 1.11.0
