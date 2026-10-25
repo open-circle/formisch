@@ -104,12 +104,12 @@ export default component$(() => {
 Writing this guard at every field gets repetitive. The common fix is to move it into a small reusable component, either on its own or folded into the `TextInput` from the <Link href="/qwik/guides/input-components/">input components</Link> guide, so the `isEdited || isSubmitted` logic lives in exactly one place:
 
 ```tsx
-import { component$, type ReadonlySignal } from '@qwik.dev/core';
+import { component$, type Signal } from '@qwik.dev/core';
 
 interface FieldErrorProps {
-  errors: ReadonlySignal<[string, ...string[]] | null>;
-  isEdited: ReadonlySignal<boolean>;
-  isSubmitted: ReadonlySignal<boolean>;
+  errors: Readonly<Signal<[string, ...string[]] | null>>;
+  isEdited: Readonly<Signal<boolean>>;
+  isSubmitted: Readonly<Signal<boolean>>;
 }
 
 export const FieldError = component$<FieldErrorProps>(

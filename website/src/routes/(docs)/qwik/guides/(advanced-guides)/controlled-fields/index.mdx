@@ -51,7 +51,7 @@ import type { FieldElementProps } from '@formisch/qwik';
 import {
   component$,
   type QRL,
-  type ReadonlySignal,
+  type Signal,
   useSignal,
   useTask$,
 } from '@qwik.dev/core';
@@ -60,8 +60,8 @@ interface NumberInputProps extends Omit<FieldElementProps, 'onInput$'> {
   type: 'number';
   label?: string;
   placeholder?: string;
-  input: ReadonlySignal<number | undefined>;
-  errors: ReadonlySignal<[string, ...string[]] | null>;
+  input: Readonly<Signal<number | undefined>>;
+  errors: Readonly<Signal<[string, ...string[]] | null>>;
   required?: boolean;
   onInput$: QRL<(value: number | undefined) => void>;
 }
@@ -127,7 +127,7 @@ import type { FieldElementProps } from '@formisch/qwik';
 import {
   component$,
   type QRL,
-  type ReadonlySignal,
+  type Signal,
   useComputed$,
 } from '@qwik.dev/core';
 
@@ -135,8 +135,8 @@ interface DateInputProps extends Omit<FieldElementProps, 'onInput$'> {
   type: 'date';
   label?: string;
   placeholder?: string;
-  input: ReadonlySignal<Date | undefined>;
-  errors: ReadonlySignal<[string, ...string[]] | null>;
+  input: Readonly<Signal<Date | undefined>>;
+  errors: Readonly<Signal<[string, ...string[]] | null>>;
   required?: boolean;
   onInput$: QRL<(value: Date | undefined) => void>;
 }

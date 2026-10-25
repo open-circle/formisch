@@ -1,5 +1,5 @@
-import type { FieldElementProps, ReadonlySignal } from '@formisch/qwik';
-import { component$ } from '@qwik.dev/core';
+import type { FieldElementProps } from '@formisch/qwik';
+import { component$, Signal } from '@qwik.dev/core';
 import clsx from 'clsx';
 import { InputErrors } from './InputErrors';
 import { InputLabel } from './InputLabel';
@@ -11,8 +11,8 @@ interface SliderProps extends FieldElementProps {
   max?: number;
   step?: number;
   required?: boolean;
-  input: ReadonlySignal<string | number | undefined>;
-  errors: ReadonlySignal<[string, ...string[]] | null>;
+  input: Readonly<Signal<string | number | undefined>>;
+  errors: Readonly<Signal<[string, ...string[]] | null>>;
 }
 
 /**
