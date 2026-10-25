@@ -8,7 +8,7 @@ import { type RefObject, useCallback, useRef } from 'hono/jsx';
  * Object]"`, so the callback is what gets passed to the element.
  */
 export function useElementRef<T extends HTMLElement>(): [
-  RefObject<T>,
+  RefObject<T | null>,
   (element: T | null) => void,
 ] {
   const element = useRef<T>(null);

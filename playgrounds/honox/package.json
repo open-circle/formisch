@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build --mode client && vite build",
-    "preview": "node ./dist/index.js",
+    "preview": "cd dist && node index.js",
     "lint": "eslint \"app/**/*.ts*\" && tsc --noEmit",
     "lint.fix": "eslint \"app/**/*.ts*\" --fix",
     "format": "prettier --write ./app",
@@ -15,15 +15,15 @@
   "dependencies": {
     "@formisch/honox": "workspace:*",
     "@formkit/auto-animate": "^0.8.2",
-    "@hono/node-server": "^1.19.15",
+    "@hono/node-server": "^2.1.4",
     "clsx": "^2.1.1",
-    "hono": "4.12.32",
-    "honox": "0.1.59",
-    "valibot": "^1.4.1"
+    "hono": "^4.13.13",
+    "honox": "^0.1.62",
+    "valibot": "^1.4.2"
   },
   "devDependencies": {
     "@formisch/eslint-config": "workspace:*",
-    "@hono/vite-build": "1.11.1",
+    "@hono/vite-build": "^1.11.1",
     "@tailwindcss/vite": "^4.1.17",
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
