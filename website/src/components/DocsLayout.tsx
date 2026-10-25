@@ -199,7 +199,7 @@ type NavButtonsProps = {
   markdownPath: string | undefined;
   prevPage: ContentMenu | undefined;
   nextPage: ContentMenu | undefined;
-  chapters?: Signal<boolean>;
+  chapters?: Readonly<Signal<boolean>>;
   chaptersToggle?: QRL<() => void>;
 };
 

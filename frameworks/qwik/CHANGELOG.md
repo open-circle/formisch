@@ -5,8 +5,7 @@ All notable changes to the library will be documented in this file.
 ## vX.X.X (Month DD, YYYY)
 
 - Fix Qwik peer dependency range to `>=2.0.0-0 <3` so that it matches Qwik v2 beta and release candidate versions
-- Add `ReadonlySignal` type as temporary replacement for `Readonly<Signal<TValue>>` to work around a false positive in eslint-plugin-qwik's `valid-lexical-scope` rule
-- Change `FormStore`, `FieldStore`, `FieldArrayStore` and `usePathSignal` to use new `ReadonlySignal` type
+- Change `FormStore`, `FieldStore`, `FieldArrayStore` and `usePathSignal` to use `Readonly<Signal<TValue>>` instead of Qwik's deprecated `ReadonlySignal` type
 - Fix error in computed form state like `isValid` when inserting a new field array item
 
 ## v1.1.0 (September 07, 2026)

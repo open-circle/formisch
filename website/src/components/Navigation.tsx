@@ -42,7 +42,7 @@ export const Navigation = component$<NavigationProps>((props) => {
 });
 
 export type NavItemProps = {
-  navElement: Signal<HTMLElement | undefined>;
+  navElement: Readonly<Signal<HTMLElement | undefined>>;
   text: string;
   items?: ContentMenu[];
 };
