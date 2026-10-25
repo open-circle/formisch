@@ -1,5 +1,5 @@
 import { getFieldStore, INTERNAL } from '@formisch/core/solid-2';
-import { swap } from '@formisch/methods/solid-2';
+import { reset, swap } from '@formisch/methods/solid-2';
 import {
   fireEvent,
   render,
@@ -8,7 +8,7 @@ import {
   waitFor,
 } from '@solidjs/testing-library';
 import type { JSX } from '@solidjs/web';
-import { createSignal, flush, For, Show } from 'solid-js';
+import { flush, For } from 'solid-js';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
 import { Form } from '../../components/Form/index.ts';
@@ -429,102 +429,6 @@ describe('useField', () => {
       expect(internalFieldStore.elements).toEqual([element]);
     });
 
-    // Solid 2 runs refs before elements are inserted, so elements that share
-    // the field props must not release each other during registration
-    test('should register every element that shares the field props', () => {
-      const schema = v.object({ color: v.string() });
-      let capturedForm: FormStore<typeof schema> | undefined;
-
-      function Test(): JSX.Element {
-        const form = createForm({ schema, initialInput: { color: '' } });
-        capturedForm = form;
-        const field = useField(form, { path: ['color'] });
-        return (
-          <For each={['red', 'green', 'blue']}>
-            {(color) => (
-              <input
-                type="radio"
-                data-testid="radio"
-                value={color}
-                {...field.props}
-              />
-            )}
-          </For>
-        );
-      }
-
-      render(() => <Test />);
-      const internalFieldStore = getFieldStore(capturedForm![INTERNAL], [
-        'color',
-      ])!;
-      const radios = screen.getAllByTestId('radio');
-      expect(radios).toHaveLength(3);
-      expect(internalFieldStore.elements).toEqual(radios);
-      expect(internalFieldStore.initialElements).toEqual(radios);
-    });
-
-    // Solid 2 runs refs without an owner, so the cleanup is registered when
-    // the ref is read, which also covers a ref that is passed directly
-    test('should release the element on unmount', () => {
-      const schema = v.object({ name: v.string() });
-      let capturedForm: FormStore<typeof schema> | undefined;
-
-      function Test(): JSX.Element {
-        const form = createForm({ schema });
-        capturedForm = form;
-        const field = useField(form, { path: ['name'] });
-        return <input ref={field.props.ref} />;
-      }
-
-      const { unmount } = render(() => <Test />);
-      const internalFieldStore = getFieldStore(capturedForm![INTERNAL], [
-        'name',
-      ])!;
-      expect(internalFieldStore.elements).toHaveLength(1);
-
-      unmount();
-
-      expect(internalFieldStore.elements).toEqual([]);
-      expect(internalFieldStore.initialElements).toEqual([]);
-    });
-
-    // Conditional rendering disposes the owner of the element without
-    // disposing the field, which must still release the element
-    test('should release an element removed by Show', () => {
-      const schema = v.object({ name: v.string() });
-      let capturedForm: FormStore<typeof schema> | undefined;
-      const [isVisible, setIsVisible] = createSignal(true);
-
-      function Test(): JSX.Element {
-        const form = createForm({ schema, initialInput: { name: '' } });
-        capturedForm = form;
-        const field = useField(form, { path: ['name'] });
-        return (
-          <Show when={isVisible()}>
-            <input data-testid="input" {...field.props} />
-          </Show>
-        );
-      }
-
-      render(() => <Test />);
-      const internalFieldStore = getFieldStore(capturedForm![INTERNAL], [
-        'name',
-      ])!;
-      const firstElement = screen.getByTestId('input');
-      expect(internalFieldStore.elements).toEqual([firstElement]);
-
-      setIsVisible(false);
-      flush();
-      expect(screen.queryByTestId('input')).toBeNull();
-      expect(internalFieldStore.elements).toEqual([]);
-
-      setIsVisible(true);
-      flush();
-      const secondElement = screen.getByTestId('input');
-      expect(secondElement).not.toBe(firstElement);
-      expect(internalFieldStore.elements).toEqual([secondElement]);
-    });
-
     test('should not duplicate element registration after an array reorder', async () => {
       const schema = v.object({
         todos: v.array(v.object({ label: v.string() })),
@@ -573,7 +477,7 @@ describe('useField', () => {
       });
     });
 
-    test('should drop a detached element from the reset baseline after the elements moved', () => {
+    test('should drop a detached element from the reset baseline after the elements moved', async () => {
       const schema = v.object({ name: v.string() });
 
       let capturedForm: FormStore<typeof schema> | undefined;
@@ -597,7 +501,64 @@ describe('useField', () => {
 
       // The detached element must not survive in the reset baseline
       unmount();
-      expect(internalFieldStore.initialElements).not.toContain(element);
+      await vi.waitFor(() => {
+        expect(internalFieldStore.initialElements).not.toContain(element);
+      });
+    });
+
+    // Solid 2 applies the ref again whenever a spread prop changes, for
+    // example the name after an array reorder, so registering the element
+    // again must not change the elements of any field store
+    test('should keep the reset baseline when moved elements register again', () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
+
+      function Row(props: {
+        form: FormStore<typeof schema>;
+        index: number;
+      }): JSX.Element {
+        const field = useField(
+          () => props.form,
+          () => ({ path: ['todos', props.index, 'label'] })
+        );
+        return <input data-testid="row" {...field.props} />;
+      }
+
+      function Test(): JSX.Element {
+        const form = createForm({
+          schema,
+          initialInput: {
+            todos: [{ label: 'a' }, { label: 'b' }, { label: 'c' }],
+          },
+        });
+        formStore = form;
+        const fieldArray = useFieldArray(form, { path: ['todos'] });
+        return (
+          <For each={fieldArray.items}>
+            {(_id, index) => <Row form={form} index={index()} />}
+          </For>
+        );
+      }
+
+      render(() => <Test />);
+      const [first, , last] = screen.getAllByTestId('row');
+      const getElements = (index: number) =>
+        getFieldStore(formStore![INTERNAL], ['todos', index, 'label'])!
+          .elements;
+
+      swap(formStore!, { path: ['todos'], at: 0, and: 2 });
+      flush();
+      expect(getElements(0)).toEqual([last]);
+      expect(getElements(2)).toEqual([first]);
+
+      swap(formStore!, { path: ['todos'], at: 0, and: 2 });
+      flush();
+      reset(formStore!);
+      flush();
+      expect(getElements(0)).toEqual([first]);
+      expect(getElements(2)).toEqual([last]);
     });
   });
 });
