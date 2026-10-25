@@ -12,6 +12,8 @@ authors:
   - flySewa
 ---
 
+**Updated October 2026:** This post covers React Hook Form v7, the current stable release, including the built-in form-level validation added in 7.72. It also notes the schema-based type inference coming in TanStack Form v2, currently in alpha.
+
 [TanStack Form](https://tanstack.com/form/latest) has been gaining adoption as an alternative to [React Hook Form](https://react-hook-form.com), especially for teams building complex, type-safe forms in React. This has led to more direct comparisons between TanStack Form and React Hook Form, particularly when deciding whether switching is worth the effort.
 
 Whether you should switch from React Hook Form, start with TanStack Form on a new project, or consider alternatives like [Formisch](https://formisch.dev) depends on how your forms are structured, how complex they are, and what the migration cost looks like in practice.
@@ -108,11 +110,13 @@ This also applies to fields that need to accept more than one type. Input that s
 
 If you use a validation schema alongside your default values, which most teams do, those two things still have no enforced connection at the TypeScript level. There is still no single source of truth between `defaultValues` and your schema. In practice, mismatches can surface depending on how validators are typed, but there is no inherent guarantee they stay aligned.
 
-In summary, type maintenance in TanStack Form comes down to keeping your `defaultValues` accurate, and the form derives everything else from there.
+TanStack Form v2, in alpha since August 2026, is adding schema-based type inference, a shift we wrote about in [Schemas Won (Form Libraries Haven't Noticed Yet)](https://dev.to/oluwawunmiadesewa/schemas-won-form-libraries-havent-noticed-yet-2ek6). We'll update this section once it's stable.
+
+In summary, type maintenance in TanStack Form v1 comes down to keeping your `defaultValues` accurate, and the form derives everything else from there.
 
 ### Formisch
 
-[Formisch](https://formisch.dev) is built directly on top of a schema library, which is why its type inference behaves differently from the other two. It currently supports only [Valibot](https://valibot.dev), but could theoretically be extended to support additional schema libraries such as [Zod](https://zod.dev).
+[Formisch](https://formisch.dev) is built directly on top of a schema library, which is why its type inference behaves differently from the other two. It currently supports only [Valibot](https://valibot.dev). Support for other schema libraries such as Zod, through Standard Schema, is on the roadmap and tracked in [issue #2](https://github.com/open-circle/formisch/issues/2).
 
 Valibot schemas carry TypeScript type information as part of their construction. When you build a schema, you are simultaneously constructing a runtime validator and a compile-time type description, and these are not two separate things that are kept in sync. They are the same object.
 
@@ -217,7 +221,7 @@ Async validation is also treated as a first-class concern. [An async validator a
 
 It also supports debouncing for async validators through `onChangeAsyncDebounceMs` or `asyncDebounceMs`. This prevents unnecessary server requests when validation is triggered on input changes, but it requires explicit configuration.
 
-Form-level validators are also part of the core design. These validators run against the entire form state and can assign errors to specific fields. This avoids the manual `trigger` calls that are often required in RHF for cross-field validation.
+Form-level validators are also part of the core design. These validators run against the entire form state and can assign errors to specific fields, which makes cross-field rules straightforward to express. React Hook Form added a built-in form-level `validate` option in 7.72, so it now supports form-level validation natively too.
 
 TanStack Form gives you fine-grained control over validation timing and async behavior, but requires more explicit configuration to get there.
 
@@ -258,7 +262,7 @@ const schema = v.objectAsync({
 
 For cases where the same username is checked more than once, Valibot's [`cache`](https://valibot.dev/api/cache/) method can wrap the schema to skip re-running the server check for values that have already been validated.
 
-The same schema-first pattern applies to cross-field validation, where one field's validity depends on another. In RHF, making two password fields validate against each other requires custom event handling in the component. In Formisch, `partialCheck` defines the comparison in the schema and `forward` directs the error to the right field. Neither component knows the other exists.
+The same schema-first pattern applies to cross-field validation, where one field's validity depends on another. In RHF, you'd express this through a schema refinement in your resolver or, since 7.72, the built-in form-level `validate` option. In Formisch, `partialCheck` defines the comparison in the schema and `forward` directs the error to the right field. Neither component knows the other exists.
 
 ```ts
 const schema = v.pipe(
@@ -284,17 +288,17 @@ The error surfaces on the confirm password field's `field.errors` with no additi
 
 When validation rules change, you update the schema, and the rest of the form reads from that definition.
 
-This becomes more noticeable as validation rules evolve or as the form grows in complexity. In RHF, validation logic is either attached to individual fields or wired through a resolver, so changes often involve updating rules in multiple places. In TanStack Form, validation is centralized in configuration, but still lives alongside component code through validators and their triggers. In Formisch, validation lives entirely in the schema. When rules change, you update the schema, and the rest of the form derives from that definition.
+This becomes more noticeable as validation rules evolve or as the form grows in complexity. In RHF, validation logic is attached to individual fields, wired through a resolver, or passed as a form-level `validate` option, so changes often involve updating rules in multiple places. In TanStack Form, validation is centralized in configuration, but still lives alongside component code through validators and their triggers. In Formisch, validation lives entirely in the schema. When rules change, you update the schema, and the rest of the form derives from that definition.
 
 This also affects how portable your components are. In RHF, field components tend to carry implicit knowledge of their validation rules. In TanStack Form, they are tied to the validators configured for them. In Formisch, field components don't contain validation logic. They adapt to whatever schema is provided.
 
 With Formisch, validation is entirely schema-driven. Components remain simple, but the schema becomes the single place where correctness is defined.
 
-|                   | Where rules live               | Timing control          | Async handling                |
-| ----------------- | ------------------------------ | ----------------------- | ----------------------------- |
-| **RHF**           | Field registration or resolver | Form-wide `mode` option | Manual loading state          |
-| **TanStack Form** | Per-validator configuration    | Per-validator trigger   | Built-in `isValidating` state |
-| **Formisch**      | Valibot schema                 | Schema-level            | Built-in, via schema          |
+|                   | Where rules live                            | Timing control                         | Async handling                |
+| ----------------- | ------------------------------------------- | -------------------------------------- | ----------------------------- |
+| **RHF**           | Field registration, resolver, or `validate` | Form-wide `mode` option                | Manual loading state          |
+| **TanStack Form** | Per-validator configuration                 | Per-validator trigger                  | Built-in `isValidating` state |
+| **Formisch**      | Valibot schema                              | Form-level (`validate` / `revalidate`) | Built-in, via schema          |
 
 > Next, we'll look at how each library's approach affects rendering performance as forms grow.
 
