@@ -2,8 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.2.0 (October 26, 2026)
 
+- Change `@formisch/core` to v1.0.2
+- Change `@formisch/methods` to v1.0.2
 - Change `preact` peer dependency to also support Preact v11
 
 ## v1.1.0 (September 07, 2026)

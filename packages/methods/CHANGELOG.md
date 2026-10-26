@@ -2,7 +2,7 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.0.2 (October 26, 2026)
 
 - Fix `insert` to create child stores before updating the items of a field array, so unbatched computed signals never access a missing child store
 

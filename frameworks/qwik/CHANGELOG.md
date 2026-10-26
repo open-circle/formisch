@@ -2,8 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.2.0 (October 26, 2026)
 
+- Change `@formisch/core` to v1.0.2
+- Change `@formisch/methods` to v1.0.2
 - Fix Qwik peer dependency range to `>=2.0.0-0 <3` so that it matches Qwik v2 beta and release candidate versions
 - Change `FormStore`, `FieldStore`, `FieldArrayStore` and `usePathSignal` to use `Readonly<Signal<TValue>>` instead of Qwik's deprecated `ReadonlySignal` type
 - Fix error in computed form state like `isValid` when inserting a new field array item

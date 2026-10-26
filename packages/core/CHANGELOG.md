@@ -2,7 +2,7 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.0.2 (October 26, 2026)
 
 - Fix `getFieldStore` to throw a descriptive error with the requested path when no field store exists
 - Fix Qwik peer dependency range to `>=2.0.0-0 <3` so that it matches Qwik v2 beta and release candidate versions
