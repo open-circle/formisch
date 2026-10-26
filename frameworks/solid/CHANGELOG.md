@@ -2,8 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.2.0 (October 26, 2026)
 
+- Change `@formisch/core` to v1.0.2
+- Change `@formisch/methods` to v1.0.2
 - Add `@formisch/solid/v2` and `@formisch/solid/v2/internals` with experimental support for SolidJS 2 (requires `solid-js` and `@solidjs/web` v2)
 - Change `solid-js` peer dependency to also accept SolidJS 2
 - Add optional `@solidjs/web` peer dependency for SolidJS 2

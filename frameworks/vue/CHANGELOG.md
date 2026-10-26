@@ -2,8 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.1.1 (October 26, 2026)
 
+- Change `@formisch/core` to v1.0.2
+- Change `@formisch/methods` to v1.0.2
 - Fix focusing fields whose props are bound to a component wrapping the form control (issue #220)
 - Fix `useField` cleanup throwing when an array item is removed with Vue 3.6
 
