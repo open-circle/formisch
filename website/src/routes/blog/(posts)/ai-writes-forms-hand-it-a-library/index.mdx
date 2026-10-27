@@ -1,0 +1,370 @@
+---
+cover: AI and Forms
+title: "AI Writes Forms Pretty Well; Here's Why We'd Still Hand It a Library"
+description: >-
+  Do you still need a form library if AI writes your forms? We gave ChatGPT and
+  Claude the same prompt for a React sign-up form and read what came back.
+published: 2026-10-27
+authors:
+  - flySewa
+---
+
+If you've asked an AI tool for a form lately, you've probably noticed it's very good at it. It knows what a form needs, covers the obvious cases and follows best practices unprompted. In React, for example, it often reaches for controlled inputs, keeping every value in state, which makes things like checking input as you type or resetting the form easy.
+
+So, if AI is this good at forms, why are we, the folks behind a form library, telling you to hand it one anyway? (We know how that sounds.)
+
+**Contents**
+
+- [What does AI write when you ask it for a form?](#what-does-ai-write-when-you-ask-it-for-a-form)
+- [Is AI the problem?](#is-ai-the-problem)
+- [What does the same form look like with a library?](#what-does-the-same-form-look-like-with-a-library)
+- [What does a library give you?](#what-does-a-library-give-you)
+- [But form libraries come with baggage](#but-form-libraries-come-with-baggage)
+- [Wrapping up](#wrapping-up)
+
+Back in August, [right before Formisch hit v1](https://formisch.dev/blog/formisch-v1/), Fabian fixed a race in how validation runs. If two checks were running at once, the older one could finish last and wipe out the newer errors.
+
+A couple of weeks later, two more bugs from the same family showed up. In the first, a username check could still be running when you changed your input, and its old answer would win anyway. In the second, you could hit reset, and a check from before the reset would come back and drop its errors onto a fresh form.
+
+We didn't even find that second one ourselves! A contributor named coi tracked it down and opened the PR.
+
+If your app was on Formisch, you got all three fixes by bumping a version number. No debugging sessions or bug reports from your users. You never had to know those bugs existed.
+
+So what happens when there's no library to bump?
+
+## What does AI write when you ask it for a form?
+
+Say you need a pretty standard sign-up form: email, username and password, plus a check with the server to make sure the username isn't already taken. You might hand ChatGPT a prompt like this:
+
+> Build a React sign-up form in TypeScript with email, username and password fields. Check with the server that the username isn't already taken, using an async function called `isUsernameAvailable(username)` that returns a boolean. Show an error under each field, and on submit call `createAccount(values)`.
+
+Here's the submit handler it came back with:
+
+```tsx
+async function handleSubmit(event: FormEvent) {
+  event.preventDefault();
+  if (isSubmitting || isCheckingUsername) return;
+
+  const nextErrors = validate();
+  setErrors(nextErrors);
+  if (Object.keys(nextErrors).length > 0) return;
+
+  setIsCheckingUsername(true);
+  try {
+    const available = await isUsernameAvailable(values.username.trim());
+    if (!available) {
+      setErrors((current) => ({
+        ...current,
+        username: 'This username is already taken.',
+      }));
+      return;
+    }
+  } finally {
+    setIsCheckingUsername(false);
+  }
+
+  setIsSubmitting(true);
+  try {
+    await createAccount({ ...values, username: values.username.trim() });
+  } finally {
+    setIsSubmitting(false);
+  }
+}
+```
+
+Looks pretty solid, right? It blocks double submits, trims the username, and even handles a failed network call (that part's cut here to keep the snippet short).
+
+Here's the challenge, though: while the server thinks about the username, the button is disabled but the inputs aren't. Change your username during that second, and this implementation can still submit the value captured when you clicked, even though it's no longer what's on screen.
+
+There's a second bug sitting right next to it. Say `sewa` is taken and you change it to `flysewa` while the check is running. When the answer comes back, "This username is already taken" can show up under `flysewa`, a name nobody checked.
+
+Sound familiar? That's one generated form, but it's the same family of bugs Formisch fixed in August and September. And it's far from just us. React Hook Form had a report [in 2020](https://github.com/react-hook-form/react-hook-form/issues/1688) of an async result wiping out an error the user had already triggered, and another [in 2023](https://github.com/react-hook-form/react-hook-form/issues/10078) of an older check overwriting a newer one. React Final Form had a race in async field validation reported [back in 2018](https://github.com/final-form/react-final-form/issues/437). Even libraries that do nothing but forms have had to deal with this, more than once.
+
+Now let's see how Claude handles the same prompt.
+
+```tsx
+// Only the newest username check may update the UI.
+const latestCheck = useRef(0);
+
+const checkUsername = useCallback(async (username: string) => {
+  const checkId = ++latestCheck.current;
+  // ...
+  const available = await isUsernameAvailable(username);
+  if (checkId === latestCheck.current) {
+    setUsernameStatus({
+      state: available ? 'available' : 'taken',
+      username,
+    });
+  }
+  return available;
+}, []);
+```
+
+That counter is the same idea as the fix Fabian shipped. Claude rebuilt a little piece of a form library inside one component, without anyone asking it to. It's really impressive work!
+
+Even so, it missed a spot. Here's its submit handler:
+
+```tsx
+async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+  // ...
+  let available: boolean | null;
+  if (statusIsCurrent && usernameStatus.state === 'available') {
+    available = true;
+  } else if (statusIsCurrent && usernameStatus.state === 'taken') {
+    available = false;
+  } else {
+    available = await checkUsername(values.username);
+  }
+  if (available !== true) return;
+  await createAccount({ ...values, email: values.email.trim() });
+  // ...
+}
+```
+
+If the background check hasn't finished when you hit submit, `handleSubmit` waits on a fresh one with `await checkUsername(...)`. Edit your username during that wait, and the handler can still submit the values captured when you clicked, just like the ChatGPT version.
+
+And neither implementation moves focus to the first field with an error when you submit. On a phone, that can leave users scrolling around looking for what went wrong.
+
+## Is AI the problem?
+
+Not at all.
+
+Think about what a form is under the hood. You've got a handful of inputs, a schema describing the shape of the data, some state to collect what the user typed, and a function that does something with it at the end. None of that is hard, and AI usually one-shots it. Both ChatGPT and Claude even wired up labels, `aria-invalid` and `aria-describedby` without being asked.
+
+Hand-hold it a little more by laying out the architecture, scaffolding the structure, writing your conventions into `AGENTS.md` and reviewing each step, and it'll pretty much build you a form library.
+
+That's kind of the problem, though. The race isn't really the point. It's one item on a long list of things a form library had already solved before you noticed them. Here are a few more:
+
+- Throwing away validation results that come back after a reset.
+- Keeping the right errors on the right row when a user deletes an item from the middle of a list.
+- Knowing a field is no longer "changed" once the user types it back to its starting value.
+
+Without a library, every one of those is something your AI has to work out on its own, or something your team has to build into shared code and keep maintaining.
+
+If AI can write a solid form from a blank file, imagine what it can do starting from code that's already been through all of that.
+
+## What does the same form look like with a library?
+
+Here's the same form, with the same rules and accessibility attributes, built on Formisch.
+
+```tsx
+import { Field, Form, useForm } from '@formisch/react';
+import * as v from 'valibot';
+import { createAccount, isUsernameAvailable } from '~/api';
+
+const SignUpSchema = v.objectAsync({
+  email: v.pipe(v.string(), v.email('Enter a valid email address.')),
+  username: v.pipeAsync(
+    v.string(),
+    v.regex(
+      /^[a-zA-Z0-9_]{3,20}$/,
+      'Use 3 to 20 letters, numbers or underscores.'
+    ),
+    v.checkAsync(isUsernameAvailable, 'That username is already taken.')
+  ),
+  password: v.pipe(v.string(), v.minLength(8, 'Use at least 8 characters.')),
+});
+
+export default function SignUpPage() {
+  const signUpForm = useForm({ schema: SignUpSchema, validate: 'blur' });
+
+  return (
+    <Form of={signUpForm} onSubmit={(output) => createAccount(output)}>
+      <Field of={signUpForm} path={['email']}>
+        {(field) => (
+          <div>
+            <label htmlFor="email">Email</label>
+            <input
+              {...field.props}
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={field.input}
+              aria-invalid={Boolean(field.errors)}
+              aria-describedby={field.errors ? 'email-error' : undefined}
+            />
+            {field.errors && (
+              <p id="email-error" role="alert">
+                {field.errors[0]}
+              </p>
+            )}
+          </div>
+        )}
+      </Field>
+
+      <Field of={signUpForm} path={['username']}>
+        {(field) => (
+          <div>
+            <label htmlFor="username">Username</label>
+            <input
+              {...field.props}
+              id="username"
+              autoComplete="username"
+              value={field.input}
+              aria-invalid={Boolean(field.errors)}
+              aria-describedby={field.errors ? 'username-error' : undefined}
+            />
+            {field.errors && (
+              <p id="username-error" role="alert">
+                {field.errors[0]}
+              </p>
+            )}
+          </div>
+        )}
+      </Field>
+
+      <Field of={signUpForm} path={['password']}>
+        {(field) => (
+          <div>
+            <label htmlFor="password">Password</label>
+            <input
+              {...field.props}
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              value={field.input}
+              aria-invalid={Boolean(field.errors)}
+              aria-describedby={field.errors ? 'password-error' : undefined}
+            />
+            {field.errors && (
+              <p id="password-error" role="alert">
+                {field.errors[0]}
+              </p>
+            )}
+          </div>
+        )}
+      </Field>
+
+      <button type="submit" disabled={signUpForm.isSubmitting}>
+        {signUpForm.isSubmitting ? 'Creating account...' : 'Sign up'}
+      </button>
+    </Form>
+  );
+}
+```
+
+Notice that there's no `latestCheck` counter and no focus logic anywhere in there. Every validation run in Formisch gets an ID, and results that belong to input the user has since changed get thrown away. Change your username while a submit is waiting on the server, and Formisch drops that submit instead of sending the old value. On submit, focus moves to the first field with an error.
+
+Your AI never had to know any of that existed.
+
+It's also small enough that reaching for it on a form like this doesn't feel like overkill. We split every method into its own import, so your form only ships the pieces it uses, and bundles start at around 2.5 kB. When product comes back asking for a list of addresses users can add, delete and reorder, you don't need to switch tools. Your AI imports `FieldArray`, `insert`, `move` and `remove` to build that part. `FieldArray` hands out stable IDs, so errors stay with the right row as items are added, moved or removed, and the AI builds it the same way it built everything else.
+
+## What does a library give you?
+
+Let's look at what changes when your AI builds on Formisch. Some benefits show up while you're building, and others become apparent when you maintain the code or when someone uses the form.
+
+### Less state to keep in sync
+
+Let's go back to the ChatGPT form for a second. Before it renders a single input, it sets up all of this:
+
+```tsx
+const [values, setValues] = useState({ email: '', username: '', password: '' });
+const [errors, setErrors] = useState({});
+const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+const [isSubmitting, setIsSubmitting] = useState(false);
+const [submitError, setSubmitError] = useState('');
+```
+
+That's five pieces of state for a three-field form. Claude's version had seven, plus a ref for its counter.
+
+Every one of those needs to stay in sync. Fix a typo in your email, and the error under it has to be cleared at the right moment. Reset the form, and every value has to go back to where it started. The more behavior you add, the more state and coordination logic you need to get right.
+
+With Formisch, we never declared any of it. The form already knows:
+
+```ts
+signUpForm.isSubmitting; // Is the form submitting?
+signUpForm.isValidating; // Is a check still running?
+signUpForm.isDirty; // Has anything changed?
+field.errors; // What's wrong with this field?
+```
+
+Notice that we're only reading those values. Formisch keeps them up to date as the user types, leaves a field and submits.
+
+### The same pattern in every form
+
+ChatGPT and Claude couldn't even agree on when to check the username. One waited until submit; the other checked as you typed. That's two forms with two different ideas of how a form should behave, from the same prompt.
+
+With a library, a login form and a settings page can use the same `useForm` and `Field` patterns. A teammate who's read one Formisch form can read the others, and so can your AI the next time it opens the file.
+
+Remember all that hand-holding from earlier? The architecture, the scaffolding, the conventions in `AGENTS.md`? A library gives your team an established starting point, so you can spend your time on the parts of your app nobody else has built yet.
+
+### TypeScript catches its typos
+
+Here's a fun one. Formisch infers types from your schema all the way down into field paths. Say your agent mistypes a path:
+
+```tsx
+// ❌ TypeScript flags this. There's no `emial` in the schema.
+<Field of={signUpForm} path={['emial']}>
+  {(field) => <input {...field.props} value={field.input} />}
+</Field>
+```
+
+A coding agent that runs your type checker sees that error and can fix it before you ever look at it.
+
+Compare that to Claude's handwritten version, which reads every input's name with `name as FieldName`. That cast tells TypeScript to trust it, so a typo in a field's name goes straight through. With Formisch, the schema gives TypeScript what it needs to catch invalid paths.
+
+### There's less to review
+
+AI writes code really fast now, but somebody still has to read all of it before it gets merged, and that part hasn't sped up at the same rate.
+
+Before a reviewer can even check whether Claude's form works, they need to understand a debounce, a five-state union type and a ref-based counter. That's three new ideas for one username field. With Formisch, the reviewer can focus on the parts specific to your app: the rules, the markup and what happens on submit.
+
+Less code to generate also means fewer tokens and fewer rounds of "that's not right, try again." Across an app with a lot of forms, that adds up.
+
+### Your users get the little things
+
+Last but not least, there's the stuff your users feel.
+
+Remember how neither ChatGPT nor Claude moved focus to the first error on submit? With Formisch, that's built in. Submit with a mistake and focus moves to the field that needs fixing, making it easier to identify and correct the problem.
+
+When errors show up is also configurable through `useForm`:
+
+```ts
+const signUpForm = useForm({
+  schema: SignUpSchema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+Here, an error waits until you've left the field, then disappears when you fix it, instead of showing up on the first keystroke.
+
+These details are easy to miss when you test a form yourself, especially when everything works on a fast connection. Your users still have to deal with them, though, and a sign-up form is a bad place to confuse someone.
+
+## But form libraries come with baggage
+
+A form library has to work for thousands of apps that aren't yours. That works out well when your form fits, but introduces a new set of headaches when it doesn't. You end up undoing the library's decisions just to rebuild things your way, and that's often more work than writing the form yourself.
+
+The trick is finding one that makes the hard calls and leaves the rest to you. Here's how Formisch approaches that.
+
+**"I want full control over my markup."** That's what headless is for. Formisch manages state and validation and stops there. Every input, label and class name is yours, so it works with whatever design system or component library you already have. Fabian made it headless from day one so it would fit into your app instead of the other way around.
+
+```tsx
+<Field of={signUpForm} path={['username']}>
+  {(field) => (
+    // Your component, your styles. Formisch just wires it up.
+    <MyInput {...field.props} value={field.input} />
+  )}
+</Field>
+```
+
+**"Form libraries are bloated."** Some are! Formisch is modular, so you import the methods your form needs instead of pulling in a large API up front.
+
+**"Form libraries re-render everything."** Formisch's form store is built on signals, so typing in one field re-renders that field, not the whole form. You don't have to reach for `memo` to get there.
+
+**"What if we switch frameworks?"** The same core supports React, Vue, Svelte, Solid, Preact, Qwik, Angular and React Native. Fabian [describes the goal](https://formisch.dev/blog/formisch-v1-release-candidate/) as something like Vite, but for forms: one mental model that comes with you to whichever framework you pick next.
+
+**"I don't want to learn another API."** It's a small one. Most forms only need three pieces: `useForm` to create the form, `Form` to wrap it, and `Field` for each input. Lists add `FieldArray`. Everything else, like `reset`, `setInput` or `insert`, is a function you import when you need it, so there's no giant config object to memorize up front. And since your rules live in a Valibot schema, the validation part may be something you already know.
+
+It's also built so your AI can read it well. The [coding agents guide](https://formisch.dev/react/guides/coding-agents/) gives your agent access to an agent skill, an MCP server and `llms.txt` files, helping it follow the documented patterns instead of guessing.
+
+## Wrapping up
+
+AI doesn't need a form library to write a form; it's already really good at that on its own. Hand it one anyway and it stops starting from a blank file every time. It gets to build on work that's already been done, which means less infrastructure to recreate and maintain, and more time to focus on what makes your form specific to your app.
+
+If you want to try it, the docs are at [formisch.dev](https://formisch.dev).
+
+Huge thanks to coi for the reset fix, and to everyone who's ever filed a form bug on Formisch.
+
+Happy form building!
