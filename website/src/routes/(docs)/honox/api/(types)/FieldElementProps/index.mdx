@@ -1,0 +1,28 @@
+---
+title: FieldElementProps
+description: Props to spread onto a field element for integration with React.
+source: /frameworks/react/src/types/field.ts
+contributors:
+  - fabian-hiller
+---
+
+import { Property } from '~/components';
+import { properties } from './properties';
+
+# FieldElementProps
+
+Props to spread onto a field element for integration with React form handling.
+
+## Definition
+
+- `FieldElementProps`
+  - `name` <Property {...properties.name} />
+  - `autoFocus` <Property {...properties.autoFocus} />
+  - `ref` <Property {...properties.ref} />
+  - `onFocus` <Property {...properties.onFocus} />
+  - `onChange` <Property {...properties.onChange} />
+  - `onBlur` <Property {...properties.onBlur} />
+
+### Explanation
+
+`onFocus` marks the field as touched and runs the configured `'touch'` validation, while `onBlur` runs the configured `'blur'` validation. Neither handler uses the event object, so both are typed as `() => void` and can be passed to native elements or custom components with different focus event types.

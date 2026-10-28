@@ -1,0 +1,72 @@
+---
+title: useField
+description: Creates a reactive field store for a specific field within a form store.
+source: /frameworks/react/src/hooks/useField/useField.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# useField
+
+Creates a reactive field store for a specific field within a form store.
+
+```ts
+const field = useField<TSchema, TFieldPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldPath` <Property {...properties.TFieldPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+With `useField` you create a reactive field store for a specific field path within your form. The field store provides reactive access to the field's input value, validation errors, touched state, and more. It also includes a `props` object that you can spread onto an HTML input or textarea element to automatically handle user interactions like focus, change, and blur events.
+
+## Returns
+
+- `field` <Property {...properties.FieldStore} />
+
+## Related
+
+The following APIs can be combined with `useField`.
+
+### Hooks
+
+<ApiList
+  items={[
+    { text: 'useForm', href: '../useForm/' },
+    { text: 'useFieldArray', href: '../useFieldArray/' },
+  ]}
+/>
+
+### Components
+
+<ApiList
+  items={[
+    { text: 'Field', href: '../Field/' },
+    { text: 'FieldArray', href: '../FieldArray/' },
+    { text: 'Form', href: '../Form/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'focus', href: '/methods/api/focus/' },
+    { text: 'getErrors', href: '/methods/api/getErrors/' },
+    { text: 'getInput', href: '/methods/api/getInput/' },
+    { text: 'setErrors', href: '/methods/api/setErrors/' },
+    { text: 'setInput', href: '/methods/api/setInput/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>

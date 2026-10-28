@@ -1,0 +1,68 @@
+---
+title: Nested fields
+description: >-
+  Learn how to structure complex forms with nested objects. Nested fields help
+  organize related data and match your form structure to your database schema.
+contributors:
+  - fabian-hiller
+---
+
+import { Link } from '~/components';
+
+# Nested fields
+
+To add a little more structure to a complex form or to match the values of the form to your database, you can also nest your form fields in objects as deep as you like.
+
+## Schema definition
+
+For example, in the schema below, the first and last name are grouped under the object with the key `name`.
+
+```tsx
+import * as v from 'valibot';
+
+const ContactSchema = v.object({
+  name: v.object({
+    first: v.pipe(v.string(), v.nonEmpty()),
+    last: v.pipe(v.string(), v.nonEmpty()),
+  }),
+  email: v.pipe(v.string(), v.email()),
+  message: v.pipe(v.string(), v.nonEmpty()),
+});
+```
+
+## Path array
+
+When creating a nested field, use an array with multiple elements for the `path` property to refer to the nested field. The array represents the path through the nested structure.
+
+```tsx
+<Field of={contactForm} path={['name', 'first']}>
+  {(field) => <input {...field.props} value={field.input} type="text" />}
+</Field>
+```
+
+If you're using TypeScript, your editor will provide autocompletion for the path based on your schema structure.
+
+## Deep nesting
+
+You can nest objects as deeply as needed. Simply extend the path array with additional keys:
+
+```tsx
+const ProfileSchema = v.object({
+  user: v.object({
+    address: v.object({
+      street: v.string(),
+      city: v.string(),
+      country: v.string(),
+    }),
+  }),
+});
+
+// Access deeply nested field
+<Field of={profileForm} path={['user', 'address', 'city']}>
+  {(field) => <input {...field.props} value={field.input} type="text" />}
+</Field>;
+```
+
+## Type safety
+
+The path array is fully type-safe. TypeScript will validate that each element in your path corresponds to a valid key in your schema structure, providing autocompletion and compile-time errors if you reference a non-existent path.

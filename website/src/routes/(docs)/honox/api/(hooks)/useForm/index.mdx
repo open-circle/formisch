@@ -1,0 +1,79 @@
+---
+title: useForm
+description: Creates a reactive form store from a form configuration that manages form state and provides reactive properties.
+source: /frameworks/react/src/hooks/useForm/useForm.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# useForm
+
+Creates a reactive form store from a form configuration. The form store manages form state and provides reactive properties.
+
+```ts
+const form = useForm<TSchema>(config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+
+## Parameters
+
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+`useForm` creates a reactive form store that manages form state using the provided Valibot schema. Validation runs when the form is submitted by default, after which fields revalidate on every input, but this can be customized with the `validate` and `revalidate` options.
+
+## Returns
+
+- `form` <Property {...properties.FormStore} />
+
+## Related
+
+The following APIs can be combined with `useForm`.
+
+### Hooks
+
+<ApiList
+  items={[
+    { text: 'useField', href: '../useField/' },
+    { text: 'useFieldArray', href: '../useFieldArray/' },
+  ]}
+/>
+
+### Components
+
+<ApiList
+  items={[
+    { text: 'Field', href: '../Field/' },
+    { text: 'FieldArray', href: '../FieldArray/' },
+    { text: 'Form', href: '../Form/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'focus', href: '/methods/api/focus/' },
+    { text: 'getDeepErrors', href: '/methods/api/getDeepErrors/' },
+    { text: 'getErrors', href: '/methods/api/getErrors/' },
+    { text: 'getInput', href: '/methods/api/getInput/' },
+    { text: 'handleSubmit', href: '/methods/api/handleSubmit/' },
+    { text: 'insert', href: '/methods/api/insert/' },
+    { text: 'move', href: '/methods/api/move/' },
+    { text: 'remove', href: '/methods/api/remove/' },
+    { text: 'replace', href: '/methods/api/replace/' },
+    { text: 'reset', href: '/methods/api/reset/' },
+    { text: 'setErrors', href: '/methods/api/setErrors/' },
+    { text: 'setInput', href: '/methods/api/setInput/' },
+    { text: 'submit', href: '/methods/api/submit/' },
+    { text: 'swap', href: '/methods/api/swap/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>
