@@ -50,7 +50,7 @@ Identical `describe`/`test` names across all frameworks:
 
 `Form` only exists where the adapter provides it: React Native has no `Form` component, and Angular ships the `[formischForm]` directive instead.
 
-The `store stability` describe checks that the returned stores keep their reference across re-renders. It exists in **Preact, React, React Native, HonoX, Solid and Svelte**; Angular and Vue do not have it.
+The `store stability` describe checks that the returned stores keep their reference across re-renders. It exists in **Preact, React, React Native and HonoX**; in Angular, Solid, Svelte and Vue omit it with a one-line `// Note: ...` comment.
 
 ## Per-framework adapters
 
