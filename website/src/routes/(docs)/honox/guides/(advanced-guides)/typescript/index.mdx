@@ -12,14 +12,14 @@ import { Link } from '~/components';
 
 # TypeScript
 
-Since the library is written in TypeScript and we put a lot of emphasis on the development experience, you can expect maximum TypeScript support. Types are automatically inferred from your <Link href="/react/guides/define-your-form/">Valibot schemas</Link>, providing type safety throughout your forms.
+Since the library is written in TypeScript and we put a lot of emphasis on the development experience, you can expect maximum TypeScript support. Types are automatically inferred from your <Link href="/honox/guides/define-your-form/">Valibot schemas</Link>, providing type safety throughout your forms.
 
 ## Type inference
 
 Formisch uses Valibot's type inference to automatically derive TypeScript types from your schemas. You don't need to define separate types—they're inferred automatically.
 
 ```tsx
-import { Field, Form, useForm } from '@formisch/react';
+import { Field, Form, useForm } from '@formisch/honox';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -55,7 +55,7 @@ export default function LoginPage() {
 Valibot schemas can have different input and output types when using transformations. Formisch provides proper typing for both.
 
 ```tsx
-import { Field, Form, useForm } from '@formisch/react';
+import { Field, Form, useForm } from '@formisch/honox';
 import * as v from 'valibot';
 
 const ProfileSchema = v.object({
@@ -133,10 +133,10 @@ const userForm = useForm({ schema: UserSchema });
 
 ## Type-safe props
 
-To pass your form to another component via props, you can use the <Link href="/react/api/FormStore/">`FormStore`</Link> type along with your schema type to get full type safety.
+To pass your form to another component via props, you can use the <Link href="/honox/api/FormStore/">`FormStore`</Link> type along with your schema type to get full type safety.
 
 ```tsx
-import { Form, type FormStore, useForm } from '@formisch/react';
+import { Form, type FormStore, useForm } from '@formisch/honox';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -167,18 +167,18 @@ function FormContent(props: FormContentProps) {
 
 ## Generic field components
 
-You can create generic field components with proper TypeScript typing using the <Link href="/react/api/FormStore/">`FormStore`</Link> type with Valibot's `GenericSchema`.
+You can create generic field components with proper TypeScript typing using the <Link href="/honox/api/FormStore/">`FormStore`</Link> type with Valibot's `GenericSchema`.
 
 ```tsx
-import { type FormStore, useField } from '@formisch/react';
-import type { FunctionComponent } from 'react';
+import { type FormStore, useField } from '@formisch/honox';
+import type { FC } from 'hono/jsx';
 import * as v from 'valibot';
 
 type EmailInputProps = {
   of: FormStore<v.GenericSchema<{ email: string }>>;
 };
 
-const EmailInput: FunctionComponent<EmailInputProps> = (props) => {
+const EmailInput: FC<EmailInputProps> = (props) => {
   const field = useField(props.of, { path: ['email'] });
 
   return (
@@ -197,11 +197,11 @@ The `v.GenericSchema<{ email: string }>` type ensures that the form passed to `E
 
 ## Available types
 
-Most types you need can be imported from `@formisch/react`. You can find all available types in our <Link href="/react/api/">API reference</Link>.
+Most types you need can be imported from `@formisch/honox`. You can find all available types in our <Link href="/honox/api/">API reference</Link>.
 
-- <Link href="/react/api/FormStore/">`FormStore`</Link> - The form store type
-- <Link href="/react/api/FieldStore/">`FieldStore`</Link> - The field store type
-- <Link href="/react/api/FieldArrayStore/">`FieldArrayStore`</Link> - The field
+- <Link href="/honox/api/FormStore/">`FormStore`</Link> - The form store type
+- <Link href="/honox/api/FieldStore/">`FieldStore`</Link> - The field store type
+- <Link href="/honox/api/FieldArrayStore/">`FieldArrayStore`</Link> - The field
   array store type
 - <Link href="/core/api/ValidPath/">`ValidPath`</Link> - Type for valid field
   paths

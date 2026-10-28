@@ -1,23 +1,23 @@
 ---
 title: FieldElementProps
-description: Props to spread onto a field element for integration with React.
-source: /frameworks/react/src/types/field.ts
+description: Props to spread onto a field element for integration with HonoX.
+source: /frameworks/honox/src/types/field.ts
 contributors:
   - fabian-hiller
 ---
 
-import { Property } from '~/components';
+import { Link, Property } from '~/components';
 import { properties } from './properties';
 
 # FieldElementProps
 
-Props to spread onto a field element for integration with React form handling.
+Props to spread onto a field element for integration with HonoX form handling.
 
 ## Definition
 
 - `FieldElementProps`
   - `name` <Property {...properties.name} />
-  - `autoFocus` <Property {...properties.autoFocus} />
+  - `autofocus` <Property {...properties.autofocus} />
   - `ref` <Property {...properties.ref} />
   - `onFocus` <Property {...properties.onFocus} />
   - `onChange` <Property {...properties.onChange} />
@@ -26,3 +26,7 @@ Props to spread onto a field element for integration with React form handling.
 ### Explanation
 
 `onFocus` marks the field as touched and runs the configured `'touch'` validation, while `onBlur` runs the configured `'blur'` validation. Neither handler uses the event object, so both are typed as `() => void` and can be passed to native elements or custom components with different focus event types.
+
+The `ref` callback registers the field element, which enables methods like <Link href="/methods/api/focus/">`focus`</Link> to control it. It returns a cleanup function that hono/jsx calls when it removes the element, which is how the field unregisters it.
+
+Since hono/jsx types its event handlers with native DOM events, `onChange` receives a native `Event`. In addition, hono/jsx maps `onChange` to the native `input` event, so the field input is updated on every keystroke and not only when the element loses focus.

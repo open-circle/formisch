@@ -63,7 +63,7 @@ Each field exposes several state flags to drive this decision:
 The form additionally exposes `isSubmitted`, which becomes `true` after the first submit attempt. Combining `isEdited` with `isSubmitted` gives the balanced behavior described above:
 
 ```tsx
-import { Field, Form, useForm } from '@formisch/react';
+import { Field, Form, useForm } from '@formisch/honox';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -99,7 +99,7 @@ export default function App() {
 
 ### Reuse the guard across fields
 
-Writing this guard at every field gets repetitive. The common fix is to move it into a small reusable component, either on its own or folded into the `TextInput` from the <Link href="/react/guides/input-components/">input components</Link> guide, so the `isEdited || isSubmitted` logic lives in exactly one place:
+Writing this guard at every field gets repetitive. The common fix is to move it into a small reusable component, either on its own or folded into the `TextInput` from the <Link href="/honox/guides/input-components/">input components</Link> guide, so the `isEdited || isSubmitted` logic lives in exactly one place:
 
 ```tsx
 interface FieldErrorProps {
@@ -138,7 +138,7 @@ Each field then stays focused on its input:
 When your schema contains asynchronous checks, validation does not resolve instantly. The form's `isValidating` state is `true` while any validation is in flight, which you can use to show a loading indicator or to disable the submit button until validation settles.
 
 ```tsx
-import { Form, useForm } from '@formisch/react';
+import { Form, useForm } from '@formisch/honox';
 import * as v from 'valibot';
 import { isUsernameAvailable } from '~/api';
 
@@ -171,4 +171,4 @@ export default function App() {
 
 ## Further reading
 
-To process your form's values once they pass validation, see the <Link href="/react/guides/handle-submission/">handle submission</Link> guide. For working with the fields a user has changed, see the <Link href="/react/guides/dirty-fields/">dirty fields</Link> guide.
+To process your form's values once they pass validation, see the <Link href="/honox/guides/handle-submission/">handle submission</Link> guide. For working with the fields a user has changed, see the <Link href="/honox/guides/dirty-fields/">dirty fields</Link> guide.

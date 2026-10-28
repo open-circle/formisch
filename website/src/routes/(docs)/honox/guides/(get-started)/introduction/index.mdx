@@ -1,7 +1,7 @@
 ---
 title: Introduction
 description: >-
-  Formisch is a schema-based, headless form library for React. It manages
+  Formisch is a schema-based, headless form library for HonoX. It manages
   form state and validation. It is type-safe, fast by default and its bundle
   size is small due to its modular design.
 contributors:
@@ -12,7 +12,7 @@ import { Link } from '~/components';
 
 # Introduction
 
-Formisch is a schema-based, headless form library for React. It manages form state and validation. It is type-safe, fast by default and its bundle size is small due to its modular design. Try it out in our <Link href="/playground/login/">playground</Link>!
+Formisch is a schema-based, headless form library for HonoX. It manages form state and validation. It is type-safe, fast by default and its bundle size is small due to its modular design. Try it out in our <Link href="/playground/login/">playground</Link>!
 
 ## Highlights
 
@@ -26,10 +26,11 @@ Formisch is a schema-based, headless form library for React. It manages form sta
 
 ## Example
 
-Every form starts with the <Link href="/react/api/useForm/">`useForm`</Link> hook. It initializes your form's store based on the provided Valibot schema and infers its types. Next, wrap your form in the <Link href="/react/api/Form/">`<Form />`</Link> component. It's a thin layer around the native `<form />` element that handles form validation and submission. Then, you can access the state of a field with the <Link href="/react/api/useField/">`useField`</Link> hook or the <Link href="/react/api/Field/">`<Field />`</Link> component to connect your inputs.
+Every form starts with the <Link href="/honox/api/useForm/">`useForm`</Link> hook. It initializes your form's store based on the provided Valibot schema and infers its types. Next, wrap your form in the <Link href="/honox/api/Form/">`<Form />`</Link> component. It's a thin layer around the native `<form />` element that handles form validation and submission. Then, you can access the state of a field with the <Link href="/honox/api/useField/">`useField`</Link> hook or the <Link href="/honox/api/Field/">`<Field />`</Link> component to connect your inputs. Since forms are interactive, place them in a HonoX island so that they are rendered on the server and hydrated on the client.
 
 ```tsx
-import { Field, Form, useForm } from '@formisch/react';
+// app/islands/LoginForm.tsx
+import { Field, Form, useForm } from '@formisch/honox';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -37,7 +38,7 @@ const LoginSchema = v.object({
   password: v.pipe(v.string(), v.minLength(8)),
 });
 
-export default function LoginPage() {
+export default function LoginForm() {
   const loginForm = useForm({
     schema: LoginSchema,
   });
@@ -72,7 +73,7 @@ In addition, Formisch offers several functions (we call them "methods") that can
 
 What makes Formisch unique is its framework-agnostic core, which is fully native to the framework you are using. It works by inserting framework-specific reactivity blocks when the core package is built, giving you native performance for any UI update. A modular methods API keeps bundles starting at just ~2.5 kB by only including the methods you import, and end-to-end type safety covers deeply nested paths and field arrays with TypeScript inference that stays fast even as forms grow.
 
-For a side-by-side look at how Formisch compares to React Hook Form and TanStack Form, see the <Link href="/react/guides/comparison/">comparison guide</Link>.
+For a side-by-side look at how Formisch compares to React Hook Form and TanStack Form, see the <Link href="/honox/guides/comparison/">comparison guide</Link>.
 
 ## Vision
 

@@ -88,18 +88,18 @@ A group of radio buttons, while similar to an array of checkboxes, will only all
 
 ## Select
 
-An HTML `<select />` element allows you to select a string from a predefined list of options.
+An HTML `<select />` element allows you to select a string from a predefined list of options. Since hono/jsx does not apply the `value` property of a `<select />` element during server-side rendering, you mark the selected option with its `selected` attribute instead.
 
 ```tsx
 <Field of={form} path={['framework']}>
   {(field) => (
-    <select {...field.props} value={field.input ?? ''}>
+    <select {...field.props}>
       {[
         { label: 'React', value: 'react' },
         { label: 'Solid', value: 'solid' },
         { label: 'Qwik', value: 'qwik' },
       ].map(({ label, value }) => (
-        <option key={value} value={value}>
+        <option key={value} value={value} selected={field.input === value}>
           {label}
         </option>
       ))}
@@ -114,13 +114,17 @@ However, if you set the `multiple` attribute, multiple options can be selected m
 <Field of={form} path={['frameworks']}>
   {(field) => (
     // Set "multiple" to "true"
-    <select {...field.props} value={field.input ?? []} multiple>
+    <select {...field.props} multiple>
       {[
         { label: 'React', value: 'react' },
         { label: 'Solid', value: 'solid' },
         { label: 'Qwik', value: 'qwik' },
       ].map(({ label, value }) => (
-        <option key={value} value={value}>
+        <option
+          key={value}
+          value={value}
+          selected={field.input?.includes(value)}
+        >
           {label}
         </option>
       ))}

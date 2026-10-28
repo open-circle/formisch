@@ -12,7 +12,7 @@ import { Link } from '~/components';
 
 # Coding agents
 
-Formisch is built to be consumed by AI coding agents. This page describes the agent skill, MCP server and Markdown documentation we provide so that your AI tools generate correct React code with Formisch.
+Formisch is built to be consumed by AI coding agents. This page describes the agent skill, MCP server and Markdown documentation we provide so that your AI tools generate correct HonoX code with Formisch.
 
 ## Agent skill
 
@@ -59,16 +59,16 @@ The server metadata is available at [`/.well-known/mcp/server-card.json`](/.well
 We provide several [LLMs.txt](https://llmstxt.org/) files. Use the one that works best with your AI tool.
 
 - [`llms.txt`](/llms.txt) contains a table of contents with links to all Markdown files
-- [`llms-react.txt`](/llms-react.txt) contains a table of contents with links to React-related files
-- [`llms-react-full.txt`](/llms-react-full.txt) contains the Markdown content of the entire React docs
-- [`llms-react-guides.txt`](/llms-react-guides.txt) contains the Markdown content of the React guides
-- [`llms-react-api.txt`](/llms-react-api.txt) contains the Markdown content of the React API reference
+- [`llms-honox.txt`](/llms-honox.txt) contains a table of contents with links to HonoX-related files
+- [`llms-honox-full.txt`](/llms-honox-full.txt) contains the Markdown content of the entire HonoX docs
+- [`llms-honox-guides.txt`](/llms-honox-guides.txt) contains the Markdown content of the HonoX guides
+- [`llms-honox-api.txt`](/llms-honox-api.txt) contains the Markdown content of the HonoX API reference
 - [`llms-blog.txt`](/llms-blog.txt) contains the Markdown content of all blog posts
 
 ## Markdown for agents
 
-Every documentation page is available as Markdown. Append `.md` to the URL of a page (e.g. `/react/guides/installation/` becomes [`/react/guides/installation.md`](/react/guides/installation.md)) or request the page with an `Accept: text/markdown` header to receive its Markdown version.
+Every documentation page is available as Markdown. Append `.md` to the URL of a page (e.g. `/honox/guides/installation/` becomes [`/honox/guides/installation.md`](/honox/guides/installation.md)) or request the page with an `Accept: text/markdown` header to receive its Markdown version.
 
 ## Custom building blocks
 
-Coding agents can use `@formisch/react/internals` to build custom methods and framework bindings with the same core helpers as Formisch. See the <Link href="/react/guides/internals/">internals guide</Link> for a typed example and guidance on reactivity and lifecycle behavior.
+Coding agents can use `@formisch/honox/internals` to build custom methods and framework bindings with the same core helpers as Formisch. See the <Link href="/honox/guides/internals/">internals guide</Link> for a typed example and guidance on reactivity and lifecycle behavior.

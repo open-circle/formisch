@@ -32,7 +32,7 @@ import {
   getDirtyInput,
   type SubmitHandler,
   useForm,
-} from '@formisch/react';
+} from '@formisch/honox';
 import * as v from 'valibot';
 
 const UserSchema = v.object({
@@ -74,7 +74,7 @@ Because dirty state is bound to the form input, `getDirtyInput` always returns t
 Returns a list of paths to dirty fields. Use it for logging, telemetry, or driving a custom walker over the form's dirty state.
 
 ```tsx
-import { getDirtyPaths } from '@formisch/react';
+import { getDirtyPaths } from '@formisch/honox';
 
 const dirtyPaths = getDirtyPaths(profileForm);
 // e.g. [['email'], ['user', 'name']]
@@ -87,7 +87,7 @@ Arrays are atomic: only the array's own path is returned, never the paths of ind
 Filters a user-supplied value down to its dirty parts using the form's dirty mask. Use it when you have a separately-derived value — most commonly the validated and transformed output from a submit handler — and you want only its dirty parts.
 
 ```tsx
-import { pickDirty, type SubmitHandler } from '@formisch/react';
+import { pickDirty, type SubmitHandler } from '@formisch/honox';
 
 const onSubmit: SubmitHandler<typeof UserSchema> = async (output) => {
   const dirty = pickDirty(profileForm, { from: output });
@@ -115,7 +115,7 @@ After validation, `output.name` has whitespace trimmed and `output.age` is a num
 <Link href="/methods/api/pickDirty/">`pickDirty(form, { from: output })`</Link> is the bridge: it walks the form's dirty tree as a structural mask and reads the corresponding values from the output you supply. The result preserves the transformed types.
 
 ```tsx
-import { pickDirty, type SubmitHandler } from '@formisch/react';
+import { pickDirty, type SubmitHandler } from '@formisch/honox';
 
 const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
   // output.age is a number — pickDirty preserves that.
@@ -138,14 +138,14 @@ This differs from objects, where clean keys are omitted. Objects model keyed dic
 
 ## Common patterns
 
-The snippets below assume `form` is your form store (the result of <Link href="/react/api/useForm/">`useForm`</Link>).
+The snippets below assume `form` is your form store (the result of <Link href="/honox/api/useForm/">`useForm`</Link>).
 
 ### Skip submission when nothing changed
 
 The form's `isDirty` flag is the cheapest way to ask "is anything dirty?" — it short-circuits on the first dirty field it finds and doesn't allocate. Use it when all you need is the yes/no answer. If you actually consume the output of `getDirtyInput`, `getDirtyPaths`, or `pickDirty`, call that method directly — its return value already signals "nothing dirty", so checking `form.isDirty` first would just walk the tree twice.
 
 ```tsx
-import type { SubmitHandler } from '@formisch/react';
+import type { SubmitHandler } from '@formisch/honox';
 
 const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
   if (!form.isDirty) {
@@ -158,7 +158,7 @@ const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
 ### Send only the dirty raw input
 
 ```tsx
-import { getDirtyInput } from '@formisch/react';
+import { getDirtyInput } from '@formisch/honox';
 
 const dirty = getDirtyInput(form);
 if (dirty) {
@@ -169,7 +169,7 @@ if (dirty) {
 ### Send only the dirty validated output
 
 ```tsx
-import { pickDirty, type SubmitHandler } from '@formisch/react';
+import { pickDirty, type SubmitHandler } from '@formisch/honox';
 
 const onSubmit: SubmitHandler<typeof Schema> = async (output) => {
   const dirty = pickDirty(form, { from: output });

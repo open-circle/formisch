@@ -38,7 +38,7 @@ export const properties: Record<string, PropertyProps> = {
   children: {
     type: {
       type: 'custom',
-      name: 'ReactNode',
+      name: 'Child',
     },
   },
 };

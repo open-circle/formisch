@@ -11,7 +11,7 @@ import { Link } from '~/components';
 
 # Internals
 
-Formisch exposes its core through `@formisch/react/internals`. You can use these functions and types to build methods, reactive bindings and components for behavior that Formisch does not provide out of the box. Coding agents can use the same building blocks as the library itself.
+Formisch exposes its core through `@formisch/honox/internals`. You can use these functions and types to build methods, reactive bindings and components for behavior that Formisch does not provide out of the box. Coding agents can use the same building blocks as the library itself.
 
 ## Versioning
 
@@ -25,19 +25,19 @@ import {
   getFieldStore,
   INTERNAL,
   setFieldInput,
-} from '@formisch/react/internals';
+} from '@formisch/honox/internals';
 ```
 
-This entry point re-exports the entire React-specific core, including store types, field and array helpers, validation utilities and the reactivity adapter. It is included in `@formisch/react`, so no additional package is needed. Always use the internals from the same framework package as your form so they share its reactivity implementation.
+This entry point re-exports the entire HonoX-specific core, including store types, field and array helpers, validation utilities and the reactivity adapter. It is included in `@formisch/honox`, so no additional package is needed. Always use the internals from the same framework package as your form so they share its reactivity implementation.
 
-The regular `@formisch/react` entry point provides the ready-made methods and framework bindings. The internals entry point gives you access to the lower-level operations and store structure described in the <Link href="/react/guides/architecture/">architecture guide</Link>.
+The regular `@formisch/honox` entry point provides the ready-made methods and framework bindings. The internals entry point gives you access to the lower-level operations and store structure described in the <Link href="/honox/guides/architecture/">architecture guide</Link>.
 
 ## Implement a method
 
 The existing <Link href="/methods/api/setInput/">`setInput`</Link> method shows how these building blocks work together. This simplified implementation updates a single field and reuses `SetFieldInputConfig` to infer the path and input types from your schema:
 
 ```ts
-import type { SetFieldInputConfig } from '@formisch/react';
+import type { SetFieldInputConfig } from '@formisch/honox';
 import {
   type BaseFormStore,
   batch,
@@ -47,7 +47,7 @@ import {
   type RequiredPath,
   setFieldInput,
   validateIfRequired,
-} from '@formisch/react/internals';
+} from '@formisch/honox/internals';
 
 /**
  * Sets a field's input and validates it if required.
@@ -85,12 +85,12 @@ The [full implementation](https://github.com/open-circle/formisch/blob/main/pack
 
 ## Build reactive bindings and components
 
-You can also build your own framework bindings on top of the core. These bindings are responsible for subscribing to state changes, registering input elements or refs, handling events and cleaning up when fields unmount. Start with <Link href="/react/guides/input-components/">input components</Link> if you can compose the existing bindings.
+You can also build your own framework bindings on top of the core. These bindings are responsible for subscribing to state changes, registering input elements or refs, handling events and cleaning up when fields unmount. Start with <Link href="/honox/guides/input-components/">input components</Link> if you can compose the existing bindings.
 
-Reading a core signal alone does not subscribe a React component. The existing hooks use the internal `useSignals` hook to manage subscriptions and cleanup. Compose the public hooks where possible, or follow that implementation when building your own subscription layer.
+Reading a core signal alone does not subscribe a hono/jsx component. The existing hooks use the internal `useSignals` hook to manage subscriptions and cleanup. It only tracks signals in the browser, as hono/jsx neither runs effects nor re-renders components during server-side rendering. Compose the public hooks where possible, or follow that implementation when building your own subscription layer.
 
-The [React binding source](https://github.com/open-circle/formisch/tree/main/frameworks/react/src) shows how Formisch handles these responsibilities. The core exposes the helpers those bindings use; it does not automatically supply their framework lifecycle behavior.
+The [HonoX binding source](https://github.com/open-circle/formisch/tree/main/frameworks/honox/src) shows how Formisch handles these responsibilities. The core exposes the helpers those bindings use; it does not automatically supply their framework lifecycle behavior.
 
 ## Work with coding agents
 
-Give your agent this guide, your schema and the behavior you want to build. Ask it to inspect the relevant method or framework binding and the installed type declarations, then test the custom behavior with your form. The <Link href="/react/guides/coding-agents/">coding agents guide</Link> explains how to access the documentation through our skill, MCP server and Markdown files.
+Give your agent this guide, your schema and the behavior you want to build. Ask it to inspect the relevant method or framework binding and the installed type declarations, then test the custom behavior with your form. The <Link href="/honox/guides/coding-agents/">coding agents guide</Link> explains how to access the documentation through our skill, MCP server and Markdown files.

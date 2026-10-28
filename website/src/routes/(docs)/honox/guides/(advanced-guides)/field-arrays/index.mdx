@@ -12,7 +12,7 @@ import { Link } from '~/components';
 
 # Field arrays
 
-Dynamically generating form fields from an array introduces additional challenges when items are added, removed, swapped, or moved. Formisch provides the <Link href="/react/api/FieldArray/">`FieldArray`</Link> component, which works with its array methods to make these forms straightforward.
+Dynamically generating form fields from an array introduces additional challenges when items are added, removed, swapped, or moved. Formisch provides the <Link href="/honox/api/FieldArray/">`FieldArray`</Link> component, which works with its array methods to make these forms straightforward.
 
 > In our <Link href="/playground/todos/">playground</Link> you can take a look at a form with a field array and test it out.
 
@@ -42,10 +42,10 @@ const TodoFormSchema = v.object({
 
 ### FieldArray component
 
-To dynamically generate the form fields for the todos, you use the <Link href="/react/api/FieldArray/">`FieldArray`</Link> component in combination with JavaScript's `Array.prototype.map()` method. The field array provides an `items` array of unique string identifiers which are used to detect when an item is added, moved, or removed.
+To dynamically generate the form fields for the todos, you use the <Link href="/honox/api/FieldArray/">`FieldArray`</Link> component in combination with JavaScript's `Array.prototype.map()` method. The field array provides an `items` array of unique string identifiers which are used to detect when an item is added, moved, or removed.
 
 ```tsx
-import { Field, FieldArray, Form, useForm } from '@formisch/react';
+import { Field, FieldArray, Form, useForm } from '@formisch/honox';
 
 export default function TodoPage() {
   const todoForm = useForm({
@@ -104,7 +104,7 @@ export default function TodoPage() {
 
 ### Path array with index
 
-As with <Link href="/react/guides/nested-fields/">nested fields</Link>, you use an array for the `path` property. The key difference is that you include the index from the `map()` function to specify which array item you're referencing. This ensures the paths update correctly when items are added, moved, or removed.
+As with <Link href="/honox/guides/nested-fields/">nested fields</Link>, you use an array for the `path` property. The key difference is that you include the index from the `map()` function to specify which array item you're referencing. This ensures the paths update correctly when items are added, moved, or removed.
 
 ```tsx
 <Field of={todoForm} path={['todos', index, 'label']}>
@@ -121,7 +121,7 @@ Now you can use the <Link href="/methods/api/insert/">`insert`</Link>, <Link hre
 Add a new item to the array:
 
 ```tsx
-import { insert } from '@formisch/react';
+import { insert } from '@formisch/honox';
 
 <button
   type="button"
@@ -143,7 +143,7 @@ The `at` option can be used to specify the index where the item should be insert
 Remove an item from the array:
 
 ```tsx
-import { remove } from '@formisch/react';
+import { remove } from '@formisch/honox';
 
 <button
   type="button"
@@ -163,7 +163,7 @@ import { remove } from '@formisch/react';
 Move an item from one position to another:
 
 ```tsx
-import { move } from '@formisch/react';
+import { move } from '@formisch/honox';
 
 <button
   type="button"
@@ -184,7 +184,7 @@ import { move } from '@formisch/react';
 Swap two items in the array:
 
 ```tsx
-import { swap } from '@formisch/react';
+import { swap } from '@formisch/honox';
 
 <button
   type="button"
@@ -205,7 +205,7 @@ import { swap } from '@formisch/react';
 Replace an item with new data:
 
 ```tsx
-import { replace } from '@formisch/react';
+import { replace } from '@formisch/honox';
 
 <button
   type="button"

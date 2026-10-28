@@ -12,18 +12,18 @@ import { Link } from '~/components';
 
 # Add form fields
 
-To add a field to your form, you can use the <Link href="/react/api/Field/">`Field`</Link> component or the <Link href="/react/api/useField/">`useField`</Link> hook. Both are headless and provide access to field state for building your form UI.
+To add a field to your form, you can use the <Link href="/honox/api/Field/">`Field`</Link> component or the <Link href="/honox/api/useField/">`useField`</Link> hook. Both are headless and provide access to field state for building your form UI.
 
 ## Field component
 
-The <Link href="/react/api/Field/">`Field`</Link> component has two mandatory properties: `of` which accepts the form store, and `path` which specifies which field to connect. If you use TypeScript, you get full autocompletion for the path based on your schema.
+The <Link href="/honox/api/Field/">`Field`</Link> component has two mandatory properties: `of` which accepts the form store, and `path` which specifies which field to connect. If you use TypeScript, you get full autocompletion for the path based on your schema.
 
 ### Children prop
 
-As a child, you pass a function to the <Link href="/react/api/Field/">`Field`</Link> component that returns JSX. The function receives the field store as its parameter, which includes the current value, error messages, and props to spread onto your input element.
+As a child, you pass a function to the <Link href="/honox/api/Field/">`Field`</Link> component that returns JSX. The function receives the field store as its parameter, which includes the current value, error messages, and props to spread onto your input element.
 
 ```tsx
-import { Field, Form, useForm } from '@formisch/react';
+import { Field, Form, useForm } from '@formisch/honox';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -52,13 +52,13 @@ export default function App() {
 }
 ```
 
-> **Important:** The event handlers in `field.props` read the value from the DOM as a string. Fields with a non-string schema like `v.number()` or `v.date()` therefore need to be controlled to store the value with the correct type. See the <Link href="/react/guides/controlled-fields/">controlled fields</Link> guide to learn more.
+> **Important:** The event handlers in `field.props` read the value from the DOM as a string. Fields with a non-string schema like `v.number()` or `v.date()` therefore need to be controlled to store the value with the correct type. See the <Link href="/honox/guides/controlled-fields/">controlled fields</Link> guide to learn more.
 
-> **Important:** If you plan to set initial values with `initialInput` or programmatically control field values using methods like <Link href="/methods/api/setInput/">`setInput`</Link> or <Link href="/methods/api/reset/">`reset`</Link>, you must make your fields controlled by setting the appropriate attributes (like `value`, `checked`, or `selected`). See the <Link href="/react/guides/controlled-fields/">controlled fields</Link> guide to learn more.
+> **Important:** If you plan to set initial values with `initialInput` or programmatically control field values using methods like <Link href="/methods/api/setInput/">`setInput`</Link> or <Link href="/methods/api/reset/">`reset`</Link>, you must make your fields controlled by setting the appropriate attributes (like `value`, `checked`, or `selected`). See the <Link href="/honox/guides/controlled-fields/">controlled fields</Link> guide to learn more.
 
 ### Headless design
 
-The <Link href="/react/api/Field/">`Field`</Link> component does not render its own UI elements. It is headless and provides only the data layer of the field. This allows you to freely define your user interface. You can use HTML elements, custom components or an external UI library.
+The <Link href="/honox/api/Field/">`Field`</Link> component does not render its own UI elements. It is headless and provides only the data layer of the field. This allows you to freely define your user interface. You can use HTML elements, custom components or an external UI library.
 
 ### Path array
 
@@ -81,15 +81,15 @@ For nested fields, the path reflects the structure of your schema:
 
 ### Type safety
 
-The API design of the <Link href="/react/api/Field/">`Field`</Link> component results in a fully type-safe form. For example, if you change your schema, TypeScript will immediately alert you if the path is invalid. The field state is also fully typed based on your schema, giving you autocompletion for properties like `field.input`.
+The API design of the <Link href="/honox/api/Field/">`Field`</Link> component results in a fully type-safe form. For example, if you change your schema, TypeScript will immediately alert you if the path is invalid. The field state is also fully typed based on your schema, giving you autocompletion for properties like `field.input`.
 
 ## useField hook
 
-For very complex forms where you create individual components for each form field, Formisch provides the <Link href="/react/api/useField/">`useField`</Link> hook. It allows you to access the field state directly within your component logic.
+For very complex forms where you create individual components for each form field, Formisch provides the <Link href="/honox/api/useField/">`useField`</Link> hook. It allows you to access the field state directly within your component logic.
 
 ```tsx
-import { useField } from '@formisch/react';
-import type { FormStore } from '@formisch/react';
+import { useField } from '@formisch/honox';
+import type { FormStore } from '@formisch/honox';
 import * as v from 'valibot';
 
 type EmailInputProps = {
@@ -110,17 +110,17 @@ function EmailInput(props: EmailInputProps) {
 
 ### When to use which
 
-- **Use <Link href="/react/api/Field/">`Field`</Link> component**: When defining multiple fields in the same component. It ensures you don't accidentally access the wrong field store.
-- **Use <Link href="/react/api/useField/">`useField`</Link> hook**: When creating field components for single fields. It allows you to access field state in your component logic.
+- **Use <Link href="/honox/api/Field/">`Field`</Link> component**: When defining multiple fields in the same component. It ensures you don't accidentally access the wrong field store.
+- **Use <Link href="/honox/api/useField/">`useField`</Link> hook**: When creating field components for single fields. It allows you to access field state in your component logic.
 
-The <Link href="/react/api/Field/">`Field`</Link> component is essentially a thin wrapper around <Link href="/react/api/useField/">`useField`</Link> that allows you to access the field state within JSX code.
+The <Link href="/honox/api/Field/">`Field`</Link> component is essentially a thin wrapper around <Link href="/honox/api/useField/">`useField`</Link> that allows you to access the field state within JSX code.
 
 ## Field store
 
-The field store provides access to the following properties. They are plain values, but because Formisch wires into React's rendering, your components re-render when they change.
+The field store provides access to the following properties. They are plain values, but because Formisch wires into the rendering of hono/jsx, your components re-render when they change.
 
 - `path`: The path to the field within the form.
-- `props`: JSX props to spread onto your input element (includes event handlers, ref callback, name attribute, and `autoFocus` to automatically focus fields with errors).
+- `props`: JSX props to spread onto your input element (includes event handlers, ref callback, name attribute, and `autofocus` to automatically focus fields with errors).
 - `input`: The current input value of the field.
 - `errors`: The current array of error messages if validation fails.
 - `isTouched`: Whether the field has been touched.
@@ -131,4 +131,4 @@ The field store provides access to the following properties. They are plain valu
 
 ## Next steps
 
-Now that you know how to add fields to your form, continue to the <Link href="/react/guides/input-components/">input components</Link> guide to learn about creating reusable input components for your forms.
+Now that you know how to add fields to your form, continue to the <Link href="/honox/guides/input-components/">input components</Link> guide to learn about creating reusable input components for your forms.

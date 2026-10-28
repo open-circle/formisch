@@ -79,7 +79,7 @@ export const properties: Record<string, PropertyProps> = {
       ],
       return: {
         type: 'custom',
-        name: 'ReactElement',
+        name: 'JSX.Element',
       },
     },
   },

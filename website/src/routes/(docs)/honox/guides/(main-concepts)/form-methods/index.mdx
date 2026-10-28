@@ -31,7 +31,7 @@ To retrieve values from your form, you can use:
 - <Link href="/methods/api/getDeepErrorEntries/">`getDeepErrorEntries`</Link>:
   Get all error messages paired with the path of the field they belong to
 
-Formisch plugs into React's render cycle, so reading values with these methods inside components stays reactive. When the form state changes, components that rely on these values automatically re-render without manual subscriptions.
+Formisch plugs into the render cycle of hono/jsx, so reading values with these methods inside components stays reactive. When the form state changes, components that rely on these values automatically re-render without manual subscriptions.
 
 ## Field state
 
@@ -59,7 +59,7 @@ To work with the dirty state of your form, Formisch provides three methods:
 - <Link href="/methods/api/pickDirty/">`pickDirty`</Link>: Filter an
   externally-supplied value down to its dirty parts using the form's dirty mask
 
-See the <Link href="/react/guides/dirty-fields/">dirty fields</Link> guide for when to reach for each.
+See the <Link href="/honox/guides/dirty-fields/">dirty fields</Link> guide for when to reach for each.
 
 ## Setting values
 
@@ -70,7 +70,7 @@ To manually update form values or errors, use:
 - <Link href="/methods/api/setErrors/">`setErrors`</Link>: Manually set error
   messages for a specific field
 
-> When you have access to a field store (from <Link href="/react/api/useField/">`useField`</Link> or <Link href="/react/api/Field/">`Field`</Link>), you can use `field.onChange(value)` to update the value directly. This is especially useful for custom inputs or component libraries that don't expose native HTML elements.
+> When you have access to a field store (from <Link href="/honox/api/useField/">`useField`</Link> or <Link href="/honox/api/Field/">`Field`</Link>), you can use `field.onChange(value)` to update the value directly. This is especially useful for custom inputs or component libraries that don't expose native HTML elements.
 
 > If you need to update the form because the initial data has changed (e.g., remote data was refreshed), use <Link href="/methods/api/reset/">`reset`</Link> with a new `initialInput` instead of <Link href="/methods/api/setInput/">`setInput`</Link>. The <Link href="/methods/api/reset/">`reset`</Link> method properly reinitializes the form state, while <Link href="/methods/api/setInput/">`setInput`</Link> only changes the current input values without updating the initial state.
 
@@ -121,4 +121,4 @@ move(loginForm, { path: ['items'], from: 0, to: 3 });
 
 ## API reference
 
-You can find detailed documentation for each method in our <Link href="/react/api/">API reference</Link>.
+You can find detailed documentation for each method in our <Link href="/honox/api/">API reference</Link>.

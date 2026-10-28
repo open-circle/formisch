@@ -12,14 +12,15 @@ import { Link } from '~/components';
 
 # Create your form
 
-Formisch consists of hooks, components and methods. To create a form you use the <Link href="/react/api/useForm/">`useForm`</Link> hook.
+Formisch consists of hooks, components and methods. To create a form you use the <Link href="/honox/api/useForm/">`useForm`</Link> hook.
 
 ## Form hook
 
-The <Link href="/react/api/useForm/">`useForm`</Link> hook initializes and returns the store of your form. The store contains the state of the form and can be used with other Formisch hooks, components and methods to build your form.
+The <Link href="/honox/api/useForm/">`useForm`</Link> hook initializes and returns the store of your form. The store contains the state of the form and can be used with other Formisch hooks, components and methods to build your form.
 
 ```tsx
-import { Field, Form, useForm } from '@formisch/react';
+// app/islands/LoginForm.tsx
+import { Field, Form, useForm } from '@formisch/honox';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -27,7 +28,7 @@ const LoginSchema = v.object({
   password: v.pipe(v.string(), v.minLength(8)),
 });
 
-export default function App() {
+export default function LoginForm() {
   const loginForm = useForm({
     schema: LoginSchema,
   });
@@ -42,7 +43,7 @@ export default function App() {
 
 ### Configuration options
 
-The <Link href="/react/api/useForm/">`useForm`</Link> hook accepts a configuration object with the following options:
+The <Link href="/honox/api/useForm/">`useForm`</Link> hook accepts a configuration object with the following options:
 
 - `schema`: Your Valibot schema that defines the form
 - `initialInput`: Initial values for your form fields (optional)
@@ -84,12 +85,26 @@ const loginForm = useForm({
 
 Optional and nullable fields are never affected and keep starting as `undefined`, since they accept it. The supported types are `string`, `number`, `boolean` and `date`, and the default is `{ string: '' }`.
 
+## Render in an island
+
+Forms are interactive, so the component that creates the form must be a HonoX island. Place it in the `app/islands` directory and export it as default, as in the example above. You can then render it from any route like a regular component:
+
+```tsx
+// app/routes/login/index.tsx
+import { createRoute } from 'honox/factory';
+import LoginForm from '../../islands/LoginForm';
+
+export default createRoute((c) => c.render(<LoginForm />));
+```
+
+HonoX renders the island on the server and hydrates it on the client. During server-side rendering, effects do not run and form state is not tracked, so the form simply renders its initial state and becomes interactive after hydration. Props passed to an island are serialized as JSON, so pass plain data, such as the initial input of your form, rather than functions.
+
 ## Multiple forms
 
 When a page contains multiple forms, you can create separate form stores for each one:
 
 ```tsx
-import { Form, useForm } from '@formisch/react';
+import { Form, useForm } from '@formisch/honox';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -124,4 +139,4 @@ If you need a multi-step form (wizard), see the [multi-step form discussion](htt
 
 ## Next steps
 
-Now that you know how to create a form, continue to the <Link href="/react/guides/add-form-fields/">add form fields</Link> guide to learn how to connect your input elements to the form using the <Link href="/react/api/Field/">`Field`</Link> component.
+Now that you know how to create a form, continue to the <Link href="/honox/guides/add-form-fields/">add form fields</Link> guide to learn how to connect your input elements to the form using the <Link href="/honox/api/Field/">`Field`</Link> component.

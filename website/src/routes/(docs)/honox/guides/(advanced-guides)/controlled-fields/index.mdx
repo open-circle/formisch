@@ -16,7 +16,7 @@ By default, all form fields are uncontrolled because that's the default behavior
 
 ## Why controlled?
 
-As soon as your forms become more complex, for example you set initial values or change the values of a form field via <Link href="/methods/api/setInput/">`setInput`</Link>, it becomes necessary that you control your fields yourself. For example, depending on which HTML form field you use, you may need to set the `value`, `checked` or `selected` attributes.
+As soon as your forms become more complex, for example you set initial values or change the values of a form field via <Link href="/methods/api/setInput/">`setInput`</Link>, it becomes necessary that you control your fields yourself. For example, depending on which HTML form field you use, you may need to set the `value`, `checked` or `selected` attributes. Since HonoX renders your islands on the server, this also ensures that initial values are already included in the server-rendered HTML.
 
 ### Text input example
 
@@ -30,7 +30,7 @@ For a text input field you simply add the `value` attribute and pass the field's
 
 ### Exception for files
 
-The HTML `<input type="file" />` element is an exception because it cannot be controlled. However, you have the possibility to control the UI around it. For inspiration you can use the code of our <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/blob/main/playgrounds/react/src/components/FileInput.tsx`} target={'\_blank'} rel="noreferrer">`FileInput`</a> component from our <Link href="/playground/special/">playground</Link>.
+The HTML `<input type="file" />` element is an exception because it cannot be controlled. However, you have the possibility to control the UI around it. For inspiration you can use the code of our <a href={`${import.meta.env.PUBLIC_GITHUB_URL}/blob/main/playgrounds/honox/app/components/FileInput.tsx`} target={'\_blank'} rel="noreferrer">`FileInput`</a> component from our <Link href="/playground/special/">playground</Link>.
 
 ## Numbers and dates
 
@@ -40,11 +40,11 @@ Fields defined with a `v.number()` or `v.date()` schema need extra steps to be c
 
 An `<input type="number" />` only reads and writes strings. So if you spread `field.props` onto it, `field.input` holds a string like `"123"`, even though it is typed as `number`. To store a real number, override the change handler with one that converts the value via `valueAsNumber` and forwards it to `field.onChange`.
 
-You also have to handle `NaN`. While typing a floating point number, the value can briefly be `NaN`, for example right after typing `1.`. If you don't catch this for the displayed value, the input is cleared. It is best to encapsulate both in a separate component as described in the <Link href="/react/guides/input-components/">input components</Link> guide.
+You also have to handle `NaN`. While typing a floating point number, the value can briefly be `NaN`, for example right after typing `1.`. If you don't catch this for the displayed value, the input is cleared. It is best to encapsulate both in a separate component as described in the <Link href="/honox/guides/input-components/">input components</Link> guide.
 
 ```tsx
-import type { FieldElementProps } from '@formisch/react';
-import { useMemo, useRef } from 'react';
+import type { FieldElementProps } from '@formisch/honox';
+import { useMemo, useRef } from 'hono/jsx';
 
 interface NumberInputProps extends Omit<FieldElementProps, 'onChange'> {
   label?: string;
@@ -63,7 +63,7 @@ export function NumberInput({
   onChange,
   ...inputProps
 }: NumberInputProps) {
-  const prevValue = useRef<number | undefined>();
+  const prevValue = useRef<number | undefined>(undefined);
 
   // Get value, keeping previous value if NaN
   const value = useMemo(() => {
@@ -76,7 +76,7 @@ export function NumberInput({
 
   return (
     <div>
-      {label && <label htmlFor={name}>{label}</label>}
+      {label && <label for={name}>{label}</label>}
       <input
         {...inputProps}
         name={name}
@@ -84,13 +84,10 @@ export function NumberInput({
         type="number"
         value={value ?? ''}
         // Convert string to number before storing
-        onChange={(event) =>
-          onChange(
-            event.currentTarget.value === ''
-              ? undefined
-              : event.currentTarget.valueAsNumber
-          )
-        }
+        onChange={(event) => {
+          const element = event.currentTarget as HTMLInputElement;
+          onChange(element.value === '' ? undefined : element.valueAsNumber);
+        }}
         aria-invalid={!!errors}
         aria-errormessage={`${name}-error`}
       />
@@ -121,8 +118,8 @@ Pass `field.onChange` after spreading `field.props` so it overrides the native h
 The same applies to dates. An `<input type="date" />` works with `yyyy-mm-dd` strings, while you usually want to store a `Date`. So you convert in both directions: format the `Date` for display, and parse the entered string back with `valueAsDate` before storing it.
 
 ```tsx
-import type { FieldElementProps } from '@formisch/react';
-import { useMemo } from 'react';
+import type { FieldElementProps } from '@formisch/honox';
+import { useMemo } from 'hono/jsx';
 
 interface DateInputProps extends Omit<FieldElementProps, 'onChange'> {
   label?: string;
@@ -152,7 +149,7 @@ export function DateInput({
 
   return (
     <div>
-      {label && <label htmlFor={name}>{label}</label>}
+      {label && <label for={name}>{label}</label>}
       <input
         {...inputProps}
         name={name}
@@ -161,7 +158,9 @@ export function DateInput({
         value={value}
         // Convert string to date before storing
         onChange={(event) =>
-          onChange(event.currentTarget.valueAsDate ?? undefined)
+          onChange(
+            (event.currentTarget as HTMLInputElement).valueAsDate ?? undefined
+          )
         }
         aria-invalid={!!errors}
         aria-errormessage={`${name}-error`}
@@ -212,15 +211,6 @@ This is useful for:
 
 The `field.onChange` method updates the field value and triggers validation, just like a native input would.
 
-For ready-made wiring recipes, check out our integration guides:
-
-- <Link href="/react/guides/shadcn-ui/">shadcn/ui</Link>
-- <Link href="/react/guides/ark-ui/">Ark UI</Link>
-- <Link href="/react/guides/base-ui/">Base UI</Link>
-- <Link href="/react/guides/chakra-ui/">Chakra UI</Link>
-- <Link href="/react/guides/mantine/">Mantine</Link>
-- <Link href="/react/guides/react-aria/">React Aria</Link>
-
 ## Next steps
 
-Now that you understand controlled fields, you can explore more advanced topics like <Link href="/react/guides/nested-fields/">nested fields</Link> and <Link href="/react/guides/field-arrays/">field arrays</Link> to handle complex form structures.
+Now that you understand controlled fields, you can explore more advanced topics like <Link href="/honox/guides/nested-fields/">nested fields</Link> and <Link href="/honox/guides/field-arrays/">field arrays</Link> to handle complex form structures.

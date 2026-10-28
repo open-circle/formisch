@@ -10,7 +10,7 @@ export const properties: Record<string, PropertyProps> = {
           value: 'string',
         },
         {
-          key: 'autoFocus',
+          key: 'autofocus',
           value: 'boolean',
         },
         {
@@ -33,7 +33,17 @@ export const properties: Record<string, PropertyProps> = {
                 },
               },
             ],
-            return: 'void',
+            return: {
+              type: 'union',
+              options: [
+                {
+                  type: 'function',
+                  params: [],
+                  return: 'void',
+                },
+                'undefined',
+              ],
+            },
           },
         },
         {
@@ -47,15 +57,17 @@ export const properties: Record<string, PropertyProps> = {
         {
           key: 'onChange',
           value: {
-            type: 'custom',
-            name: 'ChangeEventHandler',
-            generics: [
+            type: 'function',
+            params: [
               {
-                type: 'custom',
-                name: 'FieldElement',
-                href: '/core/api/FieldElement/',
+                name: 'event',
+                type: {
+                  type: 'custom',
+                  name: 'Event',
+                },
               },
             ],
+            return: 'void',
           },
         },
         {
@@ -72,7 +84,7 @@ export const properties: Record<string, PropertyProps> = {
   name: {
     type: 'string',
   },
-  autoFocus: {
+  autofocus: {
     type: 'boolean',
   },
   ref: {
@@ -94,7 +106,17 @@ export const properties: Record<string, PropertyProps> = {
           },
         },
       ],
-      return: 'void',
+      return: {
+        type: 'union',
+        options: [
+          {
+            type: 'function',
+            params: [],
+            return: 'void',
+          },
+          'undefined',
+        ],
+      },
     },
   },
   onFocus: {
@@ -106,15 +128,17 @@ export const properties: Record<string, PropertyProps> = {
   },
   onChange: {
     type: {
-      type: 'custom',
-      name: 'ChangeEventHandler',
-      generics: [
+      type: 'function',
+      params: [
         {
-          type: 'custom',
-          name: 'FieldElement',
-          href: '/core/api/FieldElement/',
+          name: 'event',
+          type: {
+            type: 'custom',
+            name: 'Event',
+          },
         },
       ],
+      return: 'void',
     },
   },
   onBlur: {

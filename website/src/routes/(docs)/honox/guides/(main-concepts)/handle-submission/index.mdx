@@ -15,11 +15,11 @@ Your first form is almost ready. The remaining step is processing its data when 
 
 ## Submit event
 
-To process the values on submission, you need to pass a function to the `onSubmit` property of the <Link href="/react/api/Form/">`Form`</Link> component. The first parameter passed to the function contains the validated form values.
+To process the values on submission, you need to pass a function to the `onSubmit` property of the <Link href="/honox/api/Form/">`Form`</Link> component. The first parameter passed to the function contains the validated form values.
 
 ```tsx
-import { Field, Form, useForm } from '@formisch/react';
-import type { SubmitHandler } from '@formisch/react';
+import { Field, Form, useForm } from '@formisch/honox';
+import type { SubmitHandler } from '@formisch/honox';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -94,7 +94,7 @@ const submitForm: SubmitHandler<typeof LoginSchema> = async (values) => {
 If you want to trigger submission programmatically from outside the form, you can use the <Link href="/methods/api/submit/">`submit`</Link> method. It calls `requestSubmit()` on the underlying form element:
 
 ```tsx
-import { submit } from '@formisch/react';
+import { submit } from '@formisch/honox';
 
 <button type="button" onClick={() => submit(loginForm)}>
   Submit from outside
@@ -103,12 +103,12 @@ import { submit } from '@formisch/react';
 
 ## Submit without \<form /\>
 
-In some cases, you may not be able to wrap your fields in a `<form>` element — for example, when your form is rendered inside another form, since nesting `<form>` elements is invalid HTML. In these situations, you can use the <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method directly to submit the form programmatically without the <Link href="/react/api/Form/">`Form`</Link> component.
+In some cases, you may not be able to wrap your fields in a `<form>` element — for example, when your form is rendered inside another form, since nesting `<form>` elements is invalid HTML. In these situations, you can use the <Link href="/methods/api/handleSubmit/">`handleSubmit`</Link> method directly to submit the form programmatically without the <Link href="/honox/api/Form/">`Form`</Link> component.
 
 The returned function accepts no arguments and can be called from anywhere — for example, from a button's `onClick` handler:
 
 ```tsx
-import { Field, handleSubmit, useForm } from '@formisch/react';
+import { Field, handleSubmit, useForm } from '@formisch/honox';
 import * as v from 'valibot';
 
 const LoginSchema = v.object({
@@ -139,4 +139,4 @@ export default function App() {
 
 ## Next steps
 
-Congratulations! You've learned the core concepts of building forms with Formisch. To learn more about advanced features, check out the <Link href="/react/guides/form-methods/">form methods</Link> guide to discover how to programmatically control your forms.
+Congratulations! You've learned the core concepts of building forms with Formisch. To learn more about advanced features, check out the <Link href="/honox/guides/form-methods/">form methods</Link> guide to discover how to programmatically control your forms.

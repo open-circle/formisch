@@ -9,7 +9,7 @@ export const head: DocumentHead = {
     {
       name: 'description',
       content:
-        'This section of our website contains detailed reference documentation for working with Formisch in React.',
+        'This section of our website contains detailed reference documentation for working with Formisch in HonoX.',
     },
   ],
   frontmatter: {
