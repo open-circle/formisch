@@ -2,6 +2,11 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Add HonoX build output with `@formisch/methods/honox` export (issue #175)
+- Add HonoX specific `setInput` function that validates the `input` and `change` modes like the React version (issue #175)
+
 ## v1.0.2 (October 26, 2026)
 
 - Fix `insert` to create child stores before updating the items of a field array, so unbatched computed signals never access a missing child store
