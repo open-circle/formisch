@@ -7,6 +7,7 @@ import type { Signal } from '../types/index.ts';
  */
 export type Framework =
   | 'angular'
+  | 'honox'
   | 'preact'
   | 'qwik'
   | 'react'

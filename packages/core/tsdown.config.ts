@@ -6,6 +6,7 @@ import { defineConfig, type UserConfig, type UserConfigFn } from 'tsdown';
 
 type Framework =
   | 'angular'
+  | 'honox'
   | 'preact'
   | 'qwik'
   | 'react'
@@ -16,7 +17,7 @@ type Framework =
   | 'vue';
 
 const FRAMEWORK_FILE_REGEX =
-  /\.(?:angular|preact|qwik|react|react-native|solid|solid-2|svelte|vue)(?:\.d)?\.ts$/;
+  /\.(?:angular|honox|preact|qwik|react|react-native|solid|solid-2|svelte|vue)(?:\.d)?\.ts$/;
 
 /**
  * Rolldown plugin to rewrite framework-specific imports.
@@ -134,6 +135,7 @@ function defineFrameworkConfig(
 const config: (UserConfig | UserConfigFn)[] = [
   defineFrameworkConfig(null),
   defineFrameworkConfig('angular'),
+  defineFrameworkConfig('honox'),
   defineFrameworkConfig('preact'),
   defineFrameworkConfig('qwik'),
   defineFrameworkConfig('react'),
