@@ -1,0 +1,82 @@
+{
+  "name": "@formisch/honox",
+  "description": "The lightweight, schema-first, and fully type-safe form library for hono/jsx and HonoX",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Fabian Hiller",
+  "homepage": "https://formisch.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-circle/formisch.git"
+  },
+  "keywords": [
+    "hono",
+    "honox",
+    "hono-form",
+    "form",
+    "forms",
+    "form-validation",
+    "validation",
+    "schema",
+    "typescript",
+    "type-safe",
+    "signals",
+    "bundle-size",
+    "modular",
+    "valibot"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./internals": {
+      "types": "./dist/internals.d.ts",
+      "import": "./dist/internals.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run --typecheck",
+    "lint": "eslint \"src/**/*.ts*\" && tsc --noEmit",
+    "lint.fix": "eslint \"src/**/*.ts*\" --fix",
+    "format": "prettier --write ./src",
+    "format.check": "prettier --check ./src"
+  },
+  "devDependencies": {
+    "@formisch/core": "workspace:*",
+    "@formisch/eslint-config": "workspace:*",
+    "@formisch/methods": "workspace:*",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@types/node": "^24.10.1",
+    "@vitest/coverage-v8": "^4.1.12",
+    "eslint": "^9.39.1",
+    "hono": "^4.13.13",
+    "jsdom": "^26.1.0",
+    "tsdown": "^0.16.8",
+    "typescript": "~6.0.3",
+    "valibot": "^1.4.2",
+    "vitest": "^4.1.12"
+  },
+  "peerDependencies": {
+    "hono": ">=4.5 <5",
+    "typescript": ">=5 <8",
+    "valibot": ">=1.4.1 <2"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  }
+}
