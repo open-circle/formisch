@@ -11,6 +11,7 @@ export * from './CopyIcon';
 export * from './DiscordIcon';
 export * from './GitHubIcon';
 export * from './HashtagIcon';
+export * from './HonoXIcon';
 export * from './LogoIcon';
 export * from './MarkdownIcon';
 export * from './MenuIcon';

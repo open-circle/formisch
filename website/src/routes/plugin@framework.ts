@@ -14,6 +14,7 @@ import type { SVGProps } from '@qwik.dev/core/internal';
 import { useLocation } from '@qwik.dev/router';
 import {
   AngularIcon,
+  HonoXIcon,
   PreactIcon,
   QwikIcon,
   ReactIcon,
@@ -23,6 +24,7 @@ import {
 } from '~/icons';
 import {
   AngularLogo,
+  HonoXLogo,
   PreactLogo,
   QwikLogo,
   ReactLogo,
@@ -37,6 +39,7 @@ export const DEFAULT_FRAMEWORK: Framework = 'react';
 
 export type Framework =
   | 'angular'
+  | 'honox'
   | 'preact'
   | 'qwik'
   | 'react'
@@ -47,6 +50,7 @@ export type Framework =
 
 export const FRAMEWORK_LIST: Framework[] = [
   'angular',
+  'honox',
   'preact',
   'qwik',
   'react',
@@ -58,6 +62,7 @@ export const FRAMEWORK_LIST: Framework[] = [
 
 export const FRAMEWORK_NAME_MAP: Record<Framework, string> = {
   angular: 'Angular',
+  honox: 'HonoX',
   preact: 'Preact',
   qwik: 'Qwik',
   react: 'React',
@@ -72,6 +77,7 @@ const FRAMEWORK_LOGO_MAP: Record<
   Component<SVGProps<SVGSVGElement>>
 > = {
   angular: AngularLogo,
+  honox: HonoXLogo,
   preact: PreactLogo,
   qwik: QwikLogo,
   react: ReactLogo,
@@ -86,6 +92,7 @@ const FRAMEWORK_ICON_MAP: Record<
   Component<SVGProps<SVGSVGElement>>
 > = {
   angular: AngularIcon,
+  honox: HonoXIcon,
   preact: PreactIcon,
   qwik: QwikIcon,
   react: ReactIcon,

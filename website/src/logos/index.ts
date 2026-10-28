@@ -8,6 +8,7 @@ export * from './CodeRabbitLogo';
 export * from './DailyDevLogo';
 export * from './DigitalOceanLogo';
 export * from './HdmLogo';
+export * from './HonoXLogo';
 export * from './LambdaTestLogo';
 export * from './MotionLogo';
 export * from './NetlifyLogo';
