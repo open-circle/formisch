@@ -99,6 +99,8 @@ export default createRoute((c) => c.render(<LoginForm />));
 
 HonoX renders the island on the server and hydrates it on the client. During server-side rendering, effects do not run and form state is not tracked, so the form simply renders its initial state and becomes interactive after hydration. Props passed to an island are serialized as JSON, so pass plain data, such as the initial input of your form, rather than functions.
 
+Until the island is hydrated, the browser submits the form natively. By default, this sends a GET request with all field values in the URL. For forms with sensitive data such as passwords, set `method="post"` on the `<Form />` component to keep the values out of the URL. After hydration, Formisch handles the submission and the `method` has no effect.
+
 ## Multiple forms
 
 When a page contains multiple forms, you can create separate form stores for each one:

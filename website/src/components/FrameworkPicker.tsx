@@ -68,9 +68,14 @@ export const FrameworkPicker = component$<FrameworkPickerProps>((props) => {
       return newPathname;
     }
 
-    // Otherwise, return base path for framework
-    const pathList = location.url.pathname.split('/');
-    return `/${targetFramework}/${pathList[2]}`;
+    // Otherwise, return first page of section for framework
+    //
+    // Hint: The guides have no index page, so we fall back to the introduction
+    // guide, while the API reference has an index page with all entries.
+    const section = location.url.pathname.split('/')[2];
+    return section === 'api'
+      ? `/${targetFramework}/api/`
+      : `/${targetFramework}/guides/introduction/`;
   };
 
   /**

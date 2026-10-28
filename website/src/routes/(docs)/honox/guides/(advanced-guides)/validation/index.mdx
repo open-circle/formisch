@@ -31,7 +31,7 @@ Two config options control the timing of validation:
 
 Both accept the following modes:
 
-- `'initial'`: immediately, when the form is created (only valid for `validate`, not `revalidate`).
+- `'initial'`: immediately, when the form is mounted in the browser (only valid for `validate`, not `revalidate`). The server-rendered HTML of an island therefore does not contain any initial errors.
 - `'touch'`: when the field is first focused.
 - `'input'`: on every keystroke.
 - `'change'`: on the field's change event.
