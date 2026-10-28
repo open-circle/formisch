@@ -24,8 +24,8 @@ export interface FieldElementProps {
   /**
    * The ref callback to register the field element.
    *
-   * Hint: Unlike React, hono/jsx calls the function returned here when it
-   * removes the element again, which is how the field unregisters it.
+   * Hint: hono/jsx calls the function returned here when it removes the
+   * element, which is how the field unregisters it.
    */
   readonly ref: (element: FieldElement | null) => (() => void) | undefined;
   /**
