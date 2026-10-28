@@ -29,6 +29,8 @@ frameworks/<fw>/
     ├── vitest/
     │   ├── setup.ts          # jest-dom + cleanup
     │   ├── renderHook.ts     # (Vue/Svelte only)
+    │   ├── renderHook.tsx    # (HonoX only)
+    │   ├── render.tsx        # (HonoX only) `renderHono` mount helper
     │   └── *Host.svelte      # (Svelte only) shared hosts
     ├── hooks|primitives|composables|runes|functions/<name>/<name>.test.{ts,tsx} + .test-d.ts
     └── components|directives/<Name>/<Name>.test.{ts,tsx}
@@ -48,7 +50,7 @@ Identical `describe`/`test` names across all frameworks:
 
 `Form` only exists where the adapter provides it: React Native has no `Form` component, and Angular ships the `[formischForm]` directive instead.
 
-The `store stability` describe tests `useMemo` across re-renders and exists only in **React, React Native and HonoX**. In other frameworks omit it with a one-line `// Note: ...` comment.
+The `store stability` describe checks that the returned stores keep their reference across re-renders. It exists in **Preact, React, React Native, HonoX, Solid and Svelte**; Angular and Vue do not have it.
 
 ## Per-framework adapters
 
