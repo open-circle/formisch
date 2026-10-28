@@ -1,0 +1,65 @@
+---
+title: Form
+description: Form component that manages form submission and applies internal state.
+source: /frameworks/honox/src/components/Form/Form.tsx
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# Form
+
+Form component that manages form submission and applies internal state. It wraps a native form element and calls the provided handler with the validated form output and the submit event.
+
+```tsx
+<Form of={…} onSubmit={…}>children</Form>
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+
+## Properties
+
+- `of` <Property {...properties.of} />
+- `children` <Property {...properties.children} />
+- `onSubmit` <Property {...properties.onSubmit} />
+
+### Explanation
+
+The `Form` component wraps a native HTML `<form>` element and provides form submission handling. It automatically prevents the default form submission behavior and calls the `onSubmit` handler when the form is submitted and validation succeeds.
+
+The component uses the `of` prop to reference the form store and renders the `children` elements within the form. It also sets `novalidate` on the form element to disable browser validation, as Formisch handles validation internally.
+
+## Related
+
+### Hooks
+
+<ApiList items={[{ text: 'useForm', href: '../useForm/' }]} />
+
+### Components
+
+<ApiList
+  items={[
+    { text: 'Field', href: '../Field/' },
+    { text: 'FieldArray', href: '../FieldArray/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'focus', href: '/methods/api/focus/' },
+    { text: 'getDeepErrors', href: '/methods/api/getDeepErrors/' },
+    { text: 'getErrors', href: '/methods/api/getErrors/' },
+    { text: 'handleSubmit', href: '/methods/api/handleSubmit/' },
+    { text: 'reset', href: '/methods/api/reset/' },
+    { text: 'setErrors', href: '/methods/api/setErrors/' },
+    { text: 'setInput', href: '/methods/api/setInput/' },
+    { text: 'submit', href: '/methods/api/submit/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>

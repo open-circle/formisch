@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { ActionButton, ButtonGroup, Expandable, TextLink } from '~/components';
 import {
   AngularIcon,
+  HonoXIcon,
   PlusIcon,
   PreactIcon,
   QwikIcon,
@@ -15,6 +16,7 @@ import {
 import { blurredCodeDarkUrl, blurredCodeLightUrl } from '~/images';
 import {
   AngularLogo,
+  HonoXLogo,
   PreactLogo,
   QwikLogo,
   ReactLogo,
@@ -157,6 +159,13 @@ export default component$(() => {
                   url: `${
                     import.meta.env.PUBLIC_STACKBLITZ_ANGULAR_URL
                   }?file=src%2Froutes%2Flogin%2Flogin.component.ts`,
+                },
+                {
+                  Icon: HonoXIcon,
+                  Logo: HonoXLogo,
+                  url: `${
+                    import.meta.env.PUBLIC_STACKBLITZ_HONOX_URL
+                  }?file=app%2Fislands%2FLoginForm.tsx`,
                 },
               ].map(({ Icon, Logo, url }) => (
                 <a

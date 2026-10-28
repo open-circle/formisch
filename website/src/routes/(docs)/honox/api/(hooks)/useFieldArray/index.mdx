@@ -1,0 +1,79 @@
+---
+title: useFieldArray
+description: Creates a reactive field array store for a specific field array within a form store.
+source: /frameworks/honox/src/hooks/useFieldArray/useFieldArray.ts
+contributors:
+  - fabian-hiller
+---
+
+import { ApiList, Link, Property } from '~/components';
+import { properties } from './properties';
+
+# useFieldArray
+
+Creates a reactive field array store for a specific field array within a form store.
+
+```ts
+const fieldArray = useFieldArray<TSchema, TFieldArrayPath>(form, config);
+```
+
+## Generics
+
+- `TSchema` <Property {...properties.TSchema} />
+- `TFieldArrayPath` <Property {...properties.TFieldArrayPath} />
+
+## Parameters
+
+- `form` <Property {...properties.form} />
+- `config` <Property {...properties.config} />
+
+### Explanation
+
+With `useFieldArray` you create a reactive field array store for a specific array field within your form. The field array store provides reactive access to the array items (by their IDs), validation errors, touched state, and more. This is particularly useful when working with dynamic arrays of fields that users can add or remove.
+
+## Returns
+
+- `fieldArray` <Property {...properties.FieldArrayStore} />
+
+## Related
+
+The following APIs can be combined with `useFieldArray`.
+
+### Hooks
+
+<ApiList
+  items={[
+    { text: 'useForm', href: '../useForm/' },
+    { text: 'useField', href: '../useField/' },
+  ]}
+/>
+
+### Components
+
+<ApiList
+  items={[
+    { text: 'Field', href: '../Field/' },
+    { text: 'FieldArray', href: '../FieldArray/' },
+    { text: 'Form', href: '../Form/' },
+  ]}
+/>
+
+### Methods
+
+<ApiList
+  items={[
+    { text: 'focus', href: '/methods/api/focus/' },
+    { text: 'getDeepErrors', href: '/methods/api/getDeepErrors/' },
+    { text: 'getErrors', href: '/methods/api/getErrors/' },
+    { text: 'getInput', href: '/methods/api/getInput/' },
+    { text: 'insert', href: '/methods/api/insert/' },
+    { text: 'move', href: '/methods/api/move/' },
+    { text: 'remove', href: '/methods/api/remove/' },
+    { text: 'replace', href: '/methods/api/replace/' },
+    { text: 'reset', href: '/methods/api/reset/' },
+    { text: 'setErrors', href: '/methods/api/setErrors/' },
+    { text: 'setInput', href: '/methods/api/setInput/' },
+    { text: 'swap', href: '/methods/api/swap/' },
+    { text: 'validate', href: '/methods/api/validate/' },
+  ]}
+/>

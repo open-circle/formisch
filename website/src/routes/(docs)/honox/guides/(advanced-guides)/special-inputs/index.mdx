@@ -1,0 +1,152 @@
+---
+title: Special inputs
+description: >-
+  Learn how to use special HTML form inputs like checkboxes, radio buttons, select elements,
+  and file inputs with Formisch. This guide covers both single and multiple
+  value scenarios for each input type.
+contributors:
+  - fabian-hiller
+  - jaydiablo
+---
+
+import { Link } from '~/components';
+
+# Special inputs
+
+As listed in our features, the library supports all native HTML form fields. This includes the HTML `<select />` element as well as special cases of the `<input />` element.
+
+> In our <Link href="/playground/special/">playground</Link> you can take a look at such fields and test them out.
+
+## Checkbox
+
+A simple checkbox represents a boolean and is `true` when checked or `false` otherwise.
+
+```tsx
+<Field of={form} path={['cookies']}>
+  {(field) => (
+    <label>
+      <input {...field.props} type="checkbox" checked={field.input} />
+      Yes, I want cookies
+    </label>
+  )}
+</Field>
+```
+
+However, you can also use multiple checkboxes to represent an array of strings. For this you simply have to add the `value` attribute to the HTML `<input />` element.
+
+```tsx
+<>
+  {[
+    { label: 'Bananas', value: 'bananas' },
+    { label: 'Apples', value: 'apples' },
+    { label: 'Grapes', value: 'grapes' },
+  ].map(({ label, value }) => (
+    <Field key={value} of={form} path={['fruits']}>
+      {(field) => (
+        <label>
+          <input
+            {...field.props}
+            type="checkbox"
+            value={value}
+            checked={field.input?.includes(value)}
+          />
+          {label}
+        </label>
+      )}
+    </Field>
+  ))}
+</>
+```
+
+## Radio
+
+A group of radio buttons, while similar to an array of checkboxes, will only allow you to select one of the options based on which button is checked.
+
+```tsx
+<Field of={form} path={['color']}>
+  {(field) => (
+    <>
+      {[
+        { label: 'Red', value: 'red' },
+        { label: 'Green', value: 'green' },
+        { label: 'Blue', value: 'blue' },
+      ].map(({ label, value }) => (
+        <label key={value}>
+          <input
+            {...field.props}
+            type="radio"
+            value={value}
+            checked={field.input === value}
+          />
+          {label}
+        </label>
+      ))}
+    </>
+  )}
+</Field>
+```
+
+## Select
+
+An HTML `<select />` element allows you to select a string from a predefined list of options. Since hono/jsx does not apply the `value` property of a `<select />` element during server-side rendering, you mark the selected option with its `selected` attribute instead.
+
+```tsx
+<Field of={form} path={['framework']}>
+  {(field) => (
+    <select {...field.props}>
+      {[
+        { label: 'React', value: 'react' },
+        { label: 'Solid', value: 'solid' },
+        { label: 'Qwik', value: 'qwik' },
+      ].map(({ label, value }) => (
+        <option key={value} value={value} selected={field.input === value}>
+          {label}
+        </option>
+      ))}
+    </select>
+  )}
+</Field>
+```
+
+However, if you set the `multiple` attribute, multiple options can be selected making the field represent an array of strings.
+
+```tsx
+<Field of={form} path={['frameworks']}>
+  {(field) => (
+    // Set "multiple" to "true"
+    <select {...field.props} multiple>
+      {[
+        { label: 'React', value: 'react' },
+        { label: 'Solid', value: 'solid' },
+        { label: 'Qwik', value: 'qwik' },
+      ].map(({ label, value }) => (
+        <option
+          key={value}
+          value={value}
+          selected={field.input?.includes(value)}
+        >
+          {label}
+        </option>
+      ))}
+    </select>
+  )}
+</Field>
+```
+
+## File
+
+An HTML `<input type="file" />` works similarly to an HTML `<select />` element. Without the `multiple` attribute, it represents a single file; with `multiple`, it represents a list of files.
+
+```tsx
+<Field of={form} path={['avatar']}>
+  {(field) => <input {...field.props} type="file" accept="image/*" />}
+</Field>
+```
+
+With the `multiple` attribute, users can select multiple files:
+
+```tsx
+<Field of={form} path={['documents']}>
+  {(field) => <input {...field.props} type="file" multiple />}
+</Field>
+```

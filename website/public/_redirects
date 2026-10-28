@@ -2,12 +2,18 @@
 
 /playground /playground/login/ 302
 /playground/ /playground/login/ 302
+/angular/guides /angular/guides/introduction/ 302
+/angular/guides/ /angular/guides/introduction/ 302
+/honox/guides /honox/guides/introduction/ 302
+/honox/guides/ /honox/guides/introduction/ 302
 /preact/guides /preact/guides/introduction/ 302
 /preact/guides/ /preact/guides/introduction/ 302
 /qwik/guides /qwik/guides/introduction/ 302
 /qwik/guides/ /qwik/guides/introduction/ 302
 /react/guides /react/guides/introduction/ 302
 /react/guides/ /react/guides/introduction/ 302
+/react-native/guides /react-native/guides/introduction/ 302
+/react-native/guides/ /react-native/guides/introduction/ 302
 /solid/guides /solid/guides/introduction/ 302
 /solid/guides/ /solid/guides/introduction/ 302
 /svelte/guides /svelte/guides/introduction/ 302
