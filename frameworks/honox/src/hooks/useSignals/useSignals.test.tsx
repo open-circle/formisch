@@ -77,6 +77,65 @@ describe('useSignals', () => {
       // Both signals share a single subscriber, so a single notification fires
       expect(renderCount - initialRenderCount).toBe(1);
     });
+
+    test('should stop tracking signals that are no longer read', () => {
+      const toggle = createSignal(true);
+      const signalA = createSignal('a');
+      const signalB = createSignal('b');
+      let renderCount = 0;
+
+      function ConditionalComponent(): JSX.Element {
+        useSignals();
+        renderCount++;
+        return (
+          <span data-testid="value">
+            {toggle.value ? signalA.value : signalB.value}
+          </span>
+        );
+      }
+
+      renderHono(<ConditionalComponent />);
+
+      flushSync(() => {
+        toggle.value = false;
+      });
+      expect(screen.getByTestId('value')).toHaveTextContent('b');
+      const renderCountAfterToggle = renderCount;
+
+      flushSync(() => {
+        signalA.value = 'a2';
+      });
+      expect(renderCount).toBe(renderCountAfterToggle);
+
+      flushSync(() => {
+        signalB.value = 'b2';
+      });
+      expect(screen.getByTestId('value')).toHaveTextContent('b2');
+    });
+
+    test('should not track signals that are read after rendering', () => {
+      const rendered = createSignal(0);
+      const readLater = createSignal(0);
+      let renderCount = 0;
+
+      function TrackedComponent(): JSX.Element {
+        useSignals();
+        renderCount++;
+        return <span>{rendered.value}</span>;
+      }
+
+      renderHono(<TrackedComponent />);
+      const initialRenderCount = renderCount;
+
+      // The listener must be cleared after rendering, so that a signal read
+      // afterwards (e.g. in an event handler) does not subscribe the component
+      void readLater.value;
+      flushSync(() => {
+        readLater.value = 1;
+      });
+
+      expect(renderCount).toBe(initialRenderCount);
+    });
   });
 
   describe('cleanup', () => {
@@ -140,6 +199,50 @@ describe('useSignals', () => {
       expect(screen.getByTestId('b')).toHaveTextContent('0');
       expect(renderCountA - initialA).toBe(1);
       expect(renderCountB).toBe(initialB);
+    });
+
+    test('should not re-render the parent for signals read by its child', () => {
+      const parentSignal = createSignal('parent');
+      const childSignal = createSignal('child');
+      let parentRenderCount = 0;
+
+      function Child(): JSX.Element {
+        useSignals();
+        return <span data-testid="child">{childSignal.value}</span>;
+      }
+
+      function Parent(): JSX.Element {
+        useSignals();
+        parentRenderCount++;
+        return (
+          <div>
+            <span data-testid="parent">{parentSignal.value}</span>
+            <Child />
+          </div>
+        );
+      }
+
+      renderHono(<Parent />);
+      const initialParentRenderCount = parentRenderCount;
+
+      flushSync(() => {
+        childSignal.value = 'child-updated';
+      });
+      expect(screen.getByTestId('child')).toHaveTextContent('child-updated');
+      expect(parentRenderCount).toBe(initialParentRenderCount);
+
+      flushSync(() => {
+        parentSignal.value = 'parent-updated';
+      });
+      expect(screen.getByTestId('parent')).toHaveTextContent('parent-updated');
+
+      // The child must stay subscribed after its parent re-rendered it
+      flushSync(() => {
+        childSignal.value = 'child-updated-again';
+      });
+      expect(screen.getByTestId('child')).toHaveTextContent(
+        'child-updated-again'
+      );
     });
   });
 

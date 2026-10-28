@@ -1,5 +1,5 @@
 import { getFieldStore, INTERNAL } from '@formisch/core/honox';
-import { reset, swap } from '@formisch/methods/honox';
+import { insert, move, remove, reset, swap } from '@formisch/methods/honox';
 import { fireEvent, screen, waitFor } from '@testing-library/dom';
 import { useState } from 'hono/jsx';
 import { flushSync } from 'hono/jsx/dom';
@@ -581,6 +581,232 @@ describe('useField', () => {
       // The detached element must not survive in the reset baseline
       unmount();
       expect(internalFieldStore.initialElements).not.toContain(element);
+    });
+
+    test('should unregister the element of an unmounted field and register the remounted one', async () => {
+      const schema = v.object({ name: v.string() });
+      let formStore: FormStore<typeof schema> | undefined;
+
+      function NameField(props: {
+        form: FormStore<typeof schema>;
+      }): JSX.Element {
+        const field = useField(props.form, { path: ['name'] });
+        return <input data-testid="input" {...field.props} />;
+      }
+
+      function Test(): JSX.Element {
+        const form = useForm({ schema, initialInput: { name: '' } });
+        formStore = form;
+        const [show, setShow] = useState(true);
+        return (
+          <>
+            {show && <NameField form={form} />}
+            <button type="button" onClick={() => setShow((value) => !value)}>
+              toggle
+            </button>
+          </>
+        );
+      }
+
+      renderHono(<Test />);
+      const internalFieldStore = getFieldStore(formStore![INTERNAL], ['name'])!;
+      const firstElement = screen.getByTestId('input');
+      expect(internalFieldStore.elements).toEqual([firstElement]);
+
+      flushSync(() => {
+        fireEvent.click(screen.getByText('toggle'));
+      });
+      await waitFor(() => {
+        expect(screen.queryByTestId('input')).toBeNull();
+      });
+      expect(internalFieldStore.elements).toEqual([]);
+      expect(internalFieldStore.initialElements).toEqual([]);
+
+      flushSync(() => {
+        fireEvent.click(screen.getByText('toggle'));
+      });
+      await waitFor(() => {
+        expect(screen.queryByTestId('input')).not.toBeNull();
+      });
+      const secondElement = screen.getByTestId('input');
+      expect(secondElement).not.toBe(firstElement);
+      expect(internalFieldStore.elements).toEqual([secondElement]);
+      expect(internalFieldStore.initialElements).toEqual([secondElement]);
+    });
+
+    test('should unregister an element that is replaced by another one', async () => {
+      const schema = v.object({ text: v.string() });
+      let formStore: FormStore<typeof schema> | undefined;
+
+      function Test(): JSX.Element {
+        const form = useForm({ schema, initialInput: { text: '' } });
+        formStore = form;
+        const field = useField(form, { path: ['text'] });
+        const [multiline, setMultiline] = useState(false);
+        return (
+          <>
+            {multiline ? (
+              <textarea data-testid="element" {...field.props} />
+            ) : (
+              <input data-testid="element" {...field.props} />
+            )}
+            <button type="button" onClick={() => setMultiline(true)}>
+              multiline
+            </button>
+          </>
+        );
+      }
+
+      renderHono(<Test />);
+      const input = screen.getByTestId('element');
+
+      flushSync(() => {
+        fireEvent.click(screen.getByText('multiline'));
+      });
+      await waitFor(() => {
+        expect(screen.getByTestId('element').tagName).toBe('TEXTAREA');
+      });
+
+      const internalFieldStore = getFieldStore(formStore![INTERNAL], ['text'])!;
+      expect(internalFieldStore.elements).toEqual([
+        screen.getByTestId('element'),
+      ]);
+      expect(internalFieldStore.elements).not.toContain(input);
+    });
+
+    test('should only unregister the removed element of a field with multiple elements', async () => {
+      const schema = v.object({ color: v.string() });
+      let formStore: FormStore<typeof schema> | undefined;
+
+      function Test(): JSX.Element {
+        const form = useForm({ schema, initialInput: { color: 'red' } });
+        formStore = form;
+        const field = useField(form, { path: ['color'] });
+        const [options, setOptions] = useState(['red', 'green', 'blue']);
+        return (
+          <>
+            {options.map((option) => (
+              <input
+                key={option}
+                type="radio"
+                data-testid={option}
+                value={option}
+                {...field.props}
+              />
+            ))}
+            <button type="button" onClick={() => setOptions(['red', 'blue'])}>
+              remove
+            </button>
+          </>
+        );
+      }
+
+      renderHono(<Test />);
+      const internalFieldStore = getFieldStore(formStore![INTERNAL], [
+        'color',
+      ])!;
+      expect(internalFieldStore.elements).toHaveLength(3);
+
+      flushSync(() => {
+        fireEvent.click(screen.getByText('remove'));
+      });
+      await waitFor(() => {
+        expect(screen.queryByTestId('green')).toBeNull();
+      });
+
+      expect(internalFieldStore.elements).toEqual([
+        screen.getByTestId('red'),
+        screen.getByTestId('blue'),
+      ]);
+      expect(internalFieldStore.initialElements).toEqual(
+        internalFieldStore.elements
+      );
+    });
+
+    test('should keep the elements of every item in sync with the rendered inputs after array operations', async () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
+
+      function Row(props: {
+        form: FormStore<typeof schema>;
+        index: number;
+      }): JSX.Element {
+        const field = useField(props.form, {
+          path: ['todos', props.index, 'label'],
+        });
+        return <input class="row" {...field.props} value={field.input ?? ''} />;
+      }
+
+      function Test(): JSX.Element {
+        const form = useForm({
+          schema,
+          initialInput: {
+            todos: [{ label: 'a' }, { label: 'b' }, { label: 'c' }],
+          },
+        });
+        formStore = form;
+        const fieldArray = useFieldArray(form, { path: ['todos'] });
+        // Hint: The rows are keyed by a wrapping element like in the
+        // playground, because hono/jsx misplaces keyed components that
+        // re-render themselves in the same tick in which they are reordered
+        return (
+          <>
+            {fieldArray.items.map((id, index) => (
+              <div key={id}>
+                <Row form={form} index={index} />
+              </div>
+            ))}
+          </>
+        );
+      }
+
+      // Each item must own exactly the live input that is rendered at its
+      // index, so that no detached element is focused or read anymore
+      const expectElementsInSync = async (labels: string[]): Promise<void> => {
+        await waitFor(() => {
+          const inputs = [
+            ...document.querySelectorAll<HTMLInputElement>('input.row'),
+          ];
+          expect(inputs.map((input) => input.value)).toEqual(labels);
+          inputs.forEach((input, index) => {
+            const internalFieldStore = getFieldStore(formStore![INTERNAL], [
+              'todos',
+              index,
+              'label',
+            ])!;
+            expect(internalFieldStore.elements).toEqual([input]);
+          });
+        });
+      };
+
+      renderHono(<Test />);
+      await expectElementsInSync(['a', 'b', 'c']);
+
+      flushSync(() => {
+        remove(formStore!, { path: ['todos'], at: 1 });
+      });
+      await expectElementsInSync(['a', 'c']);
+
+      flushSync(() => {
+        insert(formStore!, {
+          path: ['todos'],
+          at: 0,
+          initialInput: { label: 'x' },
+        });
+      });
+      await expectElementsInSync(['x', 'a', 'c']);
+
+      flushSync(() => {
+        move(formStore!, { path: ['todos'], from: 0, to: 2 });
+      });
+      await expectElementsInSync(['a', 'c', 'x']);
+
+      flushSync(() => {
+        remove(formStore!, { path: ['todos'], at: 0 });
+      });
+      await expectElementsInSync(['c', 'x']);
     });
   });
 });
