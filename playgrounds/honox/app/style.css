@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+/* Lexend 400 */
+@font-face {
+  font-family: 'Lexend';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/lexend-400.woff2) format('woff2');
+}
+
+/* Base styles */
+html {
+  font-family: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Disable-transitions */
+.disable-transitions,
+.disable-transitions * {
+  transition: none !important;
+}
+
+/* Reset appearance */
+[type='date'] {
+  @apply flex appearance-none items-center justify-start;
+}
+
+/* Island layout */
+/* Hint: HonoX wraps each island in a custom `<honox-island>` element that is
+   inline by default, so that vertical spacing such as `space-y-*` would not
+   apply to the island. Rendering it as a block keeps the layout identical. */
+honox-island {
+  display: block;
+}
