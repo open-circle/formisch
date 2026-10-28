@@ -1,6 +1,6 @@
 ---
 name: repo-source-code-test-frameworks
-description: Write unit and type tests for Formisch framework packages (frameworks/angular, frameworks/preact, frameworks/solid, frameworks/svelte, frameworks/vue, frameworks/react, frameworks/react-native). Use when adding tests for hooks/composables/runes/inject functions (useForm/createForm/injectForm, useField/injectField, useFieldArray/injectFieldArray) or components and directives (Form, Field, FieldArray, formischForm, formischField) in any framework wrapper.
+description: Write unit and type tests for Formisch framework packages (frameworks/angular, frameworks/preact, frameworks/solid, frameworks/svelte, frameworks/vue, frameworks/react, frameworks/react-native, frameworks/honox). Use when adding tests for hooks/composables/runes/inject functions (useForm/createForm/injectForm, useField/injectField, useFieldArray/injectFieldArray) or components and directives (Form, Field, FieldArray, formischForm, formischField) in any framework wrapper.
 metadata:
   author: formisch
   version: '1.0'
@@ -48,23 +48,24 @@ Identical `describe`/`test` names across all frameworks:
 
 `Form` only exists where the adapter provides it: React Native has no `Form` component, and Angular ships the `[formischForm]` directive instead.
 
-The `store stability` describe tests `useMemo` across re-renders and exists only in **React and React Native**. In other frameworks omit it with a one-line `// Note: ...` comment.
+The `store stability` describe tests `useMemo` across re-renders and exists only in **React, React Native and HonoX**. In other frameworks omit it with a one-line `// Note: ...` comment.
 
 ## Per-framework adapters
 
-| Concern         | Preact                    | Solid                      | Svelte                    | Vue                    | React                    | React Native             | Angular                            |
-| --------------- | ------------------------- | -------------------------- | ------------------------- | ---------------------- | ------------------------ | ------------------------ | ---------------------------------- |
-| Hook name       | `useForm`                 | `createForm`               | `createForm`              | `useForm`              | `useForm`                | `useForm`                | `injectForm`                       |
-| Read state      | `form.isValid.value`      | `form.isValid`             | `form.isValid`            | `form.isValid`         | `form.isValid`           | `form.isValid`           | `form.isValid()`                   |
-| Imperative set  | `field.onInput(v)`        | `field.onInput(v)`         | `field.onInput(v)`        | `field.input = v`      | `field.onChange(v)`      | `field.onChange(v)`      | `field.setInput(v)`                |
-| DOM input event | `fireEvent.input`         | `fireEvent.input`          | `fireEvent.input`         | `input.setValue(v)`    | `fireEvent.change`       | `fireEvent.change`       | `input.dispatchEvent(new Event())` |
-| Auto-focus prop | `autofocus`               | `autofocus`                | `autofocus`               | `autofocus`            | `autoFocus`              | none                     | none                               |
-| Field children  | function                  | function                   | `{#snippet children}`     | `v-slot` / scoped slot | function                 | function                 | `*formischField` + `let field`     |
-| Testing library | `@testing-library/preact` | `@solidjs/testing-library` | `@testing-library/svelte` | `@vue/test-utils`      | `@testing-library/react` | `@testing-library/react` | `@angular/core/testing` (TestBed)  |
+| Concern         | Preact                    | Solid                      | Svelte                    | Vue                    | React                    | React Native             | HonoX                                 | Angular                            |
+| --------------- | ------------------------- | -------------------------- | ------------------------- | ---------------------- | ------------------------ | ------------------------ | ------------------------------------- | ---------------------------------- |
+| Hook name       | `useForm`                 | `createForm`               | `createForm`              | `useForm`              | `useForm`                | `useForm`                | `useForm`                             | `injectForm`                       |
+| Read state      | `form.isValid.value`      | `form.isValid`             | `form.isValid`            | `form.isValid`         | `form.isValid`           | `form.isValid`           | `form.isValid`                        | `form.isValid()`                   |
+| Imperative set  | `field.onInput(v)`        | `field.onInput(v)`         | `field.onInput(v)`        | `field.input = v`      | `field.onChange(v)`      | `field.onChange(v)`      | `field.onChange(v)`                   | `field.setInput(v)`                |
+| DOM input event | `fireEvent.input`         | `fireEvent.input`          | `fireEvent.input`         | `input.setValue(v)`    | `fireEvent.change`       | `fireEvent.change`       | `fireEvent.input`                     | `input.dispatchEvent(new Event())` |
+| Auto-focus prop | `autofocus`               | `autofocus`                | `autofocus`               | `autofocus`            | `autoFocus`              | none                     | `autofocus`                           | none                               |
+| Field children  | function                  | function                   | `{#snippet children}`     | `v-slot` / scoped slot | function                 | function                 | function                              | `*formischField` + `let field`     |
+| Testing library | `@testing-library/preact` | `@solidjs/testing-library` | `@testing-library/svelte` | `@vue/test-utils`      | `@testing-library/react` | `@testing-library/react` | `@testing-library/dom` + `renderHono` | `@angular/core/testing` (TestBed)  |
 
 ## `renderHook`
 
 - **Preact / React / React Native:** from the testing library — `{ result: { current }, rerender, unmount }`.
+- **HonoX:** custom helper at `src/vitest/renderHook.tsx` with the same `{ result: { current }, rerender, unmount }` shape, as there is no hono/jsx testing library.
 - **Solid:** from `@solidjs/testing-library` — `{ result, owner, cleanup }`. `result` is direct, not wrapped in `.current`. Use `createRoot` from `solid-js` only if no JSX context is needed; our primitives need an owner so `renderHook` is the default.
 - **Vue:** custom helper at `src/vitest/renderHook.ts` — mounts a `defineComponent({ setup() { return hook(); } })` (the canonical Vue Test Utils [TestComponent recipe](https://test-utils.vuejs.org/guide/advanced/reusability-composition)). Required because `onBeforeMount`/`computed` need component context.
 - **Angular:** no `renderHook`. Call the inject functions inside `TestBed.runInInjectionContext(() => …)` (or `runInInjectionContext(injector, …)` when you need to control destruction), and mount a host `@Component` with `TestBed.createComponent` for directive tests.
@@ -122,6 +123,8 @@ type Schema = typeof schema;
 ## Framework gotchas
 
 **Angular** — every reactive `field.*` / `form.*` is an Angular `Signal<T>`; read by calling it (`field.isDirty()`). Setter is `field.setInput(v)`. There is no `props` object: templates bind `[formischControl]="field"` and pass the value with `[value]="field.input() ?? ''"`. Field tests mount a host `@Component` whose template uses `*formischField="['path'] of form; let field"`, configure `TestBed` with `provideZonelessChangeDetection()`, and drive the DOM with `input.dispatchEvent(new Event('input'))` followed by `await fixture.whenStable()` and `fixture.detectChanges()`. `src/vitest/setup.ts` already calls `TestBed.initTestEnvironment` and resets the module after each test.
+
+**HonoX** — there is no hono/jsx testing library, so components mount with `renderHono` from `src/vitest/render.tsx` and hooks with `renderHook` from `src/vitest/renderHook.tsx`, and assertions query the DOM with `@testing-library/dom`. Wrap state updates in `flushSync` from `hono/jsx/dom`. hono/jsx maps `onChange` to the native `input` event, so DOM tests fire `fireEvent.input`. Submit forms by clicking a submit button, as hono/jsx treats every untrusted submit event as one of its own form actions. Elements unregister through the cleanup returned by the `ref` callback, which hono/jsx calls before it detaches the element. Server-side rendering tests live in `*.ssr.test.tsx` and run in the separate Node `server` Vitest project.
 
 **Preact** — every reactive `field.*` / `form.*` is a `ReadonlySignal<T>`; read with `.value`. Setter is `field.onInput(v)`. DOM events fire on `oninput`. `props.autofocus` is lowercase.
 
