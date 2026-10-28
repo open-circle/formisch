@@ -60,6 +60,7 @@ Create folder in the appropriate category:
 - `qwik/api/(hooks)` - Qwik hooks (useForm$, useField)
 - `preact/api/(hooks)` - Preact hooks
 - `react-native/api/(hooks)` - React Native hooks (useForm, useField)
+- `honox/api/(hooks)` - HonoX hooks (useForm, useField)
 - `angular/api/(functions)` - Angular functions (injectForm, injectField)
 - `angular/api/(directives)` - Angular directives (formischForm, formischField)
 - `angular/api/(types)` - Angular-specific types (FormStore, FieldStore, SignalOrValue)
@@ -255,6 +256,7 @@ Parentheses folders don't appear in URLs:
 | Qwik         | Hooks                  | useForm$, useField        |
 | Preact       | Hooks                  | useForm, useField         |
 | React Native | Hooks                  | useForm, useField         |
+| HonoX        | Hooks                  | useForm, useField         |
 | Angular      | Functions / Directives | injectForm, formischField |
 | Vue          | Composables            | useForm, useField         |
 | Svelte       | Runes                  | createForm, useField      |

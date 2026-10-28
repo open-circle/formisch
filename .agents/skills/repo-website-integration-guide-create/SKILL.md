@@ -176,6 +176,7 @@ The field contract is the same everywhere, but its spelling is not. Verify again
 | Vue          | `useForm`, `<Field v-slot>`                   | `v-bind="field.props"` + `v-model="field.input"` | assign `field.input = ...`   | `onFocus`, `onBlur`, `autofocus`        |
 | Qwik         | `useForm$`, `<Field>` render prop             | `{...field.props}` + `value={field.input.value}` | `field.onInput(value)` (QRL) | `onFocus$`, `onBlur$` (QRLs)            |
 | React Native | `useForm`, `<Field>` render prop, no `<Form>` | `{...field.props}` + `value`                     | `field.onChange(value)`      | `onFocus`, `onBlur` (no name/autofocus) |
+| HonoX        | `useForm`, `<Form>`, `<Field>` render prop    | `{...field.props}` + `value`                     | `field.onChange(value)`      | `onFocus`, `onBlur`, `autofocus`        |
 | Angular      | `injectForm`, `*formischField`                | `[formischControl]="field"`                      | `field.setInput(value)`      | handled by the directive                |
 
 Two consequences worth checking before writing: Svelte spells every handler in lowercase and passes its ref as an attachment symbol, so a spread only registers the element when it lands on real DOM. Vue has no setter method and its `props.onChange` only triggers change-mode validation, so the value must flow through `v-model` or an explicit assignment.

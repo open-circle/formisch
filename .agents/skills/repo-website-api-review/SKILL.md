@@ -100,6 +100,7 @@ const form = createForm({ schema });
 | Qwik         | `### Hooks`                        |
 | Preact       | `### Hooks`                        |
 | React Native | `### Hooks`                        |
+| HonoX        | `### Hooks`                        |
 | Angular      | `### Functions` / `### Directives` |
 | Vue          | `### Composables`                  |
 | Svelte       | `### Runes`                        |

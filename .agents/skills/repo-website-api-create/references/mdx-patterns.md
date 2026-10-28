@@ -173,6 +173,7 @@ Do NOT include implementation signatures.
 | Qwik         | `### Hooks`                        |
 | Preact       | `### Hooks`                        |
 | React Native | `### Hooks`                        |
+| HonoX        | `### Hooks`                        |
 | Angular      | `### Functions` / `### Directives` |
 | Vue          | `### Composables`                  |
 | Svelte       | `### Runes`                        |

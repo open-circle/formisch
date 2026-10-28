@@ -1,10 +1,10 @@
 ---
 name: formisch
-description: Form handling with Formisch, the schema-first and type-safe form library for Angular, Preact, Qwik, React, React Native, Solid, Svelte, and Vue. Use when creating forms, handling form state, validating inputs, working with field arrays, or using @formisch/* packages.
+description: Form handling with Formisch, the schema-first and type-safe form library for Angular, HonoX, Preact, Qwik, React, React Native, Solid, Svelte, and Vue. Use when creating forms, handling form state, validating inputs, working with field arrays, or using @formisch/* packages.
 license: MIT
 metadata:
   author: open-circle
-  version: "1.3"
+  version: "1.4"
 ---
 
 # Formisch
@@ -15,7 +15,7 @@ This skill helps AI agents work effectively with [Formisch](https://formisch.dev
 
 - When the user asks about form handling with Formisch
 - When managing form state and validation
-- When working with Angular, Preact, Qwik, React, React Native, Solid, Svelte, or Vue forms
+- When working with Angular, HonoX, Preact, Qwik, React, React Native, Solid, Svelte, or Vue forms
 - When integrating Valibot schemas with forms
 
 ## Introduction
@@ -33,6 +33,7 @@ Formisch is a schema-based, headless form library that works across multiple fra
 | Framework    | Package                  | Hook/Primitive |
 | ------------ | ------------------------ | -------------- |
 | Angular      | `@formisch/angular`      | `injectForm`   |
+| HonoX        | `@formisch/honox`        | `useForm`      |
 | Preact       | `@formisch/preact`       | `useForm`      |
 | Qwik         | `@formisch/qwik`         | `useForm$`     |
 | React        | `@formisch/react`        | `useForm`      |
@@ -60,6 +61,7 @@ npm install @formisch/preact        # Preact
 npm install @formisch/svelte        # Svelte
 npm install @formisch/qwik          # Qwik
 npm install @formisch/react-native  # React Native
+npm install @formisch/honox         # HonoX
 ```
 
 ## Core Concepts
@@ -112,9 +114,9 @@ Each field has its own reactive store with:
 - `isDirty` — Field value differs from initial value
 - `isValid` — Field passes validation
 - `props` — Props to spread onto native elements (Angular connects controls with `[formischControl]` instead)
-- `onChange` (React and React Native) / `onInput` (Solid, Svelte, Preact, and Qwik) / `setInput` (Angular) — Sets the field input value programmatically. Use this when the field cannot be connected to a native element. In Vue, set `field.input` directly (for example with `v-model`).
+- `onChange` (React, React Native, and HonoX) / `onInput` (Solid, Svelte, Preact, and Qwik) / `setInput` (Angular) — Sets the field input value programmatically. Use this when the field cannot be connected to a native element. In Vue, set `field.input` directly (for example with `v-model`).
 
-Store reactivity is framework-specific. React, React Native, Solid, Svelte, and Vue expose plain reactive properties. Angular properties are signals and are called like `field.errors()`, except `path`, which is a plain value. Preact and Qwik properties are signals; use `.value` in conditions and ordinary TypeScript logic. Do not copy one framework's access syntax into another.
+Store reactivity is framework-specific. React, React Native, HonoX, Solid, Svelte, and Vue expose plain reactive properties. Angular properties are signals and are called like `field.errors()`, except `path`, which is a plain value. Preact and Qwik properties are signals; use `.value` in conditions and ordinary TypeScript logic. Do not copy one framework's access syntax into another.
 
 ### Dirty Tracking
 
@@ -215,6 +217,49 @@ export default function LoginScreen() {
 ```
 
 React Native text inputs are controlled, so always pass `value={field.input}`. Use `field.onChange(value)` for switches, sliders, pickers, and non-string values.
+
+### HonoX Example
+
+Forms are interactive, so place them in a HonoX island. HonoX renders the island on the server and hydrates it on the client.
+
+```tsx
+// app/islands/LoginForm.tsx
+import { Field, Form, useForm } from "@formisch/honox";
+import * as v from "valibot";
+
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+export default function LoginForm() {
+  const loginForm = useForm({ schema: LoginSchema });
+
+  return (
+    <Form of={loginForm} onSubmit={(output) => console.log(output)}>
+      <Field of={loginForm} path={["email"]}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="email" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <Field of={loginForm} path={["password"]}>
+        {(field) => (
+          <div>
+            <input {...field.props} value={field.input} type="password" />
+            {field.errors && <div>{field.errors[0]}</div>}
+          </div>
+        )}
+      </Field>
+      <button type="submit">Login</button>
+    </Form>
+  );
+}
+```
+
+HonoX uses hono/jsx, so write `class` and `for` instead of `className` and `htmlFor`, and `field.props` contains `autofocus` instead of `autoFocus`. hono/jsx does not support the `value` prop of `<select>` during server-side rendering, so mark the selected options with their `selected` attribute instead.
 
 ### React Example
 
