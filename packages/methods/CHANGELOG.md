@@ -6,6 +6,7 @@ All notable changes to the library will be documented in this file.
 
 - Add HonoX build output with `@formisch/methods/honox` export (issue #175)
 - Add HonoX specific `setInput` function that validates the `input` and `change` modes like the React version (issue #175)
+- Fix `getDirtyPaths` always returning an empty list in bundled builds by removing the `@__NO_SIDE_EFFECTS__` annotation from `collectDirtyPaths`, which mutates the `paths` array it is given (issue #251)
 
 ## v1.0.2 (October 26, 2026)
 
