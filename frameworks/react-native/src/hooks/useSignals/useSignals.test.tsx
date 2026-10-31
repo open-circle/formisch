@@ -1,6 +1,6 @@
 import { batch, createSignal } from '@formisch/core/react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import { type ReactElement, StrictMode, useState } from 'react';
+import { Activity, type ReactElement, StrictMode, useState } from 'react';
 import { Pressable, Text } from 'react-native';
 import { describe, expect, test, vi } from 'vitest';
 import { useSignals } from './useSignals.ts';
@@ -75,33 +75,23 @@ describe('useSignals', () => {
 
   describe('cleanup', () => {
     test('should not re-render after unmount when a tracked signal changes', () => {
-      vi.useFakeTimers();
-      try {
-        const signal = createSignal('initial');
-        let renderCount = 0;
+      const signal = createSignal('initial');
+      let renderCount = 0;
 
-        function TrackedComponent(): ReactElement {
-          useSignals();
-          renderCount++;
-          return <Text testID="value">{signal.value}</Text>;
-        }
-
-        const { unmount } = render(<TrackedComponent />);
-        const renderCountBeforeUnmount = renderCount;
-
-        unmount();
-
-        // Flush the cleanup timeout scheduled in useSignals.ts
-        act(() => {
-          vi.runAllTimers();
-        });
-
-        signal.value = 'after-unmount';
-
-        expect(renderCount).toBe(renderCountBeforeUnmount);
-      } finally {
-        vi.useRealTimers();
+      function TrackedComponent(): ReactElement {
+        useSignals();
+        renderCount++;
+        return <Text testID="value">{signal.value}</Text>;
       }
+
+      const { unmount } = render(<TrackedComponent />);
+      const renderCountBeforeUnmount = renderCount;
+
+      unmount();
+
+      signal.value = 'after-unmount';
+
+      expect(renderCount).toBe(renderCountBeforeUnmount);
     });
 
     test('should keep subscriptions alive across StrictMode effect re-runs', () => {
@@ -113,7 +103,7 @@ describe('useSignals', () => {
       }
 
       // StrictMode mounts → unmounts → re-mounts the component in dev mode,
-      // which schedules and then cancels the cleanup timeout. The signal
+      // which removes and then restores the signal subscriptions. The signal
       // subscription must survive that cycle.
       render(
         <StrictMode>
@@ -126,6 +116,73 @@ describe('useSignals', () => {
       });
 
       expect(screen.getByTestId('value')).toHaveTextContent('7');
+    });
+
+    describe.each([
+      ['without StrictMode', false],
+      ['with StrictMode', true],
+    ])('Activity hide and reveal %s', (_, strict) => {
+      test('should restore subscriptions after the component is revealed', () => {
+        vi.useFakeTimers();
+        try {
+          const signal = createSignal('initial');
+
+          function TrackedComponent(): ReactElement {
+            useSignals();
+            return <Text testID="value">{signal.value}</Text>;
+          }
+
+          // Hint: The child element identity is preserved so that revealing
+          // the component re-creates its effects without re-rendering it.
+          const child = <TrackedComponent />;
+          let setVisible!: (visible: boolean) => void;
+
+          function App(): ReactElement {
+            const [visible, _setVisible] = useState(true);
+            setVisible = _setVisible;
+            return (
+              <Activity mode={visible ? 'visible' : 'hidden'}>{child}</Activity>
+            );
+          }
+
+          render(
+            strict ? (
+              <StrictMode>
+                <App />
+              </StrictMode>
+            ) : (
+              <App />
+            )
+          );
+
+          act(() => {
+            setVisible(false);
+          });
+          act(() => {
+            vi.runAllTimers();
+          });
+
+          // Signal changes while hidden must be picked up on reveal
+          signal.value = 'while-hidden';
+
+          act(() => {
+            setVisible(true);
+          });
+          act(() => {
+            vi.runAllTimers();
+          });
+
+          expect(screen.getByTestId('value')).toHaveTextContent('while-hidden');
+
+          act(() => {
+            signal.value = 'after-reveal';
+          });
+
+          expect(screen.getByTestId('value')).toHaveTextContent('after-reveal');
+        } finally {
+          vi.useRealTimers();
+        }
+      });
     });
   });
 

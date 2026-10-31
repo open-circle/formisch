@@ -34,17 +34,22 @@ export function useSignals(): void {
   // Clear listener directly after render
   useLayoutEffect(() => setListener(undefined));
 
-  // Cleanup registered subscribers on unmount
-  const timeout = useRef<ReturnType<typeof setTimeout>>(null);
+  // Cleanup registered subscribers when effects are destroyed and restore
+  // them when effects are re-created
+  //
+  // Hint: React may destroy and re-create effects without re-rendering the
+  // component, e.g. when `<StrictMode>` re-runs effects in dev mode or when
+  // `<Activity>` hides and reveals its children. Since subscriptions are only
+  // registered during render, a re-render is forced to restore them.
+  const unsubscribed = useRef(false);
   useEffect(() => {
-    // Hint: This timeout hack is necessary because React `<StrictMode>`
-    // re-runs effects twice in dev mode.
-    if (timeout.current) {
-      clearTimeout(timeout.current);
-      timeout.current = null;
+    if (unsubscribed.current) {
+      unsubscribed.current = false;
+      forceUpdate();
     }
     return () => {
-      timeout.current = setTimeout(cleanSubscribers);
+      unsubscribed.current = true;
+      cleanSubscribers();
     };
   }, [cleanSubscribers]);
 }
