@@ -1,6 +1,12 @@
 import { batch, createSignal } from '@formisch/core/react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import { Activity, type ReactElement, StrictMode, useState } from 'react';
+import {
+  Activity,
+  type ReactElement,
+  startTransition,
+  StrictMode,
+  useState,
+} from 'react';
 import { describe, expect, test, vi } from 'vitest';
 import { useSignals } from './useSignals.ts';
 
@@ -182,6 +188,63 @@ describe('useSignals', () => {
           vi.useRealTimers();
         }
       });
+    });
+
+    test('should show current signal values before paint after Activity reveal', async () => {
+      const signal = createSignal('initial');
+
+      function TrackedComponent(): ReactElement {
+        useSignals();
+        return <span data-testid="value">{signal.value}</span>;
+      }
+
+      const child = <TrackedComponent />;
+      let setVisible!: (visible: boolean) => void;
+
+      function App(): ReactElement {
+        const [visible, _setVisible] = useState(true);
+        setVisible = _setVisible;
+        return (
+          <Activity mode={visible ? 'visible' : 'hidden'}>{child}</Activity>
+        );
+      }
+
+      render(<App />);
+
+      act(() => {
+        setVisible(false);
+      });
+
+      signal.value = 'while-hidden';
+
+      // Hint: The reveal runs outside of `act` so that React schedules its
+      // work like in a browser. The mutation observer callback runs as a
+      // microtask right after the task that committed the reveal, i.e. before
+      // the browser could paint, and captures the first visible content.
+      const element = screen.getByTestId('value');
+      const globals = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
+      const isActEnvironment = globals.IS_REACT_ACT_ENVIRONMENT;
+      globals.IS_REACT_ACT_ENVIRONMENT = false;
+      try {
+        const firstVisibleContent = await new Promise<string | null>(
+          (resolve) => {
+            const observer = new MutationObserver(() => {
+              if (element.style.display !== 'none') {
+                observer.disconnect();
+                resolve(element.textContent);
+              }
+            });
+            observer.observe(element, { attributes: true });
+            startTransition(() => {
+              setVisible(true);
+            });
+          }
+        );
+
+        expect(firstVisibleContent).toBe('while-hidden');
+      } finally {
+        globals.IS_REACT_ACT_ENVIRONMENT = isActEnvironment;
+      }
     });
   });
 

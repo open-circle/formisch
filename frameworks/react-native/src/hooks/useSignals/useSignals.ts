@@ -1,7 +1,6 @@
 import { type Listener, setListener } from '@formisch/core/react-native';
 import {
   useCallback,
-  useEffect,
   useLayoutEffect,
   useMemo,
   useReducer,
@@ -40,9 +39,11 @@ export function useSignals(): void {
   // Hint: React may destroy and re-create effects without re-rendering the
   // component, e.g. when `<StrictMode>` re-runs effects in dev mode or when
   // `<Activity>` hides and reveals its children. Since subscriptions are only
-  // registered during render, a re-render is forced to restore them.
+  // registered during render, a re-render is forced to restore them. A layout
+  // effect is used so that this re-render happens before the browser paints,
+  // which prevents stale values from being shown if signals changed meanwhile.
   const unsubscribed = useRef(false);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (unsubscribed.current) {
       unsubscribed.current = false;
       forceUpdate();
