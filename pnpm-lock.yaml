@@ -750,6 +750,9 @@ importers:
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0
+      pathe:
+        specifier: ^2.0.3
+        version: 2.0.3
       react:
         specifier: ^19.2.1
         version: 19.2.1
@@ -835,6 +838,9 @@ importers:
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0
+      pathe:
+        specifier: ^2.0.3
+        version: 2.0.3
       rolldown:
         specifier: 1.0.0-beta.26
         version: 1.0.0-beta.26

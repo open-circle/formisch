@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join, normalize } from 'pathe';
 import type { RolldownPluginOption } from 'rolldown';
 import { defineConfig, type UserConfig, type UserConfigFn } from 'tsdown';
 
@@ -35,13 +35,16 @@ function rewriteFrameworkImports(framework: Framework): RolldownPluginOption {
         // Create variable for modified source code
         let modifiedCode: string | undefined;
 
+        // Get directory of current file
+        const directory = dirname(id);
+
         for (const [fullMatch, filePath, fileName] of imports) {
           // Create path to framework-specific file
-          const frameworkFilePath = `/${join(
-            ...id.split('/').slice(0, -1),
-            ...filePath.split('/').slice(0, -1),
+          const frameworkFilePath = join(
+            directory,
+            dirname(filePath),
             `${fileName}.${framework}.ts`
-          )}`;
+          );
 
           // If framework-specific file exists, rewrite import
           if (existsSync(frameworkFilePath)) {
@@ -72,7 +75,7 @@ function rewriteFrameworkImports(framework: Framework): RolldownPluginOption {
       // Continue if not null and not external
       if (resolved && !resolved.external) {
         // Create path to framework-specific file
-        const frameworkFilePath = resolved.id.replace(
+        const frameworkFilePath = normalize(resolved.id).replace(
           /\/([\w-]+)\.ts$/,
           `/$1.${framework}.ts`
         );
