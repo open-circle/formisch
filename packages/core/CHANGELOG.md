@@ -2,7 +2,7 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.1.0 (October 31, 2026)
 
 - Add HonoX framework adapter and `@formisch/core/honox` build output that reuses the React signal implementation (issue #175)
 

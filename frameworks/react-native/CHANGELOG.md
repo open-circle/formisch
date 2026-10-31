@@ -2,8 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v1.2.0 (October 31, 2026)
 
+- Change `@formisch/core` to v1.1.0
+- Change `@formisch/methods` to v1.1.0
 - Fix fields no longer updating after their effects were re-created without a re-render, e.g. when `<Activity>` hides and reveals a form (issue #230)
 
 ## v1.1.1 (October 26, 2026)
