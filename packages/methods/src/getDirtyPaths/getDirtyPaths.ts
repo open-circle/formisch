@@ -90,6 +90,18 @@ export function getDirtyPaths(
   return paths;
 }
 
+/**
+ * Recursively collects the paths of the dirty fields of a field store into the
+ * supplied list. Objects with non-nullish input recurse into their children,
+ * while arrays and nullish-cleared objects contribute only their own path.
+ *
+ * Hint: This function must not be annotated with `@__NO_SIDE_EFFECTS__`
+ * because it pushes to the supplied list instead of returning a value.
+ * Bundlers would otherwise remove its calls.
+ *
+ * @param internalFieldStore The field store to collect dirty paths from.
+ * @param paths The list to push the dirty paths to.
+ */
 function collectDirtyPaths(
   internalFieldStore: InternalFieldStore,
   paths: RequiredPath[]
