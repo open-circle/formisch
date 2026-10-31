@@ -90,7 +90,6 @@ export function getDirtyPaths(
   return paths;
 }
 
-// @__NO_SIDE_EFFECTS__
 function collectDirtyPaths(
   internalFieldStore: InternalFieldStore,
   paths: RequiredPath[]
