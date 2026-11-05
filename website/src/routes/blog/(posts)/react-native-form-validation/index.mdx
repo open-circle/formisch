@@ -358,7 +358,7 @@ Coming from Formik with Yup? Most rules have a close Valibot match. `.required()
 
 Coming from React Hook Form? Each `Controller` becomes a `Field`, and `mode` and `reValidateMode` become `validate` and `revalidate`. The [React Hook Form migration guide](https://formisch.dev/react-native/guides/migrate-from-react-hook-form/) covers the rest. If you use TanStack Form, there's a [TanStack Form migration guide](https://formisch.dev/react-native/guides/migrate-from-tanstack-form/) too.
 
-Are your rules written in Zod? Formisch only works with Valibot, but Valibot's [Zod migration guide](https://valibot.dev/guides/migrate-from-zod/) includes a codemod that converts your Zod schemas, so you don't have to rewrite them by hand.
+Are your rules written in Zod? Formisch only works with Valibot, but Valibot's [Zod migration guide](https://valibot.dev/guides/migrate-from-zod/) includes a codemod that converts most Zod schemas for you. It's still in beta, so check the output before you use it.
 
 ## Frequently asked questions
 
@@ -380,4 +380,4 @@ That's what Formisch does by default. If you leave out `validate` in `useForm`, 
 
 ### Can you use Zod with Formisch?
 
-Formisch only works with Valibot schemas. If your rules are already in Zod, Valibot's codemod can convert them for you.
+Formisch only works with Valibot schemas. If your rules are already in Zod, Valibot's codemod can convert most of them for you.
