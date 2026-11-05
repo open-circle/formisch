@@ -145,7 +145,14 @@ const submitForm = handleSubmit(signUpForm, async (output) => {
 
 So what happens when the user taps **Sign up**? Formisch checks everything against your rules first. If something is wrong, the errors show up and your function doesn't run. If everything is correct, your function runs with the values the user typed. Formisch also sets `signUpForm.isSubmitting` to `true` while your function runs, so disabling the button with it stops a double tap from sending the form twice.
 
-Want the user to be able to submit from the keyboard too? Pass the same `submitForm` to `onSubmitEditing` on the last input.
+Want the user to be able to submit from the keyboard too? Call `submitForm` from `onSubmitEditing` on the last input. Check `signUpForm.isSubmitting` first, because the keyboard has no disabled state, so pressing return twice would otherwise send the form twice.
+
+{/* prettier-ignore */}
+```tsx
+onSubmitEditing={() => {
+  if (!signUpForm.isSubmitting) submitForm();
+}}
+```
 
 ## How do you show server errors like "email already taken"?
 
@@ -161,7 +168,11 @@ const submitForm = handleSubmit(signUpForm, async (output) => {
   });
 
   if (!response.ok) {
-    throw new Error('This email is already taken.');
+    throw new Error(
+      response.status === 409
+        ? 'This email is already taken.'
+        : 'Sign-up failed. Please try again.'
+    );
   }
 });
 
@@ -170,13 +181,13 @@ const submitForm = handleSubmit(signUpForm, async (output) => {
 )}
 ```
 
-Swap the example URL for your own signup endpoint. The full example at the end already has the `Text` for this error, so you only need to add your server call.
+Swap the example URL for your own signup endpoint, and swap 409 for the status code your server sends when an email is already taken. The full example at the end already has the `Text` for this error, so you only need to add your server call.
 
 ## When should validation errors show up?
 
 By default, Formisch waits until the user taps submit before it shows any errors. After that, it rechecks each input as the user types, so an error goes away as soon as they fix it.
 
-You can change this with two settings on `useForm`. `validate` decides when an input gets checked for the first time, and `revalidate` decides when it gets checked again after it has shown an error. These are the options you can pick from.
+You can change this with two settings on `useForm`. `validate` decides when an input gets checked for the first time, and `revalidate` decides when it gets checked again, once it has an error or the user has tapped submit. These are the options you can pick from.
 
 | Option      | When the check runs                                  |
 | ----------- | ---------------------------------------------------- |
@@ -305,7 +316,9 @@ export default function SignUpScreen() {
               value={field.input}
               placeholder="Confirm password"
               secureTextEntry
-              onSubmitEditing={submitForm}
+              onSubmitEditing={() => {
+                if (!signUpForm.isSubmitting) submitForm();
+              }}
               style={styles.input}
             />
             {(field.isTouched || signUpForm.isSubmitted) && field.errors && (
