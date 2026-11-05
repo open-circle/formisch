@@ -1,0 +1,383 @@
+---
+cover: React Native
+title: 'React Native Form Validation in 2026: Step-by-Step Tutorial with Example'
+description: Learn React Native form validation step by step. Build a signup form with email, password and confirm password checks using Formisch and Valibot.
+published: 2026-11-02
+authors:
+  - flySewa
+---
+
+Need to validate a form in React Native? Maybe you want to catch a badly formatted email, or show "The two passwords do not match" right under the input where it belongs. React Native doesn't do any of this for you, so you have to set it up yourself.
+
+In this tutorial we'll build a signup screen with an email, a password and a confirm password, and validate all three with Formisch and Valibot. If you just want the code, the full example is at the end.
+
+## How do you validate a form in React Native?
+
+Here's the short version. You write your rules in a Valibot schema, create the form with Formisch's `useForm`, wrap each `TextInput` in a `Field`, show `field.errors` under each input, and run `handleSubmit` when the user taps the button. Formisch then checks what the user typed, shows each error under the right input, and only sends the form when everything is correct.
+
+We'll go through each of those steps below. The code in this tutorial was tested with `@formisch/react-native` 1.2.0 and `valibot` 1.5.0.
+
+## Why doesn't React Native validate forms for you?
+
+On a website, the browser gives you a form, a submit button that knows what to do, and a few checks like "this field is required." React Native doesn't have any of that. You get inputs and buttons, and that's it.
+
+So your app has to work out a few things on its own. When should it check what the user typed? Where should each error show up? And how does it stop the form from sending until everything is correct? In this tutorial Formisch handles those questions, and Valibot holds the rules.
+
+## What do you need to install?
+
+You only need two packages. `@formisch/react-native` runs the form, and `valibot` holds the rules.
+
+```bash
+npm install @formisch/react-native valibot
+```
+
+Make sure you import everything Formisch-related from `@formisch/react-native`, because that's the version built for React Native. If you use a different package manager, the [installation guide](https://formisch.dev/react-native/guides/installation/) has the command for it.
+
+## How do you write the validation rules?
+
+Let's start with the rules. You write all of them in one Valibot schema, and each field gets its own list of checks. For the email, Valibot first makes sure the user typed something, and then makes sure it looks like an email. The text you put in each check is the error message your user sees.
+
+```ts
+import * as v from 'valibot';
+
+const SignUpSchema = v.pipe(
+  v.object({
+    email: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your email.'),
+      v.email('The email address is badly formatted.')
+    ),
+    password: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter a password.'),
+      v.minLength(8, 'Your password must have 8 characters or more.')
+    ),
+    confirmPassword: v.pipe(
+      v.string(),
+      v.nonEmpty('Please confirm your password.')
+    ),
+  }),
+  v.forward(
+    v.partialCheck(
+      [['password'], ['confirmPassword']],
+      (input) => input.password === input.confirmPassword,
+      'The two passwords do not match.'
+    ),
+    ['confirmPassword']
+  )
+);
+```
+
+## How do you check that two passwords match?
+
+The part at the bottom of the schema checks that the two passwords match. It sits outside the other checks because it has to look at two inputs at once. `v.partialCheck` compares the password with the confirm password, and `v.forward` tells Formisch to show the error under the confirm password input.
+
+_Keep your fields in the same order they appear on the screen. If the user taps submit with mistakes, Formisch jumps to the first input with an error, and it uses the order in your schema to work out which one comes first._
+
+## How do you connect each input to the form?
+
+Now that the rules are ready, let's create the form. `useForm` takes your schema and gives you back the form. You don't need to give it starting values, because every text input starts out empty.
+
+```tsx
+const signUpForm = useForm({ schema: SignUpSchema });
+```
+
+Next, wrap each `TextInput` in a `Field`. You tell the `Field` which form it belongs to with `of`, and which input it is with `path`. Then you pass `field.props` and `field.input` to the `TextInput`.
+
+```tsx
+<Field of={signUpForm} path={['email']}>
+  {(field) => (
+    <TextInput
+      {...field.props}
+      value={field.input}
+      placeholder="Email"
+      autoCapitalize="none"
+      keyboardType="email-address"
+    />
+  )}
+</Field>
+```
+
+`field.props` is what connects the input to Formisch. It lets Formisch know when the user types, when they tap into the input and when they leave it, so you don't have to write any of that yourself. The password inputs work the same way. Use `path={['password']}` or `path={['confirmPassword']}`, and add `secureTextEntry` so the password stays hidden.
+
+Before you run it, give your inputs a border. On iOS, React Native draws a `TextInput` with no border by default, so without one your screen can look empty. The full example at the end adds a simple border with `StyleSheet`.
+
+## How do you show error messages under each input?
+
+Every `Field` gives you `field.errors`. When the input is fine, it's `null`. When a check fails, it holds the error messages. We'll show the first message in red under the input, and wrap both in a `View` so they stay together.
+
+```tsx
+<Field of={signUpForm} path={['email']}>
+  {(field) => (
+    <View>
+      <TextInput
+        {...field.props}
+        value={field.input}
+        placeholder="Email"
+        autoCapitalize="none"
+        keyboardType="email-address"
+      />
+      {field.errors && <Text style={{ color: 'red' }}>{field.errors[0]}</Text>}
+    </View>
+  )}
+</Field>
+```
+
+With Formisch's default settings, errors only show up after the user taps submit for the first time, so nobody sees red text while they're still filling things in. If you change when errors appear, which we'll do in a moment, you'll need one extra check here.
+
+## How do you submit a form in React Native?
+
+React Native doesn't have a submit event like the web, so you start the submit from the button yourself. `handleSubmit` takes your form and the function you want to run, and gives you back something you can pass to the button's `onPress`.
+
+{/* prettier-ignore */}
+```tsx
+const submitForm = handleSubmit(signUpForm, async (output) => {
+  // Send the validated values to your server here
+  console.log(output);
+});
+
+<Button
+  title="Sign up"
+  onPress={submitForm}
+  disabled={signUpForm.isSubmitting}
+/>
+```
+
+So what happens when the user taps **Sign up**? Formisch checks everything against your rules first. If something is wrong, the errors show up and your function doesn't run. If everything is correct, your function runs with the values the user typed. Formisch also sets `signUpForm.isSubmitting` to `true` while your function runs, so disabling the button with it stops a double tap from sending the form twice.
+
+Want the user to be able to submit from the keyboard too? Call `submitForm` from `onSubmitEditing` on the last input. Check `signUpForm.isSubmitting` first, because the keyboard has no disabled state, so pressing return twice would otherwise send the form twice.
+
+{/* prettier-ignore */}
+```tsx
+onSubmitEditing={() => {
+  if (!signUpForm.isSubmitting) submitForm();
+}}
+```
+
+## How do you show server errors like "email already taken"?
+
+Your rules can check that an email looks right, but only your server knows if someone already signed up with it. If your server says no, throw an error inside your submit function. Formisch catches it and puts the message in `signUpForm.errors`, so you can show it above the button.
+
+{/* prettier-ignore */}
+```tsx
+const submitForm = handleSubmit(signUpForm, async (output) => {
+  const response = await fetch('https://example.com/api/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(output),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      response.status === 409
+        ? 'This email is already taken.'
+        : 'Sign-up failed. Please try again.'
+    );
+  }
+});
+
+{signUpForm.errors && (
+  <Text style={{ color: 'red' }}>{signUpForm.errors[0]}</Text>
+)}
+```
+
+Swap the example URL for your own signup endpoint, and swap 409 for the status code your server sends when an email is already taken. The full example at the end already has the `Text` for this error, so you only need to add your server call.
+
+## When should validation errors show up?
+
+By default, Formisch waits until the user taps submit before it shows any errors. After that, it rechecks each input as the user types, so an error goes away as soon as they fix it.
+
+You can change this with two settings on `useForm`. `validate` decides when an input gets checked for the first time, and `revalidate` decides when it gets checked again once it has an error. With the default `validate: 'submit'`, every input also switches to `revalidate` after the first submit. These are the options you can pick from.
+
+| Option      | When the check runs                                  |
+| ----------- | ---------------------------------------------------- |
+| `'initial'` | As soon as the form is created (only for `validate`) |
+| `'touch'`   | When the user first taps into the input              |
+| `'input'`   | Every time the user types                            |
+| `'change'`  | Same as `'input'` in React Native                    |
+| `'blur'`    | When the user leaves the input                       |
+| `'submit'`  | Only when the user taps submit                       |
+
+For a signup screen, we like checking each input when the user leaves it. That way they find out about a mistake as soon as they move on, and the error disappears while they fix it.
+
+```tsx
+const signUpForm = useForm({
+  schema: SignUpSchema,
+  validate: 'blur',
+  revalidate: 'input',
+});
+```
+
+There's a small problem with `'blur'`, though. When the user leaves an input, Formisch checks the whole form, including inputs they haven't reached yet. So if someone types their email and moves on, "Please enter a password" shows up under the password input before they've even tapped into it.
+
+The fix is to show an error only once the user has been in that input, or has already tapped submit. `field.isTouched` tells you whether they've been in the input, and `signUpForm.isSubmitted` tells you whether they've tapped submit.
+
+{/* prettier-ignore */}
+```tsx
+{(field.isTouched || signUpForm.isSubmitted) && field.errors && (
+  <Text style={{ color: 'red' }}>{field.errors[0]}</Text>
+)}
+```
+
+Now leaving the email input only shows the email error, leaving the password input adds only the password error, and tapping submit shows everything that's wrong. If you pick `'input'` or `'change'` for `validate` instead, errors show up while the user is still typing their first letter, and the Formisch [validation guide](https://formisch.dev/react-native/guides/validation/) shows how to hold those back too.
+
+## Full React Native form validation example
+
+Here's everything in one file, ready to copy into your app.
+
+```tsx
+import { Field, handleSubmit, useForm } from '@formisch/react-native';
+import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import * as v from 'valibot';
+
+const SignUpSchema = v.pipe(
+  v.object({
+    email: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter your email.'),
+      v.email('The email address is badly formatted.')
+    ),
+    password: v.pipe(
+      v.string(),
+      v.nonEmpty('Please enter a password.'),
+      v.minLength(8, 'Your password must have 8 characters or more.')
+    ),
+    confirmPassword: v.pipe(
+      v.string(),
+      v.nonEmpty('Please confirm your password.')
+    ),
+  }),
+  v.forward(
+    v.partialCheck(
+      [['password'], ['confirmPassword']],
+      (input) => input.password === input.confirmPassword,
+      'The two passwords do not match.'
+    ),
+    ['confirmPassword']
+  )
+);
+
+export default function SignUpScreen() {
+  const signUpForm = useForm({
+    schema: SignUpSchema,
+    validate: 'blur',
+    revalidate: 'input',
+  });
+
+  const submitForm = handleSubmit(signUpForm, async (output) => {
+    // Send the validated values to your server here.
+    // If the server says no, throw an error and its message
+    // shows up above the button.
+    console.log(output);
+  });
+
+  return (
+    <View style={styles.container}>
+      <Field of={signUpForm} path={['email']}>
+        {(field) => (
+          <View>
+            <TextInput
+              {...field.props}
+              value={field.input}
+              placeholder="Email"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              style={styles.input}
+            />
+            {(field.isTouched || signUpForm.isSubmitted) && field.errors && (
+              <Text style={styles.error}>{field.errors[0]}</Text>
+            )}
+          </View>
+        )}
+      </Field>
+
+      <Field of={signUpForm} path={['password']}>
+        {(field) => (
+          <View>
+            <TextInput
+              {...field.props}
+              value={field.input}
+              placeholder="Password"
+              secureTextEntry
+              style={styles.input}
+            />
+            {(field.isTouched || signUpForm.isSubmitted) && field.errors && (
+              <Text style={styles.error}>{field.errors[0]}</Text>
+            )}
+          </View>
+        )}
+      </Field>
+
+      <Field of={signUpForm} path={['confirmPassword']}>
+        {(field) => (
+          <View>
+            <TextInput
+              {...field.props}
+              value={field.input}
+              placeholder="Confirm password"
+              secureTextEntry
+              onSubmitEditing={() => {
+                if (!signUpForm.isSubmitting) submitForm();
+              }}
+              style={styles.input}
+            />
+            {(field.isTouched || signUpForm.isSubmitted) && field.errors && (
+              <Text style={styles.error}>{field.errors[0]}</Text>
+            )}
+          </View>
+        )}
+      </Field>
+
+      {signUpForm.errors && (
+        <Text style={styles.error}>{signUpForm.errors[0]}</Text>
+      )}
+
+      <Button
+        title="Sign up"
+        onPress={submitForm}
+        disabled={signUpForm.isSubmitting}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { padding: 16, gap: 12 },
+  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 6, padding: 10 },
+  error: { color: 'red', marginTop: 4 },
+});
+```
+
+Try typing an email without an @ and moving to the next input. Only the email error should show. Then tap **Sign up** with a short password, or with two passwords that don't match, and each error shows up under its own input.
+
+## Coming from Formik, React Hook Form or Zod?
+
+Already using another form library? You don't have to switch everything at once. You can add Formisch next to it and move one form at a time, and both libraries work side by side while you switch.
+
+Coming from Formik with Yup? Most rules have a close Valibot match. `.required()` becomes `v.nonEmpty()`, `.min()` becomes `v.minLength()` for text (or `v.minValue()` for numbers), and a `Yup.ref` password check becomes the `v.forward` and `v.partialCheck` setup you used above. The [Formik migration guide](https://formisch.dev/react-native/guides/migrate-from-formik/) walks through a full login screen side by side.
+
+Coming from React Hook Form? Each `Controller` becomes a `Field`, and `mode` and `reValidateMode` become `validate` and `revalidate`. The [React Hook Form migration guide](https://formisch.dev/react-native/guides/migrate-from-react-hook-form/) covers the rest. If you use TanStack Form, there's a [TanStack Form migration guide](https://formisch.dev/react-native/guides/migrate-from-tanstack-form/) too.
+
+Are your rules written in Zod? Formisch only works with Valibot, but Valibot's [Zod migration guide](https://valibot.dev/guides/migrate-from-zod/) includes a codemod that converts most Zod schemas for you. It's still in beta, so check the output before you use it.
+
+## Frequently asked questions
+
+### Does React Native have built-in form validation?
+
+React Native doesn't have built-in form validation. It gives you inputs and buttons, but no form element and no built-in checks. You either write the checks yourself or use a form library.
+
+### Which libraries can you use for form validation in React Native?
+
+Common choices are React Hook Form, Formik, TanStack Form and Formisch. They all work in React Native, and most of them let you write your rules with a schema library like Valibot, Zod or Yup. Formisch works with Valibot only.
+
+### How do you check that two passwords match in React Native?
+
+With Valibot, add a `v.partialCheck` that compares both passwords at the end of your schema, and wrap it in `v.forward` so the error shows under the confirm password input. The schema in this tutorial shows the full setup.
+
+### How do you show errors only after the user taps submit?
+
+That's what Formisch does by default. If you leave out `validate` in `useForm`, or set it to `'submit'`, no errors show until the first submit.
+
+### Can you use Zod with Formisch?
+
+Formisch only works with Valibot schemas. If your rules are already in Zod, Valibot's codemod can convert most of them for you.
