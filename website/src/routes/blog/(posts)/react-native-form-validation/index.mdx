@@ -187,7 +187,7 @@ Swap the example URL for your own signup endpoint, and swap 409 for the status c
 
 By default, Formisch waits until the user taps submit before it shows any errors. After that, it rechecks each input as the user types, so an error goes away as soon as they fix it.
 
-You can change this with two settings on `useForm`. `validate` decides when an input gets checked for the first time, and `revalidate` decides when it gets checked again, once it has an error or the user has tapped submit. These are the options you can pick from.
+You can change this with two settings on `useForm`. `validate` decides when an input gets checked for the first time, and `revalidate` decides when it gets checked again once it has an error. With the default `validate: 'submit'`, every input also switches to `revalidate` after the first submit. These are the options you can pick from.
 
 | Option      | When the check runs                                  |
 | ----------- | ---------------------------------------------------- |
