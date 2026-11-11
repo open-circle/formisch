@@ -86,9 +86,10 @@ export function setInput(
       ? getFieldStore(internalFormStore, config.path)
       : internalFormStore;
     if (internalFieldStore) {
-      setFieldInput(internalFormStore, config.path ?? [], config.input);
-      // TODO: Should we validate on touch, change and blur too?
-      validateIfRequired(internalFormStore, internalFieldStore, 'input');
+      if (setFieldInput(internalFormStore, config.path ?? [], config.input)) {
+        // TODO: Should we validate on touch, change and blur too?
+        validateIfRequired(internalFormStore, internalFieldStore, 'input');
+      }
     }
   });
 }

@@ -119,12 +119,13 @@ export function useField(
       return getIsValid();
     },
     onInput(value) {
-      setFieldInput(getInternalFormStore(), getPath(), value);
-      validateIfRequired(
-        getInternalFormStore(),
-        getInternalFieldStore(),
-        'input'
-      );
+      if (setFieldInput(getInternalFormStore(), getPath(), value)) {
+        validateIfRequired(
+          getInternalFormStore(),
+          getInternalFieldStore(),
+          'input'
+        );
+      }
     },
     props: {
       get name() {
@@ -154,12 +155,19 @@ export function useField(
       },
       onInput(event) {
         const internalFieldStore = getInternalFieldStore();
-        setFieldInput(
-          getInternalFormStore(),
-          getPath(),
-          getElementInput(event.currentTarget, internalFieldStore)
-        );
-        validateIfRequired(getInternalFormStore(), internalFieldStore, 'input');
+        if (
+          setFieldInput(
+            getInternalFormStore(),
+            getPath(),
+            getElementInput(event.currentTarget, internalFieldStore)
+          )
+        ) {
+          validateIfRequired(
+            getInternalFormStore(),
+            internalFieldStore,
+            'input'
+          );
+        }
       },
       onChange() {
         validateIfRequired(

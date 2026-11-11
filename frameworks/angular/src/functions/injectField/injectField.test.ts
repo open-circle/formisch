@@ -7,7 +7,7 @@ import {
 import { TestBed } from '@angular/core/testing';
 import { getFieldStore, INTERNAL } from '@formisch/core/angular';
 import * as v from 'valibot';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CONTROL } from '../../types/control.ts';
 import { injectForm } from '../injectForm/index.ts';
 import { injectField } from './injectField.ts';
@@ -89,6 +89,42 @@ describe('injectField', () => {
     element.value = 'test@example.com';
     field[CONTROL].onInput({ target: element } as unknown as Event);
     expect(field.input()).toBe('test@example.com');
+  });
+
+  it('keeps pending validation when unchanged input is set', () => {
+    const check = vi.fn(() => true);
+    const { field } = TestBed.runInInjectionContext(() => {
+      const form = injectForm({
+        schema: v.object({ email: v.pipe(v.string(), v.check(check)) }),
+        validate: 'input',
+      });
+      return { form, field: injectField(form, { path: ['email'] }) };
+    });
+
+    field.setInput('test@example.com');
+    expect(check).toHaveBeenCalledOnce();
+
+    field.setInput('test@example.com');
+    expect(check).toHaveBeenCalledOnce();
+  });
+
+  it('keeps pending validation when the control onInput is called with unchanged input', () => {
+    const check = vi.fn(() => true);
+    const { field } = TestBed.runInInjectionContext(() => {
+      const form = injectForm({
+        schema: v.object({ email: v.pipe(v.string(), v.check(check)) }),
+        validate: 'input',
+      });
+      return { form, field: injectField(form, { path: ['email'] }) };
+    });
+    const element = document.createElement('input');
+    element.value = 'test@example.com';
+
+    field[CONTROL].onInput({ target: element } as unknown as Event);
+    expect(check).toHaveBeenCalledOnce();
+
+    field[CONTROL].onInput({ target: element } as unknown as Event);
+    expect(check).toHaveBeenCalledOnce();
   });
 
   it('does not change the input value when the control onChange is called', () => {

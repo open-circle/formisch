@@ -90,6 +90,55 @@ describe('useField', () => {
         expect(result.current.isValid).toBe(false);
       });
     });
+
+    test('should keep pending validation when unchanged input is set', () => {
+      const check = vi.fn(() => true);
+      const { result } = renderHook(() => {
+        const form = createForm({
+          schema: v.object({
+            email: v.pipe(v.string(), v.check(check)),
+          }),
+          validate: 'input',
+          initialInput: { email: 'jane@example.com' },
+        });
+        return useField(form, { path: ['email'] });
+      });
+
+      result.current.onInput('john@example.com');
+
+      expect(check).toHaveBeenCalledOnce();
+
+      result.current.onInput('john@example.com');
+
+      expect(check).toHaveBeenCalledOnce();
+    });
+
+    test('should keep pending validation when unchanged input is entered', async () => {
+      const started = vi.fn(() => true);
+      render(FieldHost, {
+        props: {
+          config: {
+            schema: v.objectAsync({
+              name: v.pipeAsync(
+                v.custom<string>(started),
+                v.checkAsync(() => new Promise<boolean>(() => undefined))
+              ),
+            }),
+            validate: 'input',
+            initialInput: { name: 'initial' },
+          },
+          path: ['name'],
+        },
+      });
+
+      const input = screen.getByTestId('input');
+
+      await fireEvent.input(input, { target: { value: 'changed' } });
+      expect(started).toHaveBeenCalledOnce();
+
+      await fireEvent.input(input, { target: { value: 'changed' } });
+      expect(started).toHaveBeenCalledOnce();
+    });
   });
 
   describe('validation modes', () => {

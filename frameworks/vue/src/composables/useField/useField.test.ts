@@ -1,9 +1,9 @@
 import { getFieldStore, INTERNAL } from '@formisch/core/vue';
-import { remove, swap } from '@formisch/methods/vue';
-import { mount } from '@vue/test-utils';
+import { remove, setInput, swap } from '@formisch/methods/vue';
+import { flushPromises, mount } from '@vue/test-utils';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
-import { defineComponent, h, ref } from 'vue';
+import { defineComponent, h, ref, watchEffect } from 'vue';
 import Form from '../../components/Form/Form.vue';
 import type { FormStore } from '../../types/index.ts';
 import { renderHook } from '../../vitest/renderHook.ts';
@@ -100,6 +100,48 @@ describe('useField', () => {
         expect(result.current.errors).toEqual(['Invalid email']);
         expect(result.current.isValid).toBe(false);
       });
+    });
+
+    test('should keep pending validation when unchanged input is set', () => {
+      const check = vi.fn(() => true);
+      const { result } = renderHook(() => {
+        const form = useForm({
+          schema: v.object({
+            email: v.pipe(v.string(), v.check(check)),
+          }),
+          validate: 'input',
+          initialInput: { email: 'jane@example.com' },
+        });
+        return useField(form, { path: ['email'] });
+      });
+
+      result.current.input = 'john@example.com';
+
+      expect(check).toHaveBeenCalledOnce();
+
+      result.current.input = 'john@example.com';
+
+      expect(check).toHaveBeenCalledOnce();
+    });
+
+    // Vue has no untrack, so the comparison with the current input must not
+    // read it through its tracked getter. Otherwise, this effect would run
+    // again after the edit and write the mirrored value over it.
+    test('should not subscribe a surrounding effect to the input it sets', async () => {
+      const source = ref('mirrored');
+      const { result } = renderHook(() => {
+        const form = useForm({ schema: v.object({ name: v.string() }) });
+        watchEffect(() => {
+          setInput(form, { path: ['name'], input: source.value });
+        });
+        return useField(form, { path: ['name'] });
+      });
+      await flushPromises();
+      expect(result.current.input).toBe('mirrored');
+
+      result.current.input = 'edited';
+      await flushPromises();
+      expect(result.current.input).toBe('edited');
     });
   });
 

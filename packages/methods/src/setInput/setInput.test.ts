@@ -1,6 +1,7 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
 import { swap } from '../swap/swap.ts';
+import { validate } from '../validate/validate.ts';
 import { createTestStore } from '../vitest/index.ts';
 import { setInput } from './setInput.ts';
 
@@ -102,6 +103,32 @@ describe('setInput', () => {
     setInput(store, { path: ['name'], input: 'John' });
 
     expect(store.parse).toHaveBeenCalledExactlyOnceWith({ name: 'John' });
+  });
+
+  test('should trigger validation when unchanged input is set', () => {
+    const store = createTestStore(v.object({ name: v.string() }), {
+      initialInput: { name: 'John' },
+      validate: 'input',
+    });
+
+    setInput(store, { path: ['name'], input: 'John' });
+
+    expect(store.parse).toHaveBeenCalledExactlyOnceWith({ name: 'John' });
+  });
+
+  test('should keep pending validation when unchanged input is set', async () => {
+    const store = createTestStore(v.object({ name: v.string() }), {
+      initialInput: { name: 'John' },
+      validate: 'input',
+    });
+    const pendingValidation = validate(store);
+
+    setInput(store, { path: ['name'], input: 'John' });
+
+    expect(store.isValidating.value).toBe(true);
+    await pendingValidation;
+    expect(store.parse).toHaveBeenCalledExactlyOnceWith({ name: 'John' });
+    expect(store.isValidating.value).toBe(false);
   });
 
   test('should keep dirty state from swap when setting nested field', () => {
