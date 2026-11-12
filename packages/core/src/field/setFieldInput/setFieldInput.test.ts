@@ -124,6 +124,132 @@ describe('setFieldInput', () => {
       expect(store.children.user.isDirty.value).toBe(false);
       expect(getFieldBool(store, 'isDirty')).toBe(false);
     });
+
+    test('should keep nullish input that is set on the field itself', () => {
+      const store = createTestStore(
+        v.variant('kind', [
+          v.object({
+            kind: v.literal('a'),
+            details: v.optional(v.object({ code: v.string() })),
+          }),
+          v.object({
+            kind: v.literal('b'),
+            details: v.object({ code: v.string() }),
+          }),
+        ]),
+        { initialInput: { kind: 'a', details: { code: 'x' } } }
+      );
+
+      setFieldInput(store, ['details'], undefined);
+
+      // The field store of `details` is not nullish, because the last option
+      // requires the key (see #95), but the first option allows clearing it
+      expect(getFieldInput(store)).toStrictEqual({
+        kind: 'a',
+        details: undefined,
+      });
+    });
+
+    test('should keep non-nullish children present when nullish object is set to null', () => {
+      const store = createTestStore(
+        v.object({
+          group: v.nullish(
+            v.object({
+              name: v.string(),
+              items: v.array(v.string()),
+              address: v.object({ city: v.string() }),
+              pair: v.tuple([v.string(), v.string()]),
+            })
+          ),
+        }),
+        {
+          initialInput: {
+            group: {
+              name: 'a',
+              items: ['x'],
+              address: { city: 'c' },
+              pair: ['p', 'q'],
+            },
+          },
+        }
+      );
+
+      setFieldInput(store, ['group'], null);
+      expect(getFieldInput(store)).toStrictEqual({ group: null });
+
+      const groupStore = store.children.group;
+      expect(groupStore.kind).toBe('object');
+      if (groupStore.kind === 'object') {
+        const itemsStore = groupStore.children.items;
+        const pairStore = groupStore.children.pair;
+        expect(itemsStore.kind).toBe('array');
+        expect(pairStore.kind).toBe('array');
+        if (itemsStore.kind === 'array' && pairStore.kind === 'array') {
+          expect(itemsStore.input.value).toBe(true);
+          expect(itemsStore.items.value).toEqual([]);
+          expect(groupStore.children.address.input.value).toBe(true);
+          expect(pairStore.input.value).toBe(true);
+          expect(pairStore.items.value).toHaveLength(2);
+        }
+
+        // Setting a nested child makes the nullish object present again, so
+        // its other children must hold what a newly created form holds
+        setFieldInput(store, ['group', 'name'], 'b');
+        expect(getFieldInput(store)).toStrictEqual({
+          group: {
+            name: 'b',
+            items: [],
+            address: { city: '' },
+            pair: ['', ''],
+          },
+        });
+      }
+    });
+
+    test('should keep omitted non-nullish children present when object input is set', () => {
+      const store = createTestStore(
+        v.variant('kind', [
+          v.object({ kind: v.literal('a') }),
+          v.object({
+            kind: v.literal('b'),
+            name: v.string(),
+            tags: v.array(v.string()),
+          }),
+        ]),
+        { initialInput: { kind: 'b', name: 'x', tags: ['t'] } }
+      );
+
+      setFieldInput(store, [], { kind: 'a' });
+
+      // The first option has no `name` and no `tags`, so they must hold what
+      // a newly created form holds when the other option becomes active
+      setFieldInput(store, ['kind'], 'b');
+      expect(getFieldInput(store)).toStrictEqual({
+        kind: 'b',
+        name: '',
+        tags: [],
+      });
+    });
+
+    test('should not mark omitted fields dirty when they get their start input', () => {
+      const store = createTestStore(
+        v.variant('kind', [
+          v.object({ kind: v.literal('a') }),
+          v.object({
+            kind: v.literal('b'),
+            name: v.string(),
+            tags: v.array(v.string()),
+          }),
+        ]),
+        { initialInput: { kind: 'a' } }
+      );
+
+      setFieldInput(store, [], { kind: 'a' });
+
+      // The omitted fields get the empty input they start with, so the form
+      // stays clean
+      expect(getFieldBool(store, 'isDirty')).toBe(false);
+    });
   });
 
   describe('array fields', () => {
@@ -207,6 +333,29 @@ describe('setFieldInput', () => {
       );
       setFieldInput(store, ['items'], null);
       expect(store.children.items.input.value).toBeNull();
+    });
+
+    test('should keep non-nullish array present below nullish array item that is set to null', () => {
+      const store = createTestStore(
+        v.object({
+          list: v.array(
+            v.nullish(
+              v.object({ name: v.string(), items: v.array(v.string()) })
+            )
+          ),
+        }),
+        { initialInput: { list: [{ name: 'a', items: ['x'] }] } }
+      );
+
+      setFieldInput(store, ['list'], [null]);
+      expect(getFieldInput(store)).toStrictEqual({ list: [null] });
+
+      // Setting a nested child makes the nullish item present again, so its
+      // non-nullish array must not be `undefined` then
+      setFieldInput(store, ['list', 0, 'name'], 'b');
+      expect(getFieldInput(store)).toStrictEqual({
+        list: [{ name: 'b', items: [] }],
+      });
     });
 
     test('should keep a tuple at its fixed length when given a longer input', () => {

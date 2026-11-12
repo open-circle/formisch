@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix `setFieldInput` to treat a missing input of the fields below the one it is set on like `resetItemState` does (a non-nullish array, object or tuple stays present and a non-nullish value field gets its empty input), and `setInitialFieldInput` to keep a non-nullish array, object or tuple present when its initial input is nullish or omitted (issue #266, pull request #267)
+
 ## v1.1.0 (October 31, 2026)
 
 - Add HonoX framework adapter and `@formisch/core/honox` build output that reuses the React signal implementation (issue #175)
