@@ -105,6 +105,74 @@ describe('useField', () => {
         expect(result.isValid).toBe(false);
       });
     });
+
+    test('should keep pending validation when unchanged input is set', () => {
+      const check = vi.fn(() => true);
+      const schema = v.object({
+        email: v.pipe(v.string(), v.check(check)),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
+      const { result } = renderHook(() => {
+        const form = createForm({
+          schema,
+          validate: 'input',
+          initialInput: { email: 'jane@example.com' },
+        });
+        formStore = form;
+        return useField(form, { path: ['email'] });
+      });
+
+      result.onInput('john@example.com');
+
+      expect(check).toHaveBeenCalledOnce();
+      const { validationId } = formStore![INTERNAL];
+
+      result.onInput('john@example.com');
+
+      expect(check).toHaveBeenCalledOnce();
+      expect(formStore![INTERNAL].validationId).toBe(validationId);
+      expect(formStore![INTERNAL].isValidating.value).toBe(true);
+    });
+
+    test('should keep pending validation when unchanged input is entered', () => {
+      const started = vi.fn(() => true);
+      const schema = v.objectAsync({
+        name: v.pipeAsync(
+          v.custom<string>(started),
+          v.checkAsync(() => new Promise<boolean>(() => undefined))
+        ),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
+      function Test(): JSX.Element {
+        const form = createForm({
+          schema,
+          validate: 'input',
+          initialInput: { name: 'initial' },
+        });
+        formStore = form;
+        const field = useField(form, { path: ['name'] });
+        return (
+          <input
+            data-testid="input"
+            {...field.props}
+            value={field.input ?? ''}
+          />
+        );
+      }
+
+      render(() => <Test />);
+
+      const input = screen.getByTestId('input');
+
+      fireEvent.input(input, { target: { value: 'changed' } });
+      expect(started).toHaveBeenCalledOnce();
+      const { validationId } = formStore![INTERNAL];
+
+      fireEvent.input(input, { target: { value: 'changed' } });
+      expect(started).toHaveBeenCalledOnce();
+      expect(formStore![INTERNAL].validationId).toBe(validationId);
+      expect(formStore![INTERNAL].isValidating.value).toBe(true);
+    });
   });
 
   describe('edited state', () => {

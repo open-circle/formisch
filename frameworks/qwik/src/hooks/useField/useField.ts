@@ -101,8 +101,13 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
       () => !getFieldBool(internalFieldStore.value, 'errors')
     ),
     onInput: $((value) => {
-      setFieldInput(internalFormStore, pathSignal.value, value);
-      validateIfRequired(internalFormStore, internalFieldStore.value, 'input');
+      if (setFieldInput(internalFormStore, pathSignal.value, value)) {
+        validateIfRequired(
+          internalFormStore,
+          internalFieldStore.value,
+          'input'
+        );
+      }
     }),
     props: {
       get name() {
@@ -126,16 +131,19 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
         );
       }),
       onInput$: $((_, element) => {
-        setFieldInput(
-          internalFormStore,
-          pathSignal.value,
-          getElementInput(element, internalFieldStore.value)
-        );
-        validateIfRequired(
-          internalFormStore,
-          internalFieldStore.value,
-          'input'
-        );
+        if (
+          setFieldInput(
+            internalFormStore,
+            pathSignal.value,
+            getElementInput(element, internalFieldStore.value)
+          )
+        ) {
+          validateIfRequired(
+            internalFormStore,
+            internalFieldStore.value,
+            'input'
+          );
+        }
       }),
       onChange$: $(() => {
         validateIfRequired(

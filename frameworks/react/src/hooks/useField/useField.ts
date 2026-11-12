@@ -94,9 +94,10 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
         return !getFieldBool(internalFieldStore, 'errors');
       },
       onChange(value) {
-        setFieldInput(internalFormStore, config.path, value);
-        validateIfRequired(internalFormStore, internalFieldStore, 'input');
-        validateIfRequired(internalFormStore, internalFieldStore, 'change');
+        if (setFieldInput(internalFormStore, config.path, value)) {
+          validateIfRequired(internalFormStore, internalFieldStore, 'input');
+          validateIfRequired(internalFormStore, internalFieldStore, 'change');
+        }
       },
       props: {
         name: internalFieldStore.name,
@@ -114,13 +115,16 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
           validateIfRequired(internalFormStore, internalFieldStore, 'touch');
         },
         onChange(event) {
-          setFieldInput(
-            internalFormStore,
-            config.path,
-            getElementInput(event.currentTarget, internalFieldStore)
-          );
-          validateIfRequired(internalFormStore, internalFieldStore, 'input');
-          validateIfRequired(internalFormStore, internalFieldStore, 'change');
+          if (
+            setFieldInput(
+              internalFormStore,
+              config.path,
+              getElementInput(event.currentTarget, internalFieldStore)
+            )
+          ) {
+            validateIfRequired(internalFormStore, internalFieldStore, 'input');
+            validateIfRequired(internalFormStore, internalFieldStore, 'change');
+          }
         },
         onBlur() {
           validateIfRequired(internalFormStore, internalFieldStore, 'blur');

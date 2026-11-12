@@ -83,8 +83,9 @@ export function useField(
       return isValid;
     },
     onInput(value) {
-      setFieldInput(internalFormStore, path, value);
-      validateIfRequired(internalFormStore, internalFieldStore, 'input');
+      if (setFieldInput(internalFormStore, path, value)) {
+        validateIfRequired(internalFormStore, internalFieldStore, 'input');
+      }
     },
     props: {
       get name() {
@@ -117,12 +118,15 @@ export function useField(
         validateIfRequired(internalFormStore, internalFieldStore, 'touch');
       },
       oninput(event) {
-        setFieldInput(
-          internalFormStore,
-          path,
-          getElementInput(event.currentTarget, internalFieldStore)
-        );
-        validateIfRequired(internalFormStore, internalFieldStore, 'input');
+        if (
+          setFieldInput(
+            internalFormStore,
+            path,
+            getElementInput(event.currentTarget, internalFieldStore)
+          )
+        ) {
+          validateIfRequired(internalFormStore, internalFieldStore, 'input');
+        }
       },
       onchange() {
         validateIfRequired(internalFormStore, internalFieldStore, 'change');

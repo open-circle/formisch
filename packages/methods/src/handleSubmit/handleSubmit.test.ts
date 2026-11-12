@@ -244,6 +244,42 @@ describe('handleSubmit', () => {
       }
     );
 
+    test.each(['input', 'blur'] as const)(
+      'should keep pending validation after setInput with unchanged input (revalidate: %s)',
+      async (revalidate) => {
+        type ParseResult = v.SafeParseResult<Schema>;
+        let resolveParse: (value: ParseResult) => void;
+        const pendingParse = new Promise<ParseResult>((resolve) => {
+          resolveParse = resolve;
+        });
+        const store = createTestStore(schema, {
+          initialInput: { name: 'John' },
+          revalidate,
+        });
+        store.parse = vi
+          .fn()
+          .mockReturnValueOnce(pendingParse)
+          .mockImplementation((input: unknown) =>
+            Promise.resolve(v.safeParse(schema, input))
+          );
+        const handler = vi.fn();
+        const pendingSubmission = handleSubmit(store, handler)();
+
+        setInput(store, { path: ['name'], input: 'John' });
+        expect(store.isValidating.value).toBe(true);
+
+        resolveParse!(v.safeParse(schema, { name: 'John' }));
+        await pendingSubmission;
+
+        expect(handler).toHaveBeenCalledExactlyOnceWith(
+          { name: 'John' },
+          undefined
+        );
+        expect(store.parse).toHaveBeenCalledOnce();
+        expect(store.isSubmitting.value).toBe(false);
+      }
+    );
+
     test.each([false, true])(
       'should preserve newer submission state when an old handler finishes (reset: %s)',
       async (shouldReset) => {
