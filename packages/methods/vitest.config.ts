@@ -3,10 +3,15 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   resolve: {
-    alias: {
+    alias: [
       // Use the react build of @formisch/core for testing
-      '@formisch/core': path.resolve(__dirname, '../core/dist/index.react.js'),
-    },
+      // Hint: Only the exact specifier is matched, so that framework variants
+      // can import their own entry point (e.g. @formisch/core/react-native).
+      {
+        find: /^@formisch\/core$/,
+        replacement: path.resolve(__dirname, '../core/dist/index.react.js'),
+      },
+    ],
   },
   test: {
     environment: 'jsdom',
