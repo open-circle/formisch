@@ -14,11 +14,14 @@ import { initializeFieldStore } from '../initializeFieldStore/index.ts';
  * @param internalFormStore The form store providing the empty input config.
  * @param internalFieldStore The field store to update.
  * @param input The new input value.
+ * @param belowNullish Whether the field store is below an array or object
+ * that is set to a nullish value.
  */
 function setNestedInput(
   internalFormStore: InternalFormStore,
   internalFieldStore: InternalFieldStore,
-  input: unknown
+  input: unknown,
+  belowNullish = false
 ): void {
   // Mark field as touched and edited
   internalFieldStore.isTouched.value = true;
@@ -95,12 +98,22 @@ function setNestedInput(
         internalFormStore,
         internalFieldStore.children[index],
         // @ts-expect-error
-        arrayInput[index]
+        arrayInput[index],
+        input == null
       );
     }
 
-    // Set array input
-    internalFieldStore.input.value = input == null ? input : true;
+    // Set array input (nullish or true)
+    // Hint: Below an array or object that is set to a nullish value, only a
+    // nullish array or tuple keeps a nullish input. A non-nullish one stays
+    // present (`true`), an array without items and a tuple at its fixed
+    // length, the same way `initializeFieldStore` and `resetItemState`
+    // represent it. Otherwise it would be `undefined` once a later input makes
+    // its parent present again.
+    internalFieldStore.input.value =
+      input == null && (internalFieldStore.isNullish || !belowNullish)
+        ? input
+        : true;
 
     // Update dirty state based on input or items length change
     internalFieldStore.isDirty.value =
@@ -117,12 +130,21 @@ function setNestedInput(
         internalFormStore,
         internalFieldStore.children[key],
         // @ts-expect-error
-        input?.[key]
+        input?.[key],
+        input == null
       );
     }
 
-    // Set object input
-    internalFieldStore.input.value = input == null ? input : true;
+    // Set object input (nullish or true)
+    // Hint: Below an array or object that is set to a nullish value, only a
+    // nullish object keeps a nullish input. A non-nullish one stays present
+    // (`true`), the same way `initializeFieldStore` and `resetItemState`
+    // represent it. Otherwise it would be `undefined` once a later input makes
+    // its parent present again.
+    internalFieldStore.input.value =
+      input == null && (internalFieldStore.isNullish || !belowNullish)
+        ? input
+        : true;
 
     // Update dirty state based on input change
     internalFieldStore.isDirty.value =

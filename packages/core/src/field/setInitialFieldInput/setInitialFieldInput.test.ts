@@ -36,6 +36,33 @@ describe('setInitialFieldInput', () => {
       // Current input is not affected by setting the initial input
       expect(store.children.user.input.value).toBe(true);
     });
+
+    test('should keep non-nullish object present when initial input is nullish', () => {
+      const store = createTestStore(
+        v.object({ user: v.object({ name: v.string() }) }),
+        { initialInput: { user: { name: 'John' } } }
+      );
+      setInitialFieldInput(store, store.children.user, undefined);
+      // A non-nullish object stays present (`true`) instead of becoming
+      // `undefined`, matching how `initializeFieldStore` represents it
+      expect(store.children.user.initialInput.value).toBe(true);
+    });
+
+    test('should keep omitted non-nullish children present', () => {
+      const store = createTestStore(
+        v.object({
+          name: v.string(),
+          items: v.array(v.string()),
+          address: v.object({ city: v.string() }),
+        }),
+        {
+          initialInput: { name: 'a', items: ['x'], address: { city: 'c' } },
+        }
+      );
+      setInitialFieldInput(store, store, { name: 'b' });
+      expect(store.children.items.initialInput.value).toBe(true);
+      expect(store.children.address.initialInput.value).toBe(true);
+    });
   });
 
   describe('array fields', () => {
@@ -74,6 +101,35 @@ describe('setInitialFieldInput', () => {
       expect(store.children.items.initialInput.value).toBeNull();
       // Current input is not affected by setting the initial input
       expect(store.children.items.input.value).toBe(true);
+    });
+
+    test('should set non-nullish array to present empty when initial input is nullish', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b'] },
+      });
+      const itemsStore = store.children.items;
+      setInitialFieldInput(store, itemsStore, null);
+      expect(itemsStore.kind).toBe('array');
+      if (itemsStore.kind === 'array') {
+        // A non-nullish array stays a present empty array (`true`) instead of
+        // becoming `null`, matching how `initializeFieldStore` represents it
+        expect(itemsStore.initialInput.value).toBe(true);
+        expect(itemsStore.initialItems.value).toEqual([]);
+      }
+    });
+
+    test('should keep a non-nullish tuple at its fixed length when initial input is nullish', () => {
+      const store = createTestStore(
+        v.object({ pair: v.tuple([v.string(), v.number()]) }),
+        { initialInput: { pair: ['a', 1] } }
+      );
+      const pairStore = store.children.pair;
+      setInitialFieldInput(store, pairStore, undefined);
+      expect(pairStore.kind).toBe('array');
+      if (pairStore.kind === 'array') {
+        expect(pairStore.initialInput.value).toBe(true);
+        expect(pairStore.initialItems.value).toHaveLength(2);
+      }
     });
 
     test('should set initial input on existing children', () => {
