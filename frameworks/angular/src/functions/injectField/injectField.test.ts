@@ -93,7 +93,7 @@ describe('injectField', () => {
 
   it('keeps pending validation when unchanged input is set', () => {
     const check = vi.fn(() => true);
-    const { field } = TestBed.runInInjectionContext(() => {
+    const { form, field } = TestBed.runInInjectionContext(() => {
       const form = injectForm({
         schema: v.object({ email: v.pipe(v.string(), v.check(check)) }),
         validate: 'input',
@@ -103,14 +103,17 @@ describe('injectField', () => {
 
     field.setInput('test@example.com');
     expect(check).toHaveBeenCalledOnce();
+    const { validationId } = form[INTERNAL];
 
     field.setInput('test@example.com');
     expect(check).toHaveBeenCalledOnce();
+    expect(form[INTERNAL].validationId).toBe(validationId);
+    expect(form[INTERNAL].isValidating.value).toBe(true);
   });
 
   it('keeps pending validation when the control onInput is called with unchanged input', () => {
     const check = vi.fn(() => true);
-    const { field } = TestBed.runInInjectionContext(() => {
+    const { form, field } = TestBed.runInInjectionContext(() => {
       const form = injectForm({
         schema: v.object({ email: v.pipe(v.string(), v.check(check)) }),
         validate: 'input',
@@ -122,9 +125,12 @@ describe('injectField', () => {
 
     field[CONTROL].onInput({ target: element } as unknown as Event);
     expect(check).toHaveBeenCalledOnce();
+    const { validationId } = form[INTERNAL];
 
     field[CONTROL].onInput({ target: element } as unknown as Event);
     expect(check).toHaveBeenCalledOnce();
+    expect(form[INTERNAL].validationId).toBe(validationId);
+    expect(form[INTERNAL].isValidating.value).toBe(true);
   });
 
   it('does not change the input value when the control onChange is called', () => {

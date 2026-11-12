@@ -111,14 +111,17 @@ describe('useField', () => {
 
     test('should keep pending validation when unchanged input is set', () => {
       const check = vi.fn(() => true);
+      const schema = v.object({
+        email: v.pipe(v.string(), v.check(check)),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
       const { result } = renderHook(() => {
         const form = useForm({
-          schema: v.object({
-            email: v.pipe(v.string(), v.check(check)),
-          }),
+          schema,
           validate: 'input',
           initialInput: { email: 'jane@example.com' },
         });
+        formStore = form;
         return useField(form, { path: ['email'] });
       });
 
@@ -127,29 +130,35 @@ describe('useField', () => {
       });
 
       expect(check).toHaveBeenCalledOnce();
+      const { validationId } = formStore![INTERNAL];
 
       act(() => {
         result.current.onChange('john@example.com');
       });
 
       expect(check).toHaveBeenCalledOnce();
+      expect(formStore![INTERNAL].validationId).toBe(validationId);
+      expect(formStore![INTERNAL].isValidating.value).toBe(true);
     });
 
     // React only reports a change of an element whose value differs, so a
     // second element of the field enters the unchanged input
     test('should keep pending validation when unchanged input is entered', () => {
       const started = vi.fn(() => true);
+      const schema = v.objectAsync({
+        name: v.pipeAsync(
+          v.custom<string>(started),
+          v.checkAsync(() => new Promise<boolean>(() => undefined))
+        ),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
       function Test(): ReactElement {
         const form = useForm({
-          schema: v.objectAsync({
-            name: v.pipeAsync(
-              v.custom<string>(started),
-              v.checkAsync(() => new Promise<boolean>(() => undefined))
-            ),
-          }),
+          schema,
           validate: 'input',
           initialInput: { name: 'initial' },
         });
+        formStore = form;
         const field = useField(form, { path: ['name'] });
         return (
           <>
@@ -165,11 +174,14 @@ describe('useField', () => {
         target: { value: 'changed' },
       });
       expect(started).toHaveBeenCalledOnce();
+      const { validationId } = formStore![INTERNAL];
 
       fireEvent.change(screen.getByTestId('second'), {
         target: { value: 'changed' },
       });
       expect(started).toHaveBeenCalledOnce();
+      expect(formStore![INTERNAL].validationId).toBe(validationId);
+      expect(formStore![INTERNAL].isValidating.value).toBe(true);
     });
   });
 

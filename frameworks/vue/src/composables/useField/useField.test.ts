@@ -104,24 +104,30 @@ describe('useField', () => {
 
     test('should keep pending validation when unchanged input is set', () => {
       const check = vi.fn(() => true);
+      const schema = v.object({
+        email: v.pipe(v.string(), v.check(check)),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
       const { result } = renderHook(() => {
         const form = useForm({
-          schema: v.object({
-            email: v.pipe(v.string(), v.check(check)),
-          }),
+          schema,
           validate: 'input',
           initialInput: { email: 'jane@example.com' },
         });
+        formStore = form;
         return useField(form, { path: ['email'] });
       });
 
       result.current.input = 'john@example.com';
 
       expect(check).toHaveBeenCalledOnce();
+      const { validationId } = formStore![INTERNAL];
 
       result.current.input = 'john@example.com';
 
       expect(check).toHaveBeenCalledOnce();
+      expect(formStore![INTERNAL].validationId).toBe(validationId);
+      expect(formStore![INTERNAL].isValidating.value).toBe(true);
     });
 
     // Vue has no untrack, so the comparison with the current input must not
