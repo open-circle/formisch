@@ -4,7 +4,7 @@ All notable changes to the library will be documented in this file.
 
 ## vX.X.X (Month DD, YYYY)
 
-- Fix field input updates to keep pending validation results when they leave the form input unchanged
+- Fix field input updates to keep pending validation results when they leave the form input unchanged (issue #260, pull request #261)
 
 ## v1.1.0 (October 31, 2026)
 
