@@ -1,6 +1,7 @@
 import { resetItemState } from '../../array/resetItemState/index.ts';
 import { batch, createId, untrack } from '../../framework/index.ts';
 import type {
+  EmptyInput,
   InternalFieldStore,
   InternalFormStore,
   Path,
@@ -14,14 +15,14 @@ import { initializeFieldStore } from '../initializeFieldStore/index.ts';
  * @param internalFormStore The form store providing the empty input config.
  * @param internalFieldStore The field store to update.
  * @param input The new input value.
- * @param belowNullish Whether the field store is below an array or object
- * that is set to a nullish value.
+ * @param isNested Whether the field store is below the field store that the
+ * input is set on.
  */
 function setNestedInput(
   internalFormStore: InternalFormStore,
   internalFieldStore: InternalFieldStore,
   input: unknown,
-  belowNullish = false
+  isNested = false
 ): void {
   // Mark field as touched and edited
   internalFieldStore.isTouched.value = true;
@@ -99,19 +100,18 @@ function setNestedInput(
         internalFieldStore.children[index],
         // @ts-expect-error
         arrayInput[index],
-        input == null
+        true
       );
     }
 
     // Set array input (nullish or true)
-    // Hint: Below an array or object that is set to a nullish value, only a
-    // nullish array or tuple keeps a nullish input. A non-nullish one stays
-    // present (`true`), an array without items and a tuple at its fixed
-    // length, the same way `initializeFieldStore` and `resetItemState`
-    // represent it. Otherwise it would be `undefined` once a later input makes
-    // its parent present again.
+    // Hint: Below the field that the input is set on, only a nullish array or
+    // tuple keeps a nullish input. A non-nullish one stays present (`true`)
+    // when its input is missing, an array without items and a tuple at its
+    // fixed length, the same way `initializeFieldStore` and `resetItemState`
+    // represent it.
     internalFieldStore.input.value =
-      input == null && (internalFieldStore.isNullish || !belowNullish)
+      input == null && (internalFieldStore.isNullish || !isNested)
         ? input
         : true;
 
@@ -131,18 +131,17 @@ function setNestedInput(
         internalFieldStore.children[key],
         // @ts-expect-error
         input?.[key],
-        input == null
+        true
       );
     }
 
     // Set object input (nullish or true)
-    // Hint: Below an array or object that is set to a nullish value, only a
-    // nullish object keeps a nullish input. A non-nullish one stays present
-    // (`true`), the same way `initializeFieldStore` and `resetItemState`
-    // represent it. Otherwise it would be `undefined` once a later input makes
-    // its parent present again.
+    // Hint: Below the field that the input is set on, only a nullish object
+    // keeps a nullish input. A non-nullish one stays present (`true`) when its
+    // input is missing, the same way `initializeFieldStore` and
+    // `resetItemState` represent it.
     internalFieldStore.input.value =
-      input == null && (internalFieldStore.isNullish || !belowNullish)
+      input == null && (internalFieldStore.isNullish || !isNested)
         ? input
         : true;
 
@@ -152,8 +151,19 @@ function setNestedInput(
 
     // Otherwise, handle value field input
   } else {
+    // Get value input (empty input if missing)
+    // Hint: Below the field that the input is set on, a non-nullish value
+    // field falls back to the empty input for its type when its input is
+    // missing, the same way `initializeFieldStore` and `resetItemState` do.
+    const valueInput =
+      isNested && input === undefined && !internalFieldStore.isNullish
+        ? internalFormStore.emptyInput[
+            internalFieldStore.schema.type as keyof EmptyInput
+          ]
+        : input;
+
     // Set value input
-    internalFieldStore.input.value = input;
+    internalFieldStore.input.value = valueInput;
 
     // TODO: Should we add support for Dates and Files?
     // Get start input for comparison
@@ -161,10 +171,10 @@ function setNestedInput(
 
     // Update dirty state with special handling for empty string and NaN
     internalFieldStore.isDirty.value =
-      startInput !== input &&
+      startInput !== valueInput &&
       // Hint: This check ensures that an empty string or `NaN` does not mark
       // the field as dirty if the start input was `undefined` or `null`.
-      (startInput != null || (input !== '' && !Number.isNaN(input)));
+      (startInput != null || (valueInput !== '' && !Number.isNaN(valueInput)));
   }
 }
 

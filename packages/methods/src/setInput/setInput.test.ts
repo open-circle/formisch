@@ -102,6 +102,21 @@ describe('setInput', () => {
     });
   });
 
+  test('should keep omitted non-nullish array present when other variant option is set', () => {
+    const store = createTestStore(
+      v.variant('kind', [
+        v.object({ kind: v.literal('a') }),
+        v.object({ kind: v.literal('b'), tags: v.array(v.string()) }),
+      ]),
+      { initialInput: { kind: 'b', tags: ['t'] } }
+    );
+
+    setInput(store, { input: { kind: 'a' } });
+    setInput(store, { path: ['kind'], input: 'b' });
+
+    expect(getInput(store)).toStrictEqual({ kind: 'b', tags: [] });
+  });
+
   test('should set full form input', () => {
     const store = createTestStore(
       v.object({ name: v.string(), age: v.number() }),

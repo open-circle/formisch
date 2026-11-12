@@ -193,10 +193,62 @@ describe('setFieldInput', () => {
         }
 
         // Setting a nested child makes the nullish object present again, so
-        // its non-nullish array must not be `undefined` then
+        // its other children must hold what a newly created form holds
         setFieldInput(store, ['group', 'name'], 'b');
-        expect(getFieldInput(itemsStore)).toStrictEqual([]);
+        expect(getFieldInput(store)).toStrictEqual({
+          group: {
+            name: 'b',
+            items: [],
+            address: { city: '' },
+            pair: ['', ''],
+          },
+        });
       }
+    });
+
+    test('should keep omitted non-nullish children present when object input is set', () => {
+      const store = createTestStore(
+        v.variant('kind', [
+          v.object({ kind: v.literal('a') }),
+          v.object({
+            kind: v.literal('b'),
+            name: v.string(),
+            tags: v.array(v.string()),
+          }),
+        ]),
+        { initialInput: { kind: 'b', name: 'x', tags: ['t'] } }
+      );
+
+      setFieldInput(store, [], { kind: 'a' });
+
+      // The first option has no `name` and no `tags`, so they must hold what
+      // a newly created form holds when the other option becomes active
+      setFieldInput(store, ['kind'], 'b');
+      expect(getFieldInput(store)).toStrictEqual({
+        kind: 'b',
+        name: '',
+        tags: [],
+      });
+    });
+
+    test('should not mark omitted fields dirty when they get their start input', () => {
+      const store = createTestStore(
+        v.variant('kind', [
+          v.object({ kind: v.literal('a') }),
+          v.object({
+            kind: v.literal('b'),
+            name: v.string(),
+            tags: v.array(v.string()),
+          }),
+        ]),
+        { initialInput: { kind: 'a' } }
+      );
+
+      setFieldInput(store, [], { kind: 'a' });
+
+      // The omitted fields get the empty input they start with, so the form
+      // stays clean
+      expect(getFieldBool(store, 'isDirty')).toBe(false);
     });
   });
 
