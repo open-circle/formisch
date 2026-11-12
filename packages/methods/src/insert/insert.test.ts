@@ -1,5 +1,6 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
+import { getInput } from '../getInput/getInput.ts';
 import { createTestStore, initializeChildSlot } from '../vitest/index.ts';
 import { insert } from './insert.ts';
 
@@ -284,6 +285,46 @@ describe('insert', () => {
       expect(groupsStore.children).toEqual([]);
       expect(groupsStore.isDirty.value).toBe(false);
     }
+  });
+
+  test.each([-1, 1])(
+    'should ignore out-of-range index %i below nullish parent',
+    (at) => {
+      const store = createTestStore(
+        v.object({
+          group: v.nullish(v.object({ items: v.array(v.string()) })),
+        }),
+        { initialInput: { group: null } }
+      );
+
+      insert(store, { path: ['group', 'items'], at, initialInput: 'foo' });
+
+      const groupStore = store.children.group;
+      expect(groupStore.input.value).toBeNull();
+      expect(groupStore.kind).toBe('object');
+      if (groupStore.kind === 'object') {
+        const itemsStore = groupStore.children.items;
+        expect(itemsStore.kind).toBe('array');
+        if (itemsStore.kind === 'array') {
+          expect(itemsStore.items.value).toEqual([]);
+        }
+      }
+      expect(getInput(store)).toEqual({ group: null });
+    }
+  );
+
+  test('should mark nullish parent as present when inserting item', () => {
+    const store = createTestStore(
+      v.object({
+        group: v.nullish(v.object({ items: v.array(v.string()) })),
+      }),
+      { initialInput: { group: null } }
+    );
+
+    insert(store, { path: ['group', 'items'], initialInput: 'foo' });
+
+    expect(store.children.group.input.value).toBe(true);
+    expect(getInput(store)).toEqual({ group: { items: ['foo'] } });
   });
 
   test('should insert into nested array', () => {
