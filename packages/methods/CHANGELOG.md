@@ -4,7 +4,7 @@ All notable changes to the library will be documented in this file.
 
 ## vX.X.X (Month DD, YYYY)
 
-- Fix `reset` with `keepInput` to give the kept items of a field array of another length the start items of their index, so the array is clean again when its input is set to its start input
+- Fix `reset` with `keepInput` to give the kept items of a field array of another length the start items of their index, so the array is clean again when its input is set to its start input (issue #269, pull request #270)
 
 ## v1.1.0 (October 31, 2026)
 
