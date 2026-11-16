@@ -358,7 +358,7 @@ Coming from Formik with Yup? Most rules have a close Valibot match. `.required()
 
 Coming from React Hook Form? Each `Controller` becomes a `Field`, and `mode` and `reValidateMode` become `validate` and `revalidate`. The [React Hook Form migration guide](https://formisch.dev/react-native/guides/migrate-from-react-hook-form/) covers the rest. If you use TanStack Form, there's a [TanStack Form migration guide](https://formisch.dev/react-native/guides/migrate-from-tanstack-form/) too.
 
-Are your rules written in Zod? Formisch only works with Valibot, but Valibot's [Zod migration guide](https://valibot.dev/guides/migrate-from-zod/) includes a codemod that converts most Zod schemas for you. It's still in beta, so check the output before you use it.
+Are your rules written in Zod? Formisch only works with Valibot for now, and Zod support is planned. Until then, Valibot's [Zod migration guide](https://valibot.dev/guides/migrate-from-zod/) includes a codemod that converts most Zod schemas for you. It's still in beta, so check the output before you use it.
 
 ## Frequently asked questions
 
@@ -368,7 +368,7 @@ React Native doesn't have built-in form validation. It gives you inputs and butt
 
 ### Which libraries can you use for form validation in React Native?
 
-Common choices are React Hook Form, Formik, TanStack Form and Formisch. They all work in React Native, and most of them let you write your rules with a schema library like Valibot, Zod or Yup. Formisch works with Valibot only.
+Common choices are React Hook Form, Formik, TanStack Form and Formisch. They all work in React Native, and most of them let you write your rules with a schema library like Valibot, Zod or Yup. Formisch works with Valibot only for now, with Zod support planned.
 
 ### How do you check that two passwords match in React Native?
 
@@ -380,4 +380,4 @@ That's what Formisch does by default. If you leave out `validate` in `useForm`, 
 
 ### Can you use Zod with Formisch?
 
-Formisch only works with Valibot schemas. If your rules are already in Zod, Valibot's codemod can convert most of them for you.
+Not yet, but Zod support is planned. For now, Formisch only works with Valibot schemas. If your rules are already in Zod, Valibot's codemod can convert most of them for you. It's still in beta, so check the output before you use it.
