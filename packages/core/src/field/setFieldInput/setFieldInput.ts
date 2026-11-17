@@ -44,8 +44,31 @@ function setNestedInput(
 
       // Otherwise, if new array is longer, extend items
     } else if (length > items.length) {
+      // Get start items and copy current items
+      const startItems = internalFieldStore.startItems.value;
+      let newStartItems: string[] | undefined;
+      const newItems = [...items];
+
       // Initialize or reset each newly visible child
       for (let index = items.length; index < length; index++) {
+        // Add new item for child
+        const newItem = createId();
+        newItems.push(newItem);
+
+        // If index has start item, replace it with new item
+        // Hint: The new item takes the place of the start item of its index,
+        // so that an array that is set back to its start input is not
+        // detected as dirty by the item ID comparison below, while the
+        // regrown child still gets a new item like any other. This also
+        // applies to an index without a child store, whose start item was
+        // moved in from another array by `swapItemState` or `copyItemState`.
+        // The start items are copied first, because they may be the same
+        // array as the initial items.
+        if (index < startItems.length) {
+          newStartItems ??= [...startItems];
+          newStartItems[index] = newItem;
+        }
+
         // Reset the reused stale child but keep its start input as baseline
         // Hint: A child store from a previously longer array still holds stale
         // errors and nested values that must be cleared, but its `startInput`
@@ -80,12 +103,14 @@ function setNestedInput(
         }
       }
 
+      // Replace start items if regrown items took their place
+      if (newStartItems) {
+        internalFieldStore.startItems.value = newStartItems;
+      }
+
       // Extend items array with new items, capped to the clamped length so a
       // tuple never grows beyond its fixed number of children
-      internalFieldStore.items.value = [
-        ...items,
-        ...Array.from({ length: length - items.length }, createId),
-      ];
+      internalFieldStore.items.value = newItems;
     }
 
     // Set input for each array item
@@ -102,11 +127,15 @@ function setNestedInput(
     // Set array input
     internalFieldStore.input.value = input == null ? input : true;
 
-    // Update dirty state based on input or items length change
+    // Update dirty state based on input or items change
+    // Hint: Item IDs are compared like in the parent traversal below, so a
+    // dirty state from a changed length, order or item (e.g. after `swap`,
+    // `move`, `remove`, `insert` or `replace`) is preserved when the input
+    // of the array is set.
     internalFieldStore.isDirty.value =
       internalFieldStore.startInput.value !== internalFieldStore.input.value ||
-      internalFieldStore.startItems.value.length !==
-        internalFieldStore.items.value.length;
+      internalFieldStore.startItems.value.join() !==
+        internalFieldStore.items.value.join();
 
     // Otherwise, if field store is object, handle object input
   } else if (internalFieldStore.kind === 'object') {

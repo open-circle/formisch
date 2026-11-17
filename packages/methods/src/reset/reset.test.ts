@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
+import { insert } from '../insert/insert.ts';
+import { isDirty } from '../isDirty/isDirty.ts';
+import { remove } from '../remove/remove.ts';
 import { setInput } from '../setInput/setInput.ts';
 import { validate } from '../validate/validate.ts';
 import { createTestStore } from '../vitest/index.ts';
@@ -669,6 +672,106 @@ describe('reset', () => {
       if (itemsStore.kind === 'array') {
         expect(itemsStore.items.value).toEqual(itemsStore.initialItems.value);
       }
+    });
+
+    test('should give kept items of other length their start items with keepInput', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b'] },
+      });
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+
+      // Insert an item at the start so that the start items move up
+      insert(store, { path: ['items'], at: 0, initialInput: 'x' });
+
+      reset(store, { keepInput: true });
+
+      if (itemsStore.kind === 'array') {
+        // The first two items are the start items of their index again and
+        // the third keeps no ID of a start item
+        expect(itemsStore.items.value).toHaveLength(3);
+        expect(itemsStore.items.value.slice(0, 2)).toEqual(
+          itemsStore.startItems.value
+        );
+        expect(itemsStore.startItems.value).not.toContain(
+          itemsStore.items.value[2]
+        );
+      }
+      expect(isDirty(store)).toBe(true);
+    });
+
+    test('should keep ID of kept item beyond start items with keepInput', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b'] },
+      });
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+
+      insert(store, { path: ['items'], initialInput: 'x' });
+
+      if (itemsStore.kind === 'array') {
+        const insertedItem = itemsStore.items.value[2];
+
+        reset(store, { keepInput: true });
+
+        // The appended item is no start item, so its ID is kept
+        expect(itemsStore.items.value).toEqual([
+          ...itemsStore.startItems.value,
+          insertedItem,
+        ]);
+      }
+    });
+
+    test('should be clean when a shorter kept array grows back to its start input with keepInput', () => {
+      const store = createTestStore(
+        v.object({ rows: v.array(v.object({ tags: v.array(v.string()) })) }),
+        { initialInput: { rows: [{ tags: ['y', 'y'] }] } }
+      );
+
+      // Change the items of the nested array, then hide its row
+      remove(store, { path: ['rows', 0, 'tags'], at: 0 });
+      setInput(store, { path: ['rows'], input: [] });
+
+      reset(store, { keepInput: true });
+      expect(isDirty(store)).toBe(true);
+
+      // The hidden row is reset with its start input as baseline when the
+      // array grows again, so the array is clean
+      setInput(store, { path: ['rows'], input: [{ tags: ['y', 'y'] }] });
+
+      expect(isDirty(store)).toBe(false);
+    });
+
+    test('should be clean when start input is set after keepInput kept a shorter array', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b'] },
+      });
+
+      // Remove the first item, so that the remaining item is not the start
+      // item of its index
+      remove(store, { path: ['items'], at: 0 });
+      reset(store, { keepInput: true });
+      expect(isDirty(store)).toBe(true);
+
+      setInput(store, { path: ['items'], input: ['a', 'b'] });
+
+      expect(isDirty(store)).toBe(false);
+    });
+
+    test('should be clean when new initial input is set after keepInput kept a shorter array', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b'] },
+      });
+
+      reset(store, {
+        initialInput: { items: ['a', 'b', 'c'] },
+        keepInput: true,
+      });
+      expect(isDirty(store)).toBe(true);
+
+      setInput(store, { path: ['items'], input: ['a', 'b', 'c'] });
+
+      expect(isDirty(store)).toBe(false);
     });
 
     test('should reset nested array field state', () => {

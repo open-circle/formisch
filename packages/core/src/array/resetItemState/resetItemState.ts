@@ -18,8 +18,10 @@ import type {
  * @param internalFieldStore The field store to reset.
  * @param input The new input value (can be any type including array or object).
  * @param keepStart Whether to keep `startInput` and `startItems` as the dirty
- * baseline instead of resetting them to the new input. Used when a field store
- * is reused for an in-place edit so its dirty state is detected correctly.
+ * baseline instead of resetting them to the new input. The new items of an
+ * array then take the place of its start items by index. Used when a field
+ * store is reused for an in-place edit so its dirty state is detected
+ * correctly.
  */
 export function resetItemState(
   internalFormStore: InternalFormStore,
@@ -88,8 +90,21 @@ export function resetItemState(
           // Create new items array with unique IDs for each item
           const newItems = Array.from({ length }, createId);
 
-          // Set start items unless they are kept as the dirty baseline
-          if (!keepStart) {
+          // If start items are kept as dirty baseline, let new items take
+          // place of start items of their index
+          // Hint: Only the IDs of the start items change, so the item ID
+          // comparison only detects the reset array as dirty if its length
+          // differs from its start items, while frameworks still render the
+          // new items anew. The start items are copied, because they may be
+          // the same array as the initial items.
+          if (keepStart) {
+            internalFieldStore.startItems.value =
+              internalFieldStore.startItems.value.map((item, index) =>
+                index < length ? newItems[index] : item
+              );
+
+            // Otherwise, set start items to new items
+          } else {
             internalFieldStore.startItems.value = newItems;
           }
 

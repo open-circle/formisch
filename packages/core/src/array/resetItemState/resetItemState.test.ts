@@ -204,11 +204,36 @@ describe('resetItemState', () => {
 
         resetItemState(store, itemsStore, ['x', 'y', 'z'], true);
 
-        // Current items grow to the new length while the start items are kept
+        // Current items grow to the new length while the start items keep
+        // their length
         expect(itemsStore.items.value.length).toBe(3);
-        expect(itemsStore.startItems.value).toBe(startItems);
+        expect(itemsStore.startItems.value).toHaveLength(startItems.length);
         expect(itemsStore.children[0].input.value).toBe('x');
         expect(itemsStore.children[0].startInput.value).toBe('a');
+      }
+    });
+
+    test('should let new items take the place of kept start items', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b'] },
+      });
+
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+
+      if (itemsStore.kind === 'array') {
+        const initialItems = [...itemsStore.initialItems.value];
+
+        resetItemState(store, itemsStore, ['x', 'y', 'z'], true);
+
+        // All items are new, the first two take the place of the start items
+        // of their index, so the array is only detected as dirty by its
+        // length, and the initial items are unchanged
+        expect(initialItems).not.toContain(itemsStore.items.value[0]);
+        expect(itemsStore.startItems.value).toStrictEqual(
+          itemsStore.items.value.slice(0, 2)
+        );
+        expect(itemsStore.initialItems.value).toStrictEqual(initialItems);
       }
     });
   });

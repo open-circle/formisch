@@ -2,6 +2,11 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix `setFieldInput` to compare the item IDs of a field array with its start items, like `swap`, `move` and `remove`, when the input of the array, of a parent field or of the form is set, so a dirty state from reordering, removing, inserting or replacing items is no longer dropped by a comparison of the lengths (issue #269, pull request #270)
+- Fix `setFieldInput` to let the new item of a regrown index of a field array take the place of the start item of that index, so an array that is set back to its start input is no longer detected as dirty when a nested field is set afterwards (issue #269, pull request #270)
+
 ## v1.1.0 (October 31, 2026)
 
 - Add HonoX framework adapter and `@formisch/core/honox` build output that reuses the React signal implementation (issue #175)

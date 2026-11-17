@@ -1,6 +1,7 @@
 import {
   type BaseFormStore,
   batch,
+  createId,
   type DeepPartial,
   type FormSchema,
   getFieldStore,
@@ -184,6 +185,26 @@ export function reset(
             ) {
               internalFieldStore.items.value =
                 internalFieldStore.initialItems.value;
+
+              // Otherwise, give kept items start item of their index
+              // Hint: The children of kept items are compared with the start
+              // input of their index from now on, so the items must not keep
+              // IDs that differ from the start items either. Otherwise, the
+              // item ID comparison of `setFieldInput` would detect the array
+              // as dirty even when its input is set to its start input later.
+              // An item beyond the start items keeps its ID, unless it is the
+              // ID of a start item.
+            } else {
+              const startItems = internalFieldStore.startItems.value;
+              const startItemSet = new Set(startItems);
+              internalFieldStore.items.value =
+                internalFieldStore.items.value.map((item, index) =>
+                  index < startItems.length
+                    ? startItems[index]
+                    : startItemSet.has(item)
+                      ? createId()
+                      : item
+                );
             }
 
             // Update is dirty to reflect changes

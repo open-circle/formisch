@@ -1,5 +1,10 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
+import { insert } from '../insert/insert.ts';
+import { isDirty } from '../isDirty/isDirty.ts';
+import { move } from '../move/move.ts';
+import { remove } from '../remove/remove.ts';
+import { replace } from '../replace/replace.ts';
 import { swap } from '../swap/swap.ts';
 import { createTestStore } from '../vitest/index.ts';
 import { setInput } from './setInput.ts';
@@ -118,5 +123,151 @@ describe('setInput', () => {
     setInput(store, { path: ['items', 0, 'name'], input: 'b' });
 
     expect(store.children.items.isDirty.value).toBe(true);
+  });
+
+  test('should stay clean when setting nested field after array input was shrunk and regrown', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [{ name: 'a' }, { name: 'b' }] } }
+    );
+
+    setInput(store, { path: ['items'], input: [{ name: 'a' }] });
+    setInput(store, {
+      path: ['items'],
+      input: [{ name: 'a' }, { name: 'b' }],
+    });
+    expect(isDirty(store)).toBe(false);
+
+    // Setting a nested field to the input it has must not mark the array as
+    // dirty, as its regrown item took the place of its start item
+    setInput(store, { path: ['items', 0, 'name'], input: 'a' });
+
+    expect(isDirty(store)).toBe(false);
+  });
+
+  test('should be clean again when a moved nested array is regrown and moved back', () => {
+    const store = createTestStore(
+      v.object({ rows: v.array(v.object({ tags: v.array(v.string()) })) }),
+      { initialInput: { rows: [{ tags: ['x'] }, { tags: [] }] } }
+    );
+
+    setInput(store, { path: ['rows', 0, 'tags'], input: [] });
+    swap(store, { path: ['rows'], at: 0, and: 1 });
+    setInput(store, { path: ['rows', 1, 'tags'], input: ['x'] });
+    expect(isDirty(store)).toBe(true);
+
+    // Swapping back restores the start input, and the regrown item of the
+    // nested array took the place of its start item
+    swap(store, { path: ['rows'], at: 0, and: 1 });
+
+    expect(isDirty(store)).toBe(false);
+  });
+
+  test('should keep dirty state from swap when setting array input', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [{ name: 'a' }, { name: 'b' }] } }
+    );
+
+    swap(store, { path: ['items'], at: 0, and: 1 });
+    expect(isDirty(store)).toBe(true);
+
+    // Setting the array to the input it already has must not clear its dirty
+    // state, as its item order still differs from the baseline
+    setInput(store, {
+      path: ['items'],
+      input: [{ name: 'b' }, { name: 'a' }],
+    });
+
+    expect(isDirty(store)).toBe(true);
+  });
+
+  test('should keep dirty state from swap when setting form input', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [{ name: 'a' }, { name: 'b' }] } }
+    );
+
+    swap(store, { path: ['items'], at: 0, and: 1 });
+    expect(isDirty(store)).toBe(true);
+
+    setInput(store, { input: { items: [{ name: 'b' }, { name: 'a' }] } });
+
+    expect(isDirty(store)).toBe(true);
+  });
+
+  test('should keep dirty state from move when setting array input', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      {
+        initialInput: { items: [{ name: 'a' }, { name: 'b' }, { name: 'c' }] },
+      }
+    );
+
+    move(store, { path: ['items'], from: 0, to: 2 });
+    expect(isDirty(store)).toBe(true);
+
+    setInput(store, {
+      path: ['items'],
+      input: [{ name: 'b' }, { name: 'c' }, { name: 'a' }],
+    });
+
+    expect(isDirty(store)).toBe(true);
+  });
+
+  test('should keep dirty state from replace when setting array input', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [{ name: 'a' }, { name: 'b' }] } }
+    );
+
+    replace(store, { path: ['items'], at: 0, initialInput: { name: 'z' } });
+    expect(isDirty(store)).toBe(true);
+
+    setInput(store, {
+      path: ['items'],
+      input: [{ name: 'z' }, { name: 'b' }],
+    });
+
+    expect(isDirty(store)).toBe(true);
+  });
+
+  test('should keep dirty state from remove and insert when setting array input', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      { initialInput: { items: [{ name: 'a' }, { name: 'b' }] } }
+    );
+
+    remove(store, { path: ['items'], at: 0 });
+    insert(store, { path: ['items'], initialInput: { name: 'c' } });
+    expect(isDirty(store)).toBe(true);
+
+    setInput(store, {
+      path: ['items'],
+      input: [{ name: 'b' }, { name: 'c' }],
+    });
+
+    expect(isDirty(store)).toBe(true);
+  });
+
+  test('should keep dirty state from remove when array input grows to start length', () => {
+    const store = createTestStore(
+      v.object({ items: v.array(v.object({ name: v.string() })) }),
+      {
+        initialInput: { items: [{ name: 'a' }, { name: 'b' }, { name: 'c' }] },
+      }
+    );
+
+    remove(store, { path: ['items'], at: 1 });
+    expect(isDirty(store)).toBe(true);
+
+    // The second index still holds the third item, so the array must stay
+    // dirty although it has its start length again
+    setInput(store, {
+      path: ['items'],
+      input: [{ name: 'a' }, { name: 'c' }, { name: 'c' }],
+    });
+
+    expect(isDirty(store)).toBe(true);
   });
 });

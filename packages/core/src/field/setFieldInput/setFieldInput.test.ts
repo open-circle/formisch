@@ -1,5 +1,8 @@
+// @vitest-environment jsdom
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
+import { copyItemState } from '../../array/copyItemState/copyItemState.ts';
+import { swapItemState } from '../../array/swapItemState/swapItemState.ts';
 import { validateFormInput } from '../../form/validateFormInput/validateFormInput.ts';
 import { createTestStore } from '../../vitest/index.ts';
 import { getFieldBool } from '../getFieldBool/getFieldBool.ts';
@@ -275,6 +278,33 @@ describe('setFieldInput', () => {
       setFieldInput(store, ['items'], ['a', 'b']);
       expect(getFieldBool(store.children.items, 'isDirty')).toBe(false);
     });
+
+    test('should keep array dirty from reordering when setting array input', () => {
+      const store = createTestStore(
+        v.object({ items: v.array(v.object({ name: v.string() })) }),
+        { initialInput: { items: [{ name: 'a' }, { name: 'b' }] } }
+      );
+
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+      if (itemsStore.kind === 'array') {
+        // Swap both items and mark the array as dirty, like the `swap` method
+        // of `@formisch/methods` does
+        itemsStore.items.value = [...itemsStore.items.value].reverse();
+        swapItemState(store, itemsStore.children[0], itemsStore.children[1]);
+        itemsStore.isDirty.value = true;
+
+        // Setting the array to the input it already has must not reset the
+        // identity-based dirty state, as the item order still differs from
+        // the baseline
+        setFieldInput(store, ['items'], [{ name: 'b' }, { name: 'a' }]);
+        expect(getFieldInput(itemsStore)).toStrictEqual([
+          { name: 'b' },
+          { name: 'a' },
+        ]);
+        expect(getFieldBool(itemsStore, 'isDirty')).toBe(true);
+      }
+    });
   });
 
   describe('reusing child stores when growing', () => {
@@ -319,6 +349,159 @@ describe('setFieldInput', () => {
       setFieldInput(store, ['items'], ['a', 'b', 'c']); // grow back to initial
       // Content matches the initial input again, so the array must be clean
       expect(getFieldBool(store.children.items, 'isDirty')).toBe(false);
+    });
+
+    test('should let regrown items take the place of their start items', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b', 'c'] },
+      });
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+      if (itemsStore.kind === 'array') {
+        const initialItems = [...itemsStore.initialItems.value];
+        setFieldInput(store, ['items'], ['a']); // shrink
+        setFieldInput(store, ['items'], ['a', 'x', 'y', 'z']); // grow beyond start
+
+        // The regrown items are new, the first two of them take the place of
+        // the start items of their index and the initial items are unchanged
+        expect(itemsStore.items.value[0]).toBe(initialItems[0]);
+        expect(initialItems).not.toContain(itemsStore.items.value[1]);
+        expect(itemsStore.startItems.value).toStrictEqual(
+          itemsStore.items.value.slice(0, 3)
+        );
+        expect(itemsStore.startItems.value).not.toContain(
+          itemsStore.items.value[3]
+        );
+        expect(itemsStore.initialItems.value).toStrictEqual(initialItems);
+      }
+    });
+
+    test('should clear elements of a regrown child', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b'] },
+      });
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+      if (itemsStore.kind === 'array') {
+        const element = document.createElement('input');
+        itemsStore.children[1].elements.push(element);
+        setFieldInput(store, ['items'], ['a']); // shrink
+        setFieldInput(store, ['items'], ['a', 'b']); // grow back to initial
+
+        // The regrown child gets a new item, which a framework renders anew,
+        // so the elements of the previous item must not stay registered
+        expect(itemsStore.children[1].elements).toEqual([]);
+      }
+    });
+
+    test('should stay clean when setting nested child after growing back to initial', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b', 'c'] },
+      });
+      setFieldInput(store, ['items'], ['a']); // shrink
+      setFieldInput(store, ['items'], ['a', 'b', 'c']); // grow back to initial
+
+      // Setting a nested child to its baseline compares the item IDs of the
+      // array, which must match the start items again after regrowing
+      setFieldInput(store, ['items', 0], 'a');
+      expect(getFieldBool(store.children.items, 'isDirty')).toBe(false);
+    });
+
+    test('should report clean after shrinking then growing nested arrays back to initial', () => {
+      const store = createTestStore(
+        v.object({ rows: v.array(v.object({ tags: v.array(v.string()) })) }),
+        { initialInput: { rows: [{ tags: ['x'] }, { tags: ['y', 'z'] }] } }
+      );
+      setFieldInput(store, ['rows'], [{ tags: ['x'] }]); // shrink
+      expect(getFieldBool(store.children.rows, 'isDirty')).toBe(true);
+      setFieldInput(store, ['rows'], [{ tags: ['x'] }, { tags: ['y', 'z'] }]); // grow back to initial
+      // The nested array of the regrown child gets its start items again
+      expect(getFieldBool(store.children.rows, 'isDirty')).toBe(false);
+    });
+
+    test('should keep nested array of an item beyond the start items clean when regrown', () => {
+      const store = createTestStore(
+        v.object({ rows: v.array(v.object({ tags: v.array(v.string()) })) }),
+        { initialInput: { rows: [{ tags: ['x'] }] } }
+      );
+      const rows = [{ tags: ['x'] }, { tags: ['y', 'z'] }];
+      setFieldInput(store, ['rows'], rows); // grow beyond start
+      setFieldInput(store, ['rows'], [{ tags: ['x'] }]); // shrink
+      setFieldInput(store, ['rows'], rows); // grow beyond start again
+
+      const rowsStore = store.children.rows;
+      expect(rowsStore.kind).toBe('array');
+      if (rowsStore.kind === 'array') {
+        // The second row is a new item, so the array is dirty, but the nested
+        // array of its reset child has the items and input of its baseline
+        expect(rowsStore.isDirty.value).toBe(true);
+        expect(getFieldBool(rowsStore.children[1], 'isDirty')).toBe(false);
+      }
+    });
+
+    test('should let a regrown item without a child store take the place of its start item', () => {
+      const store = createTestStore(
+        v.object({ rows: v.array(v.object({ tags: v.array(v.string()) })) }),
+        { initialInput: { rows: [{ tags: ['x'] }, { tags: [] }] } }
+      );
+      const rowsStore = store.children.rows;
+      expect(rowsStore.kind).toBe('array');
+      if (rowsStore.kind === 'array') {
+        setFieldInput(store, ['rows', 0, 'tags'], []); // shrink
+
+        // Swap both rows like the `swap` method of `@formisch/methods` does,
+        // which moves the start items of the emptied nested array to the
+        // second row, but not its child store
+        rowsStore.items.value = [...rowsStore.items.value].reverse();
+        swapItemState(store, rowsStore.children[0], rowsStore.children[1]);
+        rowsStore.isDirty.value = true;
+
+        setFieldInput(store, ['rows', 1, 'tags'], ['x']); // grow back to initial
+
+        // The regrown item takes the place of its start item although its
+        // child store is new, so the nested array is clean again
+        const rowStore = rowsStore.children[1];
+        expect(rowStore.kind).toBe('object');
+        if (rowStore.kind === 'object') {
+          const tagsStore = rowStore.children.tags;
+          expect(tagsStore.kind).toBe('array');
+          if (tagsStore.kind === 'array') {
+            expect(tagsStore.startItems.value).toStrictEqual(
+              tagsStore.items.value
+            );
+          }
+        }
+        expect(getFieldBool(rowsStore.children[1], 'isDirty')).toBe(false);
+      }
+    });
+
+    test('should stay dirty when an array that lost an item grows back to its start length', () => {
+      const store = createTestStore(v.object({ items: v.array(v.string()) }), {
+        initialInput: { items: ['a', 'b', 'c'] },
+      });
+      const itemsStore = store.children.items;
+      expect(itemsStore.kind).toBe('array');
+      if (itemsStore.kind === 'array') {
+        // Remove the second item and mark the array as dirty, like the
+        // `remove` method of `@formisch/methods` does
+        const [firstItem, , thirdItem] = itemsStore.items.value;
+        itemsStore.items.value = [firstItem, thirdItem];
+        copyItemState(store, itemsStore.children[2], itemsStore.children[1]);
+        itemsStore.isDirty.value = true;
+
+        // Grow back to the start length with the input the items have
+        setFieldInput(store, ['items'], ['a', 'c', 'c']);
+
+        // The second index still holds the third item, so the array stays
+        // dirty although it has its start length again
+        expect(itemsStore.items.value).toHaveLength(3);
+        expect(new Set(itemsStore.items.value).size).toBe(3);
+        expect(itemsStore.items.value.slice(0, 2)).toStrictEqual([
+          firstItem,
+          thirdItem,
+        ]);
+        expect(getFieldBool(itemsStore, 'isDirty')).toBe(true);
+      }
     });
   });
 

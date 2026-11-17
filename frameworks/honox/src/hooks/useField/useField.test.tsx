@@ -1,5 +1,13 @@
 import { getFieldStore, INTERNAL } from '@formisch/core/honox';
-import { insert, move, remove, reset, swap } from '@formisch/methods/honox';
+import {
+  insert,
+  move,
+  remove,
+  replace,
+  reset,
+  setInput,
+  swap,
+} from '@formisch/methods/honox';
 import { fireEvent, screen, waitFor } from '@testing-library/dom';
 import { useState } from 'hono/jsx';
 import { flushSync } from 'hono/jsx/dom';
@@ -553,6 +561,324 @@ describe('useField', () => {
         expect(
           getFieldStore(formStore![INTERNAL], ['todos', 1, 'label'])!.elements
         ).toHaveLength(1);
+      });
+    });
+
+    test('should register the elements of rows when an array is shrunk and regrown in one batch', async () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
+
+      function Row(props: {
+        form: FormStore<typeof schema>;
+        index: number;
+      }): JSX.Element {
+        const field = useField(props.form, {
+          path: ['todos', props.index, 'label'],
+        });
+        return <input {...field.props} />;
+      }
+
+      function Test(): JSX.Element {
+        const form = useForm({
+          schema,
+          initialInput: { todos: [{ label: 'a' }, { label: 'b' }] },
+        });
+        formStore = form;
+        const fieldArray = useFieldArray(form, { path: ['todos'] });
+        return (
+          <>
+            {fieldArray.items.map((id, index) => (
+              <Row key={id} form={form} index={index} />
+            ))}
+          </>
+        );
+      }
+
+      renderHono(<Test />);
+      expect(
+        getFieldStore(formStore![INTERNAL], ['todos', 1, 'label'])!.elements
+      ).toHaveLength(1);
+
+      // The second row gets a new item, so it is rendered anew and registers
+      // its element again
+      flushSync(() => {
+        setInput(formStore!, { path: ['todos'], input: [{ label: 'a' }] });
+        setInput(formStore!, {
+          path: ['todos'],
+          input: [{ label: 'a' }, { label: 'b' }],
+        });
+      });
+
+      await vi.waitFor(() => {
+        const inputs = screen.getAllByRole('textbox');
+        expect(inputs).toHaveLength(2);
+        inputs.forEach((input, index) => {
+          const { elements } = getFieldStore(formStore![INTERNAL], [
+            'todos',
+            index,
+            'label',
+          ])!;
+          expect(elements).toHaveLength(1);
+          expect(elements[0]).toBe(input);
+        });
+      });
+    });
+
+    describe('elements of rows after an array is shrunk and regrown', () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+
+      function setup(): FormStore<typeof schema> {
+        let formStore: FormStore<typeof schema> | undefined;
+
+        function Row(props: {
+          form: FormStore<typeof schema>;
+          index: number;
+        }): JSX.Element {
+          const field = useField(props.form, {
+            path: ['todos', props.index, 'label'],
+          });
+          return <input {...field.props} />;
+        }
+
+        function Test(): JSX.Element {
+          const form = useForm({
+            schema,
+            initialInput: { todos: [{ label: 'a' }, { label: 'b' }] },
+          });
+          formStore = form;
+          const fieldArray = useFieldArray(form, { path: ['todos'] });
+          return (
+            <>
+              {fieldArray.items.map((id, index) => (
+                <Row key={id} form={form} index={index} />
+              ))}
+            </>
+          );
+        }
+
+        renderHono(<Test />);
+        return formStore!;
+      }
+
+      async function expectElementsOfRenderedRows(
+        form: FormStore<typeof schema>
+      ): Promise<void> {
+        await vi.waitFor(() => {
+          const inputs = screen.getAllByRole('textbox');
+          expect(inputs).toHaveLength(2);
+          inputs.forEach((input, index) => {
+            const { elements } = getFieldStore(form[INTERNAL], [
+              'todos',
+              index,
+              'label',
+            ])!;
+            expect(elements).toHaveLength(1);
+            expect(elements[0]).toBe(input);
+          });
+        });
+      }
+
+      test('should keep elements after swap and a regrowing setInput in one batch', async () => {
+        const form = setup();
+        flushSync(() => {
+          swap(form, { path: ['todos'], at: 0, and: 1 });
+        });
+        await expectElementsOfRenderedRows(form);
+
+        flushSync(() => {
+          setInput(form, { path: ['todos'], input: [] });
+          setInput(form, {
+            path: ['todos'],
+            input: [{ label: 'a' }, { label: 'b' }],
+          });
+        });
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after swap, remove and a regrowing setInput', async () => {
+        const form = setup();
+        flushSync(() => {
+          swap(form, { path: ['todos'], at: 0, and: 1 });
+        });
+        await expectElementsOfRenderedRows(form);
+        flushSync(() => {
+          remove(form, { path: ['todos'], at: 0 });
+        });
+        await vi.waitFor(() => {
+          expect(screen.getAllByRole('textbox')).toHaveLength(1);
+        });
+
+        flushSync(() => {
+          setInput(form, {
+            path: ['todos'],
+            input: [{ label: 'a' }, { label: 'b' }],
+          });
+        });
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after swap, a shrinking and a regrowing setInput and reset', async () => {
+        const form = setup();
+        flushSync(() => {
+          swap(form, { path: ['todos'], at: 0, and: 1 });
+        });
+        await expectElementsOfRenderedRows(form);
+        flushSync(() => {
+          setInput(form, { path: ['todos'], input: [] });
+        });
+        await vi.waitFor(() => {
+          expect(screen.queryAllByRole('textbox')).toHaveLength(0);
+        });
+        flushSync(() => {
+          setInput(form, {
+            path: ['todos'],
+            input: [{ label: 'a' }, { label: 'b' }],
+          });
+        });
+        await expectElementsOfRenderedRows(form);
+
+        flushSync(() => {
+          reset(form);
+        });
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after replace, remove and a regrowing setInput', async () => {
+        const form = setup();
+        flushSync(() => {
+          replace(form, {
+            path: ['todos'],
+            at: 1,
+            initialInput: { label: 'z' },
+          });
+        });
+        await expectElementsOfRenderedRows(form);
+        flushSync(() => {
+          remove(form, { path: ['todos'], at: 0 });
+        });
+        await vi.waitFor(() => {
+          expect(screen.getAllByRole('textbox')).toHaveLength(1);
+        });
+
+        flushSync(() => {
+          setInput(form, {
+            path: ['todos'],
+            input: [{ label: 'a' }, { label: 'b' }],
+          });
+        });
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after insert, a shrinking and a regrowing setInput and reset', async () => {
+        const form = setup();
+        flushSync(() => {
+          insert(form, {
+            path: ['todos'],
+            at: 0,
+            initialInput: { label: 'z' },
+          });
+        });
+        await vi.waitFor(() => {
+          expect(screen.getAllByRole('textbox')).toHaveLength(3);
+        });
+        flushSync(() => {
+          setInput(form, { path: ['todos'], input: [] });
+        });
+        await vi.waitFor(() => {
+          expect(screen.queryAllByRole('textbox')).toHaveLength(0);
+        });
+        flushSync(() => {
+          setInput(form, {
+            path: ['todos'],
+            input: [{ label: 'a' }, { label: 'b' }],
+          });
+        });
+        await expectElementsOfRenderedRows(form);
+
+        flushSync(() => {
+          reset(form);
+        });
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after move and a regrowing setInput in one batch', async () => {
+        const form = setup();
+        flushSync(() => {
+          move(form, { path: ['todos'], from: 0, to: 1 });
+        });
+        await expectElementsOfRenderedRows(form);
+
+        flushSync(() => {
+          setInput(form, { path: ['todos'], input: [{ label: 'a' }] });
+          setInput(form, {
+            path: ['todos'],
+            input: [{ label: 'a' }, { label: 'b' }],
+          });
+        });
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after a shrinking and a regrowing setInput and reset', async () => {
+        const form = setup();
+        flushSync(() => {
+          setInput(form, { path: ['todos'], input: [] });
+        });
+        await vi.waitFor(() => {
+          expect(screen.queryAllByRole('textbox')).toHaveLength(0);
+        });
+        flushSync(() => {
+          setInput(form, {
+            path: ['todos'],
+            input: [{ label: 'a' }, { label: 'b' }],
+          });
+        });
+        await expectElementsOfRenderedRows(form);
+
+        flushSync(() => {
+          reset(form);
+        });
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should register the element of the row of the kept item after remove and reset with keepInput', async () => {
+        const form = setup();
+        flushSync(() => {
+          remove(form, { path: ['todos'], at: 0 });
+        });
+        await vi.waitFor(() => {
+          expect(screen.getAllByRole('textbox')).toHaveLength(1);
+        });
+
+        flushSync(() => {
+          reset(form, { keepInput: true });
+        });
+
+        // The kept row gets the start item of its index, so it is rendered
+        // anew and registers its element in the store of that index
+        await vi.waitFor(() => {
+          const inputs = screen.getAllByRole('textbox');
+          expect(inputs).toHaveLength(1);
+          inputs.forEach((input, index) => {
+            const { elements } = getFieldStore(form[INTERNAL], [
+              'todos',
+              index,
+              'label',
+            ])!;
+            expect(elements).toHaveLength(1);
+            expect(elements[0]).toBe(input);
+          });
+        });
       });
     });
 

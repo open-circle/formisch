@@ -1,9 +1,17 @@
 import { getFieldStore, INTERNAL } from '@formisch/core/vue';
-import { remove, swap } from '@formisch/methods/vue';
+import {
+  insert,
+  move,
+  remove,
+  replace,
+  reset,
+  setInput,
+  swap,
+} from '@formisch/methods/vue';
 import { mount } from '@vue/test-utils';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
-import { defineComponent, h, ref } from 'vue';
+import { defineComponent, h, nextTick, ref } from 'vue';
 import Form from '../../components/Form/Form.vue';
 import type { FormStore } from '../../types/index.ts';
 import { renderHook } from '../../vitest/renderHook.ts';
@@ -633,6 +641,291 @@ describe('useField', () => {
         expect(
           getFieldStore(formStore![INTERNAL], ['todos', 1, 'label'])!.elements
         ).toHaveLength(1);
+      });
+    });
+
+    // Note: Vue applies the changes of one tick in one update, so both
+    // `setInput` calls are made without waiting for the next tick in between
+    test('should register the elements of rows when an array is shrunk and regrown in one batch', async () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+      let formStore: FormStore<typeof schema> | undefined;
+
+      const Row = defineComponent({
+        props: {
+          form: { type: Object, required: true },
+          index: { type: Number, required: true },
+        },
+        setup(props) {
+          const field = useField(
+            props.form as FormStore<typeof schema>,
+            () => ({ path: ['todos', props.index, 'label'] as const })
+          );
+          return () => h('input', { ...field.props });
+        },
+      });
+
+      const Test = defineComponent({
+        setup() {
+          const form = useForm({
+            schema,
+            initialInput: { todos: [{ label: 'a' }, { label: 'b' }] },
+          });
+          formStore = form;
+          const fieldArray = useFieldArray(form, { path: ['todos'] });
+          return () =>
+            fieldArray.items.map((id, index) =>
+              h(Row, { key: id, form, index })
+            );
+        },
+      });
+
+      mount(Test, { attachTo: document.body });
+      expect(
+        getFieldStore(formStore![INTERNAL], ['todos', 1, 'label'])!.elements
+      ).toHaveLength(1);
+
+      // The second row gets a new item, so it is rendered anew and registers
+      // its element again
+      setInput(formStore!, { path: ['todos'], input: [{ label: 'a' }] });
+      setInput(formStore!, {
+        path: ['todos'],
+        input: [{ label: 'a' }, { label: 'b' }],
+      });
+      await nextTick();
+
+      await vi.waitFor(() => {
+        const inputs = [...document.querySelectorAll('input')];
+        expect(inputs).toHaveLength(2);
+        inputs.forEach((input, index) => {
+          const { elements } = getFieldStore(formStore![INTERNAL], [
+            'todos',
+            index,
+            'label',
+          ])!;
+          expect(elements).toHaveLength(1);
+          expect(elements[0]).toBe(input);
+        });
+      });
+    });
+
+    // Note: Vue applies the changes of one tick in one update, so the
+    // `setInput` calls of the tests with one batch are made without waiting
+    // for the next tick in between
+    describe('elements of rows after an array is shrunk and regrown', () => {
+      const schema = v.object({
+        todos: v.array(v.object({ label: v.string() })),
+      });
+
+      function setup(): FormStore<typeof schema> {
+        let formStore: FormStore<typeof schema> | undefined;
+
+        const Row = defineComponent({
+          props: {
+            form: { type: Object, required: true },
+            index: { type: Number, required: true },
+          },
+          setup(props) {
+            const field = useField(
+              props.form as FormStore<typeof schema>,
+              () => ({ path: ['todos', props.index, 'label'] as const })
+            );
+            return () => h('input', { ...field.props });
+          },
+        });
+
+        const Test = defineComponent({
+          setup() {
+            const form = useForm({
+              schema,
+              initialInput: { todos: [{ label: 'a' }, { label: 'b' }] },
+            });
+            formStore = form;
+            const fieldArray = useFieldArray(form, { path: ['todos'] });
+            return () =>
+              fieldArray.items.map((id, index) =>
+                h(Row, { key: id, form, index })
+              );
+          },
+        });
+
+        mount(Test, { attachTo: document.body });
+        return formStore!;
+      }
+
+      function getInputs(): HTMLInputElement[] {
+        return [...document.querySelectorAll('input')];
+      }
+
+      async function expectElementsOfRenderedRows(
+        form: FormStore<typeof schema>
+      ): Promise<void> {
+        await nextTick();
+        await vi.waitFor(() => {
+          const inputs = getInputs();
+          expect(inputs).toHaveLength(2);
+          inputs.forEach((input, index) => {
+            const { elements } = getFieldStore(form[INTERNAL], [
+              'todos',
+              index,
+              'label',
+            ])!;
+            expect(elements).toHaveLength(1);
+            expect(elements[0]).toBe(input);
+          });
+        });
+      }
+
+      test('should keep elements after swap and a regrowing setInput in one batch', async () => {
+        const form = setup();
+        swap(form, { path: ['todos'], at: 0, and: 1 });
+        await expectElementsOfRenderedRows(form);
+
+        setInput(form, { path: ['todos'], input: [] });
+        setInput(form, {
+          path: ['todos'],
+          input: [{ label: 'a' }, { label: 'b' }],
+        });
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after swap, remove and a regrowing setInput', async () => {
+        const form = setup();
+        swap(form, { path: ['todos'], at: 0, and: 1 });
+        await expectElementsOfRenderedRows(form);
+        remove(form, { path: ['todos'], at: 0 });
+        await vi.waitFor(() => {
+          expect(getInputs()).toHaveLength(1);
+        });
+
+        setInput(form, {
+          path: ['todos'],
+          input: [{ label: 'a' }, { label: 'b' }],
+        });
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after swap, a shrinking and a regrowing setInput and reset', async () => {
+        const form = setup();
+        swap(form, { path: ['todos'], at: 0, and: 1 });
+        await expectElementsOfRenderedRows(form);
+        setInput(form, { path: ['todos'], input: [] });
+        await vi.waitFor(() => {
+          expect(getInputs()).toHaveLength(0);
+        });
+        setInput(form, {
+          path: ['todos'],
+          input: [{ label: 'a' }, { label: 'b' }],
+        });
+        await expectElementsOfRenderedRows(form);
+
+        reset(form);
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after replace, remove and a regrowing setInput', async () => {
+        const form = setup();
+        replace(form, {
+          path: ['todos'],
+          at: 1,
+          initialInput: { label: 'z' },
+        });
+        await expectElementsOfRenderedRows(form);
+        remove(form, { path: ['todos'], at: 0 });
+        await vi.waitFor(() => {
+          expect(getInputs()).toHaveLength(1);
+        });
+
+        setInput(form, {
+          path: ['todos'],
+          input: [{ label: 'a' }, { label: 'b' }],
+        });
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after insert, a shrinking and a regrowing setInput and reset', async () => {
+        const form = setup();
+        insert(form, { path: ['todos'], at: 0, initialInput: { label: 'z' } });
+        await vi.waitFor(() => {
+          expect(getInputs()).toHaveLength(3);
+        });
+        setInput(form, { path: ['todos'], input: [] });
+        await vi.waitFor(() => {
+          expect(getInputs()).toHaveLength(0);
+        });
+        setInput(form, {
+          path: ['todos'],
+          input: [{ label: 'a' }, { label: 'b' }],
+        });
+        await expectElementsOfRenderedRows(form);
+
+        reset(form);
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after move and a regrowing setInput in one batch', async () => {
+        const form = setup();
+        move(form, { path: ['todos'], from: 0, to: 1 });
+        await expectElementsOfRenderedRows(form);
+
+        setInput(form, { path: ['todos'], input: [{ label: 'a' }] });
+        setInput(form, {
+          path: ['todos'],
+          input: [{ label: 'a' }, { label: 'b' }],
+        });
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should keep elements after a shrinking and a regrowing setInput and reset', async () => {
+        const form = setup();
+        setInput(form, { path: ['todos'], input: [] });
+        await vi.waitFor(() => {
+          expect(getInputs()).toHaveLength(0);
+        });
+        setInput(form, {
+          path: ['todos'],
+          input: [{ label: 'a' }, { label: 'b' }],
+        });
+        await expectElementsOfRenderedRows(form);
+
+        reset(form);
+
+        await expectElementsOfRenderedRows(form);
+      });
+
+      test('should register the element of the row of the kept item after remove and reset with keepInput', async () => {
+        const form = setup();
+        remove(form, { path: ['todos'], at: 0 });
+        await nextTick();
+        await vi.waitFor(() => {
+          expect(getInputs()).toHaveLength(1);
+        });
+
+        reset(form, { keepInput: true });
+        await nextTick();
+
+        // The kept row gets the start item of its index, so it is rendered
+        // anew and registers its element in the store of that index
+        await vi.waitFor(() => {
+          const inputs = getInputs();
+          expect(inputs).toHaveLength(1);
+          inputs.forEach((input, index) => {
+            const { elements } = getFieldStore(form[INTERNAL], [
+              'todos',
+              index,
+              'label',
+            ])!;
+            expect(elements).toHaveLength(1);
+            expect(elements[0]).toBe(input);
+          });
+        });
       });
     });
 
