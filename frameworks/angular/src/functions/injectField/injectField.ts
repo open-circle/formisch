@@ -104,8 +104,9 @@ export function injectField(
     isDirty: computed(() => getFieldBool(internalFieldStore(), 'isDirty')),
     isValid: computed(() => !getFieldBool(internalFieldStore(), 'errors')),
     setInput(value) {
-      setFieldInput(internalFormStore(), path(), value);
-      validateIfRequired(internalFormStore(), internalFieldStore(), 'input');
+      if (setFieldInput(internalFormStore(), path(), value)) {
+        validateIfRequired(internalFormStore(), internalFieldStore(), 'input');
+      }
     },
     [CONTROL]: {
       ref(element) {
@@ -131,12 +132,19 @@ export function injectField(
         }
       },
       onInput(event) {
-        setFieldInput(
-          internalFormStore(),
-          path(),
-          getElementInput(event.target as FieldElement, internalFieldStore())
-        );
-        validateIfRequired(internalFormStore(), internalFieldStore(), 'input');
+        if (
+          setFieldInput(
+            internalFormStore(),
+            path(),
+            getElementInput(event.target as FieldElement, internalFieldStore())
+          )
+        ) {
+          validateIfRequired(
+            internalFormStore(),
+            internalFieldStore(),
+            'input'
+          );
+        }
       },
       onChange() {
         validateIfRequired(internalFormStore(), internalFieldStore(), 'change');

@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix `setInput` to start no additional validation when it leaves the form input unchanged while a validation is pending, so that a pending submission is not dropped (issue #260, pull request #261)
+
 ## v1.1.0 (October 31, 2026)
 
 - Add HonoX build output with `@formisch/methods/honox` export (issue #175)

@@ -58,9 +58,10 @@ export function setInput(
       ? getFieldStore(internalFormStore, config.path)
       : internalFormStore;
     if (fieldOrFormStore) {
-      setFieldInput(internalFormStore, config.path ?? [], config.input);
-      validateIfRequired(internalFormStore, fieldOrFormStore, 'input');
-      validateIfRequired(internalFormStore, fieldOrFormStore, 'change');
+      if (setFieldInput(internalFormStore, config.path ?? [], config.input)) {
+        validateIfRequired(internalFormStore, fieldOrFormStore, 'input');
+        validateIfRequired(internalFormStore, fieldOrFormStore, 'change');
+      }
     }
   });
 }

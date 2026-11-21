@@ -75,9 +75,10 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
         return !getFieldBool(internalFieldStore, 'errors');
       },
       onChange(value) {
-        setFieldInput(internalFormStore, config.path, value);
-        validateIfRequired(internalFormStore, internalFieldStore, 'input');
-        validateIfRequired(internalFormStore, internalFieldStore, 'change');
+        if (setFieldInput(internalFormStore, config.path, value)) {
+          validateIfRequired(internalFormStore, internalFieldStore, 'input');
+          validateIfRequired(internalFormStore, internalFieldStore, 'change');
+        }
       },
       props: {
         name: internalFieldStore.name,
@@ -119,20 +120,23 @@ export function useField(form: FormStore, config: UseFieldConfig): FieldStore {
           validateIfRequired(internalFormStore, internalFieldStore, 'touch');
         },
         onChange(event) {
-          setFieldInput(
-            internalFormStore,
-            config.path,
-            // Hint: Unlike React, hono/jsx types its event handlers with the
-            // native `Event`, whose `currentTarget` is a nullable `EventTarget`.
-            // Narrowing the handler signature instead is not an option, as it
-            // would no longer be assignable to the intrinsic element props.
-            getElementInput(
-              event.currentTarget as FieldElement,
-              internalFieldStore
+          if (
+            setFieldInput(
+              internalFormStore,
+              config.path,
+              // Hint: Unlike React, hono/jsx types its event handlers with the
+              // native `Event`, whose `currentTarget` is a nullable `EventTarget`.
+              // Narrowing the handler signature instead is not an option, as it
+              // would no longer be assignable to the intrinsic element props.
+              getElementInput(
+                event.currentTarget as FieldElement,
+                internalFieldStore
+              )
             )
-          );
-          validateIfRequired(internalFormStore, internalFieldStore, 'input');
-          validateIfRequired(internalFormStore, internalFieldStore, 'change');
+          ) {
+            validateIfRequired(internalFormStore, internalFieldStore, 'input');
+            validateIfRequired(internalFormStore, internalFieldStore, 'change');
+          }
         },
         onBlur() {
           validateIfRequired(internalFormStore, internalFieldStore, 'blur');

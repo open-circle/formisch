@@ -63,8 +63,10 @@ export function setInput<
     const internalFormStore = form[INTERNAL];
     const internalFieldStore = getFieldStore(internalFormStore, config.path);
 
-    if (internalFieldStore) {
-      setFieldInput(internalFormStore, config.path, config.input);
+    if (
+      internalFieldStore &&
+      setFieldInput(internalFormStore, config.path, config.input)
+    ) {
       validateIfRequired(internalFormStore, internalFieldStore, 'input');
     }
   });
@@ -79,7 +81,7 @@ setInput(loginForm, { path: ['email'], input: 'jane@example.com' });
 
 `INTERNAL` is the key for accessing the internal store through `form[INTERNAL]`. `getFieldStore` can return `undefined` when a dynamic array item no longer exists, so check the result before updating the field.
 
-`setFieldInput` updates the input and maintains touched, edited and dirty state. Writing directly to an input signal bypasses this bookkeeping. `batch` groups signal updates, and `validateIfRequired` triggers validation only when the form's validation settings require it for an input event.
+`setFieldInput` updates the input and maintains touched, edited and dirty state. Writing directly to an input signal bypasses this bookkeeping. `setFieldInput` returns `false` when it leaves the form input unchanged while a validation is pending. The example then skips `validateIfRequired`, so the pending validation is not replaced by another one. `batch` groups signal updates, and `validateIfRequired` triggers validation only when the form's validation settings require it for an input event.
 
 The [full implementation](https://github.com/open-circle/formisch/blob/main/packages/methods/src/setInput/setInput.ts) also supports setting the entire form input and includes the corresponding type overloads. Use the built-in method in your application; this example is a starting point for understanding the core helpers and building your own methods.
 

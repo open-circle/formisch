@@ -5,24 +5,45 @@ import type {
   InternalFormStore,
   Path,
 } from '../../types/index.ts';
+import { getUntrackedValue } from '../getUntrackedValue/index.ts';
 import { initializeFieldStore } from '../initializeFieldStore/index.ts';
+
+/**
+ * Invalidates the validation of the previous form input, so that its pending
+ * result is discarded.
+ *
+ * @param internalFormStore The form store to invalidate the validation of.
+ */
+function invalidateValidation(internalFormStore: InternalFormStore): void {
+  internalFormStore.validationId++;
+  internalFormStore.isValidating.value = false;
+}
 
 /**
  * Sets the input for a nested field store and all its children, updating
  * touched and dirty states accordingly. Handles dynamic array resizing.
+ * Invalidates the validation of the previous input before the form input
+ * changes.
  *
  * @param internalFormStore The form store providing the empty input config.
  * @param internalFieldStore The field store to update.
  * @param input The new input value.
+ * @param isHidden Whether a nullish parent hides the field from the form input.
+ *
+ * @returns Whether the form input has changed.
  */
 function setNestedInput(
   internalFormStore: InternalFormStore,
   internalFieldStore: InternalFieldStore,
-  input: unknown
-): void {
+  input: unknown,
+  isHidden: boolean
+): boolean {
   // Mark field as touched and edited
   internalFieldStore.isTouched.value = true;
   internalFieldStore.isEdited.value = true;
+
+  // Create variable to track whether form input changes
+  let isChanged = false;
 
   // If field store is array, handle array input
   if (internalFieldStore.kind === 'array') {
@@ -37,6 +58,20 @@ function setNestedInput(
       internalFieldStore.schema.type === 'array'
         ? (arrayInput as unknown[]).length
         : internalFieldStore.children.length;
+
+    // Get next array input
+    const nextInput = input == null ? input : true;
+
+    // If array input or number of items changes, invalidate validation
+    // Hint: The items of a nullish array are not part of the form input.
+    if (
+      !isHidden &&
+      (internalFieldStore.input.value !== nextInput ||
+        (nextInput === true && length !== items.length))
+    ) {
+      isChanged = true;
+      invalidateValidation(internalFormStore);
+    }
 
     // If new array is shorter, truncate items
     if (length < items.length) {
@@ -91,16 +126,21 @@ function setNestedInput(
     // Set input for each array item
     for (let index = 0; index < length; index++) {
       // Recursively set nested input
-      setNestedInput(
-        internalFormStore,
-        internalFieldStore.children[index],
-        // @ts-expect-error
-        arrayInput[index]
-      );
+      if (
+        setNestedInput(
+          internalFormStore,
+          internalFieldStore.children[index],
+          // @ts-expect-error
+          arrayInput[index],
+          isHidden || nextInput !== true
+        )
+      ) {
+        isChanged = true;
+      }
     }
 
     // Set array input
-    internalFieldStore.input.value = input == null ? input : true;
+    internalFieldStore.input.value = nextInput;
 
     // Update dirty state based on input or items length change
     internalFieldStore.isDirty.value =
@@ -110,19 +150,34 @@ function setNestedInput(
 
     // Otherwise, if field store is object, handle object input
   } else if (internalFieldStore.kind === 'object') {
+    // Get next object input
+    const nextInput = input == null ? input : true;
+
+    // If object input changes, invalidate validation
+    if (!isHidden && internalFieldStore.input.value !== nextInput) {
+      isChanged = true;
+      invalidateValidation(internalFormStore);
+    }
+
     // Set input for each object property
+    // Hint: The children of a nullish object are not part of the form input.
     for (const key in internalFieldStore.children) {
       // Recursively set nested input
-      setNestedInput(
-        internalFormStore,
-        internalFieldStore.children[key],
-        // @ts-expect-error
-        input?.[key]
-      );
+      if (
+        setNestedInput(
+          internalFormStore,
+          internalFieldStore.children[key],
+          // @ts-expect-error
+          input?.[key],
+          isHidden || nextInput !== true
+        )
+      ) {
+        isChanged = true;
+      }
     }
 
     // Set object input
-    internalFieldStore.input.value = input == null ? input : true;
+    internalFieldStore.input.value = nextInput;
 
     // Update dirty state based on input change
     internalFieldStore.isDirty.value =
@@ -130,6 +185,17 @@ function setNestedInput(
 
     // Otherwise, handle value field input
   } else {
+    // If value input changes, invalidate validation
+    // Hint: The current input is read without tracking it, so that a
+    // surrounding reactive scope is not subscribed to the input it sets.
+    if (
+      !isHidden &&
+      !Object.is(getUntrackedValue(internalFieldStore.input), input)
+    ) {
+      isChanged = true;
+      invalidateValidation(internalFormStore);
+    }
+
     // Set value input
     internalFieldStore.input.value = input;
 
@@ -144,21 +210,35 @@ function setNestedInput(
       // the field as dirty if the start input was `undefined` or `null`.
       (startInput != null || (input !== '' && !Number.isNaN(input)));
   }
+
+  // Return whether form input has changed
+  return isChanged;
 }
 
 /**
  * Sets the input for a field at the specified path in the form store,
- * traversing the path and updating all parent fields along the way.
+ * traversing the path and updating all parent fields along the way. The
+ * validation of the previous input is only invalidated if the form input
+ * changes.
  *
  * @param internalFormStore The form store containing the field.
  * @param path The path to the field.
  * @param input The new input value.
+ *
+ * @returns Whether the form input may have to be validated, which is not the
+ * case if it is unchanged while a validation of it is pending.
  */
 export function setFieldInput(
   internalFormStore: InternalFormStore,
   path: Path,
   input: unknown
-): void {
+): boolean {
+  // Get whether validation is pending before input is set
+  const isValidating = getUntrackedValue(internalFormStore.isValidating);
+
+  // Create variable to track whether form input changes
+  let isChanged = false;
+
   // Batch all state updates for optimal reactivity performance
   batch(() => {
     // Untrack to avoid creating reactive dependencies during update
@@ -174,6 +254,15 @@ export function setFieldInput(
 
         // If not at target field, mark parent input as truthy
         if (index < path.length - 1) {
+          // If parent input is nullish, invalidate validation
+          // Hint: A nullish parent becomes present, which changes the form
+          // input even if the target field keeps its input.
+          if (!internalFieldStore.input.value) {
+            isChanged = true;
+            invalidateValidation(internalFormStore);
+          }
+
+          // Set parent input to truthy
           internalFieldStore.input.value = true;
 
           // Update dirty state based on input change
@@ -190,12 +279,16 @@ export function setFieldInput(
         }
       }
 
-      // Invalidate validation of previous input
-      internalFormStore.validationId++;
-      internalFormStore.isValidating.value = false;
-
       // Set nested input on target field
-      setNestedInput(internalFormStore, internalFieldStore, input);
+      if (setNestedInput(internalFormStore, internalFieldStore, input, false)) {
+        isChanged = true;
+      }
     });
   });
+
+  // Return whether form input may have to be validated
+  // Hint: If the form input is unchanged, a validation that was pending
+  // before still validates the current input. Starting another one would only
+  // discard its result, for example for a submission that waits for it.
+  return isChanged || !isValidating;
 }

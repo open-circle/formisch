@@ -354,4 +354,129 @@ describe('setFieldInput', () => {
     expect(store.children.name.input.value).toBe('John');
     expect(store.children.name.errors.value).toBeNull();
   });
+
+  test('should keep pending validation when input is unchanged', async () => {
+    const schema = v.object({
+      name: v.pipe(v.string(), v.nonEmpty('Required')),
+    });
+    type ParseResult = v.SafeParseResult<typeof schema>;
+    let resolveParse: (value: ParseResult) => void;
+    const pendingParse = new Promise<ParseResult>((resolve) => {
+      resolveParse = resolve;
+    });
+    const store = createTestStore(schema, { initialInput: { name: '' } });
+    store.parse = () => pendingParse;
+    const pendingValidation = validateFormInput(store);
+
+    setFieldInput(store, ['name'], '');
+    expect(store.isValidating.value).toBe(true);
+
+    resolveParse!(v.safeParse(schema, { name: '' }));
+    await pendingValidation;
+    expect(store.isValidating.value).toBe(false);
+    expect(store.children.name.errors.value).toEqual(['Required']);
+  });
+
+  describe('pending validation', () => {
+    const schema = v.object({
+      name: v.string(),
+      count: v.number(),
+      user: v.object({ name: v.string() }),
+      partner: v.nullish(v.object({ name: v.string() })),
+      tags: v.nullish(v.array(v.string())),
+      items: v.array(v.string()),
+      pair: v.tuple([v.string(), v.string()]),
+      spot: v.nullish(v.tuple([v.string()])),
+    });
+    const initialInput = {
+      name: 'John',
+      count: NaN,
+      user: { name: 'Jane' },
+      partner: null,
+      tags: null,
+      items: ['a', 'b'],
+      pair: ['x', 'y'],
+      spot: null,
+    };
+
+    test.each([
+      { path: ['name'], input: 'John' },
+      { path: ['count'], input: NaN },
+      { path: ['user'], input: { name: 'Jane' } },
+      { path: ['user', 'name'], input: 'Jane' },
+      { path: ['partner'], input: null },
+      { path: ['tags'], input: null },
+      { path: ['spot'], input: null },
+      { path: ['items'], input: ['a', 'b'] },
+      { path: ['items', 1], input: 'b' },
+      { path: ['pair'], input: ['x', 'y'] },
+      { path: ['pair'], input: ['x', 'y', 'z'] },
+      { path: [], input: initialInput },
+    ])(
+      'should keep it when $path is set to its current input $input',
+      async ({ path, input }) => {
+        const store = createTestStore(schema, { initialInput });
+        const pendingValidation = validateFormInput(store);
+
+        expect(setFieldInput(store, path, input)).toBe(false);
+        expect(store.validationId).toBe(1);
+        expect(store.isValidating.value).toBe(true);
+        await pendingValidation;
+      }
+    );
+
+    test.each([
+      { path: ['name'], input: 'Jane' },
+      { path: ['name'], input: undefined },
+      { path: ['count'], input: 0 },
+      { path: ['user'], input: { name: 'John' } },
+      { path: ['user'], input: {} },
+      { path: ['user'], input: undefined },
+      { path: ['partner'], input: undefined },
+      { path: ['partner'], input: { name: undefined } },
+      { path: ['partner', 'name'], input: '' },
+      { path: ['tags'], input: [] },
+      { path: ['spot'], input: ['x'] },
+      { path: ['items'], input: ['a'] },
+      { path: ['items'], input: ['a', 'b', 'c'] },
+      { path: ['items'], input: ['a', 'c'] },
+      { path: ['items'], input: null },
+      { path: ['items', 1], input: 'c' },
+      { path: ['pair'], input: ['x'] },
+      { path: [], input: { ...initialInput, name: 'Jane' } },
+    ])(
+      'should invalidate it when $path is set to another input $input',
+      async ({ path, input }) => {
+        const store = createTestStore(schema, { initialInput });
+        const pendingValidation = validateFormInput(store);
+
+        expect(setFieldInput(store, path, input)).toBe(true);
+        expect(store.validationId).toBeGreaterThan(1);
+        expect(store.isValidating.value).toBe(false);
+        await pendingValidation;
+      }
+    );
+
+    test('should require validation of unchanged input if none is pending', () => {
+      const store = createTestStore(schema, { initialInput });
+      expect(setFieldInput(store, ['name'], 'John')).toBe(true);
+      expect(store.validationId).toBe(0);
+    });
+
+    test('should not read unchanged input again to compare it', () => {
+      const store = createTestStore(schema, { initialInput });
+      let reads = 0;
+      const input = {
+        ...initialInput,
+        get name() {
+          reads++;
+          return reads === 1 ? 'John' : 'Jane';
+        },
+      };
+      setFieldInput(store, [], input);
+      expect(reads).toBe(1);
+      expect(store.children.name.input.value).toBe('John');
+      expect(store.validationId).toBe(0);
+    });
+  });
 });

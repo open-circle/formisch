@@ -116,12 +116,13 @@ export function useField(
       return input.value;
     },
     set input(value) {
-      setFieldInput(internalFormStore.value, path.value, value);
-      validateIfRequired(
-        internalFormStore.value,
-        internalFieldStore.value,
-        'input'
-      );
+      if (setFieldInput(internalFormStore.value, path.value, value)) {
+        validateIfRequired(
+          internalFormStore.value,
+          internalFieldStore.value,
+          'input'
+        );
+      }
     },
     get errors() {
       return internalFieldStore.value.errors.value;

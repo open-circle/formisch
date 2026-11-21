@@ -7,7 +7,7 @@ import {
 import { TestBed } from '@angular/core/testing';
 import { getFieldStore, INTERNAL } from '@formisch/core/angular';
 import * as v from 'valibot';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CONTROL } from '../../types/control.ts';
 import { injectForm } from '../injectForm/index.ts';
 import { injectField } from './injectField.ts';
@@ -89,6 +89,63 @@ describe('injectField', () => {
     element.value = 'test@example.com';
     field[CONTROL].onInput({ target: element } as unknown as Event);
     expect(field.input()).toBe('test@example.com');
+  });
+
+  it('should keep pending validation when unchanged input is set', () => {
+    const check = vi.fn(() => true);
+    const schema = v.object({
+      email: v.pipe(v.string(), v.check(check)),
+    });
+    const { form, field } = TestBed.runInInjectionContext(() => {
+      const form = injectForm({
+        schema,
+        validate: 'input',
+        initialInput: { email: 'jane@example.com' },
+      });
+      return { form, field: injectField(form, { path: ['email'] }) };
+    });
+
+    field.setInput('john@example.com');
+
+    expect(check).toHaveBeenCalledOnce();
+    const { validationId } = form[INTERNAL];
+
+    field.setInput('john@example.com');
+
+    expect(check).toHaveBeenCalledOnce();
+    expect(form[INTERNAL].validationId).toBe(validationId);
+    expect(form[INTERNAL].isValidating.value).toBe(true);
+  });
+
+  // Angular has no element props, so the control's input handler is called
+  // with an event of the element, as the `formischControl` directive does
+  it('should keep pending validation when unchanged input is entered', () => {
+    const started = vi.fn(() => true);
+    const schema = v.objectAsync({
+      name: v.pipeAsync(
+        v.custom<string>(started),
+        v.checkAsync(() => new Promise<boolean>(() => undefined))
+      ),
+    });
+    const { form, field } = TestBed.runInInjectionContext(() => {
+      const form = injectForm({
+        schema,
+        validate: 'input',
+        initialInput: { name: 'initial' },
+      });
+      return { form, field: injectField(form, { path: ['name'] }) };
+    });
+    const element = document.createElement('input');
+    element.value = 'changed';
+
+    field[CONTROL].onInput({ target: element } as unknown as Event);
+    expect(started).toHaveBeenCalledOnce();
+    const { validationId } = form[INTERNAL];
+
+    field[CONTROL].onInput({ target: element } as unknown as Event);
+    expect(started).toHaveBeenCalledOnce();
+    expect(form[INTERNAL].validationId).toBe(validationId);
+    expect(form[INTERNAL].isValidating.value).toBe(true);
   });
 
   it('does not change the input value when the control onChange is called', () => {
