@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix `setInput` and `reset` to keep a non-nullish array, object or tuple present instead of `undefined` when the input omits it or its nullish parent is set to `null` or `undefined`, and `setInput` to give a non-nullish value field its empty input in those cases (issue #266, pull request #267)
+
 ## v1.1.0 (October 31, 2026)
 
 - Add HonoX build output with `@formisch/methods/honox` export (issue #175)

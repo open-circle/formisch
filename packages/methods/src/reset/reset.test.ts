@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
+import { getInput } from '../getInput/getInput.ts';
 import { setInput } from '../setInput/setInput.ts';
 import { validate } from '../validate/validate.ts';
 import { createTestStore } from '../vitest/index.ts';
@@ -127,6 +128,55 @@ describe('reset', () => {
       expect(store.children.name.input.value).toBe('Bob');
       expect(store.children.name.initialInput.value).toBe('Bob');
     });
+
+    test('should keep omitted non-nullish array, object and tuple present', () => {
+      const store = createTestStore(
+        v.object({
+          name: v.string(),
+          items: v.array(v.string()),
+          address: v.object({ city: v.string() }),
+          pair: v.tuple([v.string(), v.string()]),
+        }),
+        {
+          initialInput: {
+            name: 'John',
+            items: ['a'],
+            address: { city: 'Berlin' },
+            pair: ['x', 'y'],
+          },
+        }
+      );
+
+      reset(store, { initialInput: { name: 'Bob' } });
+
+      // The omitted keys are present instead of `undefined`, like in a form
+      // that is created with this initial input
+      expect(getInput(store)).toStrictEqual({
+        name: 'Bob',
+        items: [],
+        address: { city: '' },
+        pair: ['', ''],
+      });
+    });
+
+    test('should keep non-nullish array present when nullish object is reset to null and set again', () => {
+      const store = createTestStore(
+        v.object({
+          group: v.nullish(
+            v.object({ name: v.string(), items: v.array(v.string()) })
+          ),
+        }),
+        { initialInput: { group: { name: 'a', items: ['x'] } } }
+      );
+
+      reset(store, { initialInput: { group: null } });
+      expect(getInput(store)).toStrictEqual({ group: null });
+
+      setInput(store, { path: ['group', 'name'], input: 'b' });
+      expect(getInput(store)).toStrictEqual({
+        group: { name: 'b', items: [] },
+      });
+    });
   });
 
   describe('form reset with keepInput', () => {
@@ -139,6 +189,21 @@ describe('reset', () => {
       reset(store, { keepInput: true });
 
       expect(store.children.name.input.value).toBe('Jane');
+    });
+
+    test('should not mark empty non-nullish array dirty when new initial input omits it', () => {
+      const store = createTestStore(
+        v.object({ name: v.string(), items: v.array(v.string()) }),
+        { initialInput: { name: 'John', items: [] } }
+      );
+
+      reset(store, { initialInput: { name: 'Bob' }, keepInput: true });
+
+      // The omitted array is present but empty in the new initial input, so
+      // the kept empty array does not differ from it
+      expect(store.children.items.initialInput.value).toBe(true);
+      expect(store.children.items.isDirty.value).toBe(false);
+      expect(store.children.name.isDirty.value).toBe(true);
     });
 
     test('should still reset touched and errors', () => {

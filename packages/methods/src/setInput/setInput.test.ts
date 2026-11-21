@@ -1,5 +1,6 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
+import { getInput } from '../getInput/getInput.ts';
 import { swap } from '../swap/swap.ts';
 import { createTestStore } from '../vitest/index.ts';
 import { setInput } from './setInput.ts';
@@ -78,6 +79,42 @@ describe('setInput', () => {
       expect(itemsStore.items.value).toEqual([]);
       expect(itemsStore.isDirty.value).toBe(false);
     }
+  });
+
+  test('should keep non-nullish array present when nullish object is set to null and set again', () => {
+    const store = createTestStore(
+      v.object({
+        group: v.nullish(
+          v.object({ name: v.string(), items: v.array(v.string()) })
+        ),
+      }),
+      { initialInput: { group: { name: 'a', items: ['x'] } } }
+    );
+
+    setInput(store, { path: ['group'], input: null });
+    expect(getInput(store)).toStrictEqual({ group: null });
+
+    // Setting a nested field makes the nullish object present again, so its
+    // non-nullish array must be an empty array instead of `undefined`
+    setInput(store, { path: ['group', 'name'], input: 'b' });
+    expect(getInput(store)).toStrictEqual({
+      group: { name: 'b', items: [] },
+    });
+  });
+
+  test('should keep omitted non-nullish array present when other variant option is set', () => {
+    const store = createTestStore(
+      v.variant('kind', [
+        v.object({ kind: v.literal('a') }),
+        v.object({ kind: v.literal('b'), tags: v.array(v.string()) }),
+      ]),
+      { initialInput: { kind: 'b', tags: ['t'] } }
+    );
+
+    setInput(store, { input: { kind: 'a' } });
+    setInput(store, { path: ['kind'], input: 'b' });
+
+    expect(getInput(store)).toStrictEqual({ kind: 'b', tags: [] });
   });
 
   test('should set full form input', () => {

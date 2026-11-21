@@ -24,9 +24,15 @@ export function setInitialFieldInput(
   batch(() => {
     // If field store is array, handle array initial input
     if (internalFieldStore.kind === 'array') {
-      // Set initial array input
+      // Set initial array input (nullish or true)
+      // Hint: Only a nullish array or tuple keeps a nullish initial input. A
+      // non-nullish one stays present (`true`) when its initial input is
+      // missing, an array without items and a tuple at its fixed length, the
+      // same way `initializeFieldStore` represents it.
       internalFieldStore.initialInput.value =
-        initialInput == null ? initialInput : true;
+        internalFieldStore.isNullish && initialInput == null
+          ? initialInput
+          : true;
 
       // Normalize input to empty array if nullish
       const initialArrayInput = initialInput ?? [];
@@ -80,9 +86,14 @@ export function setInitialFieldInput(
 
       // Otherwise, if field store is object, handle object initial input
     } else if (internalFieldStore.kind === 'object') {
-      // Set initial object input
+      // Set initial object input (nullish or true)
+      // Hint: Only a nullish object keeps a nullish initial input. A
+      // non-nullish object stays present (`true`) when its initial input is
+      // missing, the same way `initializeFieldStore` represents it.
       internalFieldStore.initialInput.value =
-        initialInput == null ? initialInput : true;
+        internalFieldStore.isNullish && initialInput == null
+          ? initialInput
+          : true;
 
       // Set initial input for each object property
       for (const key in internalFieldStore.children) {
