@@ -66,14 +66,6 @@ export function insert<
     | InternalArrayStore
     | undefined;
   if (internalArrayStore) {
-    // Walk path and mark all parents as having input
-    let internalFieldStore: InternalFieldStore = internalFormStore;
-    for (let index = 0; index < config.path.length - 1; index++) {
-      // @ts-expect-error
-      internalFieldStore = internalFieldStore.children[config.path[index]];
-      internalFieldStore.input.value = true;
-    }
-
     // Get current items of field array
     const items = untrack(() => internalArrayStore.items.value);
 
@@ -86,6 +78,16 @@ export function insert<
         // Invalidate validation of previous array input
         internalFormStore.validationId++;
         internalFormStore.isValidating.value = false;
+
+        // Walk path and mark all parents as having input
+        // Hint: This must happen only if the index is valid, because an
+        // ignored insert must not change the input of the form
+        let internalFieldStore: InternalFieldStore = internalFormStore;
+        for (let index = 0; index < config.path.length - 1; index++) {
+          // @ts-expect-error
+          internalFieldStore = internalFieldStore.children[config.path[index]];
+          internalFieldStore.input.value = true;
+        }
 
         // Move all child stores after the insertion point one index up
         for (let index = items.length; index > insertIndex; index--) {
