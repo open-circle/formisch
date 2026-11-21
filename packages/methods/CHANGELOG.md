@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Fix `insert` and `remove` to track the dirty state of nullish parent fields and nullish arrays that `insert` makes present, so the form stays dirty when the inserted item is removed again
+
 ## v1.1.0 (October 31, 2026)
 
 - Add HonoX build output with `@formisch/methods/honox` export (issue #175)

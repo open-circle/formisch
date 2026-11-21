@@ -75,10 +75,17 @@ export function remove<
         }
 
         // Mark field array as touched and edited and update dirty state
+        // Hint: The input is compared too, because a nullish array that became
+        // present through `insert` differs from its start input, even when
+        // its item IDs equal the start items again.
         internalArrayStore.isTouched.value = true;
         internalArrayStore.isEdited.value = true;
-        internalArrayStore.isDirty.value =
-          internalArrayStore.startItems.value.join() !== newItems.join();
+        internalArrayStore.isDirty.value = untrack(
+          () =>
+            internalArrayStore.startInput.value !==
+              internalArrayStore.input.value ||
+            internalArrayStore.startItems.value.join() !== newItems.join()
+        );
 
         // Validate if required
         // TODO: Should we validate on touch, change and blur too?

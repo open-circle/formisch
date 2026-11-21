@@ -66,12 +66,26 @@ export function insert<
     | InternalArrayStore
     | undefined;
   if (internalArrayStore) {
-    // Walk path and mark all parents as having input
+    // Walk path, mark all parents as having input and update dirty state
     let internalFieldStore: InternalFieldStore = internalFormStore;
     for (let index = 0; index < config.path.length - 1; index++) {
       // @ts-expect-error
       internalFieldStore = internalFieldStore.children[config.path[index]];
       internalFieldStore.input.value = true;
+
+      // Update dirty state based on input change
+      // Hint: A nullish parent that becomes present differs from its start
+      // input, even after the inserted item is removed again. Arrays also
+      // compare item IDs so structural dirty state from a changed length,
+      // order or item is preserved.
+      internalFieldStore.isDirty.value = untrack(
+        () =>
+          internalFieldStore.startInput.value !==
+            internalFieldStore.input.value ||
+          (internalFieldStore.kind === 'array' &&
+            internalFieldStore.startItems.value.join() !==
+              internalFieldStore.items.value.join())
+      );
     }
 
     // Get current items of field array

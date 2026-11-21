@@ -1,5 +1,7 @@
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
+import { setInput } from '../setInput/setInput.ts';
+import { swap } from '../swap/swap.ts';
 import { createTestStore, initializeChildSlot } from '../vitest/index.ts';
 import { insert } from './insert.ts';
 
@@ -176,6 +178,78 @@ describe('insert', () => {
     insert(store, { path: ['items'], initialInput: 'b' });
 
     expect(store.children.items.isEdited.value).toBe(true);
+  });
+
+  test.each([null, undefined])(
+    'should mark parent with start input %s as dirty when inserting item',
+    (startInput) => {
+      const store = createTestStore(
+        v.object({
+          group: v.nullish(v.object({ items: v.array(v.string()) })),
+        }),
+        { initialInput: { group: startInput } }
+      );
+
+      insert(store, { path: ['group', 'items'], initialInput: 'foo' });
+
+      expect(store.children.group.input.value).toBe(true);
+      expect(store.children.group.isDirty.value).toBe(true);
+    }
+  );
+
+  test('should not mark present parent as dirty when inserting item', () => {
+    const store = createTestStore(
+      v.object({ group: v.object({ items: v.array(v.string()) }) }),
+      { initialInput: { group: { items: [] } } }
+    );
+
+    insert(store, { path: ['group', 'items'], initialInput: 'foo' });
+
+    // Only the array is dirty, as the parent was present at its baseline
+    const groupStore = store.children.group;
+    expect(groupStore.isDirty.value).toBe(false);
+    expect(groupStore.kind).toBe('object');
+    if (groupStore.kind === 'object') {
+      expect(groupStore.children.items.isDirty.value).toBe(true);
+    }
+  });
+
+  test('should clear dirty state of parent when inserting item restores it', () => {
+    const store = createTestStore(
+      v.object({
+        group: v.nullish(v.object({ items: v.array(v.string()) })),
+      }),
+      { initialInput: { group: { items: [] } } }
+    );
+
+    const groupStore = store.children.group;
+    setInput(store, { path: ['group'], input: null });
+    expect(groupStore.isDirty.value).toBe(true);
+
+    insert(store, { path: ['group', 'items'], initialInput: 'foo' });
+
+    // The parent is present again like at its baseline, so only the array
+    // with its new item is dirty
+    expect(groupStore.input.value).toBe(true);
+    expect(groupStore.isDirty.value).toBe(false);
+  });
+
+  test('should keep parent array dirty from reordering when inserting into nested array', () => {
+    const store = createTestStore(
+      v.object({
+        list: v.array(v.object({ items: v.array(v.string()) })),
+      }),
+      { initialInput: { list: [{ items: [] }, { items: [] }] } }
+    );
+
+    swap(store, { path: ['list'], at: 0, and: 1 });
+    expect(store.children.list.isDirty.value).toBe(true);
+
+    // Inserting into a nested array must not clear the dirty state of the
+    // parent array, as its item order still differs from the baseline
+    insert(store, { path: ['list', 0, 'items'], initialInput: 'foo' });
+
+    expect(store.children.list.isDirty.value).toBe(true);
   });
 
   test('should insert object item', () => {
