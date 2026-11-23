@@ -105,4 +105,40 @@ describe('index.qwik flushUpdates', () => {
 
     expect(settled).toBe(true);
   });
+
+  test('should resolve the enclosing Qwik container across nested shadow DOM boundaries', async () => {
+    const container = document.createElement('div') as QwikContainerElement;
+    container.setAttribute('q:container', 'resumed');
+    const outerHost = document.createElement('div');
+    const outerShadow = outerHost.attachShadow({ mode: 'open' });
+    const innerHost = document.createElement('div');
+    const innerShadow = innerHost.attachShadow({ mode: 'open' });
+    const input = document.createElement('input');
+    innerShadow.appendChild(input);
+    outerShadow.appendChild(innerHost);
+    container.appendChild(outerHost);
+    document.body.appendChild(container);
+
+    let resolveRender!: () => void;
+    let settled = false;
+    container.qContainer = {
+      $renderPromise$: new Promise<void>((resolve) => {
+        resolveRender = resolve;
+      }),
+    };
+
+    const flushPromise = Promise.resolve(flushUpdates([input])).then(() => {
+      settled = true;
+    });
+
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(settled).toBe(false);
+
+    container.qContainer.$renderPromise$ = null;
+    resolveRender();
+    await flushPromise;
+
+    expect(settled).toBe(true);
+  });
 });

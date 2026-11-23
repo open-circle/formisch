@@ -1,3 +1,4 @@
+import * as qwik from '@qwik.dev/core';
 import type { Framework } from './index.ts';
 
 export { createSignal, untrack } from '@qwik.dev/core';
@@ -30,20 +31,82 @@ export function batch<T>(fn: () => T): T {
 }
 
 /**
+ * Qwik runtime container reference attached to a `[q:container]` DOM element.
+ */
+interface QwikContainer {
+  $renderPromise$?: Promise<void> | null;
+}
+
+/**
  * Qwik container DOM element with its attached runtime container reference.
  */
 interface QwikContainerElement extends Element {
-  qContainer?: {
-    $renderPromise$?: Promise<void> | null;
-  };
+  qContainer?: QwikContainer;
+}
+
+/**
+ * Finds the nearest `[q:container]` ancestor for an element, traversing across
+ * open/closed shadow DOM boundaries via `getRootNode().host`.
+ *
+ * @param element The starting DOM element.
+ *
+ * @returns The enclosing Qwik container element, or null if none is found.
+ */
+function findQwikContainer(element: Element): QwikContainerElement | null {
+  let current: Element | null = element;
+  while (current) {
+    const container = current.closest<QwikContainerElement>('[q\\:container]');
+    if (container) {
+      return container;
+    }
+    const root = current.getRootNode();
+    current =
+      typeof ShadowRoot !== 'undefined' && root instanceof ShadowRoot
+        ? root.host
+        : null;
+  }
+  return null;
+}
+
+/**
+ * Reads an active pending render promise from a Qwik container in both dev and
+ * production builds.
+ *
+ * Hint: `@qwik.dev/core` mangles `container.$renderPromise$` in production
+ * builds, while `_waitUntilRendered(container)` is exported in dev, prod, and
+ * min builds and returns `renderPromise || Promise.resolve()`. Calling it twice
+ * synchronously yields the same promise reference when a render is active and
+ * distinct resolved promises when idle.
+ *
+ * @param container The Qwik runtime container.
+ *
+ * @returns The active render promise, or undefined if no render is pending.
+ */
+function getContainerRenderPromise(
+  container: QwikContainer
+): Promise<void> | undefined {
+  const waitUntilRendered = (
+    qwik as unknown as {
+      _waitUntilRendered?: (target: QwikContainer) => Promise<void>;
+    }
+  )._waitUntilRendered;
+  if (typeof waitUntilRendered === 'function') {
+    const first = waitUntilRendered(container);
+    const second = waitUntilRendered(container);
+    if (first === second) {
+      return first;
+    }
+  }
+  return container.$renderPromise$ ?? undefined;
 }
 
 /**
  * Waits for pending Qwik container renders to settle after reactive state
  * writes. Yields a microtask for Qwik's cursor scheduler to run and awaits any
- * active container `$renderPromise$` (including time-sliced or async QRL
- * renders). When `elements` are provided, scopes the scan to the `[q:container]`
- * ancestors of those elements so unrelated islands cannot block validation.
+ * active container render promise (including time-sliced or async QRL renders).
+ * When `elements` are provided, scopes the scan to the `[q:container]`
+ * ancestors of those elements (crossing shadow boundaries) so unrelated islands
+ * cannot block validation.
  *
  * @param elements Optional elements associated with the update to scope the
  *   container scan.
@@ -67,8 +130,7 @@ export function flushUpdates(
         if (typeof Element !== 'undefined') {
           for (const item of elements) {
             if (item instanceof Element) {
-              const container =
-                item.closest<QwikContainerElement>('[q\\:container]');
+              const container = findQwikContainer(item);
               if (container) {
                 scoped.add(container);
               }
@@ -82,7 +144,9 @@ export function flushUpdates(
       }
       const pending: Promise<void>[] = [];
       for (const element of containers) {
-        const renderPromise = element.qContainer?.$renderPromise$;
+        const renderPromise = element.qContainer
+          ? getContainerRenderPromise(element.qContainer)
+          : undefined;
         if (renderPromise && !seen.has(renderPromise)) {
           seen.add(renderPromise);
           pending.push(renderPromise);
