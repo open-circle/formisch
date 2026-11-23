@@ -1,4 +1,4 @@
-import { batch, createSignal } from '@formisch/core/honox';
+import { batch, createSignal, flushUpdates } from '@formisch/core/honox';
 import { fireEvent, screen } from '@testing-library/dom';
 import { useState } from 'hono/jsx';
 import { flushSync } from 'hono/jsx/dom';
@@ -279,6 +279,47 @@ describe('useSignals', () => {
       });
       expect(count).toHaveTextContent('1');
       expect(signalText).toHaveTextContent('signal-updated');
+    });
+  });
+
+  describe('flushUpdates', () => {
+    test('should wait for a notified component render to commit before resolving', async () => {
+      const signal = createSignal('initial');
+
+      function TrackedComponent(): JSX.Element {
+        useSignals();
+        return <span data-testid="value">{signal.value}</span>;
+      }
+
+      renderHono(<TrackedComponent />);
+      expect(screen.getByTestId('value')).toHaveTextContent('initial');
+
+      signal.value = 'updated';
+      const flushPromise = flushUpdates();
+      expect(flushPromise).toBeInstanceOf(Promise);
+      expect(screen.getByTestId('value')).toHaveTextContent('initial');
+      await flushPromise;
+
+      expect(screen.getByTestId('value')).toHaveTextContent('updated');
+    });
+
+    test('should resolve cleanly when a notified pending component unmounts before committing', async () => {
+      const signal = createSignal('initial');
+
+      function TrackedComponent(): JSX.Element {
+        useSignals();
+        return <span data-testid="value">{signal.value}</span>;
+      }
+
+      const { unmount } = renderHono(<TrackedComponent />);
+      expect(screen.getByTestId('value')).toHaveTextContent('initial');
+
+      signal.value = 'updated';
+      const flushPromise = flushUpdates();
+      expect(flushPromise).toBeInstanceOf(Promise);
+
+      unmount();
+      await flushPromise;
     });
   });
 });

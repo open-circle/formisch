@@ -1,3 +1,4 @@
+import { tick } from 'svelte';
 import type { Signal } from '../types/signal/index.ts';
 import type { Framework } from './index.ts';
 
@@ -48,4 +49,13 @@ export function createSignal<T>(initialValue: T): Signal<T> {
  */
 export function batch<T>(fn: () => T): T {
   return fn();
+}
+
+/**
+ * Waits for pending DOM updates to flush after reactive state writes.
+ *
+ * @returns A promise that resolves once Svelte finishes flushing DOM updates.
+ */
+export function flushUpdates(): Promise<void> {
+  return tick();
 }

@@ -1,4 +1,10 @@
-import { type Listener, setListener } from '@formisch/core/react-native';
+import {
+  type Listener,
+  markListenerCommitted,
+  registerListener,
+  setListener,
+  unregisterListener,
+} from '@formisch/core/react-native';
 import {
   useCallback,
   useLayoutEffect,
@@ -30,8 +36,11 @@ export function useSignals(): void {
   // Set listener for tracking signals
   setListener(listener);
 
-  // Clear listener directly after render
-  useLayoutEffect(() => setListener(undefined));
+  // Clear listener directly after render and mark any pending commit complete
+  useLayoutEffect(() => {
+    setListener(undefined);
+    markListenerCommitted(listener);
+  });
 
   // Cleanup registered subscribers when effects are destroyed and restore
   // them when effects are re-created
@@ -44,13 +53,15 @@ export function useSignals(): void {
   // which prevents stale values from being shown if signals changed meanwhile.
   const unsubscribed = useRef(false);
   useLayoutEffect(() => {
+    registerListener(listener);
     if (unsubscribed.current) {
       unsubscribed.current = false;
       forceUpdate();
     }
     return () => {
       unsubscribed.current = true;
+      unregisterListener(listener);
       cleanSubscribers();
     };
-  }, [cleanSubscribers]);
+  }, [cleanSubscribers, listener]);
 }

@@ -44,6 +44,11 @@ function untrack<T>(fn: () => T): T {
 }
 
 /**
+ * Mock flushUpdates function that completes synchronously.
+ */
+function flushUpdates(): Promise<void> | void {}
+
+/**
  * Mock createId function that returns unique IDs.
  *
  * @returns The unique ID.
@@ -67,6 +72,7 @@ interface FrameworkMocks {
   createSignal: typeof createSignal;
   batch: typeof batch;
   untrack: typeof untrack;
+  flushUpdates: typeof flushUpdates;
   createId: typeof createId;
 }
 
@@ -78,5 +84,6 @@ export const frameworkMocks: FrameworkMocks = {
   createSignal: createSignal,
   batch: batch,
   untrack: untrack,
+  flushUpdates: flushUpdates,
   createId: createId,
 };

@@ -20,3 +20,22 @@ export const framework: Framework = 'preact';
 export function createId(): string {
   return Math.random().toString(36).slice(2);
 }
+
+/**
+ * Waits for pending DOM updates to flush after reactive state writes.
+ *
+ * Hint: Preact flushes component re-renders on the first microtask, while
+ * `@preact/signals` schedules direct signal-bound DOM attribute and text
+ * updates through two nested `queueMicrotask` calls. Waiting two microtasks
+ * ensures both component markup and signal-bound attributes have updated.
+ *
+ * @returns A promise that resolves once Preact and `@preact/signals` finish
+ *   flushing pending DOM updates.
+ */
+export function flushUpdates(): Promise<void> {
+  return new Promise<void>((resolve) => {
+    queueMicrotask(() => {
+      queueMicrotask(resolve);
+    });
+  });
+}

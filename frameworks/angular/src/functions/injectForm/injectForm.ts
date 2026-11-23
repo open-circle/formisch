@@ -2,6 +2,9 @@ import {
   afterNextRender,
   assertInInjectionContext,
   computed,
+  DestroyRef,
+  EnvironmentInjector,
+  inject,
 } from '@angular/core';
 import {
   createFormStore,
@@ -9,6 +12,7 @@ import {
   type FormSchema,
   getFieldBool,
   INTERNAL,
+  registerInjector,
   validateFormInput,
 } from '@formisch/core/angular';
 import * as v from 'valibot';
@@ -31,6 +35,10 @@ export function injectForm<TSchema extends FormSchema>(
 // @__NO_SIDE_EFFECTS__
 export function injectForm(config: FormConfig): FormStore {
   assertInInjectionContext(injectForm);
+
+  const injector = inject(EnvironmentInjector);
+  const destroyRef = inject(DestroyRef);
+  destroyRef.onDestroy(registerInjector(injector));
 
   const internalFormStore = createFormStore(config, (input: unknown) =>
     v.safeParseAsync(config.schema, input)

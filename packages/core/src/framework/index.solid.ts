@@ -28,3 +28,9 @@ export function createSignal<T>(initialValue: T): Signal<T> {
     },
   };
 }
+
+/**
+ * Waits for pending DOM updates to flush after reactive state writes. This is
+ * a no-op in Solid 1 as updates flush synchronously when `batch` exits.
+ */
+export function flushUpdates(): void {}

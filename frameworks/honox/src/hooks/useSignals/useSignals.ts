@@ -1,4 +1,10 @@
-import { type Listener, setListener } from '@formisch/core/honox';
+import {
+  type Listener,
+  markListenerCommitted,
+  registerListener,
+  setListener,
+  unregisterListener,
+} from '@formisch/core/honox';
 import { useCallback, useLayoutEffect, useMemo, useReducer } from 'hono/jsx';
 
 /**
@@ -38,8 +44,11 @@ export function useSignals(): void {
     setListener(listener);
   }
 
-  // Clear listener directly after render
-  useLayoutEffect(() => setListener(undefined));
+  // Clear listener directly after render and mark any pending commit complete
+  useLayoutEffect(() => {
+    setListener(undefined);
+    markListenerCommitted(listener);
+  });
 
   // Cleanup registered subscribers on unmount
   //
@@ -49,5 +58,11 @@ export function useSignals(): void {
   // signal updates. A layout effect is committed synchronously instead.
   // hono/jsx also aliases `<StrictMode>` to a fragment and never re-runs
   // effects on mount, so no timeout is needed to survive a second mount.
-  useLayoutEffect(() => () => cleanSubscribers(), [cleanSubscribers]);
+  useLayoutEffect(() => {
+    registerListener(listener);
+    return () => {
+      unregisterListener(listener);
+      cleanSubscribers();
+    };
+  }, [cleanSubscribers, listener]);
 }

@@ -1,3 +1,4 @@
+import { nextTick } from 'vue';
 import type { Framework } from './index.ts';
 
 export { shallowRef as createSignal } from 'vue';
@@ -39,4 +40,13 @@ export function batch<T>(fn: () => T): T {
  */
 export function untrack<T>(fn: () => T): T {
   return fn();
+}
+
+/**
+ * Waits for pending DOM updates to flush after reactive state writes.
+ *
+ * @returns A promise that resolves once Vue finishes flushing DOM updates.
+ */
+export function flushUpdates(): Promise<void> {
+  return nextTick();
 }

@@ -1,7 +1,7 @@
 // Hint: Solid 2 is imported through the `solid-js-2` pnpm alias because this
 // package also depends on Solid 1 for `index.solid.ts`. The build renames the
 // alias back to `solid-js` in the published output.
-import { createSignal as signal } from 'solid-js-2';
+import { flush, createSignal as signal } from 'solid-js-2';
 import type { Signal } from '../types/signal/index.ts';
 import type { Framework } from './index.ts';
 
@@ -60,4 +60,12 @@ export function createSignal<T>(initialValue: T): Signal<T> {
       }
     },
   };
+}
+
+/**
+ * Flushes staged signal writes synchronously so DOM updates are applied before
+ * subsequent side effects such as focusing an invalid field.
+ */
+export function flushUpdates(): void {
+  flush();
 }
