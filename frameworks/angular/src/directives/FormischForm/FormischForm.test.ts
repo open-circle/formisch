@@ -8,7 +8,8 @@ import { TestBed } from '@angular/core/testing';
 import { INTERNAL, type SubmitEventHandler } from '@formisch/core/angular';
 import * as v from 'valibot';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { injectForm } from '../../functions/index.ts';
+import { injectField, injectForm } from '../../functions/index.ts';
+import { FormischControl } from '../FormischControl/FormischControl.ts';
 import { FormischForm } from './FormischForm.ts';
 
 const Schema = v.object({
@@ -96,6 +97,47 @@ class InvalidSubmitHost {
 }
 
 @Component({
+  selector: 'formisch-form-focus-order-host',
+  standalone: true,
+  imports: [FormischForm, FormischControl],
+  template: `<form [formischForm]="form" [formischSubmit]="handleSubmit">
+    <input
+      [formischControl]="emailField"
+      [attr.aria-invalid]="emailField.errors() ? 'true' : 'false'"
+      aria-errormessage="email-error"
+      (focus)="onInputFocus($event)"
+    />
+    @if (emailField.errors(); as errors) {
+      <div id="email-error">{{ errors[0] }}</div>
+    }
+    <button type="submit">Submit</button>
+  </form>`,
+})
+class FocusOrderHost {
+  readonly form = injectForm({
+    schema: v.object({
+      email: v.pipe(v.string(), v.nonEmpty('Email is required')),
+    }),
+    initialInput: { email: '' },
+  });
+  readonly emailField = injectField(this.form, {
+    path: ['email'],
+  });
+  readonly handleSubmit = vi.fn();
+  snapshotAtFocus:
+    | { ariaInvalid: string | null; errorText: string | null }
+    | undefined = undefined;
+
+  onInputFocus(event: FocusEvent): void {
+    const input = event.target as HTMLInputElement;
+    this.snapshotAtFocus = {
+      ariaInvalid: input.getAttribute('aria-invalid'),
+      errorText: document.getElementById('email-error')?.textContent ?? null,
+    };
+  }
+}
+
+@Component({
   selector: 'formisch-form-swap-host',
   standalone: true,
   imports: [FormischForm],
@@ -119,6 +161,7 @@ describe('FormischForm', () => {
         AsyncSubmitHost,
         RejectSubmitHost,
         InvalidSubmitHost,
+        FocusOrderHost,
         SwapHost,
       ],
       providers: [provideZonelessChangeDetection()],
@@ -180,6 +223,33 @@ describe('FormischForm', () => {
     expect(fixture.componentInstance.handleSubmit).not.toHaveBeenCalled();
     expect(fixture.componentInstance.form.isSubmitted()).toBe(true);
     expect(fixture.componentInstance.form.isValid()).toBe(false);
+  });
+
+  it('renders field errors before focusing the first invalid field', async () => {
+    const fixture = TestBed.createComponent(FocusOrderHost);
+    document.body.appendChild(fixture.nativeElement as HTMLElement);
+    try {
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const form = (fixture.nativeElement as HTMLElement).querySelector(
+        'form'
+      )!;
+      const input = (fixture.nativeElement as HTMLElement).querySelector(
+        'input'
+      )!;
+      form.dispatchEvent(new SubmitEvent('submit', { cancelable: true }));
+      await fixture.whenStable();
+
+      expect(fixture.componentInstance.snapshotAtFocus).toStrictEqual({
+        ariaInvalid: 'true',
+        errorText: 'Email is required',
+      });
+      expect(document.activeElement).toBe(input);
+      expect(fixture.componentInstance.handleSubmit).not.toHaveBeenCalled();
+    } finally {
+      fixture.destroy();
+    }
   });
 
   it('keeps the form submitting while an async submit handler is pending', async () => {

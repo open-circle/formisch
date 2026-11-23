@@ -15,6 +15,9 @@ export {
   createSignal,
   flushUpdates,
   type Listener,
+  markListenerCommitted,
+  registerListener,
   setListener,
+  unregisterListener,
   untrack,
 } from './index.react.ts';

@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import * as v from 'valibot';
 import { describe, expect, test, vi } from 'vitest';
 import { useForm } from '../../hooks/index.ts';
+import { Field } from '../Field/index.ts';
 import { Form } from './Form.tsx';
 
 const schema = v.object({
@@ -88,6 +89,59 @@ describe('Form', () => {
       expect(valid).toHaveTextContent('false');
     });
 
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  test('should render field errors before focusing the first invalid field', async () => {
+    const onSubmit = vi.fn();
+    let snapshotAtFocus:
+      | { ariaInvalid: string | null; errorText: string | null }
+      | undefined;
+
+    function Test(): ReactElement {
+      const form = useForm({ schema, initialInput: { email: '' } });
+      return (
+        <Form of={form} onSubmit={onSubmit} aria-label="Test">
+          <Field of={form} path={['email']}>
+            {(field) => (
+              <>
+                <input
+                  {...field.props}
+                  value={field.input ?? ''}
+                  aria-invalid={Boolean(field.errors)}
+                  aria-errormessage="email-error"
+                  onFocus={(event) => {
+                    field.props.onFocus();
+                    snapshotAtFocus = {
+                      ariaInvalid: event.target.getAttribute('aria-invalid'),
+                      errorText:
+                        document.getElementById('email-error')?.textContent ??
+                        null,
+                    };
+                  }}
+                />
+                {field.errors && <div id="email-error">{field.errors[0]}</div>}
+                <button type="submit">Submit</button>
+              </>
+            )}
+          </Field>
+        </Form>
+      );
+    }
+
+    render(<Test />);
+
+    fireEvent.submit(screen.getByRole('form', { name: 'Test' }));
+
+    await waitFor(() => {
+      expect(snapshotAtFocus).toBeDefined();
+    });
+
+    expect(snapshotAtFocus).toStrictEqual({
+      ariaInvalid: 'true',
+      errorText: 'Email is required',
+    });
+    expect(document.activeElement).toBe(screen.getByRole('textbox'));
     expect(onSubmit).not.toHaveBeenCalled();
   });
 });

@@ -155,11 +155,14 @@ export async function validateFormInput(
       // Guard against a newer validation, input change or reset that occurred
       // while waiting for pending DOM updates to flush
       if (internalFormStore.validationId === validationId) {
-        // Focus the first erroring field whose element can actually receive
-        // focus, so the focus is not consumed by a field without a focusable
-        // element (e.g. unmounted or hidden)
+        // Focus the first still-erroring field whose element can actually
+        // receive focus, so focus is not consumed by a field whose errors were
+        // cleared (e.g. via `setErrors`) or whose element cannot be focused
         for (const internalFieldStore of errorFields) {
-          if (focusFieldElement(internalFieldStore)) {
+          if (
+            untrack(() => internalFieldStore.errors.value) &&
+            focusFieldElement(internalFieldStore)
+          ) {
             break;
           }
         }

@@ -467,6 +467,56 @@ describe('validateFormInput', () => {
         flushSpy.mockRestore();
       }
     });
+
+    test('should skip a field whose errors were cleared while awaiting flushUpdates', async () => {
+      const schema = v.object({ name: v.string(), email: v.string() });
+      const store = createTestStore(schema, {
+        initialInput: { name: '', email: '' },
+        issues: [
+          validationIssue('Name is required', [objectPath('name')]),
+          validationIssue('Email is required', [objectPath('email')]),
+        ],
+      });
+
+      const nameInput = document.createElement('input');
+      const emailInput = document.createElement('input');
+      document.body.appendChild(nameInput);
+      document.body.appendChild(emailInput);
+      const mockFocusName = vi.spyOn(nameInput, 'focus');
+      store.children.name.elements = [nameInput];
+      store.children.email.elements = [emailInput];
+
+      let resolveFlush!: () => void;
+      const flushSpy = vi
+        .spyOn(frameworkMocks, 'flushUpdates')
+        .mockImplementationOnce(
+          () =>
+            new Promise<void>((resolve) => {
+              resolveFlush = resolve;
+            })
+        );
+
+      try {
+        const pendingValidation = validateFormInput(store, {
+          shouldFocus: true,
+        });
+
+        await vi.waitFor(() => {
+          expect(flushSpy).toHaveBeenCalledOnce();
+        });
+
+        // Clear the first candidate's error without incrementing validationId
+        // (matching `setErrors(form, { path: ['name'], errors: null })`)
+        store.children.name.errors.value = null;
+        resolveFlush();
+        await pendingValidation;
+
+        expect(mockFocusName).not.toHaveBeenCalled();
+        expect(document.activeElement).toBe(emailInput);
+      } finally {
+        flushSpy.mockRestore();
+      }
+    });
   });
 
   describe('validation state management', () => {

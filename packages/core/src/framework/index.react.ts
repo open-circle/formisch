@@ -46,6 +46,91 @@ export function setListener(newListener: Listener | undefined): void {
 let batchSubscribers: Set<Listener> | undefined;
 
 /**
+ * Mounted component listeners registered by `useSignals`.
+ */
+const registeredListeners = new Set<Listener>();
+
+/**
+ * Registered listeners whose queued re-render has not yet committed.
+ */
+const pendingListeners = new Set<Listener>();
+
+/**
+ * Pending `flushUpdates` resolvers waiting for active commits to finish.
+ */
+let flushResolvers: (() => void)[] | undefined;
+
+/**
+ * Resolves all pending `flushUpdates` waiters once no component commits remain.
+ */
+function resolveFlushWaiters(): void {
+  if (pendingListeners.size === 0 && flushResolvers) {
+    const resolvers = flushResolvers;
+    flushResolvers = undefined;
+    for (const resolve of resolvers) {
+      resolve();
+    }
+  }
+}
+
+/**
+ * Notifies a single subscriber and tracks its commit if it is a mounted
+ * component listener.
+ *
+ * @param subscriber The listener to notify.
+ */
+function notifyListener(subscriber: Listener): void {
+  const isRegistered = registeredListeners.has(subscriber);
+  if (isRegistered) {
+    pendingListeners.add(subscriber);
+  }
+  try {
+    subscriber[0]();
+  } catch (error) {
+    if (isRegistered) {
+      pendingListeners.delete(subscriber);
+      resolveFlushWaiters();
+    }
+    throw error;
+  }
+}
+
+/**
+ * Registers a mounted component listener so `flushUpdates` waits for its
+ * committed render after signal notifications.
+ *
+ * @param targetListener The component listener to register.
+ */
+export function registerListener(targetListener: Listener): void {
+  registeredListeners.add(targetListener);
+}
+
+/**
+ * Marks a component listener's queued render as committed and resolves pending
+ * `flushUpdates` waiters once all pending listeners have committed.
+ *
+ * @param targetListener The committed component listener.
+ */
+export function markListenerCommitted(targetListener: Listener): void {
+  if (pendingListeners.delete(targetListener)) {
+    resolveFlushWaiters();
+  }
+}
+
+/**
+ * Unregisters an unmounted component listener so it can never block
+ * `flushUpdates`.
+ *
+ * @param targetListener The component listener to unregister.
+ */
+export function unregisterListener(targetListener: Listener): void {
+  registeredListeners.delete(targetListener);
+  if (pendingListeners.delete(targetListener)) {
+    resolveFlushWaiters();
+  }
+}
+
+/**
  * Creates a reactive signal without an initial value.
  *
  * @returns The created signal.
@@ -86,7 +171,7 @@ export function createSignal(value?: unknown): Signal<unknown> {
         }
         subscribers.clear();
         for (const subscriber of localSubscribers) {
-          subscriber[0]();
+          notifyListener(subscriber);
         }
       }
     },
@@ -116,7 +201,7 @@ export function batch<T>(fn: () => T): T {
       const subscribers = batchSubscribers;
       batchSubscribers = undefined;
       for (const subscriber of subscribers) {
-        subscriber[0]();
+        notifyListener(subscriber);
       }
     }
   }
@@ -140,10 +225,19 @@ export function untrack<T>(fn: () => T): T {
 }
 
 /**
- * Waits for pending DOM updates to flush after reactive state writes.
+ * Waits for pending component commits scheduled by signal updates to finish.
  *
- * @returns A promise that resolves on the next microtask.
+ * @returns A promise that resolves once all notified `useSignals` components
+ *   have committed, or undefined if no component updates are pending.
  */
-export function flushUpdates(): Promise<void> {
-  return Promise.resolve();
+export function flushUpdates(): Promise<void> | void {
+  if (pendingListeners.size === 0) {
+    return;
+  }
+  return new Promise<void>((resolve) => {
+    if (!flushResolvers) {
+      flushResolvers = [];
+    }
+    flushResolvers.push(resolve);
+  });
 }

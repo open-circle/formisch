@@ -24,8 +24,18 @@ export function createId(): string {
 /**
  * Waits for pending DOM updates to flush after reactive state writes.
  *
- * @returns A promise that resolves after Preact's microtask render flush.
+ * Hint: Preact flushes component re-renders on the first microtask, while
+ * `@preact/signals` schedules direct signal-bound DOM attribute and text
+ * updates through two nested `queueMicrotask` calls. Waiting two microtasks
+ * ensures both component markup and signal-bound attributes have updated.
+ *
+ * @returns A promise that resolves once Preact and `@preact/signals` finish
+ *   flushing pending DOM updates.
  */
 export function flushUpdates(): Promise<void> {
-  return Promise.resolve();
+  return new Promise<void>((resolve) => {
+    queueMicrotask(() => {
+      queueMicrotask(resolve);
+    });
+  });
 }
