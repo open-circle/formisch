@@ -147,7 +147,14 @@ export async function validateFormInput(
     // Focus the first erroring field after pending DOM updates flush so ARIA
     // error attributes and error elements are rendered before focus moves
     if (errorFields && errorFields.length > 0) {
-      const flushPromise = flushUpdates();
+      const elements: unknown[] = [];
+      if (internalFormStore.element) {
+        elements.push(internalFormStore.element);
+      }
+      for (const internalFieldStore of errorFields) {
+        elements.push(...internalFieldStore.elements);
+      }
+      const flushPromise = flushUpdates(elements);
       if (flushPromise) {
         await flushPromise;
       }

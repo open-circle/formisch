@@ -3,8 +3,8 @@ import {
   assertInInjectionContext,
   computed,
   DestroyRef,
+  EnvironmentInjector,
   inject,
-  Injector,
 } from '@angular/core';
 import {
   createFormStore,
@@ -36,7 +36,7 @@ export function injectForm<TSchema extends FormSchema>(
 export function injectForm(config: FormConfig): FormStore {
   assertInInjectionContext(injectForm);
 
-  const injector = inject(Injector);
+  const injector = inject(EnvironmentInjector);
   const destroyRef = inject(DestroyRef);
   destroyRef.onDestroy(registerInjector(injector));
 

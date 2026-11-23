@@ -1,5 +1,7 @@
 import {
+  ChangeDetectorRef,
   Component,
+  inject,
   provideZonelessChangeDetection,
   signal,
   type WritableSignal,
@@ -138,6 +140,43 @@ class FocusOrderHost {
 }
 
 @Component({
+  selector: 'formisch-form-detached-host',
+  standalone: true,
+  imports: [FormischForm],
+  template: `<form
+    [formischForm]="form"
+    [formischSubmit]="handleSubmit"
+  ></form>`,
+})
+class DetachedFormHost {
+  readonly cdr = inject(ChangeDetectorRef);
+  readonly form = injectForm({ schema: Schema });
+  readonly handleSubmit: SubmitEventHandler<typeof Schema> = vi.fn();
+}
+
+@Component({
+  selector: 'formisch-form-no-errors-template-host',
+  standalone: true,
+  imports: [FormischForm, FormischControl],
+  template: `<form [formischForm]="form" [formischSubmit]="handleSubmit">
+    <input [formischControl]="emailField" />
+    <button type="submit">Submit</button>
+  </form>`,
+})
+class NoErrorsTemplateHost {
+  readonly form = injectForm({
+    schema: v.object({
+      email: v.pipe(v.string(), v.nonEmpty('Email is required')),
+    }),
+    initialInput: { email: '' },
+  });
+  readonly emailField = injectField(this.form, {
+    path: ['email'],
+  });
+  readonly handleSubmit = vi.fn();
+}
+
+@Component({
   selector: 'formisch-form-swap-host',
   standalone: true,
   imports: [FormischForm],
@@ -162,6 +201,8 @@ describe('FormischForm', () => {
         RejectSubmitHost,
         InvalidSubmitHost,
         FocusOrderHost,
+        DetachedFormHost,
+        NoErrorsTemplateHost,
         SwapHost,
       ],
       providers: [provideZonelessChangeDetection()],
@@ -245,6 +286,61 @@ describe('FormischForm', () => {
         ariaInvalid: 'true',
         errorText: 'Email is required',
       });
+      expect(document.activeElement).toBe(input);
+      expect(fixture.componentInstance.handleSubmit).not.toHaveBeenCalled();
+    } finally {
+      fixture.destroy();
+    }
+  });
+
+  it('does not hang when another form sits in a detached retained view', async () => {
+    const detachedFixture = TestBed.createComponent(DetachedFormHost);
+    const fixture = TestBed.createComponent(FocusOrderHost);
+    document.body.appendChild(fixture.nativeElement as HTMLElement);
+    try {
+      detachedFixture.detectChanges();
+      detachedFixture.componentInstance.cdr.detach();
+
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const form = (fixture.nativeElement as HTMLElement).querySelector(
+        'form'
+      )!;
+      const input = (fixture.nativeElement as HTMLElement).querySelector(
+        'input'
+      )!;
+      form.dispatchEvent(new SubmitEvent('submit', { cancelable: true }));
+      await fixture.whenStable();
+
+      expect(fixture.componentInstance.snapshotAtFocus).toStrictEqual({
+        ariaInvalid: 'true',
+        errorText: 'Email is required',
+      });
+      expect(document.activeElement).toBe(input);
+      expect(fixture.componentInstance.handleSubmit).not.toHaveBeenCalled();
+    } finally {
+      fixture.destroy();
+      detachedFixture.destroy();
+    }
+  });
+
+  it('focuses the first invalid field without hanging when no template reads errors', async () => {
+    const fixture = TestBed.createComponent(NoErrorsTemplateHost);
+    document.body.appendChild(fixture.nativeElement as HTMLElement);
+    try {
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const form = (fixture.nativeElement as HTMLElement).querySelector(
+        'form'
+      )!;
+      const input = (fixture.nativeElement as HTMLElement).querySelector(
+        'input'
+      )!;
+      form.dispatchEvent(new SubmitEvent('submit', { cancelable: true }));
+      await fixture.whenStable();
+
       expect(document.activeElement).toBe(input);
       expect(fixture.componentInstance.handleSubmit).not.toHaveBeenCalled();
     } finally {

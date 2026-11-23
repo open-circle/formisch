@@ -56,19 +56,46 @@ const registeredListeners = new Set<Listener>();
 const pendingListeners = new Set<Listener>();
 
 /**
- * Pending `flushUpdates` resolvers waiting for active commits to finish.
+ * Active `flushUpdates` waiter scoped to a specific set of pending listeners.
  */
-let flushResolvers: (() => void)[] | undefined;
+interface FlushWaiter {
+  pending: Set<Listener>;
+  resolve: () => void;
+}
 
 /**
- * Resolves all pending `flushUpdates` waiters once no component commits remain.
+ * Active `flushUpdates` waiters waiting for their scoped listeners to settle.
  */
-function resolveFlushWaiters(): void {
-  if (pendingListeners.size === 0 && flushResolvers) {
-    const resolvers = flushResolvers;
-    flushResolvers = undefined;
-    for (const resolve of resolvers) {
-      resolve();
+const flushWaiters = new Set<FlushWaiter>();
+
+/**
+ * Nesting depth of active subscriber notification cycles.
+ */
+let notificationDepth = 0;
+
+/**
+ * Registered listeners notified during the active top-level notification cycle.
+ */
+let cycleNotified: Set<Listener> | undefined;
+
+/**
+ * Registered listeners notified by the most recent completed notification
+ * cycle, consumed by `flushUpdates`.
+ */
+let lastNotifiedListeners: Set<Listener> | undefined;
+
+/**
+ * Marks a listener as settled (committed, unregistered, or threw during
+ * notification) and resolves any waiters whose pending set becomes empty.
+ *
+ * @param targetListener The listener that settled.
+ */
+function settleListener(targetListener: Listener): void {
+  pendingListeners.delete(targetListener);
+  for (const waiter of flushWaiters) {
+    if (waiter.pending.delete(targetListener) && waiter.pending.size === 0) {
+      flushWaiters.delete(waiter);
+      waiter.resolve();
     }
   }
 }
@@ -83,15 +110,40 @@ function notifyListener(subscriber: Listener): void {
   const isRegistered = registeredListeners.has(subscriber);
   if (isRegistered) {
     pendingListeners.add(subscriber);
+    cycleNotified?.add(subscriber);
   }
   try {
     subscriber[0]();
   } catch (error) {
     if (isRegistered) {
-      pendingListeners.delete(subscriber);
-      resolveFlushWaiters();
+      settleListener(subscriber);
     }
     throw error;
+  }
+}
+
+/**
+ * Runs a subscriber notification cycle and records the registered listeners
+ * notified by the top-level cycle for `flushUpdates`.
+ *
+ * @param subscribers The subscribers to notify.
+ */
+function notifySubscribers(subscribers: Iterable<Listener>): void {
+  const isTopLevel = notificationDepth === 0;
+  if (isTopLevel) {
+    cycleNotified = new Set();
+  }
+  notificationDepth++;
+  try {
+    for (const subscriber of subscribers) {
+      notifyListener(subscriber);
+    }
+  } finally {
+    notificationDepth--;
+    if (isTopLevel) {
+      lastNotifiedListeners = cycleNotified;
+      cycleNotified = undefined;
+    }
   }
 }
 
@@ -106,15 +158,13 @@ export function registerListener(targetListener: Listener): void {
 }
 
 /**
- * Marks a component listener's queued render as committed and resolves pending
- * `flushUpdates` waiters once all pending listeners have committed.
+ * Marks a component listener's queued render as committed and resolves any
+ * scoped `flushUpdates` waiters whose pending listeners have all committed.
  *
  * @param targetListener The committed component listener.
  */
 export function markListenerCommitted(targetListener: Listener): void {
-  if (pendingListeners.delete(targetListener)) {
-    resolveFlushWaiters();
-  }
+  settleListener(targetListener);
 }
 
 /**
@@ -125,9 +175,7 @@ export function markListenerCommitted(targetListener: Listener): void {
  */
 export function unregisterListener(targetListener: Listener): void {
   registeredListeners.delete(targetListener);
-  if (pendingListeners.delete(targetListener)) {
-    resolveFlushWaiters();
-  }
+  settleListener(targetListener);
 }
 
 /**
@@ -170,8 +218,8 @@ export function createSignal(value?: unknown): Signal<unknown> {
           subscriber[1].delete(subscribers);
         }
         subscribers.clear();
-        for (const subscriber of localSubscribers) {
-          notifyListener(subscriber);
+        if (!batchSubscribers) {
+          notifySubscribers(localSubscribers);
         }
       }
     },
@@ -200,9 +248,7 @@ export function batch<T>(fn: () => T): T {
     if (batchDepth === 0) {
       const subscribers = batchSubscribers;
       batchSubscribers = undefined;
-      for (const subscriber of subscribers) {
-        notifyListener(subscriber);
-      }
+      notifySubscribers(subscribers);
     }
   }
 }
@@ -225,19 +271,29 @@ export function untrack<T>(fn: () => T): T {
 }
 
 /**
- * Waits for pending component commits scheduled by signal updates to finish.
+ * Waits for pending component commits scheduled by the latest signal
+ * notification cycle to finish.
  *
- * @returns A promise that resolves once all notified `useSignals` components
- *   have committed, or undefined if no component updates are pending.
+ * @returns A promise that resolves once all `useSignals` components notified
+ *   by the latest cycle have committed or unregistered, or undefined if none
+ *   are pending.
  */
 export function flushUpdates(): Promise<void> | void {
-  if (pendingListeners.size === 0) {
+  const candidates = lastNotifiedListeners;
+  lastNotifiedListeners = undefined;
+  if (!candidates || candidates.size === 0) {
+    return;
+  }
+  const pending = new Set<Listener>();
+  for (const candidate of candidates) {
+    if (pendingListeners.has(candidate)) {
+      pending.add(candidate);
+    }
+  }
+  if (pending.size === 0) {
     return;
   }
   return new Promise<void>((resolve) => {
-    if (!flushResolvers) {
-      flushResolvers = [];
-    }
-    flushResolvers.push(resolve);
+    flushWaiters.add({ pending, resolve });
   });
 }

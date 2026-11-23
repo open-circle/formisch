@@ -1,4 +1,10 @@
-import { afterNextRender, type Injector, signal } from '@angular/core';
+import {
+  afterNextRender,
+  type AfterRenderRef,
+  type EnvironmentInjector,
+  signal,
+  untracked,
+} from '@angular/core';
 import type { Signal } from '../types/signal/index.ts';
 import type { Framework } from './index.ts';
 
@@ -20,6 +26,17 @@ export function createId(): string {
 }
 
 /**
+ * Nesting depth of active `batch` calls.
+ */
+let batchDepth = 0;
+
+/**
+ * Whether a signal value actually changed since the latest batch started or
+ * since the previous `flushUpdates` call.
+ */
+let hasPendingSignalWrite = false;
+
+/**
  * Creates a reactive signal with an initial value.
  *
  * @param initialValue The initial value.
@@ -34,43 +51,56 @@ export function createSignal<T>(initialValue: T): Signal<T> {
       return writableSignal();
     },
     set value(nextValue: T) {
-      writableSignal.set(nextValue);
+      if (!Object.is(untracked(writableSignal), nextValue)) {
+        hasPendingSignalWrite = true;
+        writableSignal.set(nextValue);
+      }
     },
   };
 }
 
 /**
- * Batches multiple signal updates into a single update cycle. This is a
- * no-op in Angular as batching is handled automatically.
+ * Batches multiple signal updates into a single update cycle and tracks
+ * whether any signal value changed during the cycle.
  *
  * @param fn The function to execute.
  *
  * @returns The return value of the function.
  */
 export function batch<T>(fn: () => T): T {
-  return fn();
+  if (batchDepth === 0) {
+    hasPendingSignalWrite = false;
+  }
+  batchDepth++;
+  try {
+    return fn();
+  } finally {
+    batchDepth--;
+  }
 }
 
 /**
- * Active Angular injectors registered by `injectForm` with reference counts.
+ * Active Angular environment injectors registered by `injectForm` with
+ * reference counts.
  */
-const injectors = new Map<Injector, number>();
+const injectors = new Map<EnvironmentInjector, number>();
 
 /**
- * Pending `flushUpdates` resolvers tracked per injector so destroying a
- * component never leaves a waiter unresolved.
+ * Pending `flushUpdates` resolvers tracked per environment injector so
+ * destroying an injector never leaves a waiter unresolved.
  */
-const pendingResolvers = new Map<Injector, Set<() => void>>();
+const pendingResolvers = new Map<EnvironmentInjector, Set<() => void>>();
 
 /**
- * Registers an Angular injector so `flushUpdates` can synchronize with
- * Angular's next DOM render pass via `afterNextRender`.
+ * Registers an Angular environment injector so `flushUpdates` can synchronize
+ * with Angular's next application-level DOM render pass via `afterNextRender`
+ * without binding to any individual component's potentially detached view.
  *
- * @param injector The Angular injector to register.
+ * @param injector The Angular environment injector to register.
  *
  * @returns A cleanup function to unregister the injector on destroy.
  */
-export function registerInjector(injector: Injector): () => void {
+export function registerInjector(injector: EnvironmentInjector): () => void {
   let unregistered = false;
   injectors.set(injector, (injectors.get(injector) ?? 0) + 1);
   return () => {
@@ -95,20 +125,44 @@ export function registerInjector(injector: Injector): () => void {
 }
 
 /**
- * Waits for the next render pass on a specific Angular injector.
+ * Waits for the next application render pass on a specific Angular environment
+ * injector, with a macrotask fallback if no render pass is scheduled.
  *
- * @param injector The Angular injector to synchronize with.
+ * Hint: Angular's Zoneless scheduler schedules ticks via
+ * `scheduleCallbackWithRafRace` (`setTimeout(tick, 0)` / `rAF`) or
+ * `queueMicrotask` before this helper schedules its fallback `setTimeout(...,
+ * 0)`, so active Zoneless renders run `afterNextRender` before the fallback
+ * fires while unscheduled/manual change-detection environments resolve cleanly
+ * without hanging.
  *
- * @returns A promise that resolves after the injector finishes rendering.
+ * @param injector The Angular environment injector to synchronize with.
+ *
+ * @returns A promise that resolves after the injector finishes rendering or
+ *   when no render pass is scheduled.
  */
-function waitForInjector(injector: Injector): Promise<void> {
+function waitForInjector(injector: EnvironmentInjector): Promise<void> {
   return new Promise<void>((resolve) => {
     let resolvers = pendingResolvers.get(injector);
     if (!resolvers) {
       resolvers = new Set();
       pendingResolvers.set(injector, resolvers);
     }
-    const done = (): void => {
+    let settled = false;
+    let renderRef: AfterRenderRef | undefined;
+    let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
+    const done = (destroyRef = true): void => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      if (fallbackTimer !== undefined) {
+        clearTimeout(fallbackTimer);
+        fallbackTimer = undefined;
+      }
+      if (destroyRef) {
+        renderRef?.destroy();
+      }
+      renderRef = undefined;
       resolvers.delete(done);
       if (resolvers.size === 0) {
         pendingResolvers.delete(injector);
@@ -117,24 +171,29 @@ function waitForInjector(injector: Injector): Promise<void> {
     };
     resolvers.add(done);
     try {
-      afterNextRender(done, { injector });
+      renderRef = afterNextRender(() => done(false), { injector });
+      if (!settled) {
+        fallbackTimer = setTimeout(() => done(true), 0);
+      }
     } catch {
-      done();
+      done(true);
     }
   });
 }
 
 /**
  * Waits for Angular to finish rendering pending template updates via
- * `afterNextRender` on registered injectors. Returns immediately when no
- * browser document or active injector is registered (e.g. SSR or standalone
- * unit tests).
+ * `afterNextRender` on registered environment injectors. Returns immediately
+ * when no signal write occurred, no browser document is available, or no
+ * active injector is registered (e.g. SSR or standalone unit tests).
  *
  * @returns A promise that resolves once Angular finishes rendering, or
- *   undefined when no active injector is registered.
+ *   undefined when no flush is needed.
  */
 export function flushUpdates(): Promise<void> | void {
-  if (typeof document === 'undefined' || injectors.size === 0) {
+  const hasWrite = hasPendingSignalWrite;
+  hasPendingSignalWrite = false;
+  if (!hasWrite || typeof document === 'undefined' || injectors.size === 0) {
     return;
   }
   const activeInjectors = [...injectors.keys()];

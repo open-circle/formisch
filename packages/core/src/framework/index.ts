@@ -78,9 +78,14 @@ export function untrack<T>(fn: () => T): T {
 /**
  * Waits for pending DOM updates to flush after reactive state writes.
  *
+ * @param elements Optional elements associated with the update so framework
+ *   adapters can scope the wait to relevant containers.
+ *
  * @returns A promise that resolves once pending updates are flushed, or
  *   undefined if updates flush synchronously.
  */
-export function flushUpdates(): Promise<void> | void {
+export function flushUpdates(
+  elements?: readonly unknown[]
+): Promise<void> | void {
   throw new Error('No framework selected');
 }
