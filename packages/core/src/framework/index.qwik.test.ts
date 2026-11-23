@@ -18,7 +18,7 @@ describe('index.qwik flushUpdates', () => {
   });
 
   test('should wait for active Qwik container render promises including follow-up renders', async () => {
-    const container = document.createElement('div') as QwikContainerElement;
+    const container: QwikContainerElement = document.createElement('div');
     container.setAttribute('q:container', 'resumed');
     document.body.appendChild(container);
 
@@ -64,7 +64,7 @@ describe('index.qwik flushUpdates', () => {
   });
 
   test('should scope waiting to containers holding the provided elements', async () => {
-    const formContainer = document.createElement('div') as QwikContainerElement;
+    const formContainer: QwikContainerElement = document.createElement('div');
     formContainer.setAttribute('q:container', 'resumed');
     const form = document.createElement('form');
     const input = document.createElement('input');
@@ -72,9 +72,8 @@ describe('index.qwik flushUpdates', () => {
     formContainer.appendChild(form);
     document.body.appendChild(formContainer);
 
-    const unrelatedContainer = document.createElement(
-      'div'
-    ) as QwikContainerElement;
+    const unrelatedContainer: QwikContainerElement =
+      document.createElement('div');
     unrelatedContainer.setAttribute('q:container', 'resumed');
     unrelatedContainer.qContainer = {
       $renderPromise$: new Promise<void>(() => {}),
@@ -107,7 +106,7 @@ describe('index.qwik flushUpdates', () => {
   });
 
   test('should resolve the enclosing Qwik container across nested shadow DOM boundaries', async () => {
-    const container = document.createElement('div') as QwikContainerElement;
+    const container: QwikContainerElement = document.createElement('div');
     container.setAttribute('q:container', 'resumed');
     const outerHost = document.createElement('div');
     const outerShadow = outerHost.attachShadow({ mode: 'open' });
