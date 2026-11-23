@@ -138,3 +138,12 @@ export function untrack<T>(fn: () => T): T {
     listener = prev;
   }
 }
+
+/**
+ * Waits for pending DOM updates to flush after reactive state writes.
+ *
+ * @returns A promise that resolves on the next microtask.
+ */
+export function flushUpdates(): Promise<void> {
+  return Promise.resolve();
+}

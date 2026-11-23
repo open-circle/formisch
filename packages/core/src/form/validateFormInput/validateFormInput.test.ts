@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   arrayPath,
   createTestStore,
+  frameworkMocks,
   objectPath,
   schemaIssue,
   validationIssue,
@@ -376,6 +377,95 @@ describe('validateFormInput', () => {
       expect(mockFocusName).toHaveBeenCalledOnce();
       expect(mockFocusEmail).not.toHaveBeenCalled();
       expect(document.activeElement).toBe(nameInput);
+    });
+
+    test('should wait for flushUpdates before focusing the first error field', async () => {
+      const schema = v.object({ name: v.string() });
+      const store = createTestStore(schema, {
+        initialInput: { name: '' },
+        issues: [validationIssue('Name is required', [objectPath('name')])],
+      });
+
+      const inputElement = document.createElement('input');
+      document.body.appendChild(inputElement);
+      store.children.name.elements = [inputElement];
+
+      let resolveFlush!: () => void;
+      const flushSpy = vi
+        .spyOn(frameworkMocks, 'flushUpdates')
+        .mockImplementationOnce(
+          () =>
+            new Promise<void>((resolve) => {
+              resolveFlush = resolve;
+            })
+        );
+
+      try {
+        const pendingValidation = validateFormInput(store, {
+          shouldFocus: true,
+        });
+
+        await vi.waitFor(() => {
+          expect(flushSpy).toHaveBeenCalledOnce();
+        });
+
+        // Errors and validating state are updated before focus moves
+        expect(store.children.name.errors.value).toStrictEqual([
+          'Name is required',
+        ]);
+        expect(store.isValidating.value).toBe(false);
+        expect(document.activeElement).not.toBe(inputElement);
+
+        resolveFlush();
+        await pendingValidation;
+
+        expect(document.activeElement).toBe(inputElement);
+      } finally {
+        flushSpy.mockRestore();
+      }
+    });
+
+    test('should skip focusing if validation is invalidated while awaiting flushUpdates', async () => {
+      const schema = v.object({ name: v.string() });
+      const store = createTestStore(schema, {
+        initialInput: { name: '' },
+        issues: [validationIssue('Name is required', [objectPath('name')])],
+      });
+
+      const inputElement = document.createElement('input');
+      document.body.appendChild(inputElement);
+      const mockFocus = vi.spyOn(inputElement, 'focus');
+      store.children.name.elements = [inputElement];
+
+      let resolveFlush!: () => void;
+      const flushSpy = vi
+        .spyOn(frameworkMocks, 'flushUpdates')
+        .mockImplementationOnce(
+          () =>
+            new Promise<void>((resolve) => {
+              resolveFlush = resolve;
+            })
+        );
+
+      try {
+        const pendingValidation = validateFormInput(store, {
+          shouldFocus: true,
+        });
+
+        await vi.waitFor(() => {
+          expect(flushSpy).toHaveBeenCalledOnce();
+        });
+
+        // Invalidate the validation before pending DOM updates flush
+        store.validationId++;
+        resolveFlush();
+        await pendingValidation;
+
+        expect(mockFocus).not.toHaveBeenCalled();
+        expect(document.activeElement).not.toBe(inputElement);
+      } finally {
+        flushSpy.mockRestore();
+      }
     });
   });
 

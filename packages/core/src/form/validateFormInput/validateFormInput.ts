@@ -4,8 +4,12 @@ import {
   getFieldInput,
   walkFieldStore,
 } from '../../field/index.ts';
-import { batch, untrack } from '../../framework/index.ts';
-import type { InternalFormStore, Schema } from '../../types/index.ts';
+import { batch, flushUpdates, untrack } from '../../framework/index.ts';
+import type {
+  InternalFieldStore,
+  InternalFormStore,
+  Schema,
+} from '../../types/index.ts';
 
 /**
  * Validate form input config interface.
@@ -107,10 +111,13 @@ export async function validateFormInput(
       }
     }
 
-    // Create variable to decide if first error field should be focused
-    let shouldFocus = config?.shouldFocus ?? false;
+    // Collect erroring fields when focusing is requested so focus runs after
+    // reactive DOM updates have flushed
+    const errorFields: InternalFieldStore[] | undefined = config?.shouldFocus
+      ? []
+      : undefined;
 
-    // Batch error, focus and validation state updates together so reactive
+    // Batch error and validation state updates together so reactive
     // subscribers observe a single consistent update
     batch(() => {
       // Untracked to avoid subscribing a surrounding reactive scope to the
@@ -124,28 +131,40 @@ export async function validateFormInput(
             const fieldErrors = nestedErrors?.[internalFieldStore.name] ?? null;
             internalFieldStore.errors.value = fieldErrors;
 
-            // Focus the first erroring field whose element can actually receive
-            // focus, so the focus is not consumed by a field without a focusable
-            // element (e.g. unmounted or hidden)
-            if (
-              shouldFocus &&
-              fieldErrors &&
-              focusFieldElement(internalFieldStore)
-            ) {
-              shouldFocus = false;
+            if (errorFields && fieldErrors) {
+              errorFields.push(internalFieldStore);
             }
           }
         });
       });
 
       // Reset validation state of form
-      // Hint: The validation ID must be rechecked because focusing an erroring
-      // field can blur another field whose blur handler synchronously starts a
-      // new validation, which must keep its validating state.
       if (internalFormStore.validationId === validationId) {
         internalFormStore.isValidating.value = false;
       }
     });
+
+    // Focus the first erroring field after pending DOM updates flush so ARIA
+    // error attributes and error elements are rendered before focus moves
+    if (errorFields && errorFields.length > 0) {
+      const flushPromise = flushUpdates();
+      if (flushPromise) {
+        await flushPromise;
+      }
+
+      // Guard against a newer validation, input change or reset that occurred
+      // while waiting for pending DOM updates to flush
+      if (internalFormStore.validationId === validationId) {
+        // Focus the first erroring field whose element can actually receive
+        // focus, so the focus is not consumed by a field without a focusable
+        // element (e.g. unmounted or hidden)
+        for (const internalFieldStore of errorFields) {
+          if (focusFieldElement(internalFieldStore)) {
+            break;
+          }
+        }
+      }
+    }
 
     // Return validation result
     return result;

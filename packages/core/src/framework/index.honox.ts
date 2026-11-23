@@ -13,6 +13,7 @@ export {
   batch,
   createId,
   createSignal,
+  flushUpdates,
   type Listener,
   setListener,
   untrack,

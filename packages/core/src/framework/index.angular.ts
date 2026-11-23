@@ -50,3 +50,9 @@ export function createSignal<T>(initialValue: T): Signal<T> {
 export function batch<T>(fn: () => T): T {
   return fn();
 }
+
+/**
+ * Waits for pending DOM updates to flush after reactive state writes. This is
+ * a no-op in Angular as change detection is managed externally by the runtime.
+ */
+export function flushUpdates(): void {}

@@ -74,3 +74,13 @@ export function batch<T>(fn: () => T): T {
 export function untrack<T>(fn: () => T): T {
   throw new Error('No framework selected');
 }
+
+/**
+ * Waits for pending DOM updates to flush after reactive state writes.
+ *
+ * @returns A promise that resolves once pending updates are flushed, or
+ *   undefined if updates flush synchronously.
+ */
+export function flushUpdates(): Promise<void> | void {
+  throw new Error('No framework selected');
+}

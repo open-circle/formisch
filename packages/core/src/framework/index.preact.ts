@@ -20,3 +20,12 @@ export const framework: Framework = 'preact';
 export function createId(): string {
   return Math.random().toString(36).slice(2);
 }
+
+/**
+ * Waits for pending DOM updates to flush after reactive state writes.
+ *
+ * @returns A promise that resolves after Preact's microtask render flush.
+ */
+export function flushUpdates(): Promise<void> {
+  return Promise.resolve();
+}

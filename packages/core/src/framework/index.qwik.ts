@@ -28,3 +28,9 @@ export function createId(): string {
 export function batch<T>(fn: () => T): T {
   return fn();
 }
+
+/**
+ * Waits for pending DOM updates to flush after reactive state writes. This is
+ * a no-op in Qwik as rendering is scheduled asynchronously by the runtime.
+ */
+export function flushUpdates(): void {}
